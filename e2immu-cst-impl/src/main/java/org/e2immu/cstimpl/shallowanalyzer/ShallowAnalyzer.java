@@ -9,6 +9,10 @@ import org.e2immu.cstimpl.analysis.ValueImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/*
+Convert annotations in the Info objects of the CST to analysis properties.
+Mainly used for testing, when working without the language-inspection modules.
+ */
 public class ShallowAnalyzer {
     private static final Logger LOGGER = LoggerFactory.getLogger(ShallowAnalyzer.class);
 
