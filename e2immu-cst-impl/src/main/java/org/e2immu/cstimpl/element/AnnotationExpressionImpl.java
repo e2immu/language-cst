@@ -1,10 +1,10 @@
 package org.e2immu.cstimpl.element;
 
-import org.e2immu.cstapi.expression.AnnotationExpression;
-import org.e2immu.cstapi.expression.Expression;
-import org.e2immu.cstapi.info.TypeInfo;
-import org.e2immu.cstapi.output.OutputBuilder;
-import org.e2immu.cstapi.output.Qualification;
+import org.e2immu.language.cst.api.expression.AnnotationExpression;
+import org.e2immu.language.cst.api.expression.Expression;
+import org.e2immu.language.cst.api.info.TypeInfo;
+import org.e2immu.language.cst.api.output.OutputBuilder;
+import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.cstimpl.output.OutputBuilderImpl;
 import org.e2immu.cstimpl.output.SymbolEnum;
 import org.e2immu.cstimpl.output.TextImpl;

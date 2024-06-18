@@ -1,8 +1,8 @@
 package org.e2immu.cstimpl.expression;
 
-import org.e2immu.cstapi.expression.Expression;
-import org.e2immu.cstapi.runtime.Runtime;
-import org.e2immu.cstapi.type.ParameterizedType;
+import org.e2immu.language.cst.api.expression.Expression;
+import org.e2immu.language.cst.api.runtime.Runtime;
+import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.cstimpl.expression.util.ExtractComponentsOfTooComplex;
 
 import java.util.List;

@@ -1,13 +1,13 @@
 package org.e2immu.cstimpl.variable;
 
-import org.e2immu.cstapi.element.Element;
-import org.e2immu.cstapi.element.Visitor;
-import org.e2immu.cstapi.info.TypeInfo;
-import org.e2immu.cstapi.output.OutputBuilder;
-import org.e2immu.cstapi.output.Qualification;
-import org.e2immu.cstapi.variable.DescendMode;
-import org.e2immu.cstapi.variable.This;
-import org.e2immu.cstapi.variable.Variable;
+import org.e2immu.language.cst.api.element.Element;
+import org.e2immu.language.cst.api.element.Visitor;
+import org.e2immu.language.cst.api.info.TypeInfo;
+import org.e2immu.language.cst.api.output.OutputBuilder;
+import org.e2immu.language.cst.api.output.Qualification;
+import org.e2immu.language.cst.api.variable.DescendMode;
+import org.e2immu.language.cst.api.variable.This;
+import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.cstimpl.element.ElementImpl;
 import org.e2immu.cstimpl.output.OutputBuilderImpl;
 import org.e2immu.cstimpl.output.ThisNameImpl;

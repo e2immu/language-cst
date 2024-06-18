@@ -1,8 +1,8 @@
 package org.e2immu.cstimpl.expression.util;
 
 
-import org.e2immu.cstapi.expression.*;
-import org.e2immu.cstapi.variable.Variable;
+import org.e2immu.language.cst.api.expression.*;
+import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.cstimpl.expression.VariableExpressionImpl;
 import org.e2immu.cstimpl.variable.DescendModeEnum;
 

@@ -1,8 +1,8 @@
 package org.e2immu.cstimpl.output;
 
 
-import org.e2immu.cstapi.output.OutputBuilder;
-import org.e2immu.cstapi.output.OutputElement;
+import org.e2immu.language.cst.api.output.OutputBuilder;
+import org.e2immu.language.cst.api.output.OutputElement;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;

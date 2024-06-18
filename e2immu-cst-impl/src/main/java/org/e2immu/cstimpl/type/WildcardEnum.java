@@ -1,6 +1,6 @@
 package org.e2immu.cstimpl.type;
 
-import org.e2immu.cstapi.type.Wildcard;
+import org.e2immu.language.cst.api.type.Wildcard;
 
 public enum WildcardEnum implements Wildcard {
     EXTENDS, SUPER, UNBOUND,

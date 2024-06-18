@@ -1,7 +1,7 @@
 package org.e2immu.cstimpl.info;
 
-import org.e2immu.cstapi.output.element.Keyword;
-import org.e2immu.cstapi.type.TypeNature;
+import org.e2immu.language.cst.api.output.element.Keyword;
+import org.e2immu.language.cst.api.type.TypeNature;
 import org.e2immu.cstimpl.output.KeywordImpl;
 
 public enum TypeNatureEnum implements TypeNature {

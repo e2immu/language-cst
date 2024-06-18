@@ -1,12 +1,12 @@
 package org.e2immu.cstimpl.info;
 
-import org.e2immu.cstapi.info.FieldInfo;
-import org.e2immu.cstapi.info.MethodInfo;
-import org.e2immu.cstapi.info.TypeInfo;
-import org.e2immu.cstapi.info.TypeModifier;
-import org.e2immu.cstapi.type.ParameterizedType;
-import org.e2immu.cstapi.type.TypeNature;
-import org.e2immu.cstapi.type.TypeParameter;
+import org.e2immu.language.cst.api.info.FieldInfo;
+import org.e2immu.language.cst.api.info.MethodInfo;
+import org.e2immu.language.cst.api.info.TypeInfo;
+import org.e2immu.language.cst.api.info.TypeModifier;
+import org.e2immu.language.cst.api.type.ParameterizedType;
+import org.e2immu.language.cst.api.type.TypeNature;
+import org.e2immu.language.cst.api.type.TypeParameter;
 
 import java.util.List;
 import java.util.Set;

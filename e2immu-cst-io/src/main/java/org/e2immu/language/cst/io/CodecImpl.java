@@ -1,13 +1,13 @@
 package org.e2immu.language.cst.io;
 
-import org.e2immu.cstapi.analysis.Codec;
-import org.e2immu.cstapi.analysis.Property;
-import org.e2immu.cstapi.analysis.PropertyValueMap;
-import org.e2immu.cstapi.analysis.Value;
-import org.e2immu.cstapi.element.Element;
-import org.e2immu.cstapi.expression.Expression;
-import org.e2immu.cstapi.info.*;
-import org.e2immu.cstapi.variable.*;
+import org.e2immu.language.cst.api.analysis.Codec;
+import org.e2immu.language.cst.api.analysis.Property;
+import org.e2immu.language.cst.api.analysis.PropertyValueMap;
+import org.e2immu.language.cst.api.analysis.Value;
+import org.e2immu.language.cst.api.element.Element;
+import org.e2immu.language.cst.api.expression.Expression;
+import org.e2immu.language.cst.api.info.*;
+import org.e2immu.language.cst.api.variable.*;
 import org.parsers.json.Node;
 import org.parsers.json.ast.*;
 

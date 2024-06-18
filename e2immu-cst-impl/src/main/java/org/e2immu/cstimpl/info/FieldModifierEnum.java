@@ -15,8 +15,8 @@
 package org.e2immu.cstimpl.info;
 
 
-import org.e2immu.cstapi.info.FieldModifier;
-import org.e2immu.cstapi.output.element.Keyword;
+import org.e2immu.language.cst.api.info.FieldModifier;
+import org.e2immu.language.cst.api.output.element.Keyword;
 import org.e2immu.cstimpl.output.KeywordImpl;
 
 public enum FieldModifierEnum implements FieldModifier {

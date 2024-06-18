@@ -1,13 +1,13 @@
 package org.e2immu.cstimpl.expression;
 
-import org.e2immu.cstapi.element.Element;
-import org.e2immu.cstapi.element.Visitor;
-import org.e2immu.cstapi.expression.ConstantExpression;
-import org.e2immu.cstapi.expression.Expression;
-import org.e2immu.cstapi.expression.Precedence;
-import org.e2immu.cstapi.translate.TranslationMap;
-import org.e2immu.cstapi.variable.DescendMode;
-import org.e2immu.cstapi.variable.Variable;
+import org.e2immu.language.cst.api.element.Element;
+import org.e2immu.language.cst.api.element.Visitor;
+import org.e2immu.language.cst.api.expression.ConstantExpression;
+import org.e2immu.language.cst.api.expression.Expression;
+import org.e2immu.language.cst.api.expression.Precedence;
+import org.e2immu.language.cst.api.translate.TranslationMap;
+import org.e2immu.language.cst.api.variable.DescendMode;
+import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.cstimpl.expression.util.PrecedenceEnum;
 
 import java.util.function.Predicate;

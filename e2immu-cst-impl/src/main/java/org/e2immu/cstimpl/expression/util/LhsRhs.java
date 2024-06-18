@@ -15,10 +15,10 @@
 package org.e2immu.cstimpl.expression.util;
 
 
-import org.e2immu.cstapi.expression.And;
-import org.e2immu.cstapi.expression.Equals;
-import org.e2immu.cstapi.expression.Expression;
-import org.e2immu.cstapi.expression.MethodCall;
+import org.e2immu.language.cst.api.expression.And;
+import org.e2immu.language.cst.api.expression.Equals;
+import org.e2immu.language.cst.api.expression.Expression;
+import org.e2immu.language.cst.api.expression.MethodCall;
 
 import java.util.List;
 

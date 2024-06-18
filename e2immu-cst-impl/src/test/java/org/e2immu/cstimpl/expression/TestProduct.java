@@ -1,7 +1,7 @@
 package org.e2immu.cstimpl.expression;
 
-import org.e2immu.cstapi.expression.Expression;
-import org.e2immu.cstapi.expression.VariableExpression;
+import org.e2immu.language.cst.api.expression.Expression;
+import org.e2immu.language.cst.api.expression.VariableExpression;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

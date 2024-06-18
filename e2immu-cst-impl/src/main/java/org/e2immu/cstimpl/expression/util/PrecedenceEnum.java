@@ -1,6 +1,6 @@
 package org.e2immu.cstimpl.expression.util;
 
-import org.e2immu.cstapi.expression.Precedence;
+import org.e2immu.language.cst.api.expression.Precedence;
 
 public enum PrecedenceEnum implements Precedence {
 

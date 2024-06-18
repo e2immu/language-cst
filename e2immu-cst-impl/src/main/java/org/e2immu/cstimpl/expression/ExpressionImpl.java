@@ -1,12 +1,12 @@
 package org.e2immu.cstimpl.expression;
 
 import org.e2immu.annotation.NotNull;
-import org.e2immu.cstapi.element.Comment;
-import org.e2immu.cstapi.element.Source;
-import org.e2immu.cstapi.expression.Expression;
-import org.e2immu.cstapi.expression.Precedence;
-import org.e2immu.cstapi.output.OutputBuilder;
-import org.e2immu.cstapi.output.Qualification;
+import org.e2immu.language.cst.api.element.Comment;
+import org.e2immu.language.cst.api.element.Source;
+import org.e2immu.language.cst.api.expression.Expression;
+import org.e2immu.language.cst.api.expression.Precedence;
+import org.e2immu.language.cst.api.output.OutputBuilder;
+import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.cstimpl.element.ElementImpl;
 import org.e2immu.cstimpl.expression.util.ExpressionComparator;
 import org.e2immu.cstimpl.output.OutputBuilderImpl;

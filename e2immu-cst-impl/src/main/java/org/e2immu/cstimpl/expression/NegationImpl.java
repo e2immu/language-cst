@@ -1,10 +1,10 @@
 package org.e2immu.cstimpl.expression;
 
-import org.e2immu.cstapi.expression.Expression;
-import org.e2immu.cstapi.expression.Negation;
-import org.e2immu.cstapi.expression.Precedence;
-import org.e2immu.cstapi.info.MethodInfo;
-import org.e2immu.cstapi.translate.TranslationMap;
+import org.e2immu.language.cst.api.expression.Expression;
+import org.e2immu.language.cst.api.expression.Negation;
+import org.e2immu.language.cst.api.expression.Precedence;
+import org.e2immu.language.cst.api.info.MethodInfo;
+import org.e2immu.language.cst.api.translate.TranslationMap;
 
 public class NegationImpl extends UnaryOperatorImpl implements Negation {
 

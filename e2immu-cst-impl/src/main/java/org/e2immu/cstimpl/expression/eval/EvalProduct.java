@@ -1,9 +1,9 @@
 package org.e2immu.cstimpl.expression.eval;
 
-import org.e2immu.cstapi.expression.Expression;
-import org.e2immu.cstapi.expression.Product;
-import org.e2immu.cstapi.expression.Sum;
-import org.e2immu.cstapi.runtime.Runtime;
+import org.e2immu.language.cst.api.expression.Expression;
+import org.e2immu.language.cst.api.expression.Product;
+import org.e2immu.language.cst.api.expression.Sum;
+import org.e2immu.language.cst.api.runtime.Runtime;
 import org.e2immu.cstimpl.expression.ProductImpl;
 
 import java.util.stream.Stream;

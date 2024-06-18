@@ -1,16 +1,14 @@
 package org.e2immu.cstimpl.runtime;
 
-import org.e2immu.cstapi.element.*;
-import org.e2immu.cstapi.expression.*;
-import org.e2immu.cstapi.info.*;
-import org.e2immu.cstapi.output.OutputBuilder;
-import org.e2immu.cstapi.output.OutputElement;
-import org.e2immu.cstapi.output.Qualification;
-import org.e2immu.cstapi.runtime.Factory;
-import org.e2immu.cstapi.statement.*;
-import org.e2immu.cstapi.translate.TranslationMap;
-import org.e2immu.cstapi.type.*;
-import org.e2immu.cstapi.variable.*;
+import org.e2immu.language.cst.api.element.*;
+import org.e2immu.language.cst.api.expression.*;
+import org.e2immu.language.cst.api.info.*;
+import org.e2immu.language.cst.api.output.OutputBuilder;
+import org.e2immu.language.cst.api.output.OutputElement;
+import org.e2immu.language.cst.api.output.Qualification;
+import org.e2immu.language.cst.api.runtime.Factory;
+import org.e2immu.language.cst.api.statement.*;
+import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.cstimpl.element.*;
 import org.e2immu.cstimpl.expression.*;
 import org.e2immu.cstimpl.expression.util.PrecedenceEnum;
@@ -30,6 +28,8 @@ import org.e2immu.cstimpl.variable.DependentVariableImpl;
 import org.e2immu.cstimpl.variable.FieldReferenceImpl;
 import org.e2immu.cstimpl.variable.LocalVariableImpl;
 import org.e2immu.cstimpl.variable.ThisImpl;
+import org.e2immu.language.cst.api.type.*;
+import org.e2immu.language.cst.api.variable.*;
 import org.e2immu.support.Either;
 
 import java.util.List;

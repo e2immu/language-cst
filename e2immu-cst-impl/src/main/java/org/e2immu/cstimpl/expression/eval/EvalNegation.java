@@ -1,9 +1,9 @@
 package org.e2immu.cstimpl.expression.eval;
 
 import org.e2immu.annotation.NotNull;
-import org.e2immu.cstapi.expression.*;
-import org.e2immu.cstapi.info.MethodInfo;
-import org.e2immu.cstapi.runtime.Runtime;
+import org.e2immu.language.cst.api.expression.*;
+import org.e2immu.language.cst.api.info.MethodInfo;
+import org.e2immu.language.cst.api.runtime.Runtime;
 import org.e2immu.cstimpl.expression.NegationImpl;
 
 import java.util.List;

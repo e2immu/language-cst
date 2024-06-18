@@ -2,7 +2,7 @@ package org.e2immu.cstimpl.info;
 
 
 import org.e2immu.annotation.Fluent;
-import org.e2immu.cstapi.info.ParameterInfo;
+import org.e2immu.language.cst.api.info.ParameterInfo;
 
 public class ParameterInspectionImpl extends InspectionImpl implements ParameterInspection {
 

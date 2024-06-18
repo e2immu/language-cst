@@ -1,10 +1,10 @@
 package org.e2immu.cstimpl.info;
 
-import org.e2immu.cstapi.analysis.PropertyValueMap;
-import org.e2immu.cstapi.element.Comment;
-import org.e2immu.cstapi.element.Element;
-import org.e2immu.cstapi.element.Source;
-import org.e2immu.cstapi.variable.Variable;
+import org.e2immu.language.cst.api.analysis.PropertyValueMap;
+import org.e2immu.language.cst.api.element.Comment;
+import org.e2immu.language.cst.api.element.Element;
+import org.e2immu.language.cst.api.element.Source;
+import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.cstimpl.analysis.PropertyValueMapImpl;
 import org.e2immu.cstimpl.variable.DescendModeEnum;
 import org.e2immu.support.SetOnce;

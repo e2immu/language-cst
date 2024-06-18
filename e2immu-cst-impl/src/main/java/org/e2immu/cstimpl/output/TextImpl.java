@@ -14,8 +14,8 @@
 
 package org.e2immu.cstimpl.output;
 
-import org.e2immu.cstapi.output.FormattingOptions;
-import org.e2immu.cstapi.output.element.Text;
+import org.e2immu.language.cst.api.output.FormattingOptions;
+import org.e2immu.language.cst.api.output.element.Text;
 import org.e2immu.cstimpl.util.StringUtil;
 
 public record TextImpl(String text) implements Text {

@@ -2,16 +2,16 @@ package org.e2immu.cstimpl.variable;
 
 import org.e2immu.annotation.NotNull;
 import org.e2immu.annotation.Nullable;
-import org.e2immu.cstapi.element.Element;
-import org.e2immu.cstapi.element.Visitor;
-import org.e2immu.cstapi.expression.Expression;
-import org.e2immu.cstapi.expression.VariableExpression;
-import org.e2immu.cstapi.output.OutputBuilder;
-import org.e2immu.cstapi.output.Qualification;
-import org.e2immu.cstapi.type.ParameterizedType;
-import org.e2immu.cstapi.variable.DependentVariable;
-import org.e2immu.cstapi.variable.DescendMode;
-import org.e2immu.cstapi.variable.Variable;
+import org.e2immu.language.cst.api.element.Element;
+import org.e2immu.language.cst.api.element.Visitor;
+import org.e2immu.language.cst.api.expression.Expression;
+import org.e2immu.language.cst.api.expression.VariableExpression;
+import org.e2immu.language.cst.api.output.OutputBuilder;
+import org.e2immu.language.cst.api.output.Qualification;
+import org.e2immu.language.cst.api.type.ParameterizedType;
+import org.e2immu.language.cst.api.variable.DependentVariable;
+import org.e2immu.language.cst.api.variable.DescendMode;
+import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.cstimpl.output.OutputBuilderImpl;
 import org.e2immu.cstimpl.output.TextImpl;
 

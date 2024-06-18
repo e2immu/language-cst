@@ -1,7 +1,7 @@
 package org.e2immu.cstimpl.info;
 
-import org.e2immu.cstapi.expression.Expression;
-import org.e2immu.cstapi.info.FieldModifier;
+import org.e2immu.language.cst.api.expression.Expression;
+import org.e2immu.language.cst.api.info.FieldModifier;
 
 import java.util.Set;
 

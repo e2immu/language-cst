@@ -1,7 +1,7 @@
 package org.e2immu.cstimpl.element;
 
-import org.e2immu.cstapi.element.Element;
-import org.e2immu.cstapi.element.Source;
+import org.e2immu.language.cst.api.element.Element;
+import org.e2immu.language.cst.api.element.Source;
 
 /*
 we must be a bit memory-conscious: no unnecessary fields because there may be millions of elements

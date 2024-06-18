@@ -1,9 +1,9 @@
 package org.e2immu.cstimpl.info;
 
-import org.e2immu.cstapi.info.*;
-import org.e2immu.cstapi.type.ParameterizedType;
-import org.e2immu.cstapi.type.TypeNature;
-import org.e2immu.cstapi.type.TypeParameter;
+import org.e2immu.language.cst.api.info.*;
+import org.e2immu.language.cst.api.type.ParameterizedType;
+import org.e2immu.language.cst.api.type.TypeNature;
+import org.e2immu.language.cst.api.type.TypeParameter;
 
 import java.util.ArrayList;
 import java.util.HashSet;

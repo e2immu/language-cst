@@ -15,8 +15,8 @@
 package org.e2immu.cstimpl.expression.util;
 
 import org.e2immu.annotation.rare.IgnoreModifications;
-import org.e2immu.cstapi.expression.Expression;
-import org.e2immu.cstapi.expression.ExpressionWrapper;
+import org.e2immu.language.cst.api.expression.Expression;
+import org.e2immu.language.cst.api.expression.ExpressionWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

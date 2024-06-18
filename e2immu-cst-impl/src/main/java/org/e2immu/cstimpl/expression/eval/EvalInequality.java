@@ -1,7 +1,7 @@
 package org.e2immu.cstimpl.expression.eval;
 
-import org.e2immu.cstapi.expression.Expression;
-import org.e2immu.cstapi.runtime.Runtime;
+import org.e2immu.language.cst.api.expression.Expression;
+import org.e2immu.language.cst.api.runtime.Runtime;
 
 public class EvalInequality {
     private final Runtime runtime;

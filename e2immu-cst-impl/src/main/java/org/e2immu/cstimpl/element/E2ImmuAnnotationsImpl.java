@@ -13,8 +13,8 @@ import org.e2immu.annotation.rare.StaticSideEffects;
 import org.e2immu.annotation.type.ExtensionClass;
 import org.e2immu.annotation.type.Singleton;
 import org.e2immu.annotation.type.UtilityClass;
-import org.e2immu.cstapi.element.CompilationUnit;
-import org.e2immu.cstapi.expression.AnnotationExpression;
+import org.e2immu.language.cst.api.element.CompilationUnit;
+import org.e2immu.language.cst.api.expression.AnnotationExpression;
 import org.e2immu.cstimpl.info.TypeInfoImpl;
 
 import java.util.HashMap;

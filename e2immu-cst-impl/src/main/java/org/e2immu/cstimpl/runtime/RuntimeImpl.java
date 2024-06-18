@@ -1,13 +1,13 @@
 package org.e2immu.cstimpl.runtime;
 
-import org.e2immu.cstapi.expression.AnnotationExpression;
-import org.e2immu.cstapi.expression.Expression;
-import org.e2immu.cstapi.info.ComputeMethodOverrides;
-import org.e2immu.cstapi.info.TypeInfo;
-import org.e2immu.cstapi.runtime.Configuration;
-import org.e2immu.cstapi.runtime.Eval;
-import org.e2immu.cstapi.runtime.Runtime;
-import org.e2immu.cstapi.variable.Variable;
+import org.e2immu.language.cst.api.expression.AnnotationExpression;
+import org.e2immu.language.cst.api.expression.Expression;
+import org.e2immu.language.cst.api.info.ComputeMethodOverrides;
+import org.e2immu.language.cst.api.info.TypeInfo;
+import org.e2immu.language.cst.api.runtime.Configuration;
+import org.e2immu.language.cst.api.runtime.Eval;
+import org.e2immu.language.cst.api.runtime.Runtime;
+import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.cstimpl.element.E2ImmuAnnotationsImpl;
 import org.e2immu.cstimpl.info.ComputeMethodOverridesImpl;
 

@@ -2,8 +2,8 @@ package org.e2immu.cstimpl.shallowanalyzer;
 
 import org.e2immu.annotation.*;
 import org.e2immu.annotation.rare.IgnoreModifications;
-import org.e2immu.cstapi.info.*;
-import org.e2immu.cstapi.runtime.Runtime;
+import org.e2immu.language.cst.api.info.*;
+import org.e2immu.language.cst.api.runtime.Runtime;
 import org.e2immu.cstimpl.analysis.PropertyImpl;
 import org.e2immu.cstimpl.analysis.ValueImpl;
 import org.slf4j.Logger;

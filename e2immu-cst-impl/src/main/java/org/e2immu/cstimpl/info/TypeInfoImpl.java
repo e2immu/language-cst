@@ -1,16 +1,16 @@
 package org.e2immu.cstimpl.info;
 
-import org.e2immu.cstapi.element.*;
-import org.e2immu.cstapi.expression.AnnotationExpression;
-import org.e2immu.cstapi.info.*;
-import org.e2immu.cstapi.output.OutputBuilder;
-import org.e2immu.cstapi.output.Qualification;
-import org.e2immu.cstapi.runtime.Runtime;
-import org.e2immu.cstapi.type.ParameterizedType;
-import org.e2immu.cstapi.type.TypeNature;
-import org.e2immu.cstapi.type.TypeParameter;
-import org.e2immu.cstapi.variable.DescendMode;
-import org.e2immu.cstapi.variable.Variable;
+import org.e2immu.language.cst.api.element.*;
+import org.e2immu.language.cst.api.expression.AnnotationExpression;
+import org.e2immu.language.cst.api.info.*;
+import org.e2immu.language.cst.api.output.OutputBuilder;
+import org.e2immu.language.cst.api.output.Qualification;
+import org.e2immu.language.cst.api.runtime.Runtime;
+import org.e2immu.language.cst.api.type.ParameterizedType;
+import org.e2immu.language.cst.api.type.TypeNature;
+import org.e2immu.language.cst.api.type.TypeParameter;
+import org.e2immu.language.cst.api.variable.DescendMode;
+import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.cstimpl.analysis.PropertyImpl;
 import org.e2immu.cstimpl.analysis.ValueImpl;
 import org.e2immu.cstimpl.type.ParameterizedTypeImpl;

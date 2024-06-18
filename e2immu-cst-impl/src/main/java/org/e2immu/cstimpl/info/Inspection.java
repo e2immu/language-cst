@@ -1,10 +1,10 @@
 package org.e2immu.cstimpl.info;
 
 import org.e2immu.annotation.NotNull;
-import org.e2immu.cstapi.element.Comment;
-import org.e2immu.cstapi.element.Source;
-import org.e2immu.cstapi.expression.AnnotationExpression;
-import org.e2immu.cstapi.info.Access;
+import org.e2immu.language.cst.api.element.Comment;
+import org.e2immu.language.cst.api.element.Source;
+import org.e2immu.language.cst.api.expression.AnnotationExpression;
+import org.e2immu.language.cst.api.info.Access;
 
 import java.util.List;
 

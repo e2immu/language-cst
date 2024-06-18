@@ -1,19 +1,19 @@
 package org.e2immu.cstimpl.statement;
 
-import org.e2immu.cstapi.element.Comment;
-import org.e2immu.cstapi.element.Element;
-import org.e2immu.cstapi.element.Source;
-import org.e2immu.cstapi.element.Visitor;
-import org.e2immu.cstapi.expression.AnnotationExpression;
-import org.e2immu.cstapi.expression.Expression;
-import org.e2immu.cstapi.output.OutputBuilder;
-import org.e2immu.cstapi.output.Qualification;
-import org.e2immu.cstapi.statement.Block;
-import org.e2immu.cstapi.statement.Statement;
-import org.e2immu.cstapi.statement.WhileStatement;
-import org.e2immu.cstapi.translate.TranslationMap;
-import org.e2immu.cstapi.variable.DescendMode;
-import org.e2immu.cstapi.variable.Variable;
+import org.e2immu.language.cst.api.element.Comment;
+import org.e2immu.language.cst.api.element.Element;
+import org.e2immu.language.cst.api.element.Source;
+import org.e2immu.language.cst.api.element.Visitor;
+import org.e2immu.language.cst.api.expression.AnnotationExpression;
+import org.e2immu.language.cst.api.expression.Expression;
+import org.e2immu.language.cst.api.output.OutputBuilder;
+import org.e2immu.language.cst.api.output.Qualification;
+import org.e2immu.language.cst.api.statement.Block;
+import org.e2immu.language.cst.api.statement.Statement;
+import org.e2immu.language.cst.api.statement.WhileStatement;
+import org.e2immu.language.cst.api.translate.TranslationMap;
+import org.e2immu.language.cst.api.variable.DescendMode;
+import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.cstimpl.output.KeywordImpl;
 import org.e2immu.cstimpl.output.SymbolEnum;
 

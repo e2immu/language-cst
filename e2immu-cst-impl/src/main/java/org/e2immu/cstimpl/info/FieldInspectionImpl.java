@@ -1,10 +1,10 @@
 package org.e2immu.cstimpl.info;
 
 
-import org.e2immu.cstapi.expression.Expression;
-import org.e2immu.cstapi.info.Access;
-import org.e2immu.cstapi.info.FieldInfo;
-import org.e2immu.cstapi.info.FieldModifier;
+import org.e2immu.language.cst.api.expression.Expression;
+import org.e2immu.language.cst.api.info.Access;
+import org.e2immu.language.cst.api.info.FieldInfo;
+import org.e2immu.language.cst.api.info.FieldModifier;
 
 import java.util.HashSet;
 import java.util.Set;

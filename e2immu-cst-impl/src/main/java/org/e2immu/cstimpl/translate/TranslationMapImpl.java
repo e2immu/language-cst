@@ -1,14 +1,14 @@
 package org.e2immu.cstimpl.translate;
 
-import org.e2immu.cstapi.expression.Expression;
-import org.e2immu.cstapi.expression.MethodCall;
-import org.e2immu.cstapi.info.MethodInfo;
-import org.e2immu.cstapi.statement.Statement;
-import org.e2immu.cstapi.translate.TranslationMap;
-import org.e2immu.cstapi.type.ParameterizedType;
-import org.e2immu.cstapi.variable.FieldReference;
-import org.e2immu.cstapi.variable.LocalVariable;
-import org.e2immu.cstapi.variable.Variable;
+import org.e2immu.language.cst.api.expression.Expression;
+import org.e2immu.language.cst.api.expression.MethodCall;
+import org.e2immu.language.cst.api.info.MethodInfo;
+import org.e2immu.language.cst.api.statement.Statement;
+import org.e2immu.language.cst.api.translate.TranslationMap;
+import org.e2immu.language.cst.api.type.ParameterizedType;
+import org.e2immu.language.cst.api.variable.FieldReference;
+import org.e2immu.language.cst.api.variable.LocalVariable;
+import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.cstimpl.expression.VariableExpressionImpl;
 import org.e2immu.cstimpl.type.ParameterizedTypeImpl;
 import org.e2immu.cstimpl.variable.FieldReferenceImpl;

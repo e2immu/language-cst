@@ -1,13 +1,13 @@
 package org.e2immu.cstimpl.output;
 
-import org.e2immu.cstapi.info.FieldInfo;
-import org.e2immu.cstapi.info.MethodInfo;
-import org.e2immu.cstapi.info.TypeInfo;
-import org.e2immu.cstapi.output.Qualification;
-import org.e2immu.cstapi.output.TypeNameRequired;
-import org.e2immu.cstapi.variable.FieldReference;
-import org.e2immu.cstapi.variable.This;
-import org.e2immu.cstapi.variable.Variable;
+import org.e2immu.language.cst.api.info.FieldInfo;
+import org.e2immu.language.cst.api.info.MethodInfo;
+import org.e2immu.language.cst.api.info.TypeInfo;
+import org.e2immu.language.cst.api.output.Qualification;
+import org.e2immu.language.cst.api.output.TypeNameRequired;
+import org.e2immu.language.cst.api.variable.FieldReference;
+import org.e2immu.language.cst.api.variable.This;
+import org.e2immu.language.cst.api.variable.Variable;
 
 import java.util.HashMap;
 import java.util.HashSet;

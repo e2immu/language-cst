@@ -1,9 +1,9 @@
 package org.e2immu.cstimpl.expression.eval;
 
-import org.e2immu.cstapi.expression.Expression;
-import org.e2immu.cstapi.expression.IntConstant;
-import org.e2immu.cstapi.expression.Numeric;
-import org.e2immu.cstapi.runtime.Runtime;
+import org.e2immu.language.cst.api.expression.Expression;
+import org.e2immu.language.cst.api.expression.IntConstant;
+import org.e2immu.language.cst.api.expression.Numeric;
+import org.e2immu.language.cst.api.runtime.Runtime;
 import org.e2immu.cstimpl.expression.DivideImpl;
 
 public class EvalDivide {

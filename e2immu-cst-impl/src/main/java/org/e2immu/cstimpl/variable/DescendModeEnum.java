@@ -1,6 +1,6 @@
 package org.e2immu.cstimpl.variable;
 
-import org.e2immu.cstapi.variable.DescendMode;
+import org.e2immu.language.cst.api.variable.DescendMode;
 
 public enum DescendModeEnum implements DescendMode {
     YES,

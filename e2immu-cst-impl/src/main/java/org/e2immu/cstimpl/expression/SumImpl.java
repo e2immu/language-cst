@@ -1,12 +1,12 @@
 package org.e2immu.cstimpl.expression;
 
-import org.e2immu.cstapi.expression.Expression;
-import org.e2immu.cstapi.expression.Negation;
-import org.e2immu.cstapi.expression.Numeric;
-import org.e2immu.cstapi.expression.Sum;
-import org.e2immu.cstapi.output.OutputBuilder;
-import org.e2immu.cstapi.output.Qualification;
-import org.e2immu.cstapi.runtime.Runtime;
+import org.e2immu.language.cst.api.expression.Expression;
+import org.e2immu.language.cst.api.expression.Negation;
+import org.e2immu.language.cst.api.expression.Numeric;
+import org.e2immu.language.cst.api.expression.Sum;
+import org.e2immu.language.cst.api.output.OutputBuilder;
+import org.e2immu.language.cst.api.output.Qualification;
+import org.e2immu.language.cst.api.runtime.Runtime;
 import org.e2immu.cstimpl.expression.util.ExpressionComparator;
 import org.e2immu.cstimpl.output.OutputBuilderImpl;
 import org.e2immu.cstimpl.output.SymbolEnum;

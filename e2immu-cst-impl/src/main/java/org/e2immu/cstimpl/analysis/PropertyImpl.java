@@ -1,7 +1,7 @@
 package org.e2immu.cstimpl.analysis;
 
-import org.e2immu.cstapi.analysis.Property;
-import org.e2immu.cstapi.analysis.Value;
+import org.e2immu.language.cst.api.analysis.Property;
+import org.e2immu.language.cst.api.analysis.Value;
 
 public class PropertyImpl implements Property {
     // type

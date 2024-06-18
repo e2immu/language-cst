@@ -1,12 +1,12 @@
 package org.e2immu.cstimpl.runtime;
 
-import org.e2immu.cstapi.element.CompilationUnit;
-import org.e2immu.cstapi.expression.AnnotationExpression;
-import org.e2immu.cstapi.info.MethodInfo;
-import org.e2immu.cstapi.info.ParameterInfo;
-import org.e2immu.cstapi.info.TypeInfo;
-import org.e2immu.cstapi.runtime.Predefined;
-import org.e2immu.cstapi.type.ParameterizedType;
+import org.e2immu.language.cst.api.element.CompilationUnit;
+import org.e2immu.language.cst.api.expression.AnnotationExpression;
+import org.e2immu.language.cst.api.info.MethodInfo;
+import org.e2immu.language.cst.api.info.ParameterInfo;
+import org.e2immu.language.cst.api.info.TypeInfo;
+import org.e2immu.language.cst.api.runtime.Predefined;
+import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.cstimpl.element.AnnotationExpressionImpl;
 import org.e2immu.cstimpl.element.CompilationUnitImpl;
 import org.e2immu.cstimpl.info.InspectionImpl;

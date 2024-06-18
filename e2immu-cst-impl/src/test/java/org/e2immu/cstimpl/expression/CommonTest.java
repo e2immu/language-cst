@@ -1,8 +1,8 @@
 package org.e2immu.cstimpl.expression;
 
-import org.e2immu.cstapi.expression.VariableExpression;
-import org.e2immu.cstapi.runtime.Runtime;
-import org.e2immu.cstapi.variable.Variable;
+import org.e2immu.language.cst.api.expression.VariableExpression;
+import org.e2immu.language.cst.api.runtime.Runtime;
+import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.cstimpl.runtime.RuntimeImpl;
 
 public abstract class CommonTest {

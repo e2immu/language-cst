@@ -1,8 +1,8 @@
 package org.e2immu.cstimpl.element;
 
-import org.e2immu.cstapi.element.Comment;
-import org.e2immu.cstapi.output.OutputBuilder;
-import org.e2immu.cstapi.output.Qualification;
+import org.e2immu.language.cst.api.element.Comment;
+import org.e2immu.language.cst.api.output.OutputBuilder;
+import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.cstimpl.output.*;
 
 import java.util.Arrays;

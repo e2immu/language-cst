@@ -1,7 +1,7 @@
 package org.e2immu.cstimpl.output;
 
-import org.e2immu.cstapi.output.FormattingOptions;
-import org.e2immu.cstapi.output.element.Keyword;
+import org.e2immu.language.cst.api.output.FormattingOptions;
+import org.e2immu.language.cst.api.output.element.Keyword;
 
 public record KeywordImpl(String keyword) implements Keyword {
 

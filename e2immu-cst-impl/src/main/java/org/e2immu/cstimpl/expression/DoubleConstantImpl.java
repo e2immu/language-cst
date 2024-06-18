@@ -1,13 +1,13 @@
 package org.e2immu.cstimpl.expression;
 
-import org.e2immu.cstapi.expression.DoubleConstant;
-import org.e2immu.cstapi.expression.Expression;
-import org.e2immu.cstapi.expression.FloatConstant;
-import org.e2immu.cstapi.expression.Numeric;
-import org.e2immu.cstapi.output.OutputBuilder;
-import org.e2immu.cstapi.output.Qualification;
-import org.e2immu.cstapi.runtime.Predefined;
-import org.e2immu.cstapi.type.ParameterizedType;
+import org.e2immu.language.cst.api.expression.DoubleConstant;
+import org.e2immu.language.cst.api.expression.Expression;
+import org.e2immu.language.cst.api.expression.FloatConstant;
+import org.e2immu.language.cst.api.expression.Numeric;
+import org.e2immu.language.cst.api.output.OutputBuilder;
+import org.e2immu.language.cst.api.output.Qualification;
+import org.e2immu.language.cst.api.runtime.Predefined;
+import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.cstimpl.expression.util.ExpressionComparator;
 import org.e2immu.cstimpl.output.OutputBuilderImpl;
 import org.e2immu.cstimpl.output.TextImpl;

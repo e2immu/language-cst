@@ -17,8 +17,8 @@ package org.e2immu.cstimpl.output;
 
 import org.e2immu.annotation.ImmutableContainer;
 import org.e2immu.annotation.rare.IgnoreModifications;
-import org.e2immu.cstapi.output.FormattingOptions;
-import org.e2immu.cstapi.output.element.Guide;
+import org.e2immu.language.cst.api.output.FormattingOptions;
+import org.e2immu.language.cst.api.output.element.Guide;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

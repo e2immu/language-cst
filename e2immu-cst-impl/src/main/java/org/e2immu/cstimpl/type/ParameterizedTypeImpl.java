@@ -1,15 +1,15 @@
 package org.e2immu.cstimpl.type;
 
-import org.e2immu.cstapi.element.Element;
-import org.e2immu.cstapi.info.MethodInfo;
-import org.e2immu.cstapi.info.TypeInfo;
-import org.e2immu.cstapi.output.OutputBuilder;
-import org.e2immu.cstapi.output.Qualification;
-import org.e2immu.cstapi.runtime.PredefinedWithoutParameterizedType;
-import org.e2immu.cstapi.runtime.Runtime;
-import org.e2immu.cstapi.type.*;
+import org.e2immu.language.cst.api.element.Element;
+import org.e2immu.language.cst.api.info.MethodInfo;
+import org.e2immu.language.cst.api.info.TypeInfo;
+import org.e2immu.language.cst.api.output.OutputBuilder;
+import org.e2immu.language.cst.api.output.Qualification;
+import org.e2immu.language.cst.api.runtime.PredefinedWithoutParameterizedType;
+import org.e2immu.language.cst.api.runtime.Runtime;
 import org.e2immu.cstimpl.element.ElementImpl;
 import org.e2immu.cstimpl.output.QualificationImpl;
+import org.e2immu.language.cst.api.type.*;
 
 import java.util.*;
 import java.util.stream.Collectors;

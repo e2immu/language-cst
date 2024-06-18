@@ -1,12 +1,12 @@
 package org.e2immu.cstimpl.analysis;
 
-import org.e2immu.cstapi.analysis.Codec;
-import org.e2immu.cstapi.analysis.Value;
-import org.e2immu.cstapi.expression.Expression;
-import org.e2immu.cstapi.info.FieldInfo;
-import org.e2immu.cstapi.info.MethodInfo;
-import org.e2immu.cstapi.info.ParameterInfo;
-import org.e2immu.cstapi.util.ParSeq;
+import org.e2immu.language.cst.api.analysis.Codec;
+import org.e2immu.language.cst.api.analysis.Value;
+import org.e2immu.language.cst.api.expression.Expression;
+import org.e2immu.language.cst.api.info.FieldInfo;
+import org.e2immu.language.cst.api.info.MethodInfo;
+import org.e2immu.language.cst.api.info.ParameterInfo;
+import org.e2immu.language.cst.api.util.ParSeq;
 
 import java.util.*;
 import java.util.function.BiFunction;

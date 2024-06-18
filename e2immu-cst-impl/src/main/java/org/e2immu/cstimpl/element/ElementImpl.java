@@ -1,12 +1,12 @@
 package org.e2immu.cstimpl.element;
 
-import org.e2immu.cstapi.element.Comment;
-import org.e2immu.cstapi.element.Element;
-import org.e2immu.cstapi.element.Source;
-import org.e2immu.cstapi.expression.AnnotationExpression;
-import org.e2immu.cstapi.info.TypeInfo;
-import org.e2immu.cstapi.output.OutputBuilder;
-import org.e2immu.cstapi.variable.Variable;
+import org.e2immu.language.cst.api.element.Comment;
+import org.e2immu.language.cst.api.element.Element;
+import org.e2immu.language.cst.api.element.Source;
+import org.e2immu.language.cst.api.expression.AnnotationExpression;
+import org.e2immu.language.cst.api.info.TypeInfo;
+import org.e2immu.language.cst.api.output.OutputBuilder;
+import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.cstimpl.output.QualificationImpl;
 import org.e2immu.cstimpl.variable.DescendModeEnum;
 

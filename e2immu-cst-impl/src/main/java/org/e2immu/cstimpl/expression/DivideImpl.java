@@ -1,13 +1,13 @@
 package org.e2immu.cstimpl.expression;
 
-import org.e2immu.cstapi.element.Comment;
-import org.e2immu.cstapi.element.Source;
-import org.e2immu.cstapi.expression.Expression;
-import org.e2immu.cstapi.expression.Precedence;
-import org.e2immu.cstapi.expression.Product;
-import org.e2immu.cstapi.info.MethodInfo;
-import org.e2immu.cstapi.runtime.Runtime;
-import org.e2immu.cstapi.type.ParameterizedType;
+import org.e2immu.language.cst.api.element.Comment;
+import org.e2immu.language.cst.api.element.Source;
+import org.e2immu.language.cst.api.expression.Expression;
+import org.e2immu.language.cst.api.expression.Precedence;
+import org.e2immu.language.cst.api.expression.Product;
+import org.e2immu.language.cst.api.info.MethodInfo;
+import org.e2immu.language.cst.api.runtime.Runtime;
+import org.e2immu.language.cst.api.type.ParameterizedType;
 
 import java.util.List;
 

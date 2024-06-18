@@ -1,10 +1,10 @@
 package org.e2immu.cstimpl.element;
 
-import org.e2immu.cstapi.element.*;
-import org.e2immu.cstapi.output.OutputBuilder;
-import org.e2immu.cstapi.output.Qualification;
-import org.e2immu.cstapi.variable.DescendMode;
-import org.e2immu.cstapi.variable.Variable;
+import org.e2immu.language.cst.api.element.*;
+import org.e2immu.language.cst.api.output.OutputBuilder;
+import org.e2immu.language.cst.api.output.Qualification;
+import org.e2immu.language.cst.api.variable.DescendMode;
+import org.e2immu.language.cst.api.variable.Variable;
 
 import java.net.URI;
 import java.util.ArrayList;

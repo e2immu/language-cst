@@ -14,10 +14,10 @@
 
 package org.e2immu.cstimpl.output;
 
-import org.e2immu.cstapi.info.TypeInfo;
-import org.e2immu.cstapi.output.FormattingOptions;
-import org.e2immu.cstapi.output.TypeNameRequired;
-import org.e2immu.cstapi.output.element.TypeName;
+import org.e2immu.language.cst.api.info.TypeInfo;
+import org.e2immu.language.cst.api.output.FormattingOptions;
+import org.e2immu.language.cst.api.output.TypeNameRequired;
+import org.e2immu.language.cst.api.output.element.TypeName;
 import org.e2immu.cstimpl.util.StringUtil;
 
 public record TypeNameImpl(String simpleName,

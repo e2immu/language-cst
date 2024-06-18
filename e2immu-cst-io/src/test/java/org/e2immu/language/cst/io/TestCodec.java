@@ -1,10 +1,10 @@
 package org.e2immu.language.cst.io;
 
-import org.e2immu.cstapi.analysis.Codec;
-import org.e2immu.cstapi.analysis.Property;
-import org.e2immu.cstapi.element.CompilationUnit;
-import org.e2immu.cstapi.info.TypeInfo;
-import org.e2immu.cstapi.runtime.Runtime;
+import org.e2immu.language.cst.api.analysis.Codec;
+import org.e2immu.language.cst.api.analysis.Property;
+import org.e2immu.language.cst.api.element.CompilationUnit;
+import org.e2immu.language.cst.api.info.TypeInfo;
+import org.e2immu.language.cst.api.runtime.Runtime;
 import org.e2immu.cstimpl.analysis.PropertyImpl;
 import org.e2immu.cstimpl.analysis.ValueImpl;
 import org.e2immu.cstimpl.runtime.RuntimeImpl;

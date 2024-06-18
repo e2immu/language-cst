@@ -1,9 +1,9 @@
 package org.e2immu.cstimpl.variable;
 
-import org.e2immu.cstapi.element.Comment;
-import org.e2immu.cstapi.element.Source;
-import org.e2immu.cstapi.type.ParameterizedType;
-import org.e2immu.cstapi.variable.Variable;
+import org.e2immu.language.cst.api.element.Comment;
+import org.e2immu.language.cst.api.element.Source;
+import org.e2immu.language.cst.api.type.ParameterizedType;
+import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.cstimpl.output.QualificationImpl;
 
 import java.util.List;
