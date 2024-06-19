@@ -25,10 +25,7 @@ import org.e2immu.language.cst.impl.type.ParameterizedTypeImpl;
 import org.e2immu.language.cst.impl.type.TypeParameterImpl;
 import org.e2immu.language.cst.impl.type.WildcardEnum;
 import org.e2immu.language.cst.impl.util.IntUtil;
-import org.e2immu.language.cst.impl.variable.DependentVariableImpl;
-import org.e2immu.language.cst.impl.variable.FieldReferenceImpl;
-import org.e2immu.language.cst.impl.variable.LocalVariableImpl;
-import org.e2immu.language.cst.impl.variable.ThisImpl;
+import org.e2immu.language.cst.impl.variable.*;
 import org.e2immu.language.cst.api.type.*;
 import org.e2immu.language.cst.api.variable.*;
 import org.e2immu.language.cst.impl.element.*;
@@ -902,6 +899,16 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     @Override
     public ForStatement.Builder newForBuilder() {
         return new ForStatementImpl.Builder();
+    }
+
+    @Override
+    public DescendMode descendModeNo() {
+        return DescendModeEnum.NO;
+    }
+
+    @Override
+    public DescendMode descendModeYes() {
+        return DescendModeEnum.YES;
     }
 }
 

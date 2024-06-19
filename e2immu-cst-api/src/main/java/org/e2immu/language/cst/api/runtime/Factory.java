@@ -42,6 +42,10 @@ public interface Factory {
 
     Expression constructorCallWithArrayInitializer(MethodInfo constructor, ParameterizedType returnType, List<Object> of, ArrayInitializer initializer);
 
+    DescendMode descendModeNo();
+
+    DescendMode descendModeYes();
+
     Diamond diamondNo();
 
     Diamond diamondShowAll();
