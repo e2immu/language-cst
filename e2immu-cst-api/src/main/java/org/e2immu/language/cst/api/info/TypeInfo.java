@@ -17,7 +17,6 @@ import java.util.stream.Stream;
 
 public interface TypeInfo extends NamedType, Info {
 
-
     String fullyQualifiedName();
 
     // for java, that will be packageName == "java.lang"
@@ -186,4 +185,8 @@ public interface TypeInfo extends NamedType, Info {
     boolean isAtLeastImmutableHC();
 
     OutputBuilder print(Qualification qualification, boolean doTypeDeclaration);
+
+    // as part of type resolution
+    boolean fieldsAccessedInRestOfPrimaryType();
+
 }

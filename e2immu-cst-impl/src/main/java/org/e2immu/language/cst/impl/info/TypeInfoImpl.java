@@ -456,4 +456,9 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     public OutputBuilder print(Qualification qualification, boolean doTypeDeclaration) {
         return print(qualification); // TODO
     }
+
+    @Override
+    public boolean fieldsAccessedInRestOfPrimaryType() {
+        return inspection.get().fieldsAccessedInRestOfPrimaryType();
+    }
 }

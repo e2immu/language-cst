@@ -59,4 +59,6 @@ public interface TypeInspection extends Inspection {
     List<TypeInfo> subTypes();
     
     Set<TypeModifier> modifiers();
+
+    boolean fieldsAccessedInRestOfPrimaryType();
 }
