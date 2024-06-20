@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 public interface ParameterizedType {
+    boolean isNoTypeGivenInLambda();
     // the different components
 
     Wildcard wildcard();

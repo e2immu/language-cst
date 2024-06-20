@@ -1,5 +1,8 @@
 package org.e2immu.language.cst.api.info;
 
+import org.e2immu.language.cst.api.output.OutputBuilder;
+import org.e2immu.language.cst.api.output.element.Keyword;
+
 public interface MethodModifier {
 
     boolean isPublic();
@@ -17,4 +20,6 @@ public interface MethodModifier {
     boolean isFinal();
 
     boolean isStatic();
+
+    Keyword keyword();
 }

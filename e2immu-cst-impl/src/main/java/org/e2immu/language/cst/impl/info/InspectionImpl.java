@@ -101,10 +101,10 @@ public abstract class InspectionImpl implements Inspection {
     @SuppressWarnings("unchecked")
     public static abstract class Builder<B extends Info.Builder<?>> implements Inspection, Info.Builder<B> {
         private Access access;
-        private List<Comment> comments;
+        private List<Comment> comments = new ArrayList<>();
         private Source source;
         private boolean synthetic;
-        private List<AnnotationExpression> annotations;
+        private List<AnnotationExpression> annotations = new ArrayList<>();
 
         @Fluent
         public B setAccess(Access access) {
@@ -132,28 +132,24 @@ public abstract class InspectionImpl implements Inspection {
 
         @Override
         public B addComment(Comment comment) {
-            if (comments == null) comments = new ArrayList<>();
             comments.add(comment);
             return (B) this;
         }
 
         @Override
         public B addComments(List<Comment> comments) {
-            if (this.comments == null) this.comments = new ArrayList<>();
             this.comments.addAll(comments);
             return (B) this;
         }
 
         @Override
         public B addAnnotation(AnnotationExpression annotation) {
-            if (this.annotations == null) this.annotations = new ArrayList<>();
             annotations.add(annotation);
             return (B) this;
         }
 
         @Override
         public B addAnnotations(List<AnnotationExpression> annotations) {
-            if (this.annotations == null) this.annotations = new ArrayList<>();
             this.annotations.addAll(annotations);
             return (B) this;
         }

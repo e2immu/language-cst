@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Set;
 
 public interface MethodInspection extends Inspection {
+    List<ParameterizedType> exceptionTypes();
+
     Set<MethodInfo> overrides();
 
     List<TypeParameter> typeParameters();

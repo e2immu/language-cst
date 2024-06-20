@@ -27,6 +27,8 @@ public interface TypeInfo extends NamedType, Info {
                 : compilationUnitOrEnclosingType().getRight().compilationUnit();
     }
 
+    boolean isAnnotation();
+
     default boolean isPrimaryType() {
         return compilationUnitOrEnclosingType().isLeft();
     }

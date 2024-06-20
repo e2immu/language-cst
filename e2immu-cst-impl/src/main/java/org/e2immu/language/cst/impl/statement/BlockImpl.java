@@ -12,6 +12,10 @@ import org.e2immu.language.cst.api.statement.Block;
 import org.e2immu.language.cst.api.statement.Statement;
 import org.e2immu.language.cst.api.variable.DescendMode;
 import org.e2immu.language.cst.api.variable.Variable;
+import org.e2immu.language.cst.impl.output.GuideImpl;
+import org.e2immu.language.cst.impl.output.OutputBuilderImpl;
+import org.e2immu.language.cst.impl.output.SpaceEnum;
+import org.e2immu.language.cst.impl.output.SymbolEnum;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,7 +75,16 @@ public class BlockImpl extends StatementImpl implements Block {
 
     @Override
     public OutputBuilder print(Qualification qualification) {
-        return null;
+        OutputBuilder outputBuilder = outputBuilder(qualification);
+        outputBuilder.add(SymbolEnum.LEFT_BRACE);
+        if (!statements.isEmpty()) {
+            outputBuilder.add(statements.stream()
+                    .filter(s -> !s.isSynthetic())
+                    .map(s -> s.print(qualification))
+                    .collect(OutputBuilderImpl.joining(SpaceEnum.NONE, GuideImpl.generatorForBlock())));
+        }
+        outputBuilder.add(SymbolEnum.RIGHT_BRACE);
+        return outputBuilder;
     }
 
     @Override

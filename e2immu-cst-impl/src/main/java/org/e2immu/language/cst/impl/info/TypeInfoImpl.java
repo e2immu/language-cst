@@ -462,4 +462,9 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     public boolean fieldsAccessedInRestOfPrimaryType() {
         return inspection.get().fieldsAccessedInRestOfPrimaryType();
     }
+
+    @Override
+    public boolean isAnnotation() {
+        return inspection.get().typeNature().isAnnotation();
+    }
 }

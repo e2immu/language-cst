@@ -558,4 +558,9 @@ public class ParameterizedTypeImpl implements ParameterizedType {
     public ParameterizedType withParameters(List<ParameterizedType> parameters) {
         return new ParameterizedTypeImpl(typeInfo, typeParameter, parameters, arrays, wildcard);
     }
+
+    @Override
+    public boolean isNoTypeGivenInLambda() {
+        return this == NO_TYPE_GIVEN_IN_LAMBDA;
+    }
 }

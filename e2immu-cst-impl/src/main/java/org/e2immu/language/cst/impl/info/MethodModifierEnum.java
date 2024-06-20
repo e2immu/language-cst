@@ -74,4 +74,9 @@ public enum MethodModifierEnum implements MethodModifier {
     public boolean isStatic() {
         return this == STATIC;
     }
+
+    @Override
+    public Keyword keyword() {
+        return keyword;
+    }
 }

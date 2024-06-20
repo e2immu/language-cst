@@ -4,6 +4,7 @@ import org.e2immu.annotation.Fluent;
 import org.e2immu.language.cst.api.analysis.Value;
 import org.e2immu.language.cst.api.element.CompilationUnit;
 import org.e2immu.language.cst.api.expression.Expression;
+import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.statement.Block;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.type.TypeParameter;
@@ -16,7 +17,11 @@ import java.util.Set;
 
 public interface MethodInfo extends Info {
 
+    List<ParameterizedType> exceptionTypes();
+
     boolean isConstructor();
+
+    boolean isFinal();
 
     boolean isOverloadOfJLOMethod();
 
@@ -174,6 +179,9 @@ public interface MethodInfo extends Info {
 
         @Fluent
         Builder addTypeParameter(TypeParameter typeParameter);
+        
+        @Fluent
+        Builder addExceptionType(ParameterizedType exceptionType);
     }
 }
 

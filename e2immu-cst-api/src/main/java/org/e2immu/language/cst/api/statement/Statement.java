@@ -11,6 +11,10 @@ import java.util.stream.Stream;
 
 public interface Statement extends Element {
 
+    default boolean isSynthetic() {
+        return false;
+    }
+
     // a label to possibly jump to
     String label();
 

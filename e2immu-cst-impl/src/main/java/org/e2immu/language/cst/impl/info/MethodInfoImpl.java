@@ -144,17 +144,17 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
 
     @Override
     public void visit(Predicate<Element> predicate) {
-
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void visit(Visitor visitor) {
-
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public OutputBuilder print(Qualification qualification) {
-        return null;
+        return new MethodPrinterImpl(this).print(qualification);
     }
 
     @Override
@@ -360,5 +360,15 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
     @Override
     public Map<FieldInfo, Boolean> areOwnFieldsReadModified() {
         return analysis().getOrDefault(PropertyImpl.OWN_FIELDS_READ_MODIFIED_IN_METHOD, ValueImpl.FieldBooleanMapImpl.EMPTY).map();
+    }
+
+    @Override
+    public List<ParameterizedType> exceptionTypes() {
+        return inspection.get().exceptionTypes();
+    }
+
+    @Override
+    public boolean isFinal() {
+        return inspection.get().modifiers().stream().anyMatch(MethodModifier::isFinal);
     }
 }

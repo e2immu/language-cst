@@ -30,12 +30,14 @@ public class MethodInspectionImpl extends InspectionImpl implements MethodInspec
     private final List<TypeParameter> typeParameters;
     private final List<ParameterInfo> parameters;
     private final Set<MethodModifier> methodModifiers;
+    private final List<ParameterizedType> exceptionTypes;
 
     public MethodInspectionImpl(Inspection inspection,
                                 ParameterizedType returnType,
                                 List<TypeParameter> typeParameters,
                                 List<ParameterInfo> parameters,
                                 Set<MethodModifier> methodModifiers,
+                                List<ParameterizedType> exceptionTypes,
                                 OperatorType operatorType,
                                 Block methodBody,
                                 String fullyQualifiedName,
@@ -50,6 +52,12 @@ public class MethodInspectionImpl extends InspectionImpl implements MethodInspec
         this.overrides = overrides;
         this.typeParameters = typeParameters;
         this.methodModifiers = methodModifiers;
+        this.exceptionTypes = exceptionTypes;
+    }
+
+    @Override
+    public List<ParameterizedType> exceptionTypes() {
+        return exceptionTypes;
     }
 
     @Override
@@ -102,12 +110,24 @@ public class MethodInspectionImpl extends InspectionImpl implements MethodInspec
         private final Set<MethodInfo> overrides = new HashSet<>();
         private final MethodInfoImpl methodInfo;
         private final Set<MethodModifier> methodModifiers = new HashSet<>();
+        private final List<ParameterizedType> exceptionTypes = new ArrayList<>();
 
         public Builder(MethodInfoImpl methodInfo) {
             this.methodInfo = methodInfo;
             if (methodInfo.isStatic()) {
                 addMethodModifier(MethodModifierEnum.STATIC);
             }
+        }
+
+        @Override
+        public MethodInfo.Builder addExceptionType(ParameterizedType exceptionType) {
+            this.exceptionTypes.add(exceptionType);
+            return this;
+        }
+
+        @Override
+        public List<ParameterizedType> exceptionTypes() {
+            return exceptionTypes;
         }
 
         @Fluent
@@ -222,7 +242,7 @@ public class MethodInspectionImpl extends InspectionImpl implements MethodInspec
         public void commit() {
             if (!fullyQualifiedName.isSet()) commitParameters();
             MethodInspection mi = new MethodInspectionImpl(this, returnType, List.copyOf(typeParameters),
-                    List.copyOf(parameters), Set.copyOf(methodModifiers),
+                    List.copyOf(parameters), Set.copyOf(methodModifiers), List.copyOf(exceptionTypes),
                     operatorType, methodBody, fullyQualifiedName.get(), Set.copyOf(overrides));
             methodInfo.commit(mi);
         }
