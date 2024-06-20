@@ -7,6 +7,8 @@ import org.e2immu.language.cst.api.element.*;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.OutputElement;
 import org.e2immu.language.cst.api.output.Qualification;
+import org.e2immu.language.cst.api.output.element.ElementarySpace;
+import org.e2immu.language.cst.api.output.element.Split;
 import org.e2immu.language.cst.api.statement.*;
 import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.type.*;
@@ -51,6 +53,10 @@ public interface Factory {
     Diamond diamondShowAll();
 
     Diamond diamondYes();
+
+    ElementarySpace elementarySpaceNice();
+
+    ElementarySpace elementarySpaceRelaxedNone();
 
     Block emptyBlock();
 
@@ -326,7 +332,11 @@ public interface Factory {
 
     Precedence precedenceUnary();
 
+    Qualification qualificationDoNotQualifyImplicit();
+
     Qualification qualificationFullyQualifiedNames();
+
+    Split splitNever();
 
     OutputElement symbolColon();
 

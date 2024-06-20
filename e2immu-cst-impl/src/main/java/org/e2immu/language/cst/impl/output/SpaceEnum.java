@@ -15,37 +15,39 @@
 package org.e2immu.language.cst.impl.output;
 
 import org.e2immu.language.cst.api.output.FormattingOptions;
+import org.e2immu.language.cst.api.output.element.ElementarySpace;
 import org.e2immu.language.cst.api.output.element.Space;
+import org.e2immu.language.cst.api.output.element.Split;
 
 import java.util.Objects;
 
 
 public enum SpaceEnum implements Space {
     // no space, do not split
-    NONE(ElementarySpace.NONE, ElementarySpace.NONE, Split.NEVER),
+    NONE(ElementarySpaceEnum.NONE, ElementarySpaceEnum.NONE, SplitEnum.NEVER),
 
     // exactly one space needed, never split here (e.g. between class and class name); two ONEs collapse into one
-    ONE(ElementarySpace.ONE, ElementarySpace.ONE, Split.NEVER),
+    ONE(ElementarySpaceEnum.ONE, ElementarySpaceEnum.ONE, SplitEnum.NEVER),
 
     // end of annotation; needs minimally one, but can be newline
-    ONE_REQUIRED_EASY_SPLIT(ElementarySpace.ONE, ElementarySpace.ONE, Split.EASY),
+    ONE_REQUIRED_EASY_SPLIT(ElementarySpaceEnum.ONE, ElementarySpaceEnum.ONE, SplitEnum.EASY),
 
     // no space needed, split to make things nicer
-    NO_SPACE_SPLIT_ALLOWED(ElementarySpace.NONE, ElementarySpace.NONE, Split.EASY),
+    NO_SPACE_SPLIT_ALLOWED(ElementarySpaceEnum.NONE, ElementarySpaceEnum.NONE, SplitEnum.EASY),
 
-    RELAXED_NO_SPACE_SPLIT_ALLOWED(ElementarySpace.RELAXED_NONE, ElementarySpace.RELAXED_NONE, Split.EASY),
+    RELAXED_NO_SPACE_SPLIT_ALLOWED(ElementarySpaceEnum.RELAXED_NONE, ElementarySpaceEnum.RELAXED_NONE, SplitEnum.EASY),
 
-    ONE_IS_NICE_EASY_SPLIT(ElementarySpace.RELAXED_NONE, ElementarySpace.NICE, Split.EASY),  // no space needed but one in nice, split to make things nicer
+    ONE_IS_NICE_EASY_SPLIT(ElementarySpaceEnum.RELAXED_NONE, ElementarySpaceEnum.NICE, SplitEnum.EASY),  // no space needed but one in nice, split to make things nicer
 
-    ONE_IS_NICE_SPLIT_BEGIN_END(ElementarySpace.RELAXED_NONE, ElementarySpace.NICE, Split.BEGIN_END),  // no space needed but one in nice, split to make things nicer
+    ONE_IS_NICE_SPLIT_BEGIN_END(ElementarySpaceEnum.RELAXED_NONE, ElementarySpaceEnum.NICE, SplitEnum.BEGIN_END),  // no space needed but one in nice, split to make things nicer
 
-    NEWLINE(ElementarySpace.NEWLINE, ElementarySpace.NEWLINE, Split.ALWAYS), // enforce a newline
+    NEWLINE(ElementarySpaceEnum.NEWLINE, ElementarySpaceEnum.NEWLINE, SplitEnum.ALWAYS), // enforce a newline
 
     // easy either left or right, but consistently according to preferences
     // e.g. && either at beginning of line in sequence, or always at end
     // in nice formatting, one space is used
-    ONE_IS_NICE_EASY_L(ElementarySpace.RELAXED_NONE, ElementarySpace.NICE, Split.EASY_L),
-    ONE_IS_NICE_EASY_R(ElementarySpace.RELAXED_NONE, ElementarySpace.NICE, Split.EASY_R);
+    ONE_IS_NICE_EASY_L(ElementarySpaceEnum.RELAXED_NONE, ElementarySpaceEnum.NICE, SplitEnum.EASY_L),
+    ONE_IS_NICE_EASY_R(ElementarySpaceEnum.RELAXED_NONE, ElementarySpaceEnum.NICE, SplitEnum.EASY_R);
 
     private final ElementarySpace minimal;
     private final ElementarySpace nice;
@@ -62,6 +64,7 @@ public enum SpaceEnum implements Space {
         return minimal.write();
     }
 
+    @Override
     public ElementarySpace elementarySpace(FormattingOptions options) {
         return options.compact() ? minimal : nice;
     }
@@ -79,5 +82,15 @@ public enum SpaceEnum implements Space {
     @Override
     public boolean isNewLine() {
         return this == NEWLINE;
+    }
+
+    @Override
+    public Split split() {
+        return split;
+    }
+
+    @Override
+    public ElementarySpace nice() {
+        return nice;
     }
 }

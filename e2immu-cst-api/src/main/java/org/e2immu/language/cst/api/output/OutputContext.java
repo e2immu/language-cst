@@ -4,6 +4,4 @@ public interface OutputContext {
     FormattingOptions defaultFormattingOptions();
 
     Formatter newFormatter(FormattingOptions formattingOptions);
-
-    Qualification qualificationFQN();
 }

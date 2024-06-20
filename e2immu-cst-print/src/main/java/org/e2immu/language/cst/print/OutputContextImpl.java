@@ -15,11 +15,6 @@ public record OutputContextImpl(Runtime runtime) implements OutputContext {
 
     @Override
     public Formatter newFormatter(FormattingOptions formattingOptions) {
-        return new FormatterImpl(formattingOptions);
-    }
-
-    @Override
-    public Qualification qualificationFQN() {
-        return runtime.qualificationFullyQualifiedNames();
+        return new FormatterImpl(runtime, formattingOptions);
     }
 }

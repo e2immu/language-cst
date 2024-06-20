@@ -6,6 +6,8 @@ import org.e2immu.language.cst.api.info.*;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.OutputElement;
 import org.e2immu.language.cst.api.output.Qualification;
+import org.e2immu.language.cst.api.output.element.ElementarySpace;
+import org.e2immu.language.cst.api.output.element.Split;
 import org.e2immu.language.cst.api.runtime.Factory;
 import org.e2immu.language.cst.api.statement.*;
 import org.e2immu.language.cst.api.translate.TranslationMap;
@@ -14,10 +16,7 @@ import org.e2immu.language.cst.impl.expression.*;
 import org.e2immu.language.cst.impl.expression.*;
 import org.e2immu.language.cst.impl.expression.util.PrecedenceEnum;
 import org.e2immu.language.cst.impl.info.*;
-import org.e2immu.language.cst.impl.output.OutputBuilderImpl;
-import org.e2immu.language.cst.impl.output.QualificationImpl;
-import org.e2immu.language.cst.impl.output.SymbolEnum;
-import org.e2immu.language.cst.impl.output.TextImpl;
+import org.e2immu.language.cst.impl.output.*;
 import org.e2immu.language.cst.impl.statement.*;
 import org.e2immu.language.cst.impl.translate.TranslationMapImpl;
 import org.e2immu.language.cst.impl.type.DiamondEnum;
@@ -257,6 +256,16 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     @Override
     public Diamond diamondYes() {
         return DiamondEnum.YES;
+    }
+
+    @Override
+    public ElementarySpace elementarySpaceNice() {
+        return ElementarySpaceEnum.NICE;
+    }
+
+    @Override
+    public ElementarySpace elementarySpaceRelaxedNone() {
+        return ElementarySpaceEnum.RELAXED_NONE;
     }
 
     @Override
@@ -854,6 +863,16 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     @Override
     public Qualification qualificationFullyQualifiedNames() {
         return QualificationImpl.FULLY_QUALIFIED_NAMES;
+    }
+
+    @Override
+    public Qualification qualificationDoNotQualifyImplicit() {
+        return new QualificationImpl(true, TypeNameImpl.Required.FQN);
+    }
+
+    @Override
+    public Split splitNever() {
+        return SplitEnum.NEVER;
     }
 
     @Override

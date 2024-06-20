@@ -16,12 +16,8 @@ package org.e2immu.language.cst.print.formatter;
 
 import org.e2immu.language.cst.api.output.FormattingOptions;
 import org.e2immu.language.cst.api.output.OutputElement;
-import org.e2immu.language.cst.api.output.element.Guide;
-import org.e2immu.language.cst.api.output.element.Space;
-import org.e2immu.language.cst.api.output.element.Symbol;
-import org.e2immu.language.cst.impl.output.ElementarySpace;
-import org.e2immu.language.cst.impl.output.SpaceEnum;
-import org.e2immu.language.cst.impl.output.Split;
+import org.e2immu.language.cst.api.output.element.*;
+import org.e2immu.language.cst.api.runtime.Runtime;
 
 import java.util.List;
 import java.util.function.Function;
@@ -38,7 +34,8 @@ public class Forward {
      * @return true when interrupted by a "true" from the writer; false in all other cases (end of list, exceeding maxChars,
      * reaching maxChars using a guide)
      */
-    public static boolean forward(FormattingOptions options,
+    public static boolean forward(Runtime runtime,
+                                  FormattingOptions options,
                                   List<OutputElement> list,
                                   Function<ForwardInfo, Boolean> writer,
                                   int start,
@@ -48,23 +45,23 @@ public class Forward {
         int chars = 0;
         int end = list.size();
 
-        ElementarySpace lastOneWasSpace = ElementarySpace.NICE; // used to avoid writing double spaces
-        Split split = Split.NEVER;
+        ElementarySpace lastOneWasSpace = runtime.elementarySpaceNice(); // used to avoid writing double spaces
+        Split split = runtime.splitNever();
         boolean wroteOnce = false; // don't write a space at the beginning of the line
-        while (pos < end && ((outputElement = list.get(pos)) != SpaceEnum.NEWLINE)) {
+        while (pos < end && !(outputElement = list.get(pos)).isNewLine()) {
             String string;
 
             Split splitAfterWriting;
             ElementarySpace spaceAfterWriting;
             if (outputElement instanceof Symbol symbol) {
-                split = symbol.left().split;
+                split = symbol.left().split();
                 lastOneWasSpace = combine(lastOneWasSpace, symbol.left().elementarySpace(options));
                 string = symbol.symbol();
                 spaceAfterWriting = symbol.right().elementarySpace(options);
-                splitAfterWriting = symbol.right().split;
+                splitAfterWriting = symbol.right().split();
             } else {
-                spaceAfterWriting = ElementarySpace.RELAXED_NONE;
-                splitAfterWriting = Split.NEVER;
+                spaceAfterWriting = runtime.elementarySpaceRelaxedNone();
+                splitAfterWriting = runtime.splitNever();
                 if (outputElement instanceof Guide) {
                     string = "";
                 } else {
@@ -74,15 +71,16 @@ public class Forward {
             // check for double spaces
             if (outputElement instanceof Space space) {
                 lastOneWasSpace = combine(lastOneWasSpace, space.elementarySpace(options));
-                split = split.easiest(space.split);
+                split = split.easiest(space.split());
             } else if (outputElement instanceof Guide guide) {
                 if (chars >= maxChars) return false;
                 // empty string indicates that there is a Guide on this position
                 // split means nothing here
-                if (writer.apply(new ForwardInfo(pos, chars, null, Split.NEVER, guide, false))) return true;
+                if (writer.apply(new ForwardInfo(pos, chars, null, runtime.splitNever(), guide, false))) {
+                    return true;
+                }
             } else if (!string.isEmpty()) {
-                boolean writeSpace = lastOneWasSpace != ElementarySpace.NONE &&
-                        lastOneWasSpace != ElementarySpace.RELAXED_NONE && wroteOnce;
+                boolean writeSpace = !lastOneWasSpace.isNone() && !lastOneWasSpace.isRelaxedNone() && wroteOnce;
                 String stringToWrite = writeSpace ? (" " + string) : string;
                 if (writer.apply(new ForwardInfo(pos, chars, stringToWrite, split, null,
                         outputElement instanceof Symbol))) return true;
@@ -99,7 +97,7 @@ public class Forward {
     // main point: once we have an enforced ONE, wo do not let go
     // otherwise we step to the spacing of the next one
     private static ElementarySpace combine(ElementarySpace s1, ElementarySpace s2) {
-        if (s1 == ElementarySpace.ONE || s1 == ElementarySpace.NONE) {
+        if (s1.isOne() || s1.isNone()) {
             return s1;
         }
         return s2;

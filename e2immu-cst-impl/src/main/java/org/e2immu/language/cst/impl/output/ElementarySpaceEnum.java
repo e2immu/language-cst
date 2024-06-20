@@ -14,21 +14,37 @@
 
 package org.e2immu.language.cst.impl.output;
 
-public enum Split {
-    NEVER(0),
-    EASY_L(1),
-    EASY_R(2),
-    EASY(3),
-    BEGIN_END(4), // if you split at {, then also at }
-    ALWAYS(5);
+import org.e2immu.language.cst.api.output.element.ElementarySpace;
 
-    private final int rank;
+import java.util.Objects;
 
-    Split(int rank) {
-        this.rank = rank;
+public enum ElementarySpaceEnum implements ElementarySpace {
+    ONE(" "), NICE(" "), NONE(""), RELAXED_NONE(""), NEWLINE("\n"),
+    ;
+
+    private final String space;
+
+    ElementarySpaceEnum(String space) {
+        this.space = Objects.requireNonNull(space);
     }
 
-    public Split easiest(Split split) {
-        return split.rank > this.rank ? split : this;
+    @Override
+    public boolean isNone() {
+        return this == NONE;
+    }
+
+    @Override
+    public boolean isOne() {
+        return this == ONE;
+    }
+
+    @Override
+    public boolean isRelaxedNone() {
+        return this == RELAXED_NONE;
+    }
+
+    @Override
+    public String write() {
+        return space;
     }
 }

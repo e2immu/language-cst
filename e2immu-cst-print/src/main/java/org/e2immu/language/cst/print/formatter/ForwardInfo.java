@@ -15,6 +15,7 @@
 package org.e2immu.language.cst.print.formatter;
 
 import org.e2immu.language.cst.api.output.element.Guide;
+import org.e2immu.language.cst.api.output.element.Split;
 
 public record ForwardInfo(int pos, int chars, String string, Split before, Guide guide, boolean symbol) {
     public boolean isGuide() {

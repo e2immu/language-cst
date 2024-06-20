@@ -5,6 +5,7 @@ import org.e2immu.language.cst.api.output.FormattingOptions;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.OutputElement;
 import org.e2immu.language.cst.api.output.element.Guide;
+import org.e2immu.language.cst.api.runtime.Runtime;
 import org.e2immu.language.cst.print.formatter.CurrentExceeds;
 import org.e2immu.language.cst.print.formatter.Forward;
 import org.e2immu.language.cst.print.formatter.ForwardInfo;
@@ -17,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
 
-public record FormatterImpl(FormattingOptions options) implements Formatter {
+public record FormatterImpl(Runtime runtime, FormattingOptions options) implements Formatter {
 
     public String write(OutputBuilder outputBuilder) {
         try (StringWriter stringWriter = new StringWriter()) {
@@ -74,7 +75,7 @@ public record FormatterImpl(FormattingOptions options) implements Formatter {
             // we should only indent if we wrote a new line
             if (writeNewLine) indent(indent, writer(writer, tabs));
             int lineLength = options.lengthOfLine() - indent;
-            CurrentExceeds currentExceeds = Lookahead.lookAhead(options, list, pos, lineLength);
+            CurrentExceeds currentExceeds = Lookahead.lookAhead(runtime, options, list, pos, lineLength);
 
             NewLineDouble newLineDouble = NOT_END;
             boolean lineSplit = LINE_SPLIT == (tabs.isEmpty() ? NO_GUIDE : tabs.peek().guideIndex);
@@ -224,7 +225,7 @@ public record FormatterImpl(FormattingOptions options) implements Formatter {
      */
     void writeLine(List<OutputElement> list, Writer writer, int start, int end) throws IOException {
         try {
-            Forward.forward(options, list, forwardInfo -> {
+            Forward.forward(runtime, options, list, forwardInfo -> {
                 try {
                     if (forwardInfo.guide() == null) {
                         writer.write(forwardInfo.string());

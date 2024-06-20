@@ -18,6 +18,7 @@ package org.e2immu.language.cst.print.formatter;
 import org.e2immu.language.cst.api.output.FormattingOptions;
 import org.e2immu.language.cst.api.output.OutputElement;
 import org.e2immu.language.cst.api.output.element.Guide;
+import org.e2immu.language.cst.api.runtime.Runtime;
 
 import java.util.List;
 import java.util.Stack;
@@ -33,12 +34,13 @@ public class Lookahead {
      * which can be START, MID or END
      */
 
-    public static CurrentExceeds lookAhead(FormattingOptions options, List<OutputElement> list, int start, int lineLength) {
+    public static CurrentExceeds lookAhead(Runtime runtime, FormattingOptions options,
+                                           List<OutputElement> list, int start, int lineLength) {
         AtomicReference<ForwardInfo> currentForwardInfo = new AtomicReference<>();
         AtomicReference<ForwardInfo> prioritySplit = new AtomicReference<>();
         AtomicReference<ForwardInfo> exceeds = new AtomicReference<>();
         Stack<GuideOnStack> startOfGuides = new Stack<>();
-        Forward.forward(options, list, forwardInfo -> {
+        Forward.forward(runtime, options, list, forwardInfo -> {
             if (forwardInfo.charsPlusString() > lineLength) {
 
                 // exceeding the allowed length of the line... not everything fits on one line
