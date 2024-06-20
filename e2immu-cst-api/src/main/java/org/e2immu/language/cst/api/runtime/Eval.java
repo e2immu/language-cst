@@ -36,6 +36,7 @@ public interface Eval {
 
     Expression divide(Expression lhs, Expression rhs);
 
+    Expression binaryOperator(BinaryOperator binaryOperator);
 
     default Expression sortAndSimplify(Expression expression) {
         if (expression instanceof Sum sum) {
@@ -64,6 +65,9 @@ public interface Eval {
         }
         if (expression instanceof Divide divide) {
             return divide(divide.lhs(), divide.rhs());
+        }
+        if(expression instanceof BinaryOperator binaryOperator) {
+            return binaryOperator(binaryOperator);
         }
         return expression;
     }

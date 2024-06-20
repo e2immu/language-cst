@@ -259,6 +259,8 @@ public interface Factory {
     SwitchEntry newStatementsSwitchEntry(VariableExpression selector,
                                          List<Expression> labels, List<Statement> statements);
 
+    Expression newStringConcat(Expression l, Expression r);
+
     StringConstant newStringConstant(String string);
 
     SwitchExpression newSwitchExpression(VariableExpression selector,

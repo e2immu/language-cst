@@ -929,5 +929,10 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     public DescendMode descendModeYes() {
         return DescendModeEnum.YES;
     }
+
+    @Override
+    public Expression newStringConcat(Expression l, Expression r) {
+        return new StringConcatImpl(this, l, r);
+    }
 }
 

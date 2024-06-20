@@ -1,6 +1,7 @@
 package org.e2immu.language.cst.impl.runtime;
 
 import org.e2immu.language.cst.api.expression.AnnotationExpression;
+import org.e2immu.language.cst.api.expression.BinaryOperator;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.info.ComputeMethodOverrides;
 import org.e2immu.language.cst.api.info.TypeInfo;
@@ -105,6 +106,11 @@ public class RuntimeImpl extends FactoryImpl implements Runtime {
     @Override
     public Expression divide(Expression lhs, Expression rhs) {
         return eval.divide(lhs, rhs);
+    }
+
+    @Override
+    public Expression binaryOperator(BinaryOperator binaryOperator) {
+        return eval.binaryOperator(binaryOperator);
     }
 
     @Override

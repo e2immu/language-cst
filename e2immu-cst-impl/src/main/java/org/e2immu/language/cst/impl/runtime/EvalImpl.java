@@ -1,5 +1,6 @@
 package org.e2immu.language.cst.impl.runtime;
 
+import org.e2immu.language.cst.api.expression.BinaryOperator;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.runtime.Eval;
 import org.e2immu.language.cst.api.runtime.Runtime;
@@ -22,6 +23,7 @@ public class EvalImpl implements Eval {
     private final EvalDivide evalDivide;
     private final EvalInlineConditional evalInlineConditional;
     private final EvalInequality evalInequality;
+    private final EvalBinaryOperator evalBinaryOperator;
 
     public EvalImpl(Runtime runtime) {
         evalProduct = new EvalProduct(runtime);
@@ -33,6 +35,7 @@ public class EvalImpl implements Eval {
         evalDivide = new EvalDivide(runtime);
         evalInlineConditional = new EvalInlineConditional(runtime);
         evalInequality = new EvalInequality(runtime);
+        evalBinaryOperator = new EvalBinaryOperator(runtime);
     }
 
     @Override
@@ -43,6 +46,11 @@ public class EvalImpl implements Eval {
     @Override
     public Expression divide(Expression lhs, Expression rhs) {
         return evalDivide.divide(lhs, rhs);
+    }
+
+    @Override
+    public Expression binaryOperator(BinaryOperator binaryOperator) {
+        return evalBinaryOperator.eval(binaryOperator);
     }
 
     @Override
