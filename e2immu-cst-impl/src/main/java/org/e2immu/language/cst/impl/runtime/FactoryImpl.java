@@ -19,10 +19,7 @@ import org.e2immu.language.cst.impl.info.*;
 import org.e2immu.language.cst.impl.output.*;
 import org.e2immu.language.cst.impl.statement.*;
 import org.e2immu.language.cst.impl.translate.TranslationMapImpl;
-import org.e2immu.language.cst.impl.type.DiamondEnum;
-import org.e2immu.language.cst.impl.type.ParameterizedTypeImpl;
-import org.e2immu.language.cst.impl.type.TypeParameterImpl;
-import org.e2immu.language.cst.impl.type.WildcardEnum;
+import org.e2immu.language.cst.impl.type.*;
 import org.e2immu.language.cst.impl.util.IntUtil;
 import org.e2immu.language.cst.impl.variable.*;
 import org.e2immu.language.cst.api.type.*;
@@ -320,8 +317,8 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
-    public Expression newMultiExpressions(List<Expression> newExpressions) {
-        return null;
+    public Expression newMultiExpressions(List<Expression> expressions) {
+        return new CommaExpressionImpl(List.of(), null, expressions);
     }
 
     @Override
@@ -346,12 +343,12 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
 
     @Override
     public Instance newInstanceForTooComplex(ParameterizedType parameterizedType) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public ParameterizedType commonType(ParameterizedType pt1, ParameterizedType pt2) {
-        return null;
+        return new CommonType(this).commonType(pt1, pt2);
     }
 
     @Override

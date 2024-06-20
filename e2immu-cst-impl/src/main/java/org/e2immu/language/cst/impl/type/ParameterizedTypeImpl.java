@@ -5,8 +5,9 @@ import org.e2immu.language.cst.api.info.MethodInfo;
 import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
+import org.e2immu.language.cst.api.runtime.Predefined;
 import org.e2immu.language.cst.api.runtime.PredefinedWithoutParameterizedType;
-import org.e2immu.language.cst.api.runtime.Runtime;
+import org.e2immu.language.cst.api.runtime.Predefined;
 import org.e2immu.language.cst.impl.element.ElementImpl;
 import org.e2immu.language.cst.impl.output.QualificationImpl;
 import org.e2immu.language.cst.api.type.*;
@@ -260,7 +261,7 @@ public class ParameterizedTypeImpl implements ParameterizedType {
     }
 
     @Override
-    public boolean isAssignableFrom(Runtime runtime, ParameterizedType other) {
+    public boolean isAssignableFrom(Predefined runtime, ParameterizedType other) {
         return new IsAssignableFrom(runtime, this, other).execute();
     }
 
@@ -270,11 +271,11 @@ public class ParameterizedTypeImpl implements ParameterizedType {
     }
 
     @Override
-    public TypeInfo toBoxed(Runtime runtime) {
+    public TypeInfo toBoxed(Predefined runtime) {
         return runtime.boxed(typeInfo);
     }
 
-    public ParameterizedType ensureBoxed(Runtime runtime) {
+    public ParameterizedType ensureBoxed(Predefined runtime) {
         if (isPrimitiveExcludingVoid() || isVoid()) {
             return toBoxed(runtime).asSimpleParameterizedType();
         }
@@ -306,7 +307,7 @@ public class ParameterizedTypeImpl implements ParameterizedType {
     }
 
     @Override
-    public ParameterizedType concreteSuperType(Runtime runtime, ParameterizedType superType) {
+    public ParameterizedType concreteSuperType(Predefined runtime, ParameterizedType superType) {
         TypeInfo bestType = bestTypeInfo();
         if (bestType == superType.typeInfo()) {
             // if we start with Iterable<String>, and we're aiming for Iterable<E>, then
@@ -340,12 +341,7 @@ public class ParameterizedTypeImpl implements ParameterizedType {
     }
 
     @Override
-    public ParameterizedType commonType(Runtime runtime, ParameterizedType other) {
-        return new CommonType(runtime).commonType(this, other);
-    }
-
-    @Override
-    public ParameterizedType concreteDirectSuperType(Runtime runtime, ParameterizedType parentType) {
+    public ParameterizedType concreteDirectSuperType(Predefined runtime, ParameterizedType parentType) {
         if (parentType.parameters().isEmpty()) return parentType;
 
         Map<NamedType, ParameterizedType> map = initialTypeParameterMap(runtime);
@@ -369,13 +365,13 @@ public class ParameterizedTypeImpl implements ParameterizedType {
     }
 
     @Override
-    public Map<NamedType, ParameterizedType> initialTypeParameterMap(Runtime runtime) {
+    public Map<NamedType, ParameterizedType> initialTypeParameterMap(Predefined runtime) {
         if (!isType()) return Map.of();
         if (parameters.isEmpty()) return Map.of();
         return initialTypeParameterMap(runtime, new HashSet<>());
     }
 
-    private Map<NamedType, ParameterizedType> initialTypeParameterMap(Runtime runtime, Set<TypeInfo> visited) {
+    private Map<NamedType, ParameterizedType> initialTypeParameterMap(Predefined runtime, Set<TypeInfo> visited) {
         if (!isType()) return Map.of();
         visited.add(typeInfo);
         if (parameters.isEmpty()) return Map.of();
@@ -444,7 +440,7 @@ public class ParameterizedTypeImpl implements ParameterizedType {
     }
 
     @Override
-    public ParameterizedType mostSpecific(Runtime runtime, TypeInfo primaryType, ParameterizedType other) {
+    public ParameterizedType mostSpecific(Predefined runtime, TypeInfo primaryType, ParameterizedType other) {
         if (equals(other)) return this;
         if (isType() && typeInfo.isVoid() || other.isType() && other.typeInfo().isVoid()) {
             return runtime.voidParameterizedType();
@@ -476,7 +472,7 @@ public class ParameterizedTypeImpl implements ParameterizedType {
     Given Map<K, V>, go from abstract to concrete (HM:K to Map:K, HM:V to Map:V)
     */
     @Override
-    public Map<NamedType, ParameterizedType> forwardTypeParameterMap(Runtime runtime) {
+    public Map<NamedType, ParameterizedType> forwardTypeParameterMap(Predefined runtime) {
         if (!isType()) return Map.of();
         if (parameters.isEmpty()) return Map.of();
         ParameterizedType originalType = typeInfo.asParameterizedType(runtime); // Map:K, Map:V

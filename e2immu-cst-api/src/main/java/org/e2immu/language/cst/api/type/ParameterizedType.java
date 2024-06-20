@@ -4,8 +4,10 @@ import org.e2immu.language.cst.api.element.Element;
 import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
+import org.e2immu.language.cst.api.runtime.Factory;
+import org.e2immu.language.cst.api.runtime.Predefined;
 import org.e2immu.language.cst.api.runtime.PredefinedWithoutParameterizedType;
-import org.e2immu.language.cst.api.runtime.Runtime;
+import org.e2immu.language.cst.api.runtime.Predefined;
 
 import java.util.List;
 import java.util.Map;
@@ -41,7 +43,7 @@ public interface ParameterizedType {
 
     // conversions
 
-    ParameterizedType ensureBoxed(Runtime runtime);
+    ParameterizedType ensureBoxed(Predefined runtime);
 
     ParameterizedType erased();
 
@@ -90,7 +92,7 @@ public interface ParameterizedType {
     boolean isUnboundTypeParameter();
 
     // TODO consider moving this to "runtime"
-    boolean isAssignableFrom(Runtime runtime, ParameterizedType other);
+    boolean isAssignableFrom(Predefined runtime, ParameterizedType other);
 
     String detailedString();
 
@@ -98,7 +100,7 @@ public interface ParameterizedType {
         return typeInfo() != null;
     }
 
-    TypeInfo toBoxed(Runtime runtime);
+    TypeInfo toBoxed(Predefined runtime);
 
     String printForMethodFQN(boolean varArgs, Diamond diamond);
 
@@ -106,15 +108,13 @@ public interface ParameterizedType {
 
     boolean isTypeOfNullConstant();
 
-    ParameterizedType concreteDirectSuperType(Runtime runtime, ParameterizedType interfaceImplemented);
+    ParameterizedType concreteDirectSuperType(Predefined runtime, ParameterizedType interfaceImplemented);
 
-    ParameterizedType concreteSuperType(Runtime runtime, ParameterizedType superType);
-
-    ParameterizedType commonType(Runtime runtime, ParameterizedType other);
+    ParameterizedType concreteSuperType(Predefined runtime, ParameterizedType superType);
 
     boolean isUnboundWildcard();
 
-    ParameterizedType mostSpecific(Runtime runtime,
+    ParameterizedType mostSpecific(Predefined runtime,
                                    TypeInfo primaryType,
                                    ParameterizedType other);
 
@@ -125,13 +125,13 @@ public interface ParameterizedType {
        With visited, the method returns K=Integer, V=Map<Integer,String> when presented with Map<Integer,Map<Integer,String>>,
        without visited, it would recurse and return K=Integer, V=String
        */
-    Map<NamedType, ParameterizedType> initialTypeParameterMap(Runtime runtime);
+    Map<NamedType, ParameterizedType> initialTypeParameterMap(Predefined runtime);
 
     /*
     HashMap<K, V> implements Map<K, V>
     Given Map<K, V>, go from abstract to concrete (HM:K to Map:K, HM:V to Map:V)
     */
-    Map<NamedType, ParameterizedType> forwardTypeParameterMap(Runtime runtime);
+    Map<NamedType, ParameterizedType> forwardTypeParameterMap(Predefined runtime);
 
     ParameterizedType applyTranslation(PredefinedWithoutParameterizedType predefined,
                                        Map<NamedType, ParameterizedType> translate);

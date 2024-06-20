@@ -5,6 +5,7 @@ import org.e2immu.language.cst.api.expression.AnnotationExpression;
 import org.e2immu.language.cst.api.info.*;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
+import org.e2immu.language.cst.api.runtime.Predefined;
 import org.e2immu.language.cst.api.runtime.Runtime;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.type.TypeNature;
@@ -176,7 +177,7 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     }
 
     @Override
-    public ParameterizedType asParameterizedType(Runtime runtime) {
+    public ParameterizedType asParameterizedType(Predefined runtime) {
         List<ParameterizedType> typeParameters = typeParameters()
                 .stream().map(tp -> tp.asParameterizedType(runtime))
                 .collect(Collectors.toList());

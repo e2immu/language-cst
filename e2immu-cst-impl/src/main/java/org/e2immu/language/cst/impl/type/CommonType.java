@@ -1,15 +1,16 @@
 package org.e2immu.language.cst.impl.type;
 
 import org.e2immu.language.cst.api.info.TypeInfo;
+import org.e2immu.language.cst.api.runtime.Predefined;
 import org.e2immu.language.cst.api.runtime.Runtime;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 
 import java.util.*;
 
 public class CommonType {
-    private final Runtime runtime;
+    private final Predefined runtime;
 
-    public CommonType(Runtime runtime) {
+    public CommonType(Predefined runtime) {
         this.runtime = runtime;
     }
 

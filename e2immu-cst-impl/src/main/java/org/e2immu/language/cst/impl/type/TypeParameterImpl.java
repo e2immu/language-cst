@@ -4,6 +4,7 @@ import org.e2immu.language.cst.api.info.MethodInfo;
 import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
+import org.e2immu.language.cst.api.runtime.Predefined;
 import org.e2immu.language.cst.api.runtime.Runtime;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.type.TypeParameter;
@@ -81,7 +82,7 @@ public class TypeParameterImpl implements TypeParameter {
     }
 
     @Override
-    public ParameterizedType asParameterizedType(Runtime runtime) {
+    public ParameterizedType asParameterizedType(Predefined runtime) {
         // NOTE: we do not add the type bounds
         return new ParameterizedTypeImpl(this, 0);
     }

@@ -3,6 +3,7 @@ package org.e2immu.language.cst.impl.type;
 import org.e2immu.language.cst.api.info.MethodInfo;
 import org.e2immu.language.cst.api.info.ParameterInfo;
 import org.e2immu.language.cst.api.info.TypeInfo;
+import org.e2immu.language.cst.api.runtime.Predefined;
 import org.e2immu.language.cst.api.runtime.Runtime;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.type.TypeParameter;
@@ -18,7 +19,7 @@ import java.util.function.IntBinaryOperator;
  * @param target
  * @param from
  */
-public record IsAssignableFrom(Runtime runtime,
+public record IsAssignableFrom(Predefined runtime,
                                ParameterizedType target,
                                ParameterizedType from) {
 
