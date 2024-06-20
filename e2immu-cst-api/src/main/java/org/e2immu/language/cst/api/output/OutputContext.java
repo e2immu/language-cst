@@ -6,6 +6,4 @@ public interface OutputContext {
     Formatter newFormatter(FormattingOptions formattingOptions);
 
     Qualification qualificationFQN();
-
-    Qualification doNotQualifyImplicit();
 }

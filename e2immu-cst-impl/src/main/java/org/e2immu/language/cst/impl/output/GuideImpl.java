@@ -149,4 +149,19 @@ public record GuideImpl(String name,
             case END -> "end";
         }) + "()) // priority=" + prioritySplit + ", startNL=" + startWithNewLine + ", endNL=" + endWithNewLine;
     }
+
+    @Override
+    public boolean positionIsMid() {
+        return position == Position.MID;
+    }
+
+    @Override
+    public boolean positionIsStart() {
+        return position == Position.START;
+    }
+
+    @Override
+    public boolean positionIsEnd() {
+        return position == Position.END;
+    }
 }

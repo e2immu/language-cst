@@ -2,6 +2,18 @@ package org.e2immu.language.cst.api.output;
 
 public interface OutputElement {
 
+    default boolean isLeftBlockComment() {
+        return false;
+    }
+
+    default boolean isNewLine() {
+        return false;
+    }
+
+    default boolean isRightBlockComment() {
+        return false;
+    }
+
     String minimal();
 
     String write(FormattingOptions options);

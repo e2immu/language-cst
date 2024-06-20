@@ -75,4 +75,9 @@ public enum SpaceEnum implements Space {
     public String generateJavaForDebugging() {
         return ".add(Space." + this.name() + ")";
     }
+
+    @Override
+    public boolean isNewLine() {
+        return this == NEWLINE;
+    }
 }

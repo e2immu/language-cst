@@ -117,4 +117,14 @@ public record SymbolEnum(String symbol, Space left, Space right, String constant
     public String symbol() {
         return symbol;
     }
+
+    @Override
+    public boolean isLeftBlockComment() {
+        return this == LEFT_BLOCK_COMMENT;
+    }
+
+    @Override
+    public boolean isRightBlockComment() {
+        return this == RIGHT_BLOCK_COMMENT;
+    }
 }
