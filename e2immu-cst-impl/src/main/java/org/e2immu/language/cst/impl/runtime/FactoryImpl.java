@@ -59,7 +59,7 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
 
     @Override
     public InstanceOf newInstanceOf(ParameterizedType parameterizedType, Expression expression, LocalVariable patternVariable) {
-        throw new UnsupportedOperationException();
+        return new InstanceOfImpl(List.of(), null, expression, parameterizedType, patternVariable);
     }
 
     @Override

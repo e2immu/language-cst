@@ -15,11 +15,7 @@
 package org.e2immu.language.cst.impl.expression;
 
 import org.e2immu.language.cst.api.expression.Expression;
-import org.e2immu.language.cst.api.variable.Variable;
 import org.junit.jupiter.api.Test;
-
-import java.util.Map;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -92,58 +88,63 @@ public class TestAbstractValue extends CommonTest {
         Expression or2 = r.or(iva, iva2);
         assertEquals("a instanceof Object||a instanceof String", or2.toString());
     }
-/*
-    Map<Variable, Boolean> nullClauses(Expression v, boolean accept) {
-        Filter filter = new Filter(context, filterMode);
-        return filter.filter(v, filter.individualNullOrNotNullClause()).accepted()
-                .entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey,
-                        e -> e.getValue() instanceof Equals Equals && Equals.lhs == NullConstant.NULL_CONSTANT));
-    }
 
-    // note: van and vbn are nullable, va and vb are NOT (see CommonAbstractValue)
-    @Test
-    public void testIsNull() {
-        Expression v = r.equals(an, r.nullConstant());
-        assertEquals("null==an", v.toString());
-        Map<Variable, Boolean> nullClauses = nullClauses(v, Filter.FilterMode.ACCEPT);
-        assertEquals(1, nullClauses.size());
-        assertEquals(true, nullClauses.get(van));
+    /*
+        Map<Variable, Boolean> nullClauses(Expression v, boolean accept) {
+            Filter filter = new Filter(context, filterMode);
+            return filter.filter(v, filter.individualNullOrNotNullClause()).accepted()
+                    .entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey,
+                            e -> e.getValue() instanceof Equals Equals && Equals.lhs == NullConstant.NULL_CONSTANT));
+        }
 
-        Expression v2 = r.equals(bn, r.nullConstant());
-        assertEquals("null==bn", v2.toString());
-        Map<Variable, Boolean> nullClauses2 = nullClauses(v2, Filter.FilterMode.ACCEPT);
-        assertEquals(1, nullClauses2.size());
-        assertEquals(true, nullClauses2.get(vbn));
+        // note: van and vbn are nullable, va and vb are NOT (see CommonAbstractValue)
+        @Test
+        public void testIsNull() {
+            Expression v = r.equals(an, r.nullConstant());
+            assertEquals("null==an", v.toString());
+            Map<Variable, Boolean> nullClauses = nullClauses(v, Filter.FilterMode.ACCEPT);
+            assertEquals(1, nullClauses.size());
+            assertEquals(true, nullClauses.get(van));
 
-        Expression orValue = r.or(v, r.negate(v2));
-        assertEquals("null==an||null!=bn", orValue.toString());
-        Map<Variable, Boolean> nullClausesAnd = nullClauses(orValue, Filter.FilterMode.REJECT);
-        assertEquals(2, nullClausesAnd.size());
-        assertEquals(true, nullClausesAnd.get(van));
-        assertEquals(false, nullClausesAnd.get(vbn));
-    }
+            Expression v2 = r.equals(bn, r.nullConstant());
+            assertEquals("null==bn", v2.toString());
+            Map<Variable, Boolean> nullClauses2 = nullClauses(v2, Filter.FilterMode.ACCEPT);
+            assertEquals(1, nullClauses2.size());
+            assertEquals(true, nullClauses2.get(vbn));
 
-    @Test
-    public void testIsNotNull() {
-        Expression v = r.negate(r.equals(r.nullConstant(), a));
-        assertEquals("null!=a", v.toString());
-        Map<Variable, Boolean> nullClauses = nullClauses(v, Filter.FilterMode.REJECT);
-        assertEquals(1, nullClauses.size());
-        assertEquals(false, nullClauses.get(va));
-    }
-*/
+            Expression orValue = r.or(v, r.negate(v2));
+            assertEquals("null==an||null!=bn", orValue.toString());
+            Map<Variable, Boolean> nullClausesAnd = nullClauses(orValue, Filter.FilterMode.REJECT);
+            assertEquals(2, nullClausesAnd.size());
+            assertEquals(true, nullClausesAnd.get(van));
+            assertEquals(false, nullClausesAnd.get(vbn));
+        }
+
+        @Test
+        public void testIsNotNull() {
+            Expression v = r.negate(r.equals(r.nullConstant(), a));
+            assertEquals("null!=a", v.toString());
+            Map<Variable, Boolean> nullClauses = nullClauses(v, Filter.FilterMode.REJECT);
+            assertEquals(1, nullClauses.size());
+            assertEquals(false, nullClauses.get(va));
+        }
+    */
     public static final String EXPECTED = "(a||c)&&(a||d)&&(b||c)&&(b||d)";
     public static final String EXPECTED2 = "(a||!c)&&(a||d)&&(!b||!c)&&(!b||d)";
 
     @Test
     public void testCNF() {
         // (a && b) || (c && d)
-        Expression or = r.or(r.and(a, b), r.and(c, d));
+        Expression and1 = r.and(a, b);
+        assertEquals("a&&b", and1.toString());
+        Expression and2 = r.and(c, d);
+        assertEquals("c&&d", and2.toString());
+        Expression or = r.or(and1, and2);
         assertEquals(EXPECTED, or.toString());
-        or = r.or(r.and(b, a), r.and(d, c));
-        assertEquals(EXPECTED, or.toString());
-        or = r.or(r.and(d, c), r.and(b, a));
-        assertEquals(EXPECTED, or.toString());
+        Expression or2 = r.or(r.and(b, a), r.and(d, c));
+        assertEquals(EXPECTED, or2.toString());
+        Expression or3 = r.or(r.and(d, c), r.and(b, a));
+        assertEquals(EXPECTED, or3.toString());
     }
 
     @Test
@@ -152,10 +153,10 @@ public class TestAbstractValue extends CommonTest {
         Expression notC = r.negate(c);
         Expression or = r.or(r.and(a, notB), r.and(notC, d));
         assertEquals(EXPECTED2, or.toString());
-        or = r.or(r.and(notB, a), r.and(d, notC));
-        assertEquals(EXPECTED2, or.toString());
-        or = r.or(r.and(d, notC), r.and(notB, a));
-        assertEquals(EXPECTED2, or.toString());
+        Expression or2 = r.or(r.and(notB, a), r.and(d, notC));
+        assertEquals(EXPECTED2, or2.toString());
+        Expression or3 = r.or(r.and(d, notC), r.and(notB, a));
+        assertEquals(EXPECTED2, or3.toString());
     }
 
     // (not ('a' == c (parameter 0)) and not ('b' == c (parameter 0)) and ('a' == c (parameter 0) or 'b' == c (parameter 0)))

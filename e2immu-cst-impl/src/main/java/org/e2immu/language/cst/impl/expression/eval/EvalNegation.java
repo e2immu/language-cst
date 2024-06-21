@@ -21,6 +21,9 @@ public class EvalNegation {
         if (v instanceof BooleanConstant boolValue) {
             return boolValue.negate();
         }
+        if(v instanceof Negation n) {
+            return n.expression();
+        }
         if (v instanceof Numeric numeric) {
             return numeric.negate();
         }

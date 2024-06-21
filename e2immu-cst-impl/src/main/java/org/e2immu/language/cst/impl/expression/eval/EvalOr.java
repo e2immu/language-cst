@@ -141,7 +141,7 @@ public class EvalOr {
         ArrayList<Expression> finalValues = concat;
         if (firstAnd != null) {
             List<Expression> components = firstAnd.expressions().stream()
-                    .map(v -> runtime.and(ListUtil.immutableConcat(finalValues, List.of(v))))
+                    .map(v -> eval(ListUtil.immutableConcat(finalValues, List.of(v))))
                     .toList();
             LOGGER.debug("Found And-clause {}, components for new And are {}", firstAnd, components);
             int complexityComponents = components.stream().mapToInt(Expression::complexity).sum();
