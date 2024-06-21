@@ -8,5 +8,5 @@ public interface InstanceOf extends Expression {
 
     LocalVariable patternVariable();
 
-    ParameterizedType parameterizedType();
+    ParameterizedType testType();
 }

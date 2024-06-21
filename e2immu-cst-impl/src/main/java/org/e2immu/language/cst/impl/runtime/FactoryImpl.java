@@ -58,8 +58,9 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
-    public InstanceOf newInstanceOf(ParameterizedType parameterizedType, Expression expression, LocalVariable patternVariable) {
-        return new InstanceOfImpl(List.of(), null, expression, parameterizedType, patternVariable);
+    public InstanceOf newInstanceOf(Expression expression, ParameterizedType parameterizedType, LocalVariable patternVariable) {
+        return new InstanceOfImpl(List.of(), null, expression, parameterizedType, patternVariable,
+                booleanParameterizedType());
     }
 
     @Override

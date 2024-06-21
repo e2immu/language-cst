@@ -196,7 +196,11 @@ public interface Factory {
 
     Instance newInstanceForTooComplex(ParameterizedType parameterizedType);
 
-    InstanceOf newInstanceOf(ParameterizedType parameterizedType, Expression expression, LocalVariable patternVariable);
+    default InstanceOf newInstanceOf(Expression expression, ParameterizedType parameterizedType) {
+        return newInstanceOf(expression, parameterizedType, null);
+    }
+
+    InstanceOf newInstanceOf(Expression expression, ParameterizedType parameterizedType, LocalVariable patternVariable);
 
     IntConstant newInt(int i);
 

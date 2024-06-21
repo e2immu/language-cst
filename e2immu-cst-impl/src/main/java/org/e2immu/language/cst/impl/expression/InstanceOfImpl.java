@@ -31,18 +31,21 @@ import java.util.stream.Stream;
 
 public class InstanceOfImpl extends ExpressionImpl implements InstanceOf {
     private final Expression expression;
-    private final ParameterizedType parameterizedType;
+    private final ParameterizedType testType;
     private final LocalVariable patternVariable;
+    private final ParameterizedType booleanParameterizedType;
 
     public InstanceOfImpl(List<Comment> comments,
                           Source source,
                           Expression expression,
-                          ParameterizedType parameterizedType,
-                          LocalVariable patternVariable) {
+                          ParameterizedType testType,
+                          LocalVariable patternVariable,
+                          ParameterizedType booleanParameterizedType) {
         super(comments, source, 2 + expression.complexity());
         this.expression = expression;
-        this.parameterizedType = parameterizedType;
+        this.testType = testType;
         this.patternVariable = patternVariable;
+        this.booleanParameterizedType = booleanParameterizedType;
     }
 
     @Override
@@ -50,13 +53,13 @@ public class InstanceOfImpl extends ExpressionImpl implements InstanceOf {
         if (this == o) return true;
         if (!(o instanceof InstanceOfImpl that)) return false;
         return Objects.equals(expression, that.expression)
-               && Objects.equals(parameterizedType, that.parameterizedType)
+               && Objects.equals(testType, that.testType)
                && Objects.equals(patternVariable, that.patternVariable);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(expression, parameterizedType, patternVariable);
+        return Objects.hash(expression, testType, patternVariable);
     }
 
     @Override
@@ -65,8 +68,13 @@ public class InstanceOfImpl extends ExpressionImpl implements InstanceOf {
     }
 
     @Override
+    public ParameterizedType testType() {
+        return testType;
+    }
+
+    @Override
     public ParameterizedType parameterizedType() {
-        return parameterizedType;
+        return booleanParameterizedType;
     }
 
     @Override
@@ -86,10 +94,10 @@ public class InstanceOfImpl extends ExpressionImpl implements InstanceOf {
                 && other.expression() instanceof VariableExpression ve2) {
                 int c = ve.variable().fullyQualifiedName().compareTo(ve2.variable().fullyQualifiedName());
                 if (c == 0)
-                    c = parameterizedType.detailedString().compareTo(other.parameterizedType().detailedString());
+                    c = testType.detailedString().compareTo(other.parameterizedType().detailedString());
                 return c;
             }
-            int c = parameterizedType.fullyQualifiedName().compareTo(other.parameterizedType().fullyQualifiedName());
+            int c = testType.fullyQualifiedName().compareTo(other.parameterizedType().fullyQualifiedName());
             if (c != 0) return c;
             return expression.compareTo(other.expression());
         }
@@ -101,14 +109,16 @@ public class InstanceOfImpl extends ExpressionImpl implements InstanceOf {
         Expression translated = translationMap.translateExpression(this);
         if (translated != this) return translated;
 
-        ParameterizedType translatedType = translationMap.translateType(this.parameterizedType);
+        ParameterizedType translatedType = translationMap.translateType(this.testType);
         Expression translatedExpression = expression.translate(translationMap);
         LocalVariable translatedLv = patternVariable == null ? null
                 : (LocalVariable) translationMap.translateVariable(patternVariable);
-        if (translatedType == parameterizedType && translatedExpression == expression && translatedLv == patternVariable) {
+        if (translatedType == testType && translatedExpression == expression
+            && translatedLv == patternVariable) {
             return this;
         }
-        return new InstanceOfImpl(comments(), source(), translatedExpression, translatedType, translatedLv);
+        return new InstanceOfImpl(comments(), source(), translatedExpression, translatedType, translatedLv,
+                booleanParameterizedType);
     }
 
     @Override
@@ -137,7 +147,7 @@ public class InstanceOfImpl extends ExpressionImpl implements InstanceOf {
         OutputBuilder ob = new OutputBuilderImpl()
                 .add(expression.print(qualification))
                 .add(SymbolEnum.INSTANCE_OF)
-                .add(parameterizedType.print(qualification, false, DiamondEnum.SHOW_ALL));
+                .add(testType.print(qualification, false, DiamondEnum.SHOW_ALL));
         if (patternVariable != null) {
             ob.add(SpaceEnum.ONE).add(patternVariable.print(qualification));
         }
@@ -151,7 +161,7 @@ public class InstanceOfImpl extends ExpressionImpl implements InstanceOf {
 
     @Override
     public Stream<Element.TypeReference> typesReferenced() {
-        return Stream.concat(Stream.of(new ElementImpl.TypeReference(parameterizedType.typeInfo(), true)),
+        return Stream.concat(Stream.of(new ElementImpl.TypeReference(testType.typeInfo(), true)),
                 expression.typesReferenced());
     }
 }

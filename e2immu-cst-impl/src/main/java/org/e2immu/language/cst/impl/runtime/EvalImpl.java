@@ -2,11 +2,11 @@ package org.e2immu.language.cst.impl.runtime;
 
 import org.e2immu.language.cst.api.expression.BinaryOperator;
 import org.e2immu.language.cst.api.expression.Expression;
+import org.e2immu.language.cst.api.expression.InstanceOf;
 import org.e2immu.language.cst.api.runtime.Eval;
 import org.e2immu.language.cst.api.runtime.Runtime;
 import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.language.cst.impl.expression.ExpressionImpl;
-import org.e2immu.language.cst.impl.expression.eval.*;
 import org.e2immu.language.cst.impl.expression.eval.*;
 
 import java.util.Arrays;
@@ -24,6 +24,7 @@ public class EvalImpl implements Eval {
     private final EvalInlineConditional evalInlineConditional;
     private final EvalInequality evalInequality;
     private final EvalBinaryOperator evalBinaryOperator;
+    private final EvalInstanceOf evalInstanceOf;
 
     public EvalImpl(Runtime runtime) {
         evalProduct = new EvalProduct(runtime);
@@ -36,6 +37,12 @@ public class EvalImpl implements Eval {
         evalInlineConditional = new EvalInlineConditional(runtime);
         evalInequality = new EvalInequality(runtime);
         evalBinaryOperator = new EvalBinaryOperator(runtime);
+        evalInstanceOf = new EvalInstanceOf(runtime);
+    }
+
+    @Override
+    public Expression instanceOf(InstanceOf instanceOf) {
+        return evalInstanceOf.eval(instanceOf);
     }
 
     @Override

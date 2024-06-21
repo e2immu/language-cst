@@ -9,6 +9,8 @@ import java.util.stream.Stream;
 
 public interface Eval {
 
+    Expression instanceOf(InstanceOf instanceOf);
+
     Expression inlineConditional(Expression condition, Expression ifTrue, Expression ifFalse,
                                  Variable myself, boolean modifying);
 
@@ -68,6 +70,9 @@ public interface Eval {
         }
         if(expression instanceof BinaryOperator binaryOperator) {
             return binaryOperator(binaryOperator);
+        }
+        if(expression instanceof InstanceOf instanceOf) {
+            return instanceOf(instanceOf);
         }
         return expression;
     }
