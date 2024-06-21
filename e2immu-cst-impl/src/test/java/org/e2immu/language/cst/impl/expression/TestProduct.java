@@ -35,7 +35,7 @@ public class TestProduct extends CommonTest {
         Expression all = r.sum(r.sum(s1, s2), p1);
         assertEquals("2+i+k+k*l+m*n", all.toString());
         Expression product = r.product(all, all);
-        assertEquals(129, product.complexity());
+        assertEquals(140, product.complexity());
         assertEquals("4+4*i+i*i+4*k+k*k+2*i*k+4*k*l+k*l*k*l+2*k*k*l+4*m*n+m*n*m*n+2*i*k*l+2*i*m*n+2*k*m*n+2*k*l*m*n",
                 product.toString());
     }
@@ -45,7 +45,7 @@ public class TestProduct extends CommonTest {
         Expression all = r.sum(r.sum(r.sum(r.product(k, l), i), r.sum(k, r.newInt(2))), m);
         assertEquals("2+i+k+m+k*l", all.toString());
         Expression product = r.product(all, all);
-        assertEquals(111, product.complexity());
+        assertEquals(122, product.complexity());
         assertEquals("4+4*i+i*i+4*k+k*k+4*m+m*m+2*i*k+2*i*m+4*k*l+k*l*k*l+2*k*k*l+2*k*m+2*i*k*l+2*m*k*l",
                 product.toString());
     }
