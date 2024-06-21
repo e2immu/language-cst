@@ -22,7 +22,7 @@ public interface Variable extends Comparable<Variable>, Element, OneVariable {
 
     @Override
     default int compareTo(Variable o) {
-        throw new UnsupportedOperationException();
+       return fullyQualifiedName().compareTo(o.fullyQualifiedName());
     }
 
     default boolean isStatic() {

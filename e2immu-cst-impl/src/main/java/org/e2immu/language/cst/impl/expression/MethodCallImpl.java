@@ -59,7 +59,6 @@ public class MethodCallImpl extends ExpressionImpl implements MethodCall {
         private String modificationTimes = "";
 
         public Builder() {
-
         }
 
         public Builder(MethodCall mc) {
@@ -194,12 +193,18 @@ public class MethodCallImpl extends ExpressionImpl implements MethodCall {
 
     @Override
     public void visit(Predicate<Element> predicate) {
-
+        if (predicate.test(this)) {
+            object.visit(predicate);
+            parameterExpressions.forEach(e -> e.visit(predicate));
+        }
     }
 
     @Override
     public void visit(Visitor visitor) {
-
+        if (visitor.beforeExpression(this)) {
+            object.visit(visitor);
+            parameterExpressions.forEach(e -> e.visit(visitor));
+        }
     }
 
     @Override
@@ -285,12 +290,14 @@ public class MethodCallImpl extends ExpressionImpl implements MethodCall {
 
     @Override
     public Stream<Variable> variables(DescendMode descendMode) {
-        return Stream.empty();
+        return Stream.concat(object.variables(descendMode),
+                parameterExpressions.stream().flatMap(e -> e.variables(descendMode)));
     }
 
     @Override
     public Stream<Element.TypeReference> typesReferenced() {
-        return Stream.empty();
+        return Stream.concat(object.typesReferenced(),
+                parameterExpressions.stream().flatMap(Expression::typesReferenced));
     }
 
     @Override

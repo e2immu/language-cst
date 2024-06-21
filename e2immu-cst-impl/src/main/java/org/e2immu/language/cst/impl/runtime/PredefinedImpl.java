@@ -18,7 +18,7 @@ import java.util.*;
 
 public class PredefinedImpl implements Predefined {
     private static final CompilationUnit JAVA_PRIMITIVE = new CompilationUnitImpl.Builder().build();
-    private static final CompilationUnit JAVA_LANG =new CompilationUnitImpl.Builder().setPackageName("java.lang").build();
+    private static final CompilationUnit JAVA_LANG = new CompilationUnitImpl.Builder().setPackageName("java.lang").build();
 
     private final TypeInfo intTypeInfo = new TypeInfoImpl(JAVA_PRIMITIVE, "int");
     private final ParameterizedType intParameterizedType = intTypeInfo.asSimpleParameterizedType();
@@ -207,23 +207,28 @@ public class PredefinedImpl implements Predefined {
         return primitiveByName;
     }
 
-    private final Set<TypeInfo> boxed = Set.of(boxedBooleanTypeInfo, boxedByteTypeInfo, boxedDoubleTypeInfo, boxedFloatTypeInfo,
-            boxedLongTypeInfo, boxedShortTypeInfo, boxedVoidTypeInfo, integerTypeInfo, characterTypeInfo);
-
-    private final Set<TypeInfo> primitives = Set.of(booleanTypeInfo, byteTypeInfo, doubleTypeInfo, floatTypeInfo,
-            longTypeInfo, shortTypeInfo, voidTypeInfo, intTypeInfo, charTypeInfo);
-
-
     public PredefinedImpl() {
+        Set<TypeInfo> primitives = Set.of(booleanTypeInfo, byteTypeInfo, doubleTypeInfo, floatTypeInfo,
+                longTypeInfo, shortTypeInfo, voidTypeInfo, intTypeInfo, charTypeInfo);
         for (TypeInfo ti : primitives) {
             TypeInfo.Builder builder = ti.builder();
+            ti.builder().setAccess(InspectionImpl.AccessEnum.PUBLIC);
             builder.setTypeNature(TypeNatureEnum.PRIMITIVE);
             builder.commit();
             primitiveByName.put(ti.simpleName(), ti);
         }
         for (TypeInfo ti : List.of(stringTypeInfo, objectTypeInfo, classTypeInfo, functionalInterface)) {
+            ti.builder().setAccess(InspectionImpl.AccessEnum.PUBLIC);
+            ti.builder().setTypeNature(TypeNatureEnum.CLASS);
             typeByName.put(ti.simpleName(), ti);
         }
+        for (TypeInfo ti : List.of(functionalInterface)) {
+            ti.builder().setAccess(InspectionImpl.AccessEnum.PUBLIC);
+            ti.builder().setTypeNature(TypeNatureEnum.ANNOTATION);
+            typeByName.put(ti.simpleName(), ti);
+        }
+        Set<TypeInfo> boxed = Set.of(boxedBooleanTypeInfo, boxedByteTypeInfo, boxedDoubleTypeInfo, boxedFloatTypeInfo,
+                boxedLongTypeInfo, boxedShortTypeInfo, boxedVoidTypeInfo, integerTypeInfo, characterTypeInfo);
         for (TypeInfo ti : boxed) {
             typeByName.put(ti.simpleName(), ti);
         }

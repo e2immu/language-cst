@@ -22,6 +22,7 @@ import org.e2immu.language.cst.impl.variable.DescendModeEnum;
 import org.e2immu.support.EventuallyFinal;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -42,15 +43,33 @@ public class ParameterInfoImpl implements ParameterInfo {
         inspection.setVariable(new ParameterInspectionImpl.Builder(this));
     }
 
-    public ParameterInspectionImpl.Builder inspectionBuilder() {
-        if (inspection.isVariable()) return (ParameterInspectionImpl.Builder) inspection.get();
-        throw new UnsupportedOperationException();
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ParameterInfoImpl that)) return false;
+        return index == that.index && Objects.equals(methodInfo, that.methodInfo);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(index, methodInfo);
+    }
+
+    @Override
+    public int compareTo(Variable o) {
+        if (o instanceof ParameterInfoImpl pi && methodInfo == pi.methodInfo) return index - pi.index;
+        return fullyQualifiedName().compareTo(o.fullyQualifiedName());
     }
 
     @Override
     public Builder builder() {
         if (inspection.isVariable()) return (ParameterInfo.Builder) inspection.get();
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String toString() {
+        return fullyQualifiedName();
     }
 
     public boolean hasBeenCommitted() {

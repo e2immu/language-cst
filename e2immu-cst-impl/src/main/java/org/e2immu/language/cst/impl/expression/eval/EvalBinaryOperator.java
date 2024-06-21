@@ -33,7 +33,6 @@ public class EvalBinaryOperator {
         }
         if (operator == runtime.notEqualsOperatorObject()) {
             if (l.equals(r)) return runtime.constantFalse();
-            ;
 
             // HERE are the !=null checks
             if (l.isNullConstant() && runtime.isNotNull0(r)) return runtime.constantTrue();

@@ -44,6 +44,7 @@ public class LocalVariableCreationImpl extends StatementImpl implements LocalVar
 
     public LocalVariableCreationImpl(LocalVariable localVariable) {
         this.localVariable = localVariable;
+        assert localVariable != null && localVariable.assignmentExpression() != null;
         this.modifiers = Set.of();
         this.otherLocalVariables = List.of();
     }

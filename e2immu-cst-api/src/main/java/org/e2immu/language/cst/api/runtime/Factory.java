@@ -42,8 +42,6 @@ public interface Factory {
         return newBoolean(true);
     }
 
-    Expression constructorCallWithArrayInitializer(MethodInfo constructor, ParameterizedType returnType, List<Object> of, ArrayInitializer initializer);
-
     DescendMode descendModeNo();
 
     DescendMode descendModeYes();

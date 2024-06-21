@@ -77,11 +77,6 @@ public class TypeExpressionImpl extends ExpressionImpl implements TypeExpression
     }
 
     @Override
-    public int compareTo(Expression o) {
-        return 0;
-    }
-
-    @Override
     public Precedence precedence() {
         return PrecedenceEnum.TOP;
     }

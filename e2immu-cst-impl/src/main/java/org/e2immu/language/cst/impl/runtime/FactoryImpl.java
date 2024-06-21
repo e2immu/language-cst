@@ -276,11 +276,6 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
-    public Expression constructorCallWithArrayInitializer(MethodInfo constructor, ParameterizedType returnType, List<Object> of, ArrayInitializer initializer) {
-        return null;
-    }
-
-    @Override
     public InlineConditional newInlineConditional(Expression condition, Expression ifTrue, Expression ifFalse) {
         return new InlineConditionalImpl(List.of(), null, condition, ifTrue, ifFalse,
                 commonType(ifTrue.parameterizedType(), ifFalse.parameterizedType()));
