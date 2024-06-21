@@ -13,7 +13,6 @@ import org.e2immu.language.cst.api.statement.*;
 import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.impl.element.*;
 import org.e2immu.language.cst.impl.expression.*;
-import org.e2immu.language.cst.impl.expression.*;
 import org.e2immu.language.cst.impl.expression.util.PrecedenceEnum;
 import org.e2immu.language.cst.impl.info.*;
 import org.e2immu.language.cst.impl.output.*;
@@ -24,9 +23,6 @@ import org.e2immu.language.cst.impl.util.IntUtil;
 import org.e2immu.language.cst.impl.variable.*;
 import org.e2immu.language.cst.api.type.*;
 import org.e2immu.language.cst.api.variable.*;
-import org.e2immu.language.cst.impl.element.*;
-import org.e2immu.language.cst.impl.info.*;
-import org.e2immu.language.cst.impl.statement.*;
 import org.e2immu.support.Either;
 
 import java.util.List;
@@ -63,7 +59,7 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
 
     @Override
     public InstanceOf newInstanceOf(ParameterizedType parameterizedType, Expression expression, LocalVariable patternVariable) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -73,12 +69,12 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
 
     @Override
     public ConstructorCall newObjectCreation(Expression scope, MethodInfo constructor, ParameterizedType parameterizedType, Diamond diamond, List<Expression> newParams) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public GreaterThanZero newGreaterThanZero(Expression e, boolean allowEquals) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -93,7 +89,7 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
 
     @Override
     public MethodReference newMethodReference(Expression e, MethodInfo methodInfo, ParameterizedType parameterizedType) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -161,7 +157,7 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
-    public AssertStatement.Builder newAssertStatementBuilder() {
+    public AssertStatement.Builder newAssertBuilder() {
         return new AssertStatementImpl.Builder();
     }
 
@@ -197,7 +193,7 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
 
     @Override
     public ConstructorCall objectCreation(Expression scope, MethodInfo constructor, ParameterizedType parameterizedType, Diamond diamond, List<Expression> parameterExpressions) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -251,6 +247,11 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
+    public ParameterizedType parameterizedTypeNullConstant() {
+        return ParameterizedTypeImpl.NULL_CONSTANT;
+    }
+
+    @Override
     public Diamond diamondYes() {
         return DiamondEnum.YES;
     }
@@ -288,12 +289,12 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
 
     @Override
     public SwitchExpression newSwitchExpression(VariableExpression selector, List<SwitchEntry> switchEntries, ParameterizedType parameterizedType, List<Expression> expressions) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public SwitchEntry newStatementsSwitchEntry(VariableExpression selector, List<Expression> labels, List<Statement> statements) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -418,17 +419,17 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
 
     @Override
     public ShortConstant newShort(short s) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public ByteConstant newByte(byte b) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public FloatConstant newFloat(float f) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -450,7 +451,7 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
 
     @Override
     public Expression nullConstant() {
-        return null;
+        return new NullConstantImpl(parameterizedTypeNullConstant());
     }
 
     @Override

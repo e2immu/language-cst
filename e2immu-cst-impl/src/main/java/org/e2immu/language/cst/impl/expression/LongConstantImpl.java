@@ -22,6 +22,7 @@ public class LongConstantImpl extends ConstantExpressionImpl<Long> implements Nu
     }
 
     protected LongConstantImpl(ParameterizedType parameterizedType, long value) {
+        super(0 == value ? 1 : 2);
         this.parameterizedType = parameterizedType;
         this.value = value;
     }

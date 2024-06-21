@@ -22,6 +22,7 @@ public class StringConstantImpl extends ConstantExpressionImpl<String> implement
     }
 
     protected StringConstantImpl(ParameterizedType stringPt, String constant) {
+        super(constant.isEmpty() ? 1 : 2);
         this.stringPt = Objects.requireNonNull(stringPt);
         this.constant = Objects.requireNonNull(constant);
     }

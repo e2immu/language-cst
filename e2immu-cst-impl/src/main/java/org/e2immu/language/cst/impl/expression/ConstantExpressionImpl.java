@@ -15,8 +15,8 @@ import java.util.stream.Stream;
 
 public abstract class ConstantExpressionImpl<T> extends ExpressionImpl implements ConstantExpression<T> {
 
-    protected ConstantExpressionImpl() {
-        super(1);
+    protected ConstantExpressionImpl(int complexity) {
+        super(complexity);
     }
 
     @Override

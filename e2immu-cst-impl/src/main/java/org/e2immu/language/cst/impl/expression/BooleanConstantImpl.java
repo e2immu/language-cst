@@ -19,6 +19,7 @@ public class BooleanConstantImpl extends ConstantExpressionImpl<Boolean> impleme
     }
 
     protected BooleanConstantImpl(ParameterizedType booleanPt, boolean constant) {
+        super(1);
         this.booleanPt = booleanPt;
         this.constant = constant;
     }

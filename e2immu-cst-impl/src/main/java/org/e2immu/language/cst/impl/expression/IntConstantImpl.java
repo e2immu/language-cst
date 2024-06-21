@@ -21,6 +21,7 @@ public class IntConstantImpl extends ConstantExpressionImpl<Integer> implements 
     }
 
     protected IntConstantImpl(ParameterizedType parameterizedType, int value) {
+        super(value < -1 || value > 1 ? 2 : 1);
         this.parameterizedType = parameterizedType;
         this.value = value;
     }

@@ -3,7 +3,6 @@ package org.e2immu.language.cst.api.runtime;
 import org.e2immu.language.cst.api.element.*;
 import org.e2immu.language.cst.api.expression.*;
 import org.e2immu.language.cst.api.info.*;
-import org.e2immu.language.cst.api.element.*;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.OutputElement;
 import org.e2immu.language.cst.api.output.Qualification;
@@ -11,11 +10,6 @@ import org.e2immu.language.cst.api.output.element.ElementarySpace;
 import org.e2immu.language.cst.api.output.element.Split;
 import org.e2immu.language.cst.api.statement.*;
 import org.e2immu.language.cst.api.translate.TranslationMap;
-import org.e2immu.language.cst.api.type.*;
-import org.e2immu.language.cst.api.variable.*;
-import org.e2immu.language.cst.api.expression.*;
-import org.e2immu.language.cst.api.info.*;
-import org.e2immu.language.cst.api.statement.*;
 import org.e2immu.language.cst.api.type.*;
 import org.e2immu.language.cst.api.variable.*;
 
@@ -49,6 +43,8 @@ public interface Factory {
     Diamond diamondNo();
 
     Diamond diamondShowAll();
+
+    ParameterizedType parameterizedTypeNullConstant();
 
     Diamond diamondYes();
 
@@ -120,7 +116,7 @@ public interface Factory {
 
     ArrayLength newArrayLength(Expression e);
 
-    AssertStatement.Builder newAssertStatementBuilder();
+    AssertStatement.Builder newAssertBuilder();
 
     Assignment newAssignment(Expression target, Expression value);
 

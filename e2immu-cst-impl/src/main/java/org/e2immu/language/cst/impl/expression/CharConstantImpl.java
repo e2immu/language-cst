@@ -20,6 +20,7 @@ public class CharConstantImpl extends ConstantExpressionImpl<Character> implemen
     }
 
     protected CharConstantImpl(ParameterizedType parameterizedType, char constant) {
+        super('\0' == constant ? 1 : 2);
         this.parameterizedType = parameterizedType;
         this.constant = constant;
     }

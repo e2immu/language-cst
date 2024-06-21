@@ -23,6 +23,7 @@ public class DoubleConstantImpl extends ConstantExpressionImpl<Double> implement
     }
 
     protected DoubleConstantImpl(ParameterizedType parameterizedType, double value) {
+        super(0 == value ? 1: 2);
         this.parameterizedType = parameterizedType;
         this.value = value;
     }
