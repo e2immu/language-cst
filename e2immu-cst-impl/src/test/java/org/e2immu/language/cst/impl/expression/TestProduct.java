@@ -7,10 +7,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestProduct extends CommonTest {
-    VariableExpression k = r.newVariableExpression(createVariable("k"));
-    VariableExpression l = r.newVariableExpression(createVariable("l"));
-    VariableExpression m = r.newVariableExpression(createVariable("m"));
-    VariableExpression n = r.newVariableExpression(createVariable("n"));
 
     @Test
     public void test0() {
