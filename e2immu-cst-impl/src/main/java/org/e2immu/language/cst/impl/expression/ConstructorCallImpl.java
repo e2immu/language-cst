@@ -47,13 +47,13 @@ public class ConstructorCallImpl extends ExpressionImpl implements ConstructorCa
                                ArrayInitializer arrayInitializer, TypeInfo anonymousClass) {
         super(comments, source, 1 + (object == null ? 0 : object.complexity())
                                 + expressions.stream().mapToInt(Expression::complexity).sum());
-        this.constructor = constructor;
-        this.diamond = diamond;
+        this.constructor = Objects.requireNonNull(constructor);
+        this.diamond = Objects.requireNonNull(diamond);
         this.object = object;
         parameterExpressions = expressions;
         this.arrayInitializer = arrayInitializer;
         this.anonymousClass = anonymousClass;
-        this.concreteReturnType = concreteReturnType;
+        this.concreteReturnType = Objects.requireNonNull(concreteReturnType);
     }
 
     public static class Builder extends ElementImpl.Builder<ConstructorCall.Builder> implements ConstructorCall.Builder {
