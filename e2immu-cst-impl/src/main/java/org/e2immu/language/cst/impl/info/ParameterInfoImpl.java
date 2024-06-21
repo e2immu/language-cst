@@ -113,7 +113,7 @@ public class ParameterInfoImpl implements ParameterInfo {
 
     @Override
     public int complexity() {
-        return 0;
+        return 2;
     }
 
     @Override

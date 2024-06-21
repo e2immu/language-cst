@@ -91,7 +91,7 @@ public class DependentVariableImpl extends VariableImpl implements DependentVari
 
     @Override
     public int complexity() {
-        return 1 + arrayExpression.complexity() + indexExpression.complexity();
+        return arrayExpression.complexity() + indexExpression.complexity();
     }
 
     @Override
