@@ -242,6 +242,10 @@ public class TranslationMapImpl implements TranslationMap {
                 return new FieldReferenceImpl(fr.fieldInfo(), e, scopeTranslated, fr.fieldInfo().type());
             }
         }
+        if (variable instanceof LocalVariable lv && lv.assignmentExpression() != null) {
+            Expression te = lv.assignmentExpression().translate(this);
+            return lv.withAssignmentExpression(te);
+        }
         return variable;
     }
 

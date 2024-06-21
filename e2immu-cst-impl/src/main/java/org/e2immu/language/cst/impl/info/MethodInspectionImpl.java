@@ -261,7 +261,9 @@ public class MethodInspectionImpl extends InspectionImpl implements MethodInspec
 
         @Override
         public Builder addAndCommitParameter(String name, ParameterizedType type) {
-            return null;
+            ParameterInfo pi = addParameter(name, type);
+            pi.builder().commit();
+            return this;
         }
 
         @Override

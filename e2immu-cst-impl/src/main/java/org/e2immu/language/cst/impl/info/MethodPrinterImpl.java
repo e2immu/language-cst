@@ -141,7 +141,7 @@ public record MethodPrinterImpl(MethodInfo methodInfo) {
             outputBuilder.add(annotation.print(qualification));
             outputBuilder.add(SpaceEnum.ONE);
         }
-        if (pi.parameterizedType().isNoTypeGivenInLambda()) {
+        if (!pi.parameterizedType().isNoTypeGivenInLambda()) {
             outputBuilder.add(pi.parameterizedType().print(qualification, pi.isVarArgs(), DiamondEnum.SHOW_ALL));
             outputBuilder.add(SpaceEnum.ONE);
         }

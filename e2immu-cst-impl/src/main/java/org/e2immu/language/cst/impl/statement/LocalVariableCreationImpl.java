@@ -192,7 +192,7 @@ public class LocalVariableCreationImpl extends StatementImpl implements LocalVar
             return ob;
         });
         outputBuilder.add(Stream.concat(Stream.of(first), rest).collect(OutputBuilderImpl.joining(SymbolEnum.COMMA)));
-        return outputBuilder;
+        return outputBuilder.add(SymbolEnum.SEMICOLON);
     }
 
     @Override

@@ -45,12 +45,12 @@ public class RuntimeImpl extends FactoryImpl implements Runtime {
 
     @Override
     public Expression wrapInProduct(Expression[] translated, int length) {
-        return null;
+        return eval.wrapInProduct(translated, length);
     }
 
     @Override
     public Expression wrapInSum(Expression[] translated, int length) {
-        return null;
+        return eval.wrapInSum(translated, length);
     }
 
     @Override
