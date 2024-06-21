@@ -143,6 +143,15 @@ public class ParameterizedTypeImpl implements ParameterizedType {
     }
 
     @Override
+    public Set<TypeParameter> extractTypeParameters() {
+        if (typeParameter != null) return Set.of(typeParameter);
+        if (typeInfo != null) {
+            return parameters.stream().flatMap(p -> p.extractTypeParameters().stream()).collect(Collectors.toUnmodifiableSet());
+        }
+        return Set.of();
+    }
+
+    @Override
     public ParameterizedType copyWithArrays(int arrays) {
         // the following check is important to maintain object '==' for the static types like NULL_CONSTANT
         if (arrays == this.arrays) return this;

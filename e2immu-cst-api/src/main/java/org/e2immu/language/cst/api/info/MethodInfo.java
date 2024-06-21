@@ -179,9 +179,14 @@ public interface MethodInfo extends Info {
 
         @Fluent
         Builder addTypeParameter(TypeParameter typeParameter);
-        
+
         @Fluent
         Builder addExceptionType(ParameterizedType exceptionType);
+    }
+
+    default boolean isVarargs() {
+        if (parameters().isEmpty()) return false;
+        return parameters().get(parameters().size() - 1).isVarArgs();
     }
 }
 

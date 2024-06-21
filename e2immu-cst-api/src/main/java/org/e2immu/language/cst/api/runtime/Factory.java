@@ -44,6 +44,10 @@ public interface Factory {
 
     Diamond diamondShowAll();
 
+    int isAssignableFromCovariantErasure(ParameterizedType typeOfParameter, ParameterizedType actualType);
+
+    int isNotAssignable();
+
     ParameterizedType parameterizedTypeNullConstant();
 
     Diamond diamondYes();

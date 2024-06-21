@@ -928,5 +928,16 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     public Expression newStringConcat(Expression l, Expression r) {
         return new StringConcatImpl(this, l, r);
     }
+
+    @Override
+    public int isAssignableFromCovariantErasure(ParameterizedType target, ParameterizedType from) {
+        return new IsAssignableFrom(this, target, from)
+                .execute(false, IsAssignableFrom.Mode.COVARIANT_ERASURE);
+    }
+
+    @Override
+    public int isNotAssignable() {
+        return IsAssignableFrom.NOT_ASSIGNABLE;
+    }
 }
 
