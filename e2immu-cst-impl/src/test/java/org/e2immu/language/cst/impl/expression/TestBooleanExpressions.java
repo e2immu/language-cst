@@ -37,11 +37,15 @@ public class TestBooleanExpressions extends CommonTest {
     public void test1() {
         Expression aAndB = r.and(a, b);
         assertEquals("a&&b", aAndB.toString());
+        assertEquals(5, aAndB.complexity());
+
         Expression not_AAndB = r.negate(aAndB);
         assertEquals("!a||!b", not_AAndB.toString());
 
         Expression notAAndNotB = r.and(r.negate(a), r.negate(b));
         assertEquals("!a&&!b", notAAndNotB.toString());
+        assertEquals(7, notAAndNotB.complexity());
+
         Expression notNotAAndNotB = r.negate(notAAndNotB);
         assertEquals("a||b", notNotAAndNotB.toString());
 

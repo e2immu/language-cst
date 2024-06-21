@@ -94,10 +94,10 @@ public class InstanceOfImpl extends ExpressionImpl implements InstanceOf {
                 && other.expression() instanceof VariableExpression ve2) {
                 int c = ve.variable().fullyQualifiedName().compareTo(ve2.variable().fullyQualifiedName());
                 if (c == 0)
-                    c = testType.detailedString().compareTo(other.parameterizedType().detailedString());
+                    c = testType.detailedString().compareTo(other.testType().detailedString());
                 return c;
             }
-            int c = testType.fullyQualifiedName().compareTo(other.parameterizedType().fullyQualifiedName());
+            int c = testType.fullyQualifiedName().compareTo(other.testType().fullyQualifiedName());
             if (c != 0) return c;
             return expression.compareTo(other.expression());
         }

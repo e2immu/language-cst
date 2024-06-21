@@ -230,6 +230,8 @@ public class PredefinedImpl implements Predefined {
         Set<TypeInfo> boxed = Set.of(boxedBooleanTypeInfo, boxedByteTypeInfo, boxedDoubleTypeInfo, boxedFloatTypeInfo,
                 boxedLongTypeInfo, boxedShortTypeInfo, boxedVoidTypeInfo, integerTypeInfo, characterTypeInfo);
         for (TypeInfo ti : boxed) {
+            ti.builder().setAccess(InspectionImpl.AccessEnum.PUBLIC);
+            ti.builder().setTypeNature(TypeNatureEnum.CLASS);
             typeByName.put(ti.simpleName(), ti);
         }
     }
