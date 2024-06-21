@@ -19,6 +19,9 @@ public interface ParameterizedType {
                                        Map<NamedType, ParameterizedType> translate);
 
     int arrays();
+
+    // initially implemented to ensure that a NULL type doesn't overwrite a valid type, see Lambda_17
+    ParameterizedType bestDefined(ParameterizedType other);
     // the different components
 
     /**
@@ -131,6 +134,8 @@ public interface ParameterizedType {
     OutputBuilder print(Qualification qualification, boolean varArgs, Diamond diamond);
 
     String printForMethodFQN(boolean varArgs, Diamond diamond);
+
+    List<ParameterizedType> replaceByTypeBounds();
 
     TypeInfo toBoxed(Predefined runtime);
 

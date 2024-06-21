@@ -108,6 +108,7 @@ public interface TranslationMap {
         String modificationTimes(MethodCall beforeTranslation,
                                  Expression translatedObject, List<Expression> translatedParameters);
     }
+
     /*
     Note: to avoid cyclic type dependencies, the first parameter takes 'Expression' rather than 'MethodCall'
      */
@@ -118,6 +119,11 @@ public interface TranslationMap {
     }
 
     default <T> Collector<T, List<T>, List<T>> toList(List<T> original) {
+        return staticToList(original);
+    }
+
+    // used by ParameterizedTypeImpl
+    static <T> Collector<T, List<T>, List<T>> staticToList(List<T> original) {
         return new Collector<>() {
             boolean changes;
 

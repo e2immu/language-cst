@@ -7,12 +7,17 @@ import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.runtime.Predefined;
 import org.e2immu.language.cst.api.runtime.PredefinedWithoutParameterizedType;
-import org.e2immu.language.cst.api.runtime.Predefined;
+import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.impl.element.ElementImpl;
 import org.e2immu.language.cst.impl.output.QualificationImpl;
 import org.e2immu.language.cst.api.type.*;
 
 import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -571,5 +576,68 @@ public class ParameterizedTypeImpl implements ParameterizedType {
     @Override
     public boolean isNoTypeGivenInLambda() {
         return this == NO_TYPE_GIVEN_IN_LAMBDA;
+    }
+
+
+    // initially implemented to ensure that a NULL type doesn't overwrite a valid type, see Lambda_17
+    @Override
+    public ParameterizedType bestDefined(ParameterizedType other) {
+        if (typeInfo != null && other.typeInfo() == null) return this;
+        if (other.typeInfo() != null && typeInfo == null) return other;
+        if (typeInfo != null) {
+            return this; // TODO? should we go recursively?
+        }
+        if (typeParameter != null && other.typeParameter() == null) return this;
+        if (typeParameter == null && other.typeParameter() != null) return other;
+        return this;// doesn't matter anymore
+    }
+
+    /*
+  Let A, B be a type rather than a type parameter.
+  A -> A
+  A<T extends B> -> A<B>
+  T extends A -> return A
+  T extends Comparable<? super T> -> return Comparable, remove the T
+  T === T extends Object -> return JLO
+
+  when there are multiple type bounds,
+   */
+    public List<ParameterizedType> replaceByTypeBounds() {
+        return replaceByTypeBounds(new HashSet<>());
+    }
+
+    /*
+    MethodCall_32,_36,46,_47 show why this method is relatively complicated
+     */
+    private List<ParameterizedType> replaceByTypeBounds(Set<TypeParameter> remove) {
+        if (typeInfo != null) {
+            if (parameters.isEmpty()) {
+                return List.of(this);
+            }
+            // the translation collector detects !=; returns 'parameters 'when there are no differences in the list
+            List<ParameterizedType> updatedParameters = parameters.stream()
+                    .filter(pt -> pt.typeParameter() == null || !remove.contains(pt.typeParameter()))
+                    .flatMap(p -> ((ParameterizedTypeImpl) p).replaceByTypeBounds(remove).stream())
+                    .collect(TranslationMap.staticToList(parameters));
+            if (updatedParameters == parameters) {
+                return List.of(this);
+            }
+            return List.of(new ParameterizedTypeImpl(typeInfo, updatedParameters));
+        }
+        if (typeParameter != null) {
+            List<ParameterizedType> typeBounds = typeParameter.typeBounds();
+            if (typeBounds.isEmpty()) {
+                // a type parameter without type bounds; we can keep that one; IsAssignableFrom can deal with it
+                return List.of(this);
+            }
+            Set<TypeParameter> newRemove = Stream.concat(remove.stream(), Stream.of(typeParameter))
+                    .collect(Collectors.toUnmodifiableSet());
+            return typeBounds
+                    .stream().filter(pt -> pt.typeParameter() == null || !remove.contains(pt.typeParameter()))
+                    .flatMap(p -> ((ParameterizedTypeImpl) p).replaceByTypeBounds(newRemove).stream())
+                    .map(p -> p.copyWithArrays(arrays))
+                    .collect(TranslationMap.staticToList(typeBounds));
+        }
+        return List.of(this);
     }
 }
