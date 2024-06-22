@@ -6,7 +6,6 @@ import org.e2immu.language.cst.api.info.*;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.runtime.Predefined;
-import org.e2immu.language.cst.api.runtime.Runtime;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.type.TypeNature;
 import org.e2immu.language.cst.api.type.TypeParameter;
@@ -16,12 +15,12 @@ import org.e2immu.language.cst.impl.analysis.PropertyImpl;
 import org.e2immu.language.cst.impl.analysis.ValueImpl;
 import org.e2immu.language.cst.impl.type.ParameterizedTypeImpl;
 import org.e2immu.support.Either;
-import org.e2immu.support.EventuallyFinal;
+import org.e2immu.support.EventuallyFinalOnDemand;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Predicate;
+import java.util.function.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -31,7 +30,7 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     private final String fullyQualifiedName;
     private final String simpleName;
     private final Either<CompilationUnit, TypeInfo> compilationUnitOrEnclosingType;
-    private final EventuallyFinal<TypeInspection> inspection = new EventuallyFinal<>();
+    private final EventuallyFinalOnDemand<TypeInspection> inspection = new EventuallyFinalOnDemand<>();
 
     public TypeInfoImpl(CompilationUnit compilationUnit, String simpleName) {
         String packageName = compilationUnit.packageName();
@@ -371,6 +370,12 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     @Override
     public boolean isPublic() {
         return inspection.get().isPublic();
+    }
+
+    @Override
+    public void setOnDemandInspection(Consumer<TypeInfo> inspector) {
+        assert inspection.isVariable();
+        inspection.setOnDemand(() -> inspector.accept(this));
     }
 
     @Override

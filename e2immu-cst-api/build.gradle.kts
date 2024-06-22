@@ -29,5 +29,5 @@ java {
 }
 
 dependencies {
-    implementation("org.e2immu:e2immu-support:0.6.4")
+    implementation("org.e2immu:e2immu-external-support:some.version")
 }
