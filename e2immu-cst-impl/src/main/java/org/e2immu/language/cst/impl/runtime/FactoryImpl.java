@@ -939,5 +939,15 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     public int isNotAssignable() {
         return IsAssignableFrom.NOT_ASSIGNABLE;
     }
+
+    @Override
+    public Precedence precedenceTop() {
+        return PrecedenceEnum.TOP;
+    }
+
+    @Override
+    public Precedence precedenceBottom() {
+        return PrecedenceEnum.BOTTOM;
+    }
 }
 

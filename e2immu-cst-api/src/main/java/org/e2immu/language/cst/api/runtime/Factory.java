@@ -326,6 +326,8 @@ public interface Factory {
 
     Precedence precedenceAssignment();
 
+    Precedence precedenceBottom();
+
     Precedence precedenceEquality();
 
     Precedence precedenceGreaterThan();
@@ -333,6 +335,8 @@ public interface Factory {
     Precedence precedenceMultiplicative();
 
     Precedence precedenceOr();
+
+    Precedence precedenceTop();
 
     Precedence precedenceUnary();
 
