@@ -47,7 +47,8 @@ public class ConstructorCallImpl extends ExpressionImpl implements ConstructorCa
                                ArrayInitializer arrayInitializer, TypeInfo anonymousClass) {
         super(comments, source, 1 + (object == null ? 0 : object.complexity())
                                 + expressions.stream().mapToInt(Expression::complexity).sum());
-        this.constructor = Objects.requireNonNull(constructor);
+        assert constructor != null || anonymousClass != null;
+        this.constructor = constructor;
         this.diamond = Objects.requireNonNull(diamond);
         this.object = object;
         parameterExpressions = expressions;
