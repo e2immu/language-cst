@@ -304,8 +304,8 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
-    public This newThis(TypeInfo typeInfo) {
-        return new ThisImpl(typeInfo);
+    public This newThis(TypeInfo typeInfo, TypeInfo explicitlyWriteType, boolean writeSuper) {
+        return new ThisImpl(typeInfo, explicitlyWriteType, writeSuper);
     }
 
     @Override

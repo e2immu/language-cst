@@ -273,7 +273,11 @@ public interface Factory {
 
     OutputElement newText(String text);
 
-    This newThis(TypeInfo typeInfo);
+    default This newThis(TypeInfo typeInfo) {
+        return newThis(typeInfo, null, false);
+    }
+
+    This newThis(TypeInfo typeInfo, TypeInfo explicitlyWriteType, boolean writeSuper);
 
     ThrowStatement.Builder newThrowBuilder();
 

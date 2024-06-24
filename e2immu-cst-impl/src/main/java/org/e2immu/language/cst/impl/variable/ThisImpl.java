@@ -39,6 +39,11 @@ public class ThisImpl extends VariableImpl implements This {
     }
 
     @Override
+    public TypeInfo explicitlyWriteType() {
+        return explicitlyWriteType;
+    }
+
+    @Override
     public boolean writeSuper() {
         return writeSuper;
     }

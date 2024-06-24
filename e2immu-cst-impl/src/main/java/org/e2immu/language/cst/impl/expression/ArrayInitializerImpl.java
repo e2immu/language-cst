@@ -55,7 +55,7 @@ public class ArrayInitializerImpl extends ExpressionImpl implements ArrayInitial
 
     @Override
     public ParameterizedType parameterizedType() {
-        return new ParameterizedTypeImpl(commonType.typeInfo(), 1);
+        return commonType.copyWithArrays(commonType.arrays() + 1);
     }
 
     @Override
