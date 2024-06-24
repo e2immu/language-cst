@@ -518,6 +518,16 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
+    public Lambda.OutputVariant lambdaOutputVariantTyped() {
+        return LambdaImpl.OutputVariantImpl.TYPED;
+    }
+
+    @Override
+    public Lambda.OutputVariant lambdaOutputVariantVar() {
+        return LambdaImpl.OutputVariantImpl.VAR;
+    }
+
+    @Override
     public FieldReference newFieldReference(FieldInfo fieldInfo) {
         return new FieldReferenceImpl(fieldInfo);
     }

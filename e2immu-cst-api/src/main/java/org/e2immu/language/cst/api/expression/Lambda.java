@@ -38,6 +38,10 @@ public interface Lambda extends Expression {
     interface OutputVariant {
         boolean isEmpty();
 
+        boolean isTyped();
+
+        boolean isVar();
+
         OutputBuilder print(ParameterInfo parameterInfo, Qualification qualification);
     }
 

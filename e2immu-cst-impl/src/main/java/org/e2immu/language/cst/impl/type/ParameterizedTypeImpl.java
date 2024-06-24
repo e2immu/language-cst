@@ -425,7 +425,7 @@ public class ParameterizedTypeImpl implements ParameterizedType {
 
     @Override
     public String toString() {
-        return (typeParameter != null ? "Type " : isTypeParameter() ? "Type param " : "") + detailedString();
+        return (typeInfo != null ? "Type " : typeParameter != null ? "Type param " : "") + detailedString();
     }
 
     @Override

@@ -154,7 +154,7 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
 
     @Override
     public boolean doesNotRequirePackage() {
-        return true;
+        return "java.lang".equals(packageName());
     }
 
     @Override

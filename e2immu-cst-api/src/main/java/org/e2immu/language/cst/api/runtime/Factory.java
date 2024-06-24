@@ -44,12 +44,6 @@ public interface Factory {
 
     Diamond diamondShowAll();
 
-    int isAssignableFromCovariantErasure(ParameterizedType typeOfParameter, ParameterizedType actualType);
-
-    int isNotAssignable();
-
-    ParameterizedType parameterizedTypeNullConstant();
-
     Diamond diamondYes();
 
     ElementarySpace elementarySpaceNice();
@@ -80,7 +74,15 @@ public interface Factory {
 
     IntConstant intZero();
 
+    int isAssignableFromCovariantErasure(ParameterizedType typeOfParameter, ParameterizedType actualType);
+
+    int isNotAssignable();
+
     Lambda.OutputVariant lambdaOutputVariantEmpty();
+
+    Lambda.OutputVariant lambdaOutputVariantTyped();
+
+    Lambda.OutputVariant lambdaOutputVariantVar();
 
     MethodModifier methodModifierAbstract();
 
@@ -317,6 +319,8 @@ public interface Factory {
                                    Diamond diamond, List<Expression> parameterExpressions);
 
     Collector<OutputBuilder, OutputBuilder, OutputBuilder> outputBuilderJoining(OutputElement outputElement);
+
+    ParameterizedType parameterizedTypeNullConstant();
 
     ParameterizedType parameterizedTypeReturnTypeOfConstructor();
 

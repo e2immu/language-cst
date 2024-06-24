@@ -73,6 +73,16 @@ public class LambdaImpl extends ExpressionImpl implements Lambda {
         public boolean isEmpty() {
             return this == EMPTY;
         }
+
+        @Override
+        public boolean isVar() {
+            return this == VAR;
+        }
+
+        @Override
+        public boolean isTyped() {
+            return this == TYPED;
+        }
     }
 
     public static class Builder extends ElementImpl.Builder<Lambda.Builder> implements Lambda.Builder {
