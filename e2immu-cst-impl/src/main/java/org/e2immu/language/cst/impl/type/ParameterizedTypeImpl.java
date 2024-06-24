@@ -640,4 +640,13 @@ public class ParameterizedTypeImpl implements ParameterizedType {
         }
         return List.of(this);
     }
+
+    @Override
+    public boolean hasTypeParameters() {
+        if (typeParameter != null) return true;
+        if (typeInfo != null) {
+            return parameters.stream().anyMatch(ParameterizedType::hasTypeParameters);
+        }
+        return false;
+    }
 }

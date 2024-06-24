@@ -150,4 +150,6 @@ public interface ParameterizedType {
     ParameterizedType withParameters(List<ParameterizedType> parameterizedTypes);
 
     ParameterizedType withWildcard(Wildcard wildcard);
+
+    boolean hasTypeParameters();
 }

@@ -371,4 +371,10 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
     public boolean isFinal() {
         return inspection.get().modifiers().stream().anyMatch(MethodModifier::isFinal);
     }
+
+    @Override
+    public boolean hasBeenAnalyzed() {
+        // TODO should add computational analyzer too, later
+        return analysis().getOrDefault(PropertyImpl.SHALLOW_ANALYZER, ValueImpl.BoolImpl.FALSE).isTrue();
+    }
 }
