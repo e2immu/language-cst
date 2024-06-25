@@ -197,15 +197,6 @@ public class PredefinedImpl implements Predefined {
             List.of(objectParameterizedType, objectParameterizedType), booleanParameterizedType);
 
     private final Map<String, TypeInfo> primitiveByName = new HashMap<>();
-    private final Map<String, TypeInfo> typeByName = new HashMap<>();
-
-    public Map<String, TypeInfo> getTypeByName() {
-        return typeByName;
-    }
-
-    public Map<String, TypeInfo> getPrimitiveByName() {
-        return primitiveByName;
-    }
 
     public PredefinedImpl() {
         Set<TypeInfo> primitives = Set.of(booleanTypeInfo, byteTypeInfo, doubleTypeInfo, floatTypeInfo,
@@ -220,19 +211,16 @@ public class PredefinedImpl implements Predefined {
         for (TypeInfo ti : List.of(stringTypeInfo, objectTypeInfo, classTypeInfo, functionalInterface)) {
             ti.builder().setAccess(InspectionImpl.AccessEnum.PUBLIC);
             ti.builder().setTypeNature(TypeNatureEnum.CLASS);
-            typeByName.put(ti.simpleName(), ti);
         }
         for (TypeInfo ti : List.of(functionalInterface)) {
             ti.builder().setAccess(InspectionImpl.AccessEnum.PUBLIC);
             ti.builder().setTypeNature(TypeNatureEnum.ANNOTATION);
-            typeByName.put(ti.simpleName(), ti);
         }
         Set<TypeInfo> boxed = Set.of(boxedBooleanTypeInfo, boxedByteTypeInfo, boxedDoubleTypeInfo, boxedFloatTypeInfo,
                 boxedLongTypeInfo, boxedShortTypeInfo, boxedVoidTypeInfo, integerTypeInfo, characterTypeInfo);
         for (TypeInfo ti : boxed) {
             ti.builder().setAccess(InspectionImpl.AccessEnum.PUBLIC);
             ti.builder().setTypeNature(TypeNatureEnum.CLASS);
-            typeByName.put(ti.simpleName(), ti);
         }
     }
 

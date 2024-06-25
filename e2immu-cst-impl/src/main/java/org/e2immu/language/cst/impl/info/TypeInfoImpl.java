@@ -18,6 +18,7 @@ import org.e2immu.support.Either;
 import org.e2immu.support.EventuallyFinalOnDemand;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.*;
@@ -49,6 +50,18 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
 
     public TypeInfoImpl(TypeInfo enclosingType, int index) {
         this(enclosingType, "$" + index);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof TypeInfoImpl typeInfo)) return false;
+        return Objects.equals(fullyQualifiedName, typeInfo.fullyQualifiedName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(fullyQualifiedName);
     }
 
     @Override
