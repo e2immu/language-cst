@@ -6,10 +6,15 @@ public interface ImportStatement extends Element {
 
     String importString();
 
+    boolean isStatic();
+
     interface Builder extends Element.Builder<Builder> {
 
         @Fluent
         Builder setImport(String importString);
+
+        @Fluent
+        Builder setIsStatic(boolean isStatic);
 
         ImportStatement build();
     }

@@ -823,8 +823,8 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
-    public ImportStatement newImportStatement(String importString) {
-        return new ImportStatementImpl(importString);
+    public ImportStatement newImportStatement(String importString, boolean isStatic) {
+        return new ImportStatementImpl(importString, isStatic);
     }
 
     @Override

@@ -28,6 +28,8 @@ public interface TypeInfo extends NamedType, Info {
                 : compilationUnitOrEnclosingType().getRight().compilationUnit();
     }
 
+    boolean hasBeenInspected();
+
     boolean isAnnotation();
 
     default boolean isPrimaryType() {

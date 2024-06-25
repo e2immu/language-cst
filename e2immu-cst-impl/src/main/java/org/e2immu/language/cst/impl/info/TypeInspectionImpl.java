@@ -276,7 +276,7 @@ public class TypeInspectionImpl extends InspectionImpl implements TypeInspection
 
         @Override
         public boolean hasBeenCommitted() {
-            return typeInfo.hasBeenCommitted();
+            return typeInfo.hasBeenInspected();
         }
     }
 

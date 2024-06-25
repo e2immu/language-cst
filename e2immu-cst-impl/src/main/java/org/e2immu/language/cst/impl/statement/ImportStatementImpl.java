@@ -17,9 +17,11 @@ import java.util.stream.Stream;
 
 public class ImportStatementImpl extends StatementImpl implements ImportStatement {
     private final String importString;
+    private final boolean isStatic;
 
-    public ImportStatementImpl(String importString) {
+    public ImportStatementImpl(String importString, boolean isStatic) {
         this.importString = importString;
+        this.isStatic = isStatic;
     }
 
     @Override
@@ -37,6 +39,11 @@ public class ImportStatementImpl extends StatementImpl implements ImportStatemen
     @Override
     public String importString() {
         return importString;
+    }
+
+    @Override
+    public boolean isStatic() {
+        return isStatic;
     }
 
     @Override

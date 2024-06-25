@@ -194,7 +194,7 @@ public interface Factory {
 
     IfElseStatement.Builder newIfElseBuilder();
 
-    ImportStatement newImportStatement(String importString);
+    ImportStatement newImportStatement(String importString, boolean isStatic);
 
     InlineConditional newInlineConditional(Expression condition, Expression ifTrue, Expression ifFalse);
 

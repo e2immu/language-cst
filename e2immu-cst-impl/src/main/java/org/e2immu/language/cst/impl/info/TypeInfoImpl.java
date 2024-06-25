@@ -50,11 +50,7 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     public TypeInfoImpl(TypeInfo enclosingType, int index) {
         this(enclosingType, "$" + index);
     }
-
-    public boolean hasBeenCommitted() {
-        return inspection.isFinal();
-    }
-
+    
     @Override
     public String packageName() {
         if (compilationUnitOrEnclosingType.isLeft()) return compilationUnitOrEnclosingType.getLeft().packageName();
@@ -471,5 +467,10 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     @Override
     public boolean isAnnotation() {
         return inspection.get().typeNature().isAnnotation();
+    }
+
+    @Override
+    public boolean hasBeenInspected() {
+        return inspection.isFinal();
     }
 }
