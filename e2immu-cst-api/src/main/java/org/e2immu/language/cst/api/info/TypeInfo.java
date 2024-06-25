@@ -153,6 +153,8 @@ public interface TypeInfo extends NamedType, Info {
 
     void setOnDemandInspection(Consumer<TypeInfo> inspector);
 
+    boolean haveOnDemandInspection();
+
     Builder builder();
 
     TypeNature typeNature();

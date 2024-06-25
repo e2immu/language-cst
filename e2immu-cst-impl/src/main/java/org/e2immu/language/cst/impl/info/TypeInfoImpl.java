@@ -50,7 +50,7 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     public TypeInfoImpl(TypeInfo enclosingType, int index) {
         this(enclosingType, "$" + index);
     }
-    
+
     @Override
     public String packageName() {
         if (compilationUnitOrEnclosingType.isLeft()) return compilationUnitOrEnclosingType.getLeft().packageName();
@@ -472,5 +472,10 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     @Override
     public boolean hasBeenInspected() {
         return inspection.isFinal();
+    }
+
+    @Override
+    public boolean haveOnDemandInspection() {
+        return inspection.haveOnDemand();
     }
 }
