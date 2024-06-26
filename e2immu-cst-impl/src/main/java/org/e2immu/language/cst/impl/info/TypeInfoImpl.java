@@ -389,7 +389,7 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
 
     @Override
     public TypeInfo.Builder builder() {
-        assert inspection.isVariable();
+        assert inspection.isVariable() : "Inspection of " + fullyQualifiedName + " has already been committed";
         return (TypeInfo.Builder) inspection.get();
     }
 
