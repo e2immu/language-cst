@@ -13,6 +13,7 @@ import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.type.*;
 import org.e2immu.language.cst.api.variable.*;
 
+import java.net.URI;
 import java.util.List;
 import java.util.stream.Collector;
 
@@ -149,6 +150,8 @@ public interface Factory {
     CommaExpression.Builder newCommaBuilder();
 
     CompilationUnit.Builder newCompilationUnitBuilder();
+
+    Source newCompiledClassSource(CompilationUnit compilationUnit);
 
     MethodInfo newConstructor(TypeInfo owner);
 

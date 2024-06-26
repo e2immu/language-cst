@@ -7,6 +7,7 @@ import org.e2immu.language.cst.api.variable.DescendMode;
 import org.e2immu.language.cst.api.variable.Variable;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
@@ -91,6 +92,16 @@ public class CompilationUnitImpl extends ElementImpl implements CompilationUnit 
         @Override
         public CompilationUnit.Builder setURI(URI uri) {
             this.uri = uri;
+            return this;
+        }
+
+        @Override
+        public CompilationUnit.Builder setURIString(String s) {
+            try {
+                this.uri = new URI(s);
+            } catch (URISyntaxException e) {
+                throw new RuntimeException(e);
+            }
             return this;
         }
 

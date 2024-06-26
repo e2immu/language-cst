@@ -18,6 +18,10 @@ public interface CompilationUnit extends Element {
         @Fluent
         Builder setURI(URI uri);
 
+        // to avoid having to catch exceptions in PredefinedImpl
+        @Fluent
+        Builder setURIString(String s);
+
         @Fluent
         Builder addImportStatement(ImportStatement importStatement);
 

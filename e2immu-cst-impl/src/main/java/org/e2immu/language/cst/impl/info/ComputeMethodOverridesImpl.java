@@ -59,6 +59,7 @@ public class ComputeMethodOverridesImpl implements ComputeMethodOverrides {
                 Map<NamedType, ParameterizedType> map = mapOfSuperType(superInterface);
                 Map<NamedType, ParameterizedType> superMap = new HashMap<>(translationMap);
                 superMap.putAll(map);
+                assert !typeInfo.equals(superInterface.typeInfo()) : "Can never be the same type";
                 abstractMethods.addAll(computeIsFunctionalInterface(superInterface.typeInfo(), overriddenByDefault,
                         superMap));
             }

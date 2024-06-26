@@ -29,6 +29,7 @@ public interface Source extends Comparable<Source> {
     }
 
     default CompilationUnit compilationUnit() {
+        if(parent() instanceof CompilationUnit cu) return cu;
         Info info = info();
         return info == null ? null : info.compilationUnit();
     }
