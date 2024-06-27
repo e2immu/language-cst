@@ -51,6 +51,8 @@ public interface MethodInfo extends Info {
 
     boolean isAbstract();
 
+    ParameterizedType typeOfParameterHandleVarargs(int index);
+
     interface MethodType {
         boolean isCompactConstructor();
 

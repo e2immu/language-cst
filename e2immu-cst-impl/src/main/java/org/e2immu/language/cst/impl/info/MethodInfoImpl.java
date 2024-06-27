@@ -387,4 +387,13 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
     public MethodType methodType() {
         return methodType;
     }
+
+    @Override
+    public ParameterizedType typeOfParameterHandleVarargs(int index) {
+        int formalParams = parameters().size();
+        if (index < formalParams - 1 || index < formalParams && !isVarargs()) {
+            return parameters().get(index).parameterizedType();
+        }
+        return parameters().get(formalParams - 1).parameterizedType().copyWithOneFewerArrays();
+    }
 }
