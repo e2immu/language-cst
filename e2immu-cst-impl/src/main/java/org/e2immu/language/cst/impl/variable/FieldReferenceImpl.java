@@ -41,7 +41,7 @@ public class FieldReferenceImpl extends VariableImpl implements FieldReference {
     private final String fullyQualifiedName;
 
     public FieldReferenceImpl(FieldInfo fieldInfo) {
-        this(fieldInfo, null, null, null);
+        this(fieldInfo, null, null, fieldInfo.type());
     }
 
     public FieldReferenceImpl(FieldInfo fieldInfo,

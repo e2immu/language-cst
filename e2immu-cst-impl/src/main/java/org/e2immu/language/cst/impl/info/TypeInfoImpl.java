@@ -108,7 +108,10 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
         List<MethodInfo> list = constructors().stream()
                 .filter(constructor -> constructor.parameters().size() == numberOfParameters)
                 .toList();
-        if (list.size() != 1) throw new UnsupportedOperationException();
+        if (list.size() != 1) {
+            throw new UnsupportedOperationException("Found " + list.size() + " constructors with "
+                                                    + numberOfParameters + " parameters");
+        }
         return list.get(0);
     }
 
