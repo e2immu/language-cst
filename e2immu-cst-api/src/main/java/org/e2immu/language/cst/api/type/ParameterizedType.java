@@ -137,7 +137,7 @@ public interface ParameterizedType {
 
     List<ParameterizedType> replaceByTypeBounds();
 
-    TypeInfo toBoxed(Predefined runtime);
+    TypeInfo toBoxed(PredefinedWithoutParameterizedType runtime);
 
     TypeInfo typeInfo();
 

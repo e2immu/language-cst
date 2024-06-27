@@ -112,4 +112,11 @@ public class TypeParameterImpl implements TypeParameter {
     public String simpleName() {
         return name;
     }
+
+    @Override
+    public String toString() {
+        String shortOwner = owner.isLeft() ? owner.getLeft().simpleName()
+                : owner.getRight().typeInfo().simpleName() + "." + owner.getRight().name();
+        return simpleName() + "=TP#" + index + " in " + shortOwner;
+    }
 }

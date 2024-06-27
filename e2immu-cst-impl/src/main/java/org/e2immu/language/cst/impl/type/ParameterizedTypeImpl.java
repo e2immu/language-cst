@@ -76,6 +76,7 @@ public class ParameterizedTypeImpl implements ParameterizedType {
         this.arrays = arrays;
         this.wildcard = wildcard;
         this.parameters = parameters;
+        assert parameters.stream().noneMatch(Objects::isNull);
     }
 
     @Override
@@ -172,7 +173,10 @@ public class ParameterizedTypeImpl implements ParameterizedType {
 
     @Override
     public ParameterizedType ensureBoxed(PredefinedWithoutParameterizedType predefined) {
-        return null;
+        if (isPrimitiveExcludingVoid() || isVoid()) {
+            return toBoxed(predefined).asSimpleParameterizedType();
+        }
+        return this;
     }
 
     @Override
@@ -285,7 +289,7 @@ public class ParameterizedTypeImpl implements ParameterizedType {
     }
 
     @Override
-    public TypeInfo toBoxed(Predefined runtime) {
+    public TypeInfo toBoxed(PredefinedWithoutParameterizedType runtime) {
         return runtime.boxed(typeInfo);
     }
 

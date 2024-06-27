@@ -2,7 +2,10 @@ package org.e2immu.language.cst.api.runtime;
 
 import org.e2immu.language.cst.api.expression.AnnotationExpression;
 import org.e2immu.language.cst.api.info.MethodInfo;
+import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.type.ParameterizedType;
+
+import java.util.List;
 
 public interface Predefined extends PredefinedWithoutParameterizedType {
     MethodInfo assignOperator(ParameterizedType parameterizedType);
@@ -32,6 +35,8 @@ public interface Predefined extends PredefinedWithoutParameterizedType {
     ParameterizedType longParameterizedType();
 
     ParameterizedType objectParameterizedType();
+
+    List<TypeInfo> predefinedObjects();
 
     int primitiveTypeOrder(ParameterizedType pt);
 

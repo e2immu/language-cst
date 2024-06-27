@@ -141,12 +141,12 @@ public class RuntimeImpl extends FactoryImpl implements Runtime {
 
     @Override
     public TypeInfo getFullyQualified(String name, boolean complain) {
-        throw new UnsupportedOperationException(); // FIXME
+        throw new UnsupportedOperationException("Override me");
     }
 
     @Override
     public TypeInfo syntheticFunctionalType(int inputParameters, boolean hasReturnValue) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Override me");
     }
 
     @Override

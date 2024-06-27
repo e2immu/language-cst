@@ -202,6 +202,7 @@ public class PredefinedImpl implements Predefined {
             List.of(objectParameterizedType, objectParameterizedType), booleanParameterizedType);
 
     private final Map<String, TypeInfo> primitiveByName = new HashMap<>();
+    private final List<TypeInfo> predefinedObjects;
 
     public PredefinedImpl() {
         Set<TypeInfo> primitives = Set.of(booleanTypeInfo, byteTypeInfo, doubleTypeInfo, floatTypeInfo,
@@ -213,20 +214,30 @@ public class PredefinedImpl implements Predefined {
             builder.commit();
             primitiveByName.put(ti.simpleName(), ti);
         }
+        List<TypeInfo> objects = new ArrayList<>();
         for (TypeInfo ti : List.of(stringTypeInfo, objectTypeInfo, classTypeInfo, functionalInterface)) {
             ti.builder().setAccess(InspectionImpl.AccessEnum.PUBLIC);
             ti.builder().setTypeNature(TypeNatureEnum.CLASS);
+            objects.add(ti);
         }
         for (TypeInfo ti : List.of(functionalInterface)) {
             ti.builder().setAccess(InspectionImpl.AccessEnum.PUBLIC);
             ti.builder().setTypeNature(TypeNatureEnum.ANNOTATION);
+            objects.add(ti);
         }
         Set<TypeInfo> boxed = Set.of(boxedBooleanTypeInfo, boxedByteTypeInfo, boxedDoubleTypeInfo, boxedFloatTypeInfo,
                 boxedLongTypeInfo, boxedShortTypeInfo, boxedVoidTypeInfo, integerTypeInfo, characterTypeInfo);
         for (TypeInfo ti : boxed) {
             ti.builder().setAccess(InspectionImpl.AccessEnum.PUBLIC);
             ti.builder().setTypeNature(TypeNatureEnum.CLASS);
+            objects.add(ti);
         }
+        predefinedObjects = List.copyOf(objects);
+    }
+
+    @Override
+    public List<TypeInfo> predefinedObjects() {
+        return predefinedObjects;
     }
 
     @Override
