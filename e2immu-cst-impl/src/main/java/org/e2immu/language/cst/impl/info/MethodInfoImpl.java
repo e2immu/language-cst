@@ -45,6 +45,11 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
         public boolean isStatic() {
             return this == STATIC_BLOCK || this == STATIC_METHOD;
         }
+
+        @Override
+        public boolean isCompactConstructor() {
+            return this == COMPACT_CONSTRUCTOR;
+        }
     }
 
     private final TypeInfo typeInfo; // back reference, only @ContextClass after...
@@ -376,5 +381,10 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
     public boolean hasBeenAnalyzed() {
         // TODO should add computational analyzer too, later
         return analysis().getOrDefault(PropertyImpl.SHALLOW_ANALYZER, ValueImpl.BoolImpl.FALSE).isTrue();
+    }
+
+    @Override
+    public MethodType methodType() {
+        return methodType;
     }
 }

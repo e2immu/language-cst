@@ -5,6 +5,8 @@ import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.variable.DescendMode;
 import org.e2immu.language.cst.api.variable.Variable;
+import org.e2immu.language.cst.impl.output.OutputBuilderImpl;
+import org.e2immu.language.cst.impl.output.TextImpl;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -71,7 +73,9 @@ public class CompilationUnitImpl extends ElementImpl implements CompilationUnit 
 
     @Override
     public OutputBuilder print(Qualification qualification) {
-        throw new UnsupportedOperationException();
+        OutputBuilder ob = new OutputBuilderImpl().add(new TextImpl(packageName));
+        if (uri != null) ob.add(new TextImpl(" [" + uri + "]"));
+        return ob;
     }
 
     @Override

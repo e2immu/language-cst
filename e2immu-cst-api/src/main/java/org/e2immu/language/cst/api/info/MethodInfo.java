@@ -29,6 +29,8 @@ public interface MethodInfo extends Info {
 
     boolean isSynchronized();
 
+    MethodInfo.MethodType methodType();
+
     TypeInfo primaryType();
 
     boolean isDefault();
@@ -50,6 +52,8 @@ public interface MethodInfo extends Info {
     boolean isAbstract();
 
     interface MethodType {
+        boolean isCompactConstructor();
+
         boolean isStatic();
 
         boolean isConstructor();

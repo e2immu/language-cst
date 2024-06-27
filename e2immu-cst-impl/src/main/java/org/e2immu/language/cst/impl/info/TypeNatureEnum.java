@@ -34,6 +34,11 @@ public enum TypeNatureEnum implements TypeNature {
     }
 
     @Override
+    public boolean isRecord() {
+        return this == RECORD;
+    }
+
+    @Override
     public boolean isEnum() {
         return this == ENUM;
     }

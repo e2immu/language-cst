@@ -103,6 +103,8 @@ public interface Factory {
 
     MethodInfo.MethodType methodTypeAbstractMethod();
 
+    MethodInfo.MethodType methodTypeCompactConstructor();
+
     MethodInfo.MethodType methodTypeConstructor();
 
     MethodInfo.MethodType methodTypeDefaultMethod();

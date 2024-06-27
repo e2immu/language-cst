@@ -604,6 +604,11 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
+    public MethodInfo.MethodType methodTypeCompactConstructor() {
+        return MethodInfoImpl.MethodTypeEnum.COMPACT_CONSTRUCTOR;
+    }
+
+    @Override
     public MethodInfo.MethodType methodTypeDefaultMethod() {
         return MethodInfoImpl.MethodTypeEnum.DEFAULT_METHOD;
     }
