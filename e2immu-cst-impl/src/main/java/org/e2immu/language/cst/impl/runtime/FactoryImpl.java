@@ -421,17 +421,17 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
 
     @Override
     public ShortConstant newShort(short s) {
-        throw new UnsupportedOperationException();
+        return new ShortConstantImpl(this, s);
     }
 
     @Override
     public ByteConstant newByte(byte b) {
-        throw new UnsupportedOperationException();
+        return new ByteConstantImpl(this, b);
     }
 
     @Override
     public FloatConstant newFloat(float f) {
-        throw new UnsupportedOperationException();
+        return new FloatConstantImpl(this, f);
     }
 
     @Override
@@ -963,7 +963,7 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
 
     @Override
     public Source newCompiledClassSource(CompilationUnit compilationUnit) {
-        return new SourceImpl(compilationUnit,"", 0,0,0,0);
+        return new SourceImpl(compilationUnit, "", 0, 0, 0, 0);
     }
 }
 
