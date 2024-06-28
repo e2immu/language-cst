@@ -17,6 +17,14 @@ public interface Value extends Comparable<Value> {
         throw new UnsupportedOperationException();
     }
 
+    default boolean lt(Value other) {
+        return compareTo(other) < 0;
+    }
+
+    default Value min(Value v) {
+        return v == null || compareTo(v) <= 0 ? this : v;
+    }
+
     interface Bool extends Value {
         boolean isTrue();
 
