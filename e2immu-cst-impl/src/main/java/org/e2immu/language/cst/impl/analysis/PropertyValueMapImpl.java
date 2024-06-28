@@ -7,6 +7,7 @@ import org.e2immu.support.SetOnceMap;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Stream;
 
 public class PropertyValueMapImpl implements PropertyValueMap {
     private final SetOnceMap<Property, Value> map = new SetOnceMap<>();
@@ -44,6 +45,11 @@ public class PropertyValueMapImpl implements PropertyValueMap {
         Property property = propertyMap.get(key);
         if (property == null) throw new UnsupportedOperationException("Unknown property " + key);
         return property;
+    }
+
+    @Override
+    public Stream<PropertyValue> propertyValueStream() {
+        return map.stream().map(e -> new PropertyValue(e.getKey(), e.getValue()));
     }
 
     @Override

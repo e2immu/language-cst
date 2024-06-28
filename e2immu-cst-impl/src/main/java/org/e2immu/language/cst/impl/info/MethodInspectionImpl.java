@@ -268,7 +268,7 @@ public class MethodInspectionImpl extends InspectionImpl implements MethodInspec
 
         @Override
         public String fullyQualifiedName() {
-            return fullyQualifiedName.get("FQN has not yet been computed");
+            return fullyQualifiedName.getOrDefault("?.?." + methodInfo.name());
         }
 
         @Override

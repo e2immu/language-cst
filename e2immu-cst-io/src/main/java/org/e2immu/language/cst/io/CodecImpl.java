@@ -27,6 +27,10 @@ public class CodecImpl implements Codec {
     }
 
     record E(String s) implements EncodedValue {
+        @Override
+        public String toString() {
+            return s;
+        }
     }
 
     @Override

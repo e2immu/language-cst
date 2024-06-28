@@ -54,6 +54,8 @@ public interface TypeInfo extends NamedType, Info {
 
     TypeInfo findSubType(String simpleName);
 
+    TypeInfo findSubType(String simpleName, boolean complain);
+
     FieldInfo getFieldByName(String name, boolean complain);
 
     MethodInfo findUniqueMethod(String tryCatch, TypeInfo typeInfoOfFirstParameter);

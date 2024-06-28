@@ -123,6 +123,13 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     }
 
     @Override
+    public TypeInfo findSubType(String simpleName, boolean complain) {
+        List<TypeInfo> subTypes = subTypes().stream().filter(st -> simpleName.equals(st.simpleName())).toList();
+        if (subTypes.size() != 1 && complain) throw new UnsupportedOperationException();
+        return subTypes.isEmpty() ? null : subTypes.get(0);
+    }
+
+    @Override
     public FieldInfo getFieldByName(String name, boolean complain) {
         Optional<FieldInfo> optional = fields().stream().filter(fieldInfo -> name.equals(fieldInfo.name())).findFirst();
         return complain ? optional.orElseThrow() : optional.orElse(null);
