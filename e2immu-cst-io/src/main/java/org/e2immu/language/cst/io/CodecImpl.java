@@ -204,6 +204,7 @@ public class CodecImpl implements Codec {
             fqn = "P" + pi.fullyQualifiedName();
         } else throw new UnsupportedOperationException();
         String pvStream = encodedPropertyValueStream.map(epv -> '"' + epv.key() + "\":" + ((E) epv.encodedValue()).s)
+                .sorted()
                 .collect(Collectors.joining(",", "{", "}"));
         String all = "{\"fqn\": " + quote(fqn) + ", \"data\":" + pvStream + "}";
         return new E(all);
