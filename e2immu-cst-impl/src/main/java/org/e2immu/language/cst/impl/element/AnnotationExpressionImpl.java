@@ -80,4 +80,11 @@ public class AnnotationExpressionImpl implements AnnotationExpression {
             return new AnnotationExpressionImpl(typeInfo, List.copyOf(keyValuePairs));
         }
     }
+
+    @Override
+    public boolean extractBoolean(String property) {
+        return keyValuePairs.stream()
+                .filter(kv -> property.equals(kv.key())).map(kv -> kv.value().isBoolValueTrue())
+                .findFirst().orElse(false);
+    }
 }

@@ -6,6 +6,8 @@ import org.e2immu.language.cst.api.analysis.Value;
 public class PropertyImpl implements Property {
     // type
     public static final Property IMMUTABLE_TYPE = new PropertyImpl("immutableType", ValueImpl.ImmutableImpl.MUTABLE);
+    public static final Property CONTAINER_TYPE = new PropertyImpl("containerType", ValueImpl.BoolImpl.FALSE);
+    public static final Property INDEPENDENT_TYPE = new PropertyImpl("independentType", ValueImpl.IndependentImpl.DEPENDENT);
 
     // method
     public static final Property MODIFIED_METHOD = new PropertyImpl("modifiedMethod");

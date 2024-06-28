@@ -9,8 +9,13 @@ import org.e2immu.language.cst.api.util.ParSeq;
 import java.util.Map;
 import java.util.Set;
 
-public interface Value {
+public interface Value extends Comparable<Value> {
     Codec.EncodedValue encode(Codec codec);
+
+    @Override
+    default int compareTo(Value o) {
+        throw new UnsupportedOperationException();
+    }
 
     interface Bool extends Value {
         boolean isTrue();
@@ -20,6 +25,16 @@ public interface Value {
 
     interface Immutable extends Value {
         boolean isAtLeastImmutableHC();
+
+        boolean isImmutable();
+    }
+
+
+    interface Independent extends Value {
+
+        boolean isAtLeastIndependentHc();
+
+        boolean isIndependent();
     }
 
     /*

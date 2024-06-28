@@ -48,6 +48,14 @@ public abstract class ValueImpl implements Value {
         public Codec.EncodedValue encode(Codec codec) {
             return codec.encodeBoolean(value);
         }
+
+        @Override
+        public int compareTo(Value o) {
+            if (o instanceof BoolImpl b) {
+                return value == b.value ? 0 : value ? 1 : -1;
+            }
+            throw new UnsupportedOperationException();
+        }
     }
 
     static {
@@ -92,21 +100,90 @@ public abstract class ValueImpl implements Value {
     }
 
     public record ImmutableImpl(int value) implements Immutable {
-        public static final Immutable MUTABLE = new ImmutableImpl(0);
+        public static final ImmutableImpl MUTABLE = new ImmutableImpl(0);
+        public static final ImmutableImpl FINAL_FIELDS = new ImmutableImpl(1);
+        public static final ImmutableImpl IMMUTABLE_HC = new ImmutableImpl(2);
+        public static final ImmutableImpl IMMUTABLE = new ImmutableImpl(3);
+
+        public static Value.Immutable from(int level) {
+            return switch (level) {
+                case 0 -> MUTABLE;
+                case 1 -> FINAL_FIELDS;
+                case 2 -> IMMUTABLE_HC;
+                case 3 -> IMMUTABLE;
+                default -> throw new UnsupportedOperationException();
+            };
+        }
 
         @Override
         public boolean isAtLeastImmutableHC() {
-            return value > 10; // FIXME
+            return value >= 2;
+        }
+
+        @Override
+        public boolean isImmutable() {
+            return value == 3;
         }
 
         @Override
         public Codec.EncodedValue encode(Codec codec) {
             return codec.encodeInt(value);
         }
+
+        @Override
+        public int compareTo(Value o) {
+            if (o instanceof ImmutableImpl i) {
+                return value - i.value;
+            }
+            throw new UnsupportedOperationException();
+        }
     }
 
     static {
         decoderMap.put(ImmutableImpl.class, (codec, encodedValue) -> new ImmutableImpl(codec.decodeInt(encodedValue)));
+    }
+
+
+    public record IndependentImpl(int value) implements Independent {
+        public static final IndependentImpl DEPENDENT = new IndependentImpl(0);
+        public static final IndependentImpl INDEPENDENT_HC = new IndependentImpl(1);
+        public static final IndependentImpl INDEPENDENT = new IndependentImpl(2);
+
+        public static Value from(int level) {
+            return switch (level) {
+                case 0 -> DEPENDENT;
+                case 1 -> INDEPENDENT_HC;
+                case 2 -> INDEPENDENT;
+                default -> throw new UnsupportedOperationException();
+            };
+        }
+
+        @Override
+        public boolean isAtLeastIndependentHc() {
+            return value > 0;
+        }
+
+        @Override
+        public boolean isIndependent() {
+            return value == 2;
+        }
+
+        @Override
+        public Codec.EncodedValue encode(Codec codec) {
+            return codec.encodeInt(value);
+        }
+
+        @Override
+        public int compareTo(Value o) {
+            if (o instanceof IndependentImpl i) {
+                return value - i.value;
+            }
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    static {
+        decoderMap.put(IndependentImpl.class, (codec, encodedValue) -> new IndependentImpl(codec.decodeInt(encodedValue)));
     }
 
     public record FieldValueImpl(FieldInfo field) implements FieldValue {
@@ -229,12 +306,12 @@ public abstract class ValueImpl implements Value {
         }
     }
 
-    static  {
+    static {
         decoderMap.put(GetSetEquivalentImpl.class, (codec, encodedValue) -> {
             List<Codec.EncodedValue> list = codec.decodeList(encodedValue);
             Set<ParameterInfo> set = codec.decodeSet(list.get(0)).stream()
                     .map(codec::decodeParameterInfo).collect(Collectors.toUnmodifiableSet());
-           return new GetSetEquivalentImpl(set, codec.decodeMethodInfo(list.get(1)));
+            return new GetSetEquivalentImpl(set, codec.decodeMethodInfo(list.get(1)));
         });
     }
 }

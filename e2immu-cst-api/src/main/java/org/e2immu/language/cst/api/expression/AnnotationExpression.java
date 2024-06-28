@@ -33,4 +33,7 @@ public interface AnnotationExpression {
 
         AnnotationExpression build();
     }
+
+    boolean extractBoolean(String property);
+
 }
