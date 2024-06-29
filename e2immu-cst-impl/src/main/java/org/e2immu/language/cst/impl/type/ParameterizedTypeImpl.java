@@ -436,7 +436,7 @@ public class ParameterizedTypeImpl implements ParameterizedType {
     public TypeInfo bestTypeInfo() {
         if (typeInfo != null) return typeInfo;
         if (typeParameter != null) {
-            if (wildcard.isExtends() && parameters.size() == 1) {
+            if (wildcard != null && wildcard.isExtends() && parameters.size() == 1) {
                 return parameters.get(0).bestTypeInfo();
             }
             TypeParameter definition;
