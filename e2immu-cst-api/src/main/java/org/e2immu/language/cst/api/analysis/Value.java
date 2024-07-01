@@ -29,6 +29,8 @@ public interface Value extends Comparable<Value> {
         boolean isTrue();
 
         boolean isFalse();
+
+        Bool or(Bool bool);
     }
 
     interface Immutable extends Value {

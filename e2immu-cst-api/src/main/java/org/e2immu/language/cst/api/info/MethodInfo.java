@@ -19,6 +19,10 @@ public interface MethodInfo extends Info {
 
     List<ParameterizedType> exceptionTypes();
 
+    boolean noReturnValue();
+
+    boolean explicitlyEmptyMethod();
+
     boolean hasBeenAnalyzed();
 
     boolean isConstructor();

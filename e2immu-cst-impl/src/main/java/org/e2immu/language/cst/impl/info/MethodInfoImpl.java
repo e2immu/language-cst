@@ -396,4 +396,19 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
         }
         return parameters().get(formalParams - 1).parameterizedType().copyWithOneFewerArrays();
     }
+
+    @Override
+    public boolean noReturnValue() {
+        return isVoid() || isConstructor();
+    }
+
+    @Override
+    public boolean explicitlyEmptyMethod() {
+        if (!methodBody().statements().isEmpty() || isStatic() && isSynthetic()) return false;
+        boolean shallowAnalyzer = typeInfo.analysis()
+                .getOrDefault(PropertyImpl.SHALLOW_ANALYZER, ValueImpl.BoolImpl.FALSE).isTrue();
+        boolean empty = !shallowAnalyzer && !isAbstract();
+        assert !empty || noReturnValue();
+        return empty;
+    }
 }

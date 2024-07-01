@@ -38,6 +38,10 @@ public abstract class ValueImpl implements Value {
             return !value;
         }
 
+        @Override
+        public Bool or(Bool bool) {
+            return value ? this : bool;
+        }
 
         @Override
         public boolean isTrue() {
