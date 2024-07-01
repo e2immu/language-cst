@@ -48,11 +48,21 @@ public class PropertyImpl implements Property {
     public static final Property IGNORE_MODIFICATIONS_PARAMETER = new PropertyImpl("ignoreModsParameter");
     public static final Property PARAMETER_ASSIGNED_TO_FIELD = new PropertyImpl("parameterAssignedToField",
             ValueImpl.AssignedToFieldImpl.EMPTY);
+    public static final Property NOT_NULL_PARAMETER = new PropertyImpl("notNullParameter", ValueImpl.NotNullImpl.NULLABLE);
+    public static final Property IMMUTABLE_PARAMETER = new PropertyImpl("immutableParameter"
+            , ValueImpl.ImmutableImpl.MUTABLE);
+    public static final Property CONTAINER_PARAMETER = new PropertyImpl("containerParameter", ValueImpl.BoolImpl.FALSE);
+    public static final Property INDEPENDENT_PARAMETER = new PropertyImpl("independentParameter",
+            ValueImpl.IndependentImpl.DEPENDENT);
 
     // field
     public static final Property FINAL_FIELD = new PropertyImpl("finalField");
     public static final Property NOT_NULL_FIELD = new PropertyImpl("notNullField", ValueImpl.NotNullImpl.NULLABLE);
     public static final Property IGNORE_MODIFICATIONS_FIELD = new PropertyImpl("ignoreModificationsField");
+    public static final Property MODIFIED_FIELD = new PropertyImpl("modifiedField");
+    public static final Property IMMUTABLE_FIELD = new PropertyImpl("immutableField"
+            , ValueImpl.ImmutableImpl.MUTABLE);
+    public static final Property CONTAINER_FIELD = new PropertyImpl("containerField", ValueImpl.BoolImpl.FALSE);
 
     // statement
     public static final Property ALWAYS_ESCAPES = new PropertyImpl("statementAlwaysEscapes");

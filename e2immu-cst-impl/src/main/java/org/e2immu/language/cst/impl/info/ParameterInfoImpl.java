@@ -2,10 +2,8 @@ package org.e2immu.language.cst.impl.info;
 
 import org.e2immu.language.cst.api.analysis.PropertyValueMap;
 import org.e2immu.language.cst.api.analysis.Value;
-import org.e2immu.language.cst.api.element.Comment;
-import org.e2immu.language.cst.api.element.Element;
-import org.e2immu.language.cst.api.element.Source;
-import org.e2immu.language.cst.api.element.Visitor;
+import org.e2immu.language.cst.api.element.*;
+import org.e2immu.language.cst.api.info.Access;
 import org.e2immu.language.cst.api.info.MethodInfo;
 import org.e2immu.language.cst.api.info.ParameterInfo;
 import org.e2immu.language.cst.api.output.OutputBuilder;
@@ -41,6 +39,16 @@ public class ParameterInfoImpl implements ParameterInfo {
         this.parameterizedType = parameterizedType;
         inspection = new EventuallyFinal<>();
         inspection.setVariable(new ParameterInspectionImpl.Builder(this));
+    }
+
+    @Override
+    public Access access() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public CompilationUnit compilationUnit() {
+        return methodInfo.compilationUnit();
     }
 
     @Override

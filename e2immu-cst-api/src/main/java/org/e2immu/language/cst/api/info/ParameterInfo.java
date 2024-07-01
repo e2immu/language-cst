@@ -4,7 +4,7 @@ import org.e2immu.annotation.Fluent;
 import org.e2immu.language.cst.api.analysis.Value;
 import org.e2immu.language.cst.api.variable.Variable;
 
-public interface ParameterInfo extends Variable {
+public interface ParameterInfo extends Variable, Info {
     int index();
 
     String name();

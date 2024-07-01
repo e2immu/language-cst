@@ -200,8 +200,6 @@ public class CodecImpl implements Codec {
         String fqn;
         if (info instanceof Info i) {
             fqn = encodeInfoFqn(i);
-        } else if (info instanceof ParameterInfo pi) {
-            fqn = "P" + pi.fullyQualifiedName();
         } else throw new UnsupportedOperationException();
         String pvStream = encodedPropertyValueStream.map(epv -> '"' + epv.key() + "\":" + ((E) epv.encodedValue()).s)
                 .sorted()
