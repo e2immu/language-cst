@@ -507,4 +507,12 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
         return inspection.get().isSynthetic();
     }
 
+    @Override
+    public boolean isSealedOrFinal() {
+        TypeNature typeNature = inspection.get().typeNature();
+        if (typeNature.isClass()) {
+            return inspection.get().modifiers().stream().anyMatch(m -> m.isFinal() || m.isSealed());
+        }
+        return !typeNature.isInterface();
+    }
 }

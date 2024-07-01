@@ -12,28 +12,30 @@ public interface AnnotationExpression {
     OutputBuilder print(Qualification qualification);
 
     interface KV {
+
         String key();
-
         /* in Java, that would be "value" */
+
         boolean keyIsDefault();
-
         Expression value();
-    }
 
+    }
     TypeInfo typeInfo();
 
     List<KV> keyValuePairs();
 
     interface Builder {
+
         @Fluent
         Builder addKeyValuePair(String key, Expression value);
-
         @Fluent
         Builder setTypeInfo(TypeInfo typeInfo);
 
         AnnotationExpression build();
-    }
 
-    boolean extractBoolean(String property);
+    }
+    boolean extractBoolean(String key);
+
+    String extractString(String key);
 
 }

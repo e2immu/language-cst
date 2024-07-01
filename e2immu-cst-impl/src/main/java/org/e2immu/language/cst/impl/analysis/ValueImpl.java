@@ -129,6 +129,11 @@ public abstract class ValueImpl implements Value {
         }
 
         @Override
+        public boolean isMutable() {
+            return value == 0;
+        }
+
+        @Override
         public Immutable max(Immutable other) {
             assert this != NO_VALUE && other != NO_VALUE;
             int otherValue = ((ImmutableImpl) other).value;
@@ -198,6 +203,18 @@ public abstract class ValueImpl implements Value {
                 return value - i.value;
             }
             throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public Independent min(Independent other) {
+            int otherValue = ((IndependentImpl) other).value;
+            return value <= otherValue ? this : other;
+        }
+
+        @Override
+        public Independent max(Independent other) {
+            int otherValue = ((IndependentImpl) other).value;
+            return value >= otherValue ? this : other;
         }
     }
 
@@ -347,6 +364,11 @@ public abstract class ValueImpl implements Value {
                 case 2 -> CONTENT_NOT_NULL;
                 default -> throw new UnsupportedOperationException();
             };
+        }
+
+        @Override
+        public boolean isAtLeastNotNull() {
+            return value >= 1;
         }
 
         @Override

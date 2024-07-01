@@ -36,6 +36,8 @@ public interface TypeInfo extends NamedType, Info {
         return compilationUnitOrEnclosingType().isLeft();
     }
 
+    boolean isSealedOrFinal();
+
     String packageName();
 
     // chain of type names Primary.Sub.Sub2

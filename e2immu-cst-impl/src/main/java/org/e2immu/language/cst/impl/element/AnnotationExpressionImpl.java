@@ -2,6 +2,7 @@ package org.e2immu.language.cst.impl.element;
 
 import org.e2immu.language.cst.api.expression.AnnotationExpression;
 import org.e2immu.language.cst.api.expression.Expression;
+import org.e2immu.language.cst.api.expression.StringConstant;
 import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
@@ -79,10 +80,18 @@ public class AnnotationExpressionImpl implements AnnotationExpression {
     }
 
     @Override
-    public boolean extractBoolean(String property) {
+    public boolean extractBoolean(String key) {
         return keyValuePairs.stream()
-                .filter(kv -> property.equals(kv.key())).map(kv -> kv.value().isBoolValueTrue())
+                .filter(kv -> key.equals(kv.key())).map(kv -> kv.value().isBoolValueTrue())
                 .findFirst().orElse(false);
+    }
+
+    @Override
+    public String extractString(String key) {
+        return keyValuePairs.stream()
+                .filter(kv -> key.equals(kv.key()))
+                .map(kv -> ((StringConstant) kv.value()).constant())
+                .findFirst().orElse(null);
     }
 
     @Override

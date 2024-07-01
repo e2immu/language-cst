@@ -16,18 +16,6 @@ import java.util.stream.Stream;
 public abstract class InfoImpl implements Info {
 
     private final PropertyValueMap propertyValueMap = new PropertyValueMapImpl();
-    private final SetOnce<List<Comment>> comments = new SetOnce<>();
-    private final SetOnce<Source> source = new SetOnce<>();
-
-    @Override
-    public List<Comment> comments() {
-        return comments.getOrDefaultNull();
-    }
-
-    @Override
-    public Source source() {
-        return source.getOrDefaultNull();
-    }
 
     @Override
     public Stream<Variable> variableStreamDescend() {

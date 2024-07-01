@@ -9,6 +9,8 @@ import java.util.Set;
 
 public interface FieldInfo extends Info {
 
+    boolean hasBeenInspected();
+
     String name();
 
     TypeInfo owner();
