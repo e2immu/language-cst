@@ -300,9 +300,11 @@ public interface Factory {
 
     TypeInfo newTypeInfo(CompilationUnit cu, String simpleName);
 
-    TypeParameter newTypeParameter(int index, String simpleName, MethodInfo owner);
+    default TypeParameter newTypeParameter(int index, String simpleName, Info owner) {
+        return newTypeParameter(index, simpleName, owner, List.of());
+    }
 
-    TypeParameter newTypeParameter(int index, String simpleName, TypeInfo owner);
+    TypeParameter newTypeParameter(int index, String simpleName, Info owner, List<AnnotationExpression> annotations);
 
     UnaryOperator newUnaryOperator(MethodInfo operator, Expression e, Precedence precedence);
 

@@ -1,5 +1,6 @@
 package org.e2immu.language.cst.impl.type;
 
+import org.e2immu.language.cst.api.expression.AnnotationExpression;
 import org.e2immu.language.cst.api.info.MethodInfo;
 import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.output.OutputBuilder;
@@ -22,12 +23,16 @@ public class TypeParameterImpl implements TypeParameter {
     private final String name;
     private final Either<TypeInfo, MethodInfo> owner;
     private final FirstThen<Builder, List<ParameterizedType>> typeBounds;
+    private final List<AnnotationExpression> annotations;
 
-    public TypeParameterImpl(int index, String name, Either<TypeInfo, MethodInfo> owner) {
+    public TypeParameterImpl(int index, String name,
+                             Either<TypeInfo, MethodInfo> owner,
+                             List<AnnotationExpression> annotations) {
         this.index = index;
         this.name = name;
         this.owner = owner;
         this.typeBounds = new FirstThen<>(new Builder(this));
+        this.annotations = annotations;
     }
 
     private void commit(List<ParameterizedType> typeBounds) {
@@ -118,5 +123,10 @@ public class TypeParameterImpl implements TypeParameter {
         String shortOwner = owner.isLeft() ? owner.getLeft().simpleName()
                 : owner.getRight().typeInfo().simpleName() + "." + owner.getRight().name();
         return simpleName() + "=TP#" + index + " in " + shortOwner;
+    }
+
+    @Override
+    public List<AnnotationExpression> annotations() {
+        return annotations;
     }
 }

@@ -7,15 +7,17 @@ public class PropertyImpl implements Property {
     // type
     public static final Property IMMUTABLE_TYPE = new PropertyImpl("immutableType",
             ValueImpl.ImmutableImpl.MUTABLE);
-    public static final Property CONTAINER_TYPE = new PropertyImpl("containerType", ValueImpl.BoolImpl.FALSE);
+    public static final Property CONTAINER_TYPE = new PropertyImpl("containerType");
     public static final Property INDEPENDENT_TYPE = new PropertyImpl("independentType",
             ValueImpl.IndependentImpl.DEPENDENT);
+    public static final Property IMMUTABLE_TYPE_DETERMINED_BY_PARAMETERS
+            = new PropertyImpl("immutableTypeDeterminedByParameters");
 
     // method
     public static final Property MODIFIED_METHOD = new PropertyImpl("modifiedMethod");
     public static final Property FLUENT_METHOD = new PropertyImpl("fluentMethod");
     public static final Property IDENTITY_METHOD = new PropertyImpl("identityMethod");
-    public static final Property NOT_NULL_METHOD = new PropertyImpl("notNullMethod");
+    public static final Property NOT_NULL_METHOD = new PropertyImpl("notNullMethod", ValueImpl.NotNullImpl.NULLABLE);
     public static final Property STATIC_SIDE_EFFECTS_METHOD = new PropertyImpl("sseMethod");
     public static final Property POST_CONDITIONS_METHOD = new PropertyImpl("postConditionsMethod",
             ValueImpl.PostConditionsImpl.EMPTY);
@@ -63,6 +65,8 @@ public class PropertyImpl implements Property {
     public static final Property IMMUTABLE_FIELD = new PropertyImpl("immutableField"
             , ValueImpl.ImmutableImpl.MUTABLE);
     public static final Property CONTAINER_FIELD = new PropertyImpl("containerField", ValueImpl.BoolImpl.FALSE);
+    public static final Property INDEPENDENT_FIELD = new PropertyImpl("independentField",
+            ValueImpl.IndependentImpl.DEPENDENT);
 
     // statement
     public static final Property ALWAYS_ESCAPES = new PropertyImpl("statementAlwaysEscapes");

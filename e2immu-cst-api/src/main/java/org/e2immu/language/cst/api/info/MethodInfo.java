@@ -47,8 +47,6 @@ public interface MethodInfo extends Info {
 
     boolean isInfix();
 
-    boolean isSynthetic();
-
     boolean isAbstract();
 
     ParameterizedType typeOfParameterHandleVarargs(int index);

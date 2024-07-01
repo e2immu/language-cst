@@ -100,6 +100,8 @@ public abstract class ValueImpl implements Value {
     }
 
     public record ImmutableImpl(int value) implements Immutable {
+        // NO_VALUE for 'null' constant
+        public static final ImmutableImpl NO_VALUE = new ImmutableImpl(-1);
         public static final ImmutableImpl MUTABLE = new ImmutableImpl(0);
         public static final ImmutableImpl FINAL_FIELDS = new ImmutableImpl(1);
         public static final ImmutableImpl IMMUTABLE_HC = new ImmutableImpl(2);
@@ -107,6 +109,7 @@ public abstract class ValueImpl implements Value {
 
         public static Value.Immutable from(int level) {
             return switch (level) {
+                case -1 -> NO_VALUE;
                 case 0 -> MUTABLE;
                 case 1 -> FINAL_FIELDS;
                 case 2 -> IMMUTABLE_HC;
@@ -123,6 +126,22 @@ public abstract class ValueImpl implements Value {
         @Override
         public boolean isImmutable() {
             return value == 3;
+        }
+
+        @Override
+        public Immutable max(Immutable other) {
+            assert this != NO_VALUE && other != NO_VALUE;
+            int otherValue = ((ImmutableImpl) other).value;
+            if (value >= otherValue) return this;
+            return other;
+        }
+
+        @Override
+        public Immutable min(Immutable other) {
+            assert this != NO_VALUE && other != NO_VALUE;
+            int otherValue = ((ImmutableImpl) other).value;
+            if (value <= otherValue) return this;
+            return other;
         }
 
         @Override
@@ -328,6 +347,11 @@ public abstract class ValueImpl implements Value {
                 case 2 -> CONTENT_NOT_NULL;
                 default -> throw new UnsupportedOperationException();
             };
+        }
+
+        @Override
+        public boolean isNullable() {
+            return value == 0;
         }
 
         @Override

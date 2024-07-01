@@ -174,4 +174,9 @@ public class FieldInfoImpl extends InfoImpl implements FieldInfo {
     public Expression initializer() {
         return inspection.get().initializer();
     }
+
+    @Override
+    public boolean isSynthetic() {
+        return inspection.get().isSynthetic();
+    }
 }

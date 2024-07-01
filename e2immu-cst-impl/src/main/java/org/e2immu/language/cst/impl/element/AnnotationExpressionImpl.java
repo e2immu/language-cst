@@ -5,10 +5,7 @@ import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
-import org.e2immu.language.cst.impl.output.OutputBuilderImpl;
-import org.e2immu.language.cst.impl.output.SymbolEnum;
-import org.e2immu.language.cst.impl.output.TextImpl;
-import org.e2immu.language.cst.impl.output.TypeNameImpl;
+import org.e2immu.language.cst.impl.output.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,8 +38,8 @@ public class AnnotationExpressionImpl implements AnnotationExpression {
             outputBuilder.add(SymbolEnum.LEFT_PARENTHESIS)
                     .add(keyValuePairs.stream()
                             .map(kv ->
-                                    new OutputBuilderImpl().addIf(kv.keyIsDefault(), new TextImpl(kv.key()))
-                                            .addIf(kv.keyIsDefault(), SymbolEnum.assignment("="))
+                                    new OutputBuilderImpl().addIf(!kv.keyIsDefault(), new TextImpl(kv.key()))
+                                            .addIf(!kv.keyIsDefault(), SymbolEnum.assignment("="))
                                             .add(kv.value().print(qualification)))
                             .collect(OutputBuilderImpl.joining(SymbolEnum.COMMA)))
                     .add(SymbolEnum.RIGHT_PARENTHESIS);
@@ -86,5 +83,10 @@ public class AnnotationExpressionImpl implements AnnotationExpression {
         return keyValuePairs.stream()
                 .filter(kv -> property.equals(kv.key())).map(kv -> kv.value().isBoolValueTrue())
                 .findFirst().orElse(false);
+    }
+
+    @Override
+    public String toString() {
+        return print(QualificationImpl.SIMPLE_NAMES).toString();
     }
 }

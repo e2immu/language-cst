@@ -501,4 +501,10 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     public boolean haveOnDemandInspection() {
         return inspection.haveOnDemand();
     }
+
+    @Override
+    public boolean isSynthetic() {
+        return inspection.get().isSynthetic();
+    }
+
 }

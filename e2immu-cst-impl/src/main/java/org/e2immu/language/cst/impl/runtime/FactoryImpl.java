@@ -224,19 +224,22 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
-    public ParameterizedType newParameterizedType(TypeInfo typeInfo, int arrays, Wildcard wildCard, List<ParameterizedType> parameters) {
+    public ParameterizedType newParameterizedType(TypeInfo typeInfo,
+                                                  int arrays,
+                                                  Wildcard wildCard,
+                                                  List<ParameterizedType> parameters) {
         return new ParameterizedTypeImpl(typeInfo, null, parameters, arrays, wildCard);
     }
 
     @Override
-    public TypeParameter newTypeParameter(int index, String simpleName, TypeInfo owner) {
-        return new TypeParameterImpl(index, simpleName, Either.left(owner));
+    public TypeParameter newTypeParameter(int index, String simpleName, Info owner, List<AnnotationExpression> annotations) {
+        if (owner instanceof TypeInfo typeInfo) {
+            return new TypeParameterImpl(index, simpleName, Either.left(typeInfo), annotations);
+        } else if (owner instanceof MethodInfo methodInfo) {
+            return new TypeParameterImpl(index, simpleName, Either.right(methodInfo), annotations);
+        } else throw new UnsupportedOperationException();
     }
 
-    @Override
-    public TypeParameter newTypeParameter(int index, String simpleName, MethodInfo owner) {
-        return new TypeParameterImpl(index, simpleName, Either.right(owner));
-    }
 
     @Override
     public ParameterizedType parameterizedTypeWildcard() {

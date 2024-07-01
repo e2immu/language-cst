@@ -57,7 +57,8 @@ public class ShallowAnalyzer {
             boolean isModified = haveActiveAnnotation(Modified.class, methodInfo);
             methodInfo.analysis().set(PropertyImpl.MODIFIED_METHOD, ValueImpl.BoolImpl.from(isModified));
             boolean isNotNull = haveActiveAnnotation(NotNull.class, methodInfo);
-            methodInfo.analysis().set(PropertyImpl.NOT_NULL_METHOD, ValueImpl.BoolImpl.from(isNotNull));
+            methodInfo.analysis().set(PropertyImpl.NOT_NULL_METHOD, isNotNull
+                    ? ValueImpl.NotNullImpl.NOT_NULL : ValueImpl.NotNullImpl.NULLABLE);
 
             for (ParameterInfo parameterInfo : methodInfo.parameters()) {
                 analyze(parameterInfo);

@@ -35,6 +35,10 @@ public interface Value extends Comparable<Value> {
         boolean isAtLeastImmutableHC();
 
         boolean isImmutable();
+
+        Immutable max(Immutable other);
+
+        Immutable min(Immutable other);
     }
 
 
@@ -45,8 +49,9 @@ public interface Value extends Comparable<Value> {
         boolean isIndependent();
     }
 
-    interface NotNull extends  Value {
+    interface NotNull extends Value {
 
+        boolean isNullable();
     }
 
     /*

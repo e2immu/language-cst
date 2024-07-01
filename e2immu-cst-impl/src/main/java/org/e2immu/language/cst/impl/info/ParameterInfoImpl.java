@@ -194,4 +194,9 @@ public class ParameterInfoImpl implements ParameterInfo {
         inspection.setFinal(pi);
     }
 
+    @Override
+    public boolean isSynthetic() {
+        return inspection.get().isSynthetic();
+    }
+
 }

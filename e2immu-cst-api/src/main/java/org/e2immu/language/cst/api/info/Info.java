@@ -9,6 +9,8 @@ public interface Info extends Element {
 
     CompilationUnit compilationUnit();
 
+    boolean isSynthetic();
+
     interface Builder<B extends Builder<?>> extends Element.Builder<B> {
         @Fluent
         B setAccess(Access access);
