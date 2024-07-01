@@ -45,6 +45,10 @@ public interface Value extends Comparable<Value> {
         boolean isIndependent();
     }
 
+    interface NotNull extends  Value {
+
+    }
+
     /*
     the strings are arbitrary labels.
     at least two methods should have the same label, of the same kind (seq, par, multi).

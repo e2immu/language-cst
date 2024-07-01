@@ -5,9 +5,11 @@ import org.e2immu.language.cst.api.analysis.Value;
 
 public class PropertyImpl implements Property {
     // type
-    public static final Property IMMUTABLE_TYPE = new PropertyImpl("immutableType", ValueImpl.ImmutableImpl.MUTABLE);
+    public static final Property IMMUTABLE_TYPE = new PropertyImpl("immutableType",
+            ValueImpl.ImmutableImpl.MUTABLE);
     public static final Property CONTAINER_TYPE = new PropertyImpl("containerType", ValueImpl.BoolImpl.FALSE);
-    public static final Property INDEPENDENT_TYPE = new PropertyImpl("independentType", ValueImpl.IndependentImpl.DEPENDENT);
+    public static final Property INDEPENDENT_TYPE = new PropertyImpl("independentType",
+            ValueImpl.IndependentImpl.DEPENDENT);
 
     // method
     public static final Property MODIFIED_METHOD = new PropertyImpl("modifiedMethod");
@@ -24,6 +26,12 @@ public class PropertyImpl implements Property {
     public static final Property METHOD_ALLOWS_INTERRUPTS = new PropertyImpl("methodAllowsInterrupts");
     public static final Property OWN_FIELDS_READ_MODIFIED_IN_METHOD = new PropertyImpl("areOwnFieldsReadModified",
             ValueImpl.FieldBooleanMapImpl.EMPTY);
+    public static final Property INDEPENDENT_METHOD = new PropertyImpl("independentMethod",
+            ValueImpl.IndependentImpl.DEPENDENT);
+    // dynamic return type
+    public static final Property IMMUTABLE_METHOD = new PropertyImpl("immutableMethod"
+            , ValueImpl.ImmutableImpl.MUTABLE);
+    public static final Property CONTAINER_METHOD = new PropertyImpl("containerMethod", ValueImpl.BoolImpl.FALSE);
 
     // commutation on methods
     public static final Property PARALLEL_PARAMETER_GROUPS = new PropertyImpl("parallelParameterGroups",
@@ -43,7 +51,7 @@ public class PropertyImpl implements Property {
 
     // field
     public static final Property FINAL_FIELD = new PropertyImpl("finalField");
-    public static final Property NOT_NULL_FIELD = new PropertyImpl("notNullField");
+    public static final Property NOT_NULL_FIELD = new PropertyImpl("notNullField", ValueImpl.NotNullImpl.NULLABLE);
     public static final Property IGNORE_MODIFICATIONS_FIELD = new PropertyImpl("ignoreModificationsField");
 
     // statement

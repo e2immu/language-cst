@@ -314,4 +314,38 @@ public abstract class ValueImpl implements Value {
             return new GetSetEquivalentImpl(set, codec.decodeMethodInfo(list.get(1)));
         });
     }
+
+
+    public record NotNullImpl(int value) implements NotNull {
+        public static final NotNullImpl NULLABLE = new NotNullImpl(0);
+        public static final NotNullImpl NOT_NULL = new NotNullImpl(1);
+        public static final NotNullImpl CONTENT_NOT_NULL = new NotNullImpl(2);
+
+        public static Value from(int level) {
+            return switch (level) {
+                case 0 -> NULLABLE;
+                case 1 -> NOT_NULL;
+                case 2 -> CONTENT_NOT_NULL;
+                default -> throw new UnsupportedOperationException();
+            };
+        }
+
+        @Override
+        public Codec.EncodedValue encode(Codec codec) {
+            return codec.encodeInt(value);
+        }
+
+        @Override
+        public int compareTo(Value o) {
+            if (o instanceof NotNullImpl i) {
+                return value - i.value;
+            }
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    static {
+        decoderMap.put(NotNullImpl.class, (codec, encodedValue) -> new NotNullImpl(codec.decodeInt(encodedValue)));
+    }
+
 }
