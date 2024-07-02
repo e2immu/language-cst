@@ -493,6 +493,13 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     }
 
     @Override
+    public boolean isEnclosedIn(TypeInfo typeInfo) {
+        if (typeInfo == this) return true;
+        if (compilationUnitOrEnclosingType.isLeft()) return false;
+        return compilationUnitOrEnclosingType.getRight().isEnclosedIn(typeInfo);
+    }
+
+    @Override
     public boolean hasBeenInspected() {
         return inspection.isFinal();
     }

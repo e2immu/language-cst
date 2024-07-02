@@ -30,6 +30,8 @@ public interface Value extends Comparable<Value> {
 
         boolean isFalse();
 
+        boolean hasAValue();
+
         Bool or(Bool bool);
     }
 
@@ -43,6 +45,8 @@ public interface Value extends Comparable<Value> {
         Immutable max(Immutable other);
 
         Immutable min(Immutable other);
+
+        Independent toCorrespondingIndependent();
     }
 
 

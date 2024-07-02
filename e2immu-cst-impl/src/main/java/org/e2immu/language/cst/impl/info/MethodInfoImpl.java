@@ -411,4 +411,10 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
         assert !empty || noReturnValue();
         return empty;
     }
+
+    @Override
+    public boolean isFactoryMethod() {
+        return isStatic() && returnType().typeInfo() != null
+               && returnType().typeInfo().isEnclosedIn(typeInfo);
+    }
 }

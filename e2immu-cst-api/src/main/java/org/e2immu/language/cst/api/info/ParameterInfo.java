@@ -26,4 +26,6 @@ public interface ParameterInfo extends Variable, Info {
     boolean isIgnoreModifications();
 
     Value.AssignedToField assignedToField();
+
+    MethodInfo methodInfo();
 }

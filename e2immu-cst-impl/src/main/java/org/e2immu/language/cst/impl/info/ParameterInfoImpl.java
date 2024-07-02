@@ -199,4 +199,9 @@ public class ParameterInfoImpl implements ParameterInfo {
         return inspection.get().isSynthetic();
     }
 
+
+    @Override
+    public MethodInfo methodInfo() {
+        return methodInfo;
+    }
 }

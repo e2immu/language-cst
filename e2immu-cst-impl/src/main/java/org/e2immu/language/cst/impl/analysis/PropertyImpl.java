@@ -33,7 +33,7 @@ public class PropertyImpl implements Property {
     // dynamic return type
     public static final Property IMMUTABLE_METHOD = new PropertyImpl("immutableMethod"
             , ValueImpl.ImmutableImpl.MUTABLE);
-    public static final Property CONTAINER_METHOD = new PropertyImpl("containerMethod", ValueImpl.BoolImpl.FALSE);
+    public static final Property CONTAINER_METHOD = new PropertyImpl("containerMethod");
 
     // commutation on methods
     public static final Property PARALLEL_PARAMETER_GROUPS = new PropertyImpl("parallelParameterGroups",

@@ -87,11 +87,11 @@ public class AnnotationExpressionImpl implements AnnotationExpression {
     }
 
     @Override
-    public String extractString(String key) {
+    public String extractString(String key, String defaultValue) {
         return keyValuePairs.stream()
                 .filter(kv -> key.equals(kv.key()))
                 .map(kv -> ((StringConstant) kv.value()).constant())
-                .findFirst().orElse(null);
+                .findFirst().orElse(defaultValue);
     }
 
     @Override

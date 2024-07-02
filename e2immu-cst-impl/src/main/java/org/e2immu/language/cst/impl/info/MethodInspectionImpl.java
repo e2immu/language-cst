@@ -13,10 +13,7 @@ import org.e2immu.support.SetOnce;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class MethodInspectionImpl extends InspectionImpl implements MethodInspection {
@@ -157,6 +154,12 @@ public class MethodInspectionImpl extends InspectionImpl implements MethodInspec
         }
 
         @Override
+        public Builder addOverrides(Collection<MethodInfo> overrides) {
+            this.overrides.addAll(overrides);
+            return this;
+        }
+
+        @Override
         public List<TypeParameter> typeParameters() {
             return typeParameters;
         }
@@ -274,12 +277,6 @@ public class MethodInspectionImpl extends InspectionImpl implements MethodInspec
         @Override
         public List<ParameterInfo> parameters() {
             return parameters;
-        }
-
-        @Fluent
-        public Builder addParameter(ParameterInfoImpl pi) {
-            parameters.add(pi);
-            return this;
         }
     }
 

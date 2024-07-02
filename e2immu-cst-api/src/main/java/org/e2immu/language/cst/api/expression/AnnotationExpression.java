@@ -36,6 +36,6 @@ public interface AnnotationExpression {
     }
     boolean extractBoolean(String key);
 
-    String extractString(String key);
+    String extractString(String key, String defaultValue);
 
 }

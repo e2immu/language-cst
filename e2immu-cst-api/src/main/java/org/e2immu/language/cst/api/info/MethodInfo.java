@@ -10,14 +10,13 @@ import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.type.TypeParameter;
 import org.e2immu.language.cst.api.util.ParSeq;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public interface MethodInfo extends Info {
 
     List<ParameterizedType> exceptionTypes();
+
+    boolean isFactoryMethod();
 
     boolean noReturnValue();
 
@@ -192,6 +191,9 @@ public interface MethodInfo extends Info {
 
         @Fluent
         Builder addExceptionType(ParameterizedType exceptionType);
+
+        @Fluent
+        Builder addOverrides(Collection<MethodInfo> overrides);
     }
 
     default boolean isVarargs() {

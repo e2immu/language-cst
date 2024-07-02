@@ -21,49 +21,57 @@ public abstract class ValueImpl implements Value {
     }
 
     public static class BoolImpl implements Value.Bool {
-        public static final Bool FALSE = new BoolImpl(false);
-        public static final Bool TRUE = new BoolImpl(true);
-        private final boolean value;
+        public static final Bool NO_VALUE = new BoolImpl(-1);
+        public static final Bool FALSE = new BoolImpl(0);
+        public static final Bool TRUE = new BoolImpl(1);
+        private final int value;
 
-        private BoolImpl(boolean value) {
+        private BoolImpl(int value) {
             this.value = value;
         }
 
-        public static Value from(boolean b) {
+        public static Value.Bool from(boolean b) {
             return b ? TRUE : FALSE;
         }
 
         @Override
         public boolean isFalse() {
-            return !value;
+            return value == 0;
+        }
+
+        @Override
+        public boolean hasAValue() {
+            return value >= 0;
         }
 
         @Override
         public Bool or(Bool bool) {
-            return value ? this : bool;
+            if (this == NO_VALUE) return bool;
+            if (bool == NO_VALUE) return this;
+            return value == 1 ? this : bool;
         }
 
         @Override
         public boolean isTrue() {
-            return value;
+            return value == 1;
         }
 
         @Override
         public Codec.EncodedValue encode(Codec codec) {
-            return codec.encodeBoolean(value);
+            return codec.encodeInt(value);
         }
 
         @Override
         public int compareTo(Value o) {
             if (o instanceof BoolImpl b) {
-                return value == b.value ? 0 : value ? 1 : -1;
+                return value - b.value;
             }
             throw new UnsupportedOperationException();
         }
     }
 
     static {
-        decoderMap.put(BoolImpl.class, (codec, encodedValue) -> new BoolImpl(codec.decodeBoolean(encodedValue)));
+        decoderMap.put(BoolImpl.class, (codec, encodedValue) -> new BoolImpl(codec.decodeInt(encodedValue)));
     }
 
     public record ParameterParSeqImpl(ParSeq<ParameterInfo> parSeq) implements Value.ParameterParSeq {
@@ -103,7 +111,13 @@ public abstract class ValueImpl implements Value {
         });
     }
 
-    public record ImmutableImpl(int value) implements Immutable {
+    public static class ImmutableImpl implements Immutable {
+        private final int value;
+
+        private ImmutableImpl(int value) {
+            this.value = value;
+        }
+
         // NO_VALUE for 'null' constant
         public static final ImmutableImpl NO_VALUE = new ImmutableImpl(-1);
         public static final ImmutableImpl MUTABLE = new ImmutableImpl(0);
@@ -139,6 +153,7 @@ public abstract class ValueImpl implements Value {
 
         @Override
         public Immutable max(Immutable other) {
+            if (other == null) return this;
             assert this != NO_VALUE && other != NO_VALUE;
             int otherValue = ((ImmutableImpl) other).value;
             if (value >= otherValue) return this;
@@ -165,6 +180,16 @@ public abstract class ValueImpl implements Value {
             }
             throw new UnsupportedOperationException();
         }
+
+        @Override
+        public Independent toCorrespondingIndependent() {
+            return switch (value) {
+                case 0, 1 -> IndependentImpl.DEPENDENT;
+                case 2 -> IndependentImpl.INDEPENDENT_HC;
+                case 3 -> IndependentImpl.INDEPENDENT;
+                default -> throw new UnsupportedOperationException();
+            };
+        }
     }
 
     static {
@@ -172,7 +197,13 @@ public abstract class ValueImpl implements Value {
     }
 
 
-    public record IndependentImpl(int value) implements Independent {
+    public static class IndependentImpl implements Independent {
+        private final int value;
+
+        private IndependentImpl(int value) {
+            this.value = value;
+        }
+
         public static final IndependentImpl DEPENDENT = new IndependentImpl(0);
         public static final IndependentImpl INDEPENDENT_HC = new IndependentImpl(1);
         public static final IndependentImpl INDEPENDENT = new IndependentImpl(2);
@@ -217,6 +248,7 @@ public abstract class ValueImpl implements Value {
 
         @Override
         public Independent max(Independent other) {
+            if (other == null) return this;
             int otherValue = ((IndependentImpl) other).value;
             return value >= otherValue ? this : other;
         }
