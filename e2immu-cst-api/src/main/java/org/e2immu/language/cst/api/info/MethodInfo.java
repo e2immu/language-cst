@@ -60,6 +60,10 @@ public interface MethodInfo extends Info {
         boolean isStatic();
 
         boolean isConstructor();
+
+        boolean isAbstract();
+
+        boolean isDefault();
     }
 
     String name();

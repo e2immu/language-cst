@@ -230,4 +230,9 @@ public interface TypeInfo extends NamedType, Info {
                 .flatMap(ti -> Stream.concat(Stream.of(ti), ti.recursiveSuperTypeStream()));
         return Stream.concat(s1, Stream.concat(s2, s3));
     }
+
+
+    default Stream<MethodInfo> methodAndConstructorStream() {
+        return Stream.concat(methodStream(), constructors().stream());
+    }
 }

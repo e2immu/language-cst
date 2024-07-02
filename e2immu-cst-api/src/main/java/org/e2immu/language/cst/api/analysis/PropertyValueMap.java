@@ -13,6 +13,12 @@ public interface PropertyValueMap {
 
     boolean haveAnalyzedValueFor(Property property);
 
+    default boolean haveAnalyzedValueFor(Property property, Runnable runWhenNoValue) {
+        boolean b = haveAnalyzedValueFor(property);
+        if (!b) runWhenNoValue.run();
+        return b;
+    }
+
     Stream<PropertyValue> propertyValueStream();
 
     <V extends Value> void set(Property property, V value);

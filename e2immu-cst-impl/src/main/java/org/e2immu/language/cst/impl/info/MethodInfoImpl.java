@@ -50,6 +50,16 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
         public boolean isCompactConstructor() {
             return this == COMPACT_CONSTRUCTOR;
         }
+
+        @Override
+        public boolean isAbstract() {
+            return this == ABSTRACT_METHOD;
+        }
+
+        @Override
+        public boolean isDefault() {
+            return this == DEFAULT_METHOD;
+        }
     }
 
     private final TypeInfo typeInfo; // back reference, only @ContextClass after...
@@ -206,7 +216,7 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
 
     @Override
     public boolean isDefault() {
-        return methodType == MethodTypeEnum.DEFAULT_METHOD;
+        return methodType.isDefault();
     }
 
     public boolean isCompactConstructor() {
@@ -223,7 +233,7 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
 
     @Override
     public boolean isStatic() {
-        return methodType == MethodTypeEnum.STATIC_METHOD || methodType == MethodTypeEnum.STATIC_BLOCK;
+        return methodType.isStatic();
     }
 
     @Override
@@ -279,7 +289,7 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
 
     @Override
     public boolean isAbstract() {
-        return inspection.get().modifiers().stream().anyMatch(MethodModifier::isAbstract);
+        return methodType.isAbstract();
     }
 
     @Override
@@ -415,6 +425,6 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
     @Override
     public boolean isFactoryMethod() {
         return isStatic() && returnType().typeInfo() != null
-               && returnType().typeInfo().isEnclosedIn(typeInfo);
+                && returnType().typeInfo().isEnclosedIn(typeInfo);
     }
 }
