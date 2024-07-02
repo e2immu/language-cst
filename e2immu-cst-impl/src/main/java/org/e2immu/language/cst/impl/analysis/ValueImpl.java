@@ -200,6 +200,18 @@ public abstract class ValueImpl implements Value {
                 default -> throw new UnsupportedOperationException();
             };
         }
+
+        @Override
+        public String toString() {
+            return switch (value) {
+                case -1 -> "<no immutable value>";
+                case 0 -> "@Mutable";
+                case 1 -> "@FinalFields";
+                case 2 -> "@Immutable(hc=true)";
+                case 3 -> "@Immutable";
+                default -> throw new UnsupportedOperationException();
+            };
+        }
     }
 
     static {
@@ -261,6 +273,16 @@ public abstract class ValueImpl implements Value {
             if (other == null) return this;
             int otherValue = ((IndependentImpl) other).value;
             return value >= otherValue ? this : other;
+        }
+
+        @Override
+        public String toString() {
+            return switch (value) {
+                case 0 -> "@Dependent";
+                case 1 -> "@Independent(hc=true)";
+                case 2 -> "@Independent";
+                default -> throw new UnsupportedOperationException();
+            };
         }
     }
 

@@ -12,6 +12,7 @@ import org.e2immu.language.cst.api.type.TypeParameter;
 import org.e2immu.support.Either;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
@@ -204,4 +205,29 @@ public interface TypeInfo extends NamedType, Info {
     // as part of type resolution
     boolean fieldsAccessedInRestOfPrimaryType();
 
+
+    default Stream<TypeInfo> recursiveSubTypeStream() {
+        return Stream.concat(Stream.of(this), subTypes().stream().flatMap(TypeInfo::recursiveSubTypeStream));
+    }
+
+    default Stream<TypeInfo> recursiveSuperTypeStream() {
+        Stream<TypeInfo> s1;
+        if (compilationUnitOrEnclosingType().isRight() && !isStatic()) {
+            TypeInfo right = compilationUnitOrEnclosingType().getRight();
+            s1 = Stream.concat(Stream.of(right), right.recursiveSuperTypeStream());
+        } else {
+            s1 = Stream.of();
+        }
+        Stream<TypeInfo> s2;
+        if (parentClass() != null) {
+            TypeInfo parent = parentClass().bestTypeInfo();
+            s2 = Stream.concat(Stream.of(parent), parent.recursiveSuperTypeStream());
+        } else {
+            s2 = Stream.of();
+        }
+        Stream<TypeInfo> s3 = interfacesImplemented().stream().map(ParameterizedType::bestTypeInfo)
+                .filter(Objects::nonNull)
+                .flatMap(ti -> Stream.concat(Stream.of(ti), ti.recursiveSuperTypeStream()));
+        return Stream.concat(s1, Stream.concat(s2, s3));
+    }
 }
