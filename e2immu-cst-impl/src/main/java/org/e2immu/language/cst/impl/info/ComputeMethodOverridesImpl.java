@@ -125,6 +125,7 @@ public class ComputeMethodOverridesImpl implements ComputeMethodOverrides {
                 ParameterizedType concreteParameter = superType.parameters().get(index);
                 translationMapOfSuperType.put(parameter.typeParameter(), concreteParameter);
                 index++;
+                if (index >= superType.parameters().size()) break;
             }
         }
         return translationMapOfSuperType;
