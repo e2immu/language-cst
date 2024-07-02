@@ -68,6 +68,16 @@ public abstract class ValueImpl implements Value {
             }
             throw new UnsupportedOperationException();
         }
+
+        @Override
+        public String toString() {
+            return switch (value) {
+                case -1 -> "<no value>";
+                case 0 -> "false";
+                case 1 -> "true";
+                default -> throw new UnsupportedOperationException();
+            };
+        }
     }
 
     static {

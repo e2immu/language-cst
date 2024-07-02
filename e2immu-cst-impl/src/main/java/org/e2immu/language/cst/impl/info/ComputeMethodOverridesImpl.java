@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 public class ComputeMethodOverridesImpl implements ComputeMethodOverrides {
     private static final Logger LOGGER = LoggerFactory.getLogger(ComputeMethodOverridesImpl.class);
@@ -78,7 +79,39 @@ public class ComputeMethodOverridesImpl implements ComputeMethodOverrides {
 
     @Override
     public Set<MethodInfo> overrides(MethodInfo methodInfo) {
-        return Set.of();
+        return Set.copyOf(recursiveOverridesCall(methodInfo.typeInfo(), methodInfo, Map.of()));
+    }
+
+    private Set<MethodInfo> recursiveOverridesCall(TypeInfo typeToSearch,
+                                                   MethodInfo targetMethod,
+                                                   Map<NamedType, ParameterizedType> translationMap) {
+        Set<MethodInfo> result = new HashSet<>();
+        for (ParameterizedType superType : directSuperTypes(typeToSearch)) {
+            Map<NamedType, ParameterizedType> translationMapOfSuperType = mapOfSuperType(superType);
+            translationMapOfSuperType.putAll(translationMap);
+            assert superType.typeInfo() != null;
+            MethodInfo override = findUniqueMethod(superType.typeInfo(), targetMethod, translationMapOfSuperType);
+            if (override != null) {
+                result.add(override);
+            }
+            if (!superType.typeInfo().isJavaLangObject()) {
+                result.addAll(recursiveOverridesCall(superType.typeInfo(), targetMethod, translationMapOfSuperType));
+            }
+        }
+        return result;
+    }
+
+    private MethodInfo findUniqueMethod(TypeInfo typeInfo, MethodInfo targetMethod,
+                                        Map<NamedType, ParameterizedType> translationMap) {
+        return Stream.concat(typeInfo.methods().stream(), typeInfo.constructors().stream())
+                .filter(mi -> sameMethod(mi, targetMethod, translationMap))
+                .findFirst().orElse(null);
+    }
+
+    private boolean sameMethod(MethodInfo base, MethodInfo targetMethod,
+                               Map<NamedType, ParameterizedType> translationMap) {
+        if (!base.name().equals(targetMethod.name())) return false;
+        return sameParameters(base.parameters(), targetMethod.parameters(), translationMap);
     }
 
     @Override
