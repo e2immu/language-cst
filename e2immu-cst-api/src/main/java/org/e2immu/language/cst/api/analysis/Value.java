@@ -107,7 +107,7 @@ public interface Value extends Comparable<Value> {
 
     // meant for the "GetSetEquivalent" property
     interface GetSetEquivalent extends Value {
-        Set<ParameterInfo> parameters();
+        Set<ParameterInfo> convertToGetSet();
 
         MethodInfo methodWithoutParameters();
     }

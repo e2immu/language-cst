@@ -403,13 +403,13 @@ public abstract class ValueImpl implements Value {
         });
     }
 
-    public record GetSetEquivalentImpl(Set<ParameterInfo> parameters,
+    public record GetSetEquivalentImpl(Set<ParameterInfo> convertToGetSet,
                                        MethodInfo methodWithoutParameters) implements GetSetEquivalent {
         public static final GetSetEquivalent EMPTY = new GetSetEquivalentImpl(Set.of(), null);
 
         @Override
         public Codec.EncodedValue encode(Codec codec) {
-            Set<Codec.EncodedValue> set = parameters.stream().map(codec::encodeVariable)
+            Set<Codec.EncodedValue> set = convertToGetSet.stream().map(codec::encodeVariable)
                     .collect(Collectors.toUnmodifiableSet());
             return codec.encodeList(List.of(codec.encodeSet(set), codec.encodeInfo(methodWithoutParameters)));
         }
