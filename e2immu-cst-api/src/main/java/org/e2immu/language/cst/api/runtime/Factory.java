@@ -399,4 +399,5 @@ public interface Factory {
 
     Wildcard wildcardSuper();
 
+    ClassExpression newClassExpression(TypeInfo typeInfo);
 }

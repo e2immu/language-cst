@@ -1,6 +1,9 @@
 package org.e2immu.language.cst.impl.info;
 
 import org.e2immu.annotation.Fluent;
+import org.e2immu.language.cst.api.element.Comment;
+import org.e2immu.language.cst.api.element.Source;
+import org.e2immu.language.cst.api.expression.AnnotationExpression;
 import org.e2immu.language.cst.api.info.Access;
 import org.e2immu.language.cst.api.info.MethodInfo;
 import org.e2immu.language.cst.api.info.MethodModifier;
@@ -134,8 +137,11 @@ public class MethodInspectionImpl extends InspectionImpl implements MethodInspec
         }
 
         @Override
-        public ParameterInfo addParameter(String name, ParameterizedType type) {
-            ParameterInfo pi = new ParameterInfoImpl(methodInfo, parameters.size(), name, type);
+        public ParameterInfo addParameter(String name, ParameterizedType type,
+                                          List<Comment> comments, Source source,
+                                          List<AnnotationExpression> annotations) {
+            ParameterInfo pi = new ParameterInfoImpl(methodInfo, parameters.size(), name, type, comments, source,
+                    annotations);
             parameters.add(pi);
             return pi;
         }

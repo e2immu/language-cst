@@ -25,7 +25,6 @@ import org.e2immu.language.cst.api.type.*;
 import org.e2immu.language.cst.api.variable.*;
 import org.e2immu.support.Either;
 
-import java.net.URI;
 import java.util.List;
 import java.util.stream.Collector;
 
@@ -972,6 +971,13 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     @Override
     public Source newCompiledClassSource(CompilationUnit compilationUnit) {
         return new SourceImpl(compilationUnit, "", 0, 0, 0, 0);
+    }
+
+    @Override
+    public ClassExpression newClassExpression(TypeInfo typeInfo) {
+        ParameterizedType pt = newParameterizedType(typeInfo, 0);
+        ParameterizedType classPt = newParameterizedType(classTypeInfo(), List.of(pt));
+        return new ClassExpressionImpl(pt, classPt);
     }
 }
 

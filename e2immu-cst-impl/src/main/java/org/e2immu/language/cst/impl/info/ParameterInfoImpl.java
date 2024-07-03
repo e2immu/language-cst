@@ -3,6 +3,7 @@ package org.e2immu.language.cst.impl.info;
 import org.e2immu.language.cst.api.analysis.PropertyValueMap;
 import org.e2immu.language.cst.api.analysis.Value;
 import org.e2immu.language.cst.api.element.*;
+import org.e2immu.language.cst.api.expression.AnnotationExpression;
 import org.e2immu.language.cst.api.info.Access;
 import org.e2immu.language.cst.api.info.MethodInfo;
 import org.e2immu.language.cst.api.info.ParameterInfo;
@@ -30,13 +31,20 @@ public class ParameterInfoImpl implements ParameterInfo {
     private final MethodInfo methodInfo;
     private final ParameterizedType parameterizedType;
     private final EventuallyFinal<ParameterInspection> inspection;
+    private final List<AnnotationExpression> annotations;
+    private final Source source;
     private final PropertyValueMap analysis = new PropertyValueMapImpl();
+    private final List<Comment> comments;
 
-    public ParameterInfoImpl(MethodInfo methodInfo, int index, String name, ParameterizedType parameterizedType) {
+    public ParameterInfoImpl(MethodInfo methodInfo, int index, String name, ParameterizedType parameterizedType,
+                             List<Comment> comments, Source source, List<AnnotationExpression> annotations) {
         this.methodInfo = methodInfo;
         this.index = index;
         this.name = name;
         this.parameterizedType = parameterizedType;
+        this.source = source;
+        this.annotations = annotations;
+        this.comments = comments;
         inspection = new EventuallyFinal<>();
         inspection.setVariable(new ParameterInspectionImpl.Builder(this));
     }
@@ -126,12 +134,12 @@ public class ParameterInfoImpl implements ParameterInfo {
 
     @Override
     public List<Comment> comments() {
-        return List.of();
+        return comments;
     }
 
     @Override
     public Source source() {
-        return null;
+        return source;
     }
 
     @Override
@@ -203,5 +211,10 @@ public class ParameterInfoImpl implements ParameterInfo {
     @Override
     public MethodInfo methodInfo() {
         return methodInfo;
+    }
+
+    @Override
+    public List<AnnotationExpression> annotations() {
+        return annotations;
     }
 }

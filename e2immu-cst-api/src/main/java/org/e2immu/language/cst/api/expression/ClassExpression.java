@@ -1,5 +1,10 @@
 package org.e2immu.language.cst.api.expression;
 
 
-public interface ClassExpression extends ConstantExpression<Class<?>> {
+import org.e2immu.language.cst.api.type.ParameterizedType;
+
+public interface ClassExpression extends ConstantExpression<ParameterizedType> {
+
+    // String.class -> String
+    ParameterizedType type();
 }
