@@ -59,6 +59,8 @@ public interface Value extends Comparable<Value> {
         Independent min(Independent other);
 
         Independent max(Independent other);
+
+        boolean isIndependentHc();
     }
 
     interface NotNull extends Value {
@@ -66,6 +68,8 @@ public interface Value extends Comparable<Value> {
         boolean isAtLeastNotNull();
 
         boolean isNullable();
+
+        NotNull max(NotNull other);
     }
 
     /*

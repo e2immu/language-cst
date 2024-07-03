@@ -144,7 +144,7 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
     @Override
     public int complexity() {
         Block methodBody = inspection.get().methodBody();
-        return methodBody == null ? 10 : methodBody.complexity();
+        return !isAbstract() && (methodBody == null || methodBody.isEmpty()) ? 10 : methodBody.complexity();
     }
 
     @Override

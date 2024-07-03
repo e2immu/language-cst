@@ -63,7 +63,7 @@ public interface TypeInfo extends NamedType, Info {
 
     FieldInfo getFieldByName(String name, boolean complain);
 
-    MethodInfo findUniqueMethod(String tryCatch, TypeInfo typeInfoOfFirstParameter);
+    MethodInfo findUniqueMethod(String name, TypeInfo typeInfoOfFirstParameter);
 
     ParameterizedType parentClass();
 

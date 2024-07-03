@@ -226,9 +226,9 @@ public abstract class ValueImpl implements Value {
             this.value = value;
         }
 
-        public static final IndependentImpl DEPENDENT = new IndependentImpl(0);
-        public static final IndependentImpl INDEPENDENT_HC = new IndependentImpl(1);
-        public static final IndependentImpl INDEPENDENT = new IndependentImpl(2);
+        public static final Independent DEPENDENT = new IndependentImpl(0);
+        public static final Independent INDEPENDENT_HC = new IndependentImpl(1);
+        public static final Independent INDEPENDENT = new IndependentImpl(2);
 
         public static Value from(int level) {
             return switch (level) {
@@ -247,6 +247,11 @@ public abstract class ValueImpl implements Value {
         @Override
         public boolean isIndependent() {
             return value == 2;
+        }
+
+        @Override
+        public boolean isIndependentHc() {
+            return value == 1;
         }
 
         @Override
@@ -421,12 +426,14 @@ public abstract class ValueImpl implements Value {
 
 
     public record NotNullImpl(int value) implements NotNull {
-        public static final NotNullImpl NULLABLE = new NotNullImpl(0);
-        public static final NotNullImpl NOT_NULL = new NotNullImpl(1);
-        public static final NotNullImpl CONTENT_NOT_NULL = new NotNullImpl(2);
+        public static final NotNull NO_VALUE = new NotNullImpl(-1);
+        public static final NotNull NULLABLE = new NotNullImpl(0);
+        public static final NotNull NOT_NULL = new NotNullImpl(1);
+        public static final NotNull CONTENT_NOT_NULL = new NotNullImpl(2);
 
         public static Value from(int level) {
             return switch (level) {
+                case -1 -> NO_VALUE;
                 case 0 -> NULLABLE;
                 case 1 -> NOT_NULL;
                 case 2 -> CONTENT_NOT_NULL;
@@ -455,6 +462,12 @@ public abstract class ValueImpl implements Value {
                 return value - i.value;
             }
             throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public NotNull max(NotNull other) {
+            int v = ((NotNullImpl) other).value;
+            return value >= v ? this : other;
         }
     }
 

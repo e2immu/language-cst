@@ -17,10 +17,7 @@ import org.e2immu.language.cst.impl.type.ParameterizedTypeImpl;
 import org.e2immu.support.Either;
 import org.e2immu.support.EventuallyFinalOnDemand;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -96,7 +93,7 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
                 .filter(mi -> methodName.equals(mi.name()) && mi.parameters().size() == numberOfParameters)
                 .toList();
         if (list.size() != 1) {
-            throw new UnsupportedOperationException("Cannot find a unique method named '" + methodName
+            throw new NoSuchElementException("Cannot find a unique method named '" + methodName
                                                     + "', with " + numberOfParameters + " parameters, in type "
                                                     + fullyQualifiedName);
         }
@@ -109,7 +106,7 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
                 .filter(constructor -> constructor.parameters().size() == numberOfParameters)
                 .toList();
         if (list.size() != 1) {
-            throw new UnsupportedOperationException("Found " + list.size() + " constructors with "
+            throw new NoSuchElementException("Found " + list.size() + " constructors with "
                                                     + numberOfParameters + " parameters");
         }
         return list.get(0);
@@ -118,14 +115,14 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     @Override
     public TypeInfo findSubType(String simpleName) {
         List<TypeInfo> subTypes = subTypes().stream().filter(st -> simpleName.equals(st.simpleName())).toList();
-        if (subTypes.size() != 1) throw new UnsupportedOperationException();
+        if (subTypes.size() != 1) throw new NoSuchElementException();
         return subTypes.get(0);
     }
 
     @Override
     public TypeInfo findSubType(String simpleName, boolean complain) {
         List<TypeInfo> subTypes = subTypes().stream().filter(st -> simpleName.equals(st.simpleName())).toList();
-        if (subTypes.size() != 1 && complain) throw new UnsupportedOperationException();
+        if (subTypes.size() != 1 && complain) throw new NoSuchElementException();
         return subTypes.isEmpty() ? null : subTypes.get(0);
     }
 
@@ -136,13 +133,13 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     }
 
     @Override
-    public MethodInfo findUniqueMethod(String methodName, TypeInfo typeInfoOfFirstParameter) {
+    public MethodInfo findUniqueMethod(String name, TypeInfo typeInfoOfFirstParameter) {
         List<MethodInfo> list = methods().stream()
-                .filter(mi -> methodName.equals(mi.name())
+                .filter(mi -> name.equals(mi.name())
                               && !mi.parameters().isEmpty()
                               && typeInfoOfFirstParameter.equals(mi.parameters().get(0).parameterizedType().typeInfo()))
                 .toList();
-        if (list.size() != 1) throw new UnsupportedOperationException();
+        if (list.size() != 1) throw new NoSuchElementException();
         return list.get(0);
     }
 
