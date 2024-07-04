@@ -57,6 +57,8 @@ public interface TypeInfo extends NamedType, Info {
 
     MethodInfo findConstructor(int i);
 
+    MethodInfo findConstructor(TypeInfo typeOfFirstParameter);
+
     TypeInfo findSubType(String simpleName);
 
     TypeInfo findSubType(String simpleName, boolean complain);
