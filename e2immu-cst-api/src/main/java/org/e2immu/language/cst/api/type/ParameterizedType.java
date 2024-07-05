@@ -143,6 +143,11 @@ public interface ParameterizedType {
 
     TypeParameter typeParameter();
 
+    default NamedType namedType() {
+        TypeInfo typeInfo = typeInfo();
+        return typeInfo == null ? typeParameter() : typeInfo;
+    }
+
     Stream<Element.TypeReference> typesReferenced();
 
     Wildcard wildcard();

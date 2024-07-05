@@ -39,7 +39,9 @@ public interface TypeInfo extends NamedType, Info {
         return compilationUnitOrEnclosingType().isLeft();
     }
 
-    boolean isSealedOrFinal();
+    default boolean isInnerClass() {
+        return typeNature().isClass() && compilationUnitOrEnclosingType().isRight() && !isStatic();
+    }
 
     String packageName();
 
@@ -170,6 +172,9 @@ public interface TypeInfo extends NamedType, Info {
 
     interface Builder extends Info.Builder<Builder> {
         @Fluent
+        Builder setEnclosingMethod(MethodInfo methodInfo);
+
+        @Fluent
         Builder addSubType(TypeInfo subType);
 
         @Fluent
@@ -237,4 +242,8 @@ public interface TypeInfo extends NamedType, Info {
     default Stream<MethodInfo> methodAndConstructorStream() {
         return Stream.concat(methodStream(), constructors().stream());
     }
+
+    boolean isExtensible();
+
+    MethodInfo enclosingMethod();
 }

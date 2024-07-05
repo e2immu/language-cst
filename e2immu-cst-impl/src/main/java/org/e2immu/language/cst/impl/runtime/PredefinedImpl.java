@@ -218,6 +218,9 @@ public class PredefinedImpl implements Predefined {
         for (TypeInfo ti : List.of(stringTypeInfo, objectTypeInfo, classTypeInfo, functionalInterface)) {
             ti.builder().setAccess(InspectionImpl.AccessEnum.PUBLIC);
             ti.builder().setTypeNature(TypeNatureEnum.CLASS);
+            if(ti != objectTypeInfo) {
+                ti.builder().setParentClass(objectParameterizedType);
+            }
             objects.add(ti);
         }
         for (TypeInfo ti : List.of(functionalInterface)) {

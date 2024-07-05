@@ -61,4 +61,6 @@ public interface TypeInspection extends Inspection {
     Set<TypeModifier> modifiers();
 
     boolean fieldsAccessedInRestOfPrimaryType();
+
+    MethodInfo enclosingMethod();
 }

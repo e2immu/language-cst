@@ -94,8 +94,8 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
                 .toList();
         if (list.size() != 1) {
             throw new NoSuchElementException("Cannot find a unique method named '" + methodName
-                    + "', with " + numberOfParameters + " parameters, in type "
-                    + fullyQualifiedName);
+                                             + "', with " + numberOfParameters + " parameters, in type "
+                                             + fullyQualifiedName);
         }
         return list.get(0);
     }
@@ -107,7 +107,7 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
                 .toList();
         if (list.size() != 1) {
             throw new NoSuchElementException("Found " + list.size() + " constructors with "
-                    + numberOfParameters + " parameters");
+                                             + numberOfParameters + " parameters");
         }
         return list.get(0);
     }
@@ -116,11 +116,11 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     public MethodInfo findConstructor(TypeInfo typeOfFirstParameter) {
         List<MethodInfo> list = constructors().stream()
                 .filter(constructor -> !constructor.parameters().isEmpty()
-                        && typeOfFirstParameter.equals(constructor.parameters().get(0).parameterizedType().typeInfo()))
+                                       && typeOfFirstParameter.equals(constructor.parameters().get(0).parameterizedType().typeInfo()))
                 .toList();
         if (list.size() != 1) {
             throw new NoSuchElementException("Found " + list.size() + " constructors with "
-                    + typeOfFirstParameter + " as type of the first parameter");
+                                             + typeOfFirstParameter + " as type of the first parameter");
         }
         return list.get(0);
     }
@@ -149,8 +149,8 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     public MethodInfo findUniqueMethod(String name, TypeInfo typeInfoOfFirstParameter) {
         List<MethodInfo> list = methods().stream()
                 .filter(mi -> name.equals(mi.name())
-                        && !mi.parameters().isEmpty()
-                        && typeInfoOfFirstParameter.equals(mi.parameters().get(0).parameterizedType().typeInfo()))
+                              && !mi.parameters().isEmpty()
+                              && typeInfoOfFirstParameter.equals(mi.parameters().get(0).parameterizedType().typeInfo()))
                 .toList();
         if (list.size() != 1) throw new NoSuchElementException();
         return list.get(0);
@@ -220,8 +220,8 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     @Override
     public boolean isStatic() {
         return typeNature().isStatic()  // interface, enum, etc.. otherwise: CLASS
-                || isPrimaryType() // otherwise: subtype
-                || inspection.get().modifiers().stream().anyMatch(TypeModifier::isStatic);
+               || isPrimaryType() // otherwise: subtype
+               || inspection.get().modifiers().stream().anyMatch(TypeModifier::isStatic);
     }
 
     @Override
@@ -242,17 +242,17 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     @Override
     public boolean isNumeric() {
         return isInt() || isInteger() ||
-                isLong() || isBoxedLong() ||
-                isShort() || isBoxedShort() ||
-                isByte() || isBoxedByte() ||
-                isFloat() || isBoxedFloat() ||
-                isDouble() || isBoxedDouble();
+               isLong() || isBoxedLong() ||
+               isShort() || isBoxedShort() ||
+               isByte() || isBoxedByte() ||
+               isFloat() || isBoxedFloat() ||
+               isDouble() || isBoxedDouble();
     }
 
     @Override
     public boolean isBoxedExcludingVoid() {
         return isBoxedByte() || isBoxedShort() || isInteger() || isBoxedLong()
-                || isCharacter() || isBoxedFloat() || isBoxedDouble() || isBoxedBoolean();
+               || isCharacter() || isBoxedFloat() || isBoxedDouble() || isBoxedBoolean();
     }
 
     @Override
@@ -393,7 +393,7 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     @Override
     public boolean isPrimitiveExcludingVoid() {
         return this.isByte() || this.isShort() || this.isInt() || this.isLong() ||
-                this.isChar() || this.isFloat() || this.isDouble() || this.isBoolean();
+               this.isChar() || this.isFloat() || this.isDouble() || this.isBoolean();
     }
 
     @Override
@@ -525,11 +525,16 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     }
 
     @Override
-    public boolean isSealedOrFinal() {
+    public boolean isExtensible() {
         TypeNature typeNature = inspection.get().typeNature();
         if (typeNature.isClass()) {
-            return inspection.get().modifiers().stream().anyMatch(m -> m.isFinal() || m.isSealed());
+            return inspection.get().modifiers().stream().noneMatch(m -> m.isFinal() || m.isSealed());
         }
-        return !typeNature.isInterface();
+        return typeNature.isInterface();
+    }
+
+    @Override
+    public MethodInfo enclosingMethod() {
+        return inspection.get().enclosingMethod();
     }
 }

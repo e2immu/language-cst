@@ -23,6 +23,7 @@ public class TypeInspectionImpl extends InspectionImpl implements TypeInspection
     private final List<TypeParameter> typeParameters;
     private final List<TypeInfo> subTypes;
     private final boolean fieldsAccessedInRestOfPrimaryType;
+    private final MethodInfo enclosingMethod;
 
     public TypeInspectionImpl(Inspection inspection,
                               Set<TypeModifier> typeModifiers,
@@ -35,7 +36,8 @@ public class TypeInspectionImpl extends InspectionImpl implements TypeInspection
                               List<ParameterizedType> interfacesImplemented,
                               List<TypeParameter> typeParameters,
                               List<TypeInfo> subTypes,
-                              boolean fieldsAccessedInRestOfPrimaryType) {
+                              boolean fieldsAccessedInRestOfPrimaryType,
+                              MethodInfo enclosingMethod) {
         super(inspection.access(), inspection.comments(), inspection.source(), inspection.isSynthetic(), inspection.annotations());
         this.typeModifiers = typeModifiers;
         this.methods = methods;
@@ -48,6 +50,7 @@ public class TypeInspectionImpl extends InspectionImpl implements TypeInspection
         this.fields = fields;
         this.typeParameters = typeParameters;
         this.fieldsAccessedInRestOfPrimaryType = fieldsAccessedInRestOfPrimaryType;
+        this.enclosingMethod = enclosingMethod;
     }
 
     @Override
@@ -118,6 +121,7 @@ public class TypeInspectionImpl extends InspectionImpl implements TypeInspection
         private MethodInfo singleAbstractMethod;
         private final TypeInfoImpl typeInfo;
         private boolean fieldsAccessedInRestOfPrimaryType;
+        private MethodInfo enclosingMethod;
 
         @Override
         public boolean fieldsAccessedInRestOfPrimaryType() {
@@ -208,7 +212,7 @@ public class TypeInspectionImpl extends InspectionImpl implements TypeInspection
             TypeInspection ti = new TypeInspectionImpl(this, Set.copyOf(typeModifiers), List.copyOf(methods),
                     List.copyOf(constructors), List.copyOf(fields), parentClass, typeNature, singleAbstractMethod,
                     List.copyOf(interfacesImplemented), List.copyOf(typeParameters), List.copyOf(subTypes),
-                    fieldsAccessedInRestOfPrimaryType);
+                    fieldsAccessedInRestOfPrimaryType, enclosingMethod);
             typeInfo.commit(ti);
         }
 
@@ -278,6 +282,17 @@ public class TypeInspectionImpl extends InspectionImpl implements TypeInspection
         public boolean hasBeenCommitted() {
             return typeInfo.hasBeenInspected();
         }
+
+        @Override
+        public Builder setEnclosingMethod(MethodInfo enclosingMethod) {
+            this.enclosingMethod = enclosingMethod;
+            return this;
+        }
+
+        @Override
+        public MethodInfo enclosingMethod() {
+            return enclosingMethod;
+        }
     }
 
     @Override
@@ -287,5 +302,10 @@ public class TypeInspectionImpl extends InspectionImpl implements TypeInspection
 
     private static boolean isAbstract(TypeNature typeNature, Set<TypeModifier> typeModifiers) {
         return typeNature.isInterface() || typeModifiers.stream().anyMatch(TypeModifier::isAbstract);
+    }
+
+    @Override
+    public MethodInfo enclosingMethod() {
+        return enclosingMethod;
     }
 }
