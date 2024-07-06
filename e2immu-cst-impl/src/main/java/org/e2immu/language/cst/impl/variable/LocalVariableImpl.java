@@ -56,19 +56,6 @@ public class LocalVariableImpl extends VariableImpl implements LocalVariable {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        LocalVariableImpl that = (LocalVariableImpl) o;
-        return name.equals(that.name);
-    }
-
-    @Override
-    public int hashCode() {
-        return name.hashCode();
-    }
-
-    @Override
     public int complexity() {
         return 2;
     }

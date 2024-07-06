@@ -7,6 +7,7 @@ import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.language.cst.impl.output.QualificationImpl;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Stream;
 
 public abstract class VariableImpl implements Variable {
@@ -15,6 +16,18 @@ public abstract class VariableImpl implements Variable {
 
     public VariableImpl(ParameterizedType parameterizedType) {
         this.parameterizedType = parameterizedType;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof VariableImpl variable)) return false;
+        return Objects.equals(fullyQualifiedName(), variable.fullyQualifiedName());
+    }
+
+    @Override
+    public int hashCode() {
+        return fullyQualifiedName().hashCode();
     }
 
     @Override

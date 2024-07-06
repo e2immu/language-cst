@@ -73,18 +73,6 @@ public class DependentVariableImpl extends VariableImpl implements DependentVari
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof DependentVariableImpl that)) return false;
-        return Objects.equals(fullyQualifiedName, that.fullyQualifiedName);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(fullyQualifiedName);
-    }
-
-    @Override
     public Variable arrayVariable() {
         return arrayVariable;
     }

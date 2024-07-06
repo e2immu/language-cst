@@ -84,6 +84,7 @@ public class FieldReferenceImpl extends VariableImpl implements FieldReference {
         }
         this.fullyQualifiedName = computeFqn();
         assert (scopeVariable == null) == fieldInfo.isStatic();
+        // know that: assert this.scope != null;
     }
 
     protected Variable newScopeVariable(Expression scope) {
