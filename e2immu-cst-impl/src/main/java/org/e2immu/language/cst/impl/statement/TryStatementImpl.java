@@ -249,4 +249,10 @@ public class TryStatementImpl extends StatementImpl implements TryStatement {
                 Stream.concat(block.typesReferenced(), Stream.concat(catchClauses.stream().flatMap(CatchClause::typesReferenced),
                         finallyBlock.typesReferenced())));
     }
+
+    @Override
+    public List<Block> otherBlocks() {
+        return Stream.concat(catchClauses.stream().map(CatchClause::block).filter(b -> !b.isEmpty()),
+                finallyBlock.isEmpty() ? Stream.of() : Stream.of(finallyBlock)).toList();
+    }
 }
