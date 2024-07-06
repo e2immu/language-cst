@@ -1,6 +1,7 @@
 package org.e2immu.language.cst.impl.statement;
 
 import org.e2immu.annotation.Fluent;
+import org.e2immu.language.cst.api.analysis.PropertyValueMap;
 import org.e2immu.language.cst.api.element.Comment;
 import org.e2immu.language.cst.api.element.Source;
 import org.e2immu.language.cst.api.expression.AnnotationExpression;
@@ -9,6 +10,7 @@ import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.statement.Block;
 import org.e2immu.language.cst.api.statement.Statement;
 import org.e2immu.language.cst.impl.analysis.PropertyImpl;
+import org.e2immu.language.cst.impl.analysis.PropertyValueMapImpl;
 import org.e2immu.language.cst.impl.analysis.ValueImpl;
 import org.e2immu.language.cst.impl.element.ElementImpl;
 import org.e2immu.language.cst.impl.output.OutputBuilderImpl;
@@ -25,6 +27,7 @@ public abstract class StatementImpl extends ElementImpl implements Statement {
     private final Source source;
     private final int complexity;
     private final String label;
+    private final PropertyValueMap propertyValueMap = new PropertyValueMapImpl();
 
     protected StatementImpl(List<Comment> comments,
                             Source source,
@@ -111,5 +114,10 @@ public abstract class StatementImpl extends ElementImpl implements Statement {
     @Override
     public boolean alwaysEscapes() {
         return analysis().getOrDefault(PropertyImpl.ALWAYS_ESCAPES, ValueImpl.BoolImpl.FALSE).isTrue();
+    }
+
+    @Override
+    public PropertyValueMap analysis() {
+        return propertyValueMap;
     }
 }

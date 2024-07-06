@@ -27,7 +27,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 public class AssignmentImpl extends ExpressionImpl implements Assignment {
-    private final Expression target;
+    private final VariableExpression target;
     private final Expression value;
     private final Variable variableTarget;
     private final MethodInfo assignmentOperator;
@@ -35,18 +35,18 @@ public class AssignmentImpl extends ExpressionImpl implements Assignment {
     private final MethodInfo binaryOperator;
     private final Boolean prefixPrimitiveOperator;
 
-    public AssignmentImpl(Expression target, Expression value) {
+    public AssignmentImpl(VariableExpression target, Expression value) {
         this(List.of(), null, target, value, null, false,
                 null, null);
     }
 
     public AssignmentImpl(List<Comment> comments, Source source,
-                          Expression target, Expression value, MethodInfo assignmentOperator,
+                          VariableExpression target, Expression value, MethodInfo assignmentOperator,
                           boolean assignmentOperatorIsPlus, MethodInfo binaryOperator, Boolean prefixPrimitiveOperator) {
         super(comments, source, 1 + target.complexity() + value.complexity());
-        this.target = target;
         this.value = value;
-        this.variableTarget = target instanceof VariableExpression ve ? ve.variable() : null;
+        this.target = target;
+        this.variableTarget = target.variable();
         this.assignmentOperator = assignmentOperator;
         this.assignmentOperatorIsPlus = assignmentOperatorIsPlus;
         this.binaryOperator = binaryOperator;
@@ -54,7 +54,7 @@ public class AssignmentImpl extends ExpressionImpl implements Assignment {
     }
 
     public static class Builder extends ElementImpl.Builder<Assignment.Builder> implements Assignment.Builder {
-        private Expression target;
+        private VariableExpression target;
         private Expression value;
         private MethodInfo assignmentOperator;
         private boolean assignmentOperatorIsPlus;
@@ -62,7 +62,7 @@ public class AssignmentImpl extends ExpressionImpl implements Assignment {
         private Boolean prefixPrimitiveOperator;
 
         @Override
-        public Builder setTarget(Expression target) {
+        public Builder setTarget(VariableExpression target) {
             this.target = target;
             return this;
         }
@@ -119,7 +119,7 @@ public class AssignmentImpl extends ExpressionImpl implements Assignment {
     }
 
     @Override
-    public Expression target() {
+    public VariableExpression target() {
         return target;
     }
 
@@ -229,7 +229,7 @@ public class AssignmentImpl extends ExpressionImpl implements Assignment {
         Expression translated = translationMap.translateExpression(this);
         if (translated != this) return translated;
 
-        Expression translatedTarget = target.translate(translationMap);
+        VariableExpression translatedTarget = (VariableExpression) target.translate(translationMap);
         Expression translatedValue = value.translate(translationMap);
         if (translatedValue == this.value && translatedTarget == this.target) return this;
 

@@ -54,6 +54,8 @@ public interface Value extends Comparable<Value> {
 
         boolean isAtLeastIndependentHc();
 
+        boolean isDependent();
+
         boolean isIndependent();
 
         Independent min(Independent other);

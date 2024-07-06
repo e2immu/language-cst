@@ -11,6 +11,8 @@ public interface PropertyValueMap {
 
     <V extends Value> V getOrDefault(Property property, V defaultValue);
 
+    <V extends Value> V getOrNull(Property property, Class<? extends V> clazz);
+
     boolean haveAnalyzedValueFor(Property property);
 
     default boolean haveAnalyzedValueFor(Property property, Runnable runWhenNoValue) {

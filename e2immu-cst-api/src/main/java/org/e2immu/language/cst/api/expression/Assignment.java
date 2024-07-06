@@ -6,7 +6,7 @@ import org.e2immu.language.cst.api.info.MethodInfo;
 import org.e2immu.language.cst.api.variable.Variable;
 
 public interface Assignment extends Expression {
-    Expression target();
+    VariableExpression target();
 
     Expression value();
 
@@ -22,7 +22,7 @@ public interface Assignment extends Expression {
 
     interface Builder extends Element.Builder<Assignment.Builder> {
         @Fluent
-        Builder setTarget(Expression target);
+        Builder setTarget(VariableExpression target);
 
         @Fluent
         Builder setValue(Expression value);

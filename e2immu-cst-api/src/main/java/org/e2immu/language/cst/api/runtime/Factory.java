@@ -127,7 +127,7 @@ public interface Factory {
 
     AssertStatement.Builder newAssertBuilder();
 
-    Assignment newAssignment(Expression target, Expression value);
+    Assignment newAssignment(VariableExpression target, Expression value);
 
     Assignment.Builder newAssignmentBuilder();
 

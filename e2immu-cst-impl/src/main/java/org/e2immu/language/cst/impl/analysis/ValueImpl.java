@@ -172,6 +172,7 @@ public abstract class ValueImpl implements Value {
 
         @Override
         public Immutable min(Immutable other) {
+            if (other == null) return this;
             assert this != NO_VALUE && other != NO_VALUE;
             int otherValue = ((ImmutableImpl) other).value;
             if (value <= otherValue) return this;
@@ -242,6 +243,11 @@ public abstract class ValueImpl implements Value {
         @Override
         public boolean isAtLeastIndependentHc() {
             return value > 0;
+        }
+
+        @Override
+        public boolean isDependent() {
+            return value == 0;
         }
 
         @Override

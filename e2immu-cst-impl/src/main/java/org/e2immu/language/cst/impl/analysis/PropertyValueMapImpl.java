@@ -64,6 +64,12 @@ public class PropertyValueMapImpl implements PropertyValueMap {
         return (V) map.getOrDefault(property, defaultValue);
     }
 
+    @SuppressWarnings("unchecked")
+    @Override
+    public <V extends Value> V getOrNull(Property property, Class<? extends V> clazz) {
+        return (V) map.getOrDefaultNull(property);
+    }
+
     @Override
     public void set(Property property, Value value) {
         assert property.classOfValue().isAssignableFrom(value.getClass());

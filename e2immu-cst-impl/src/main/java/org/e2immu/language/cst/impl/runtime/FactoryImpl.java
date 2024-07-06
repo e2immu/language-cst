@@ -41,7 +41,7 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
-    public Assignment newAssignment(Expression target, Expression value) {
+    public Assignment newAssignment(VariableExpression target, Expression value) {
         return new AssignmentImpl(target, value);
     }
 
