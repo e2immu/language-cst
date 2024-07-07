@@ -991,5 +991,15 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
                                                                       Expression whenExpression) {
         return new SwitchStatementOldStyleImpl.SwitchLabelImpl(literal, pos, patternVariable, whenExpression);
     }
+
+    @Override
+    public SwitchStatementNewStyle.Builder newSwitchStatementNewStyleBuilder() {
+        return new SwitchStatementNewStyleImpl.BuilderImpl();
+    }
+
+    @Override
+    public SwitchStatementNewStyle.EntryBuilder newSwitchStatementNewStyleEntryBuilder() {
+        return new SwitchStatementNewStyleImpl.EntryBuilderImpl();
+    }
 }
 

@@ -276,6 +276,10 @@ public interface Factory {
                                          List<SwitchEntry> switchEntries, ParameterizedType parameterizedType,
                                          List<Expression> expressions);
 
+    SwitchStatementNewStyle.Builder newSwitchStatementNewStyleBuilder();
+
+    SwitchStatementNewStyle.EntryBuilder newSwitchStatementNewStyleEntryBuilder();
+
     SwitchStatementOldStyle.Builder newSwitchStatementOldStyleBuilder();
 
     SwitchStatementOldStyle.SwitchLabel newSwitchLabelOldStyle(Expression literal, int pos,
