@@ -151,6 +151,9 @@ public class FieldReferenceImpl extends VariableImpl implements FieldReference {
             return new OutputBuilderImpl().add(new QualifiedNameImpl(fieldInfo.name(), thisName,
                     qualification.qualifierRequired(this) ? QualifiedNameImpl.Required.YES : QualifiedNameImpl.Required.NO_FIELD));
         }
+        if (qualification.isSimpleOnly()) {
+            return new OutputBuilderImpl().add(new QualifiedNameImpl(simpleName(), null, QualifiedNameImpl.Required.NEVER));
+        }
         // real variable
         return new OutputBuilderImpl().add(scope.print(qualification)).add(SymbolEnum.DOT)
                 .add(new QualifiedNameImpl(simpleName(), null, QualifiedNameImpl.Required.NEVER));

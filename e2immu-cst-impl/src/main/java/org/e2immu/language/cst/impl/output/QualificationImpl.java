@@ -17,6 +17,7 @@ import java.util.Set;
 public class QualificationImpl implements Qualification {
     public static final Qualification FULLY_QUALIFIED_NAMES = new QualificationImpl(false, TypeNameImpl.Required.FQN);
     public static final Qualification SIMPLE_NAMES = new QualificationImpl(false, TypeNameImpl.Required.SIMPLE);
+    public static final Qualification SIMPLE_ONLY = new QualificationImpl(true, TypeNameImpl.Required.SIMPLE);
 
     private final TypeNameRequired typeNameRequired;
     private final Set<FieldInfo> unqualifiedFields = new HashSet<>();
@@ -49,6 +50,11 @@ public class QualificationImpl implements Qualification {
     @Override
     public boolean isFullyQualifiedNames() {
         return this == FULLY_QUALIFIED_NAMES;
+    }
+
+    @Override
+    public boolean isSimpleOnly() {
+        return this == SIMPLE_ONLY;
     }
 
     @Override

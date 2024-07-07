@@ -10,10 +10,7 @@ import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.variable.DescendMode;
 import org.e2immu.language.cst.api.variable.LocalVariable;
 import org.e2immu.language.cst.api.variable.Variable;
-import org.e2immu.language.cst.impl.output.KeywordImpl;
-import org.e2immu.language.cst.impl.output.OutputBuilderImpl;
-import org.e2immu.language.cst.impl.output.SpaceEnum;
-import org.e2immu.language.cst.impl.output.SymbolEnum;
+import org.e2immu.language.cst.impl.output.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -64,16 +61,17 @@ public class SwitchEntryImpl implements SwitchEntry {
     public OutputBuilder print(Qualification qualification) {
         OutputBuilder outputBuilder = new OutputBuilderImpl();
         boolean containsDefault = conditions.stream().anyMatch(Expression::isEmpty);
+        boolean first = true;
         if (containsDefault) {
             outputBuilder.add(KeywordImpl.DEFAULT);
+            first = false;
             if (conditions.size() > 1) {
                 outputBuilder.add(SymbolEnum.COMMA).add(KeywordImpl.CASE);
             }
         } else {
             outputBuilder.add(KeywordImpl.CASE);
+            outputBuilder.add(SpaceEnum.ONE);
         }
-        outputBuilder.add(SpaceEnum.ONE);
-        boolean first = true;
         for (Expression condition : conditions) {
             if (!condition.isEmpty()) {
                 if (first) {
@@ -81,7 +79,7 @@ public class SwitchEntryImpl implements SwitchEntry {
                 } else {
                     outputBuilder.add(SymbolEnum.COMMA);
                 }
-                outputBuilder.add(condition.print(qualification));
+                outputBuilder.add(condition.print(QualificationImpl.SIMPLE_ONLY));
             }
         }
         outputBuilder.add(SymbolEnum.LAMBDA);

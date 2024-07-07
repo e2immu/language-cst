@@ -9,6 +9,8 @@ public interface Qualification {
 
     boolean isFullyQualifiedNames();
 
+    boolean isSimpleOnly();
+
     TypeNameRequired qualifierRequired(TypeInfo typeInfo);
 
     boolean qualifierRequired(MethodInfo methodInfo);
