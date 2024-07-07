@@ -9,11 +9,11 @@ import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.output.element.ElementarySpace;
 import org.e2immu.language.cst.api.output.element.Split;
 import org.e2immu.language.cst.api.statement.*;
+import org.e2immu.language.cst.api.statement.SwitchEntry;
 import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.type.*;
 import org.e2immu.language.cst.api.variable.*;
 
-import java.net.URI;
 import java.util.List;
 import java.util.stream.Collector;
 
@@ -272,13 +272,11 @@ public interface Factory {
 
     StringConstant newStringConstant(String string);
 
-    SwitchExpression newSwitchExpression(VariableExpression selector,
-                                         List<SwitchEntry> switchEntries, ParameterizedType parameterizedType,
-                                         List<Expression> expressions);
+    SwitchExpression.Builder newSwitchExpressionBuilder();
 
     SwitchStatementNewStyle.Builder newSwitchStatementNewStyleBuilder();
 
-    SwitchStatementNewStyle.EntryBuilder newSwitchStatementNewStyleEntryBuilder();
+    SwitchEntry.Builder newSwitchEntryBuilder();
 
     SwitchStatementOldStyle.Builder newSwitchStatementOldStyleBuilder();
 

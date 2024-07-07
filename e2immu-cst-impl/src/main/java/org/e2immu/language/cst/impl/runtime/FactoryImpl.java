@@ -10,6 +10,7 @@ import org.e2immu.language.cst.api.output.element.ElementarySpace;
 import org.e2immu.language.cst.api.output.element.Split;
 import org.e2immu.language.cst.api.runtime.Factory;
 import org.e2immu.language.cst.api.statement.*;
+import org.e2immu.language.cst.api.statement.SwitchEntry;
 import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.impl.element.*;
 import org.e2immu.language.cst.impl.expression.*;
@@ -289,11 +290,6 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     @Override
     public InlineConditional.Builder newInlineConditionalBuilder() {
         return new InlineConditionalImpl.Builder();
-    }
-
-    @Override
-    public SwitchExpression newSwitchExpression(VariableExpression selector, List<SwitchEntry> switchEntries, ParameterizedType parameterizedType, List<Expression> expressions) {
-        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -998,8 +994,13 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
-    public SwitchStatementNewStyle.EntryBuilder newSwitchStatementNewStyleEntryBuilder() {
-        return new SwitchStatementNewStyleImpl.EntryBuilderImpl();
+    public SwitchEntry.Builder newSwitchEntryBuilder() {
+        return new SwitchEntryImpl.EntryBuilderImpl();
+    }
+
+    @Override
+    public SwitchExpression.Builder newSwitchExpressionBuilder() {
+        return new SwitchExpressionImpl.BuilderImpl();
     }
 }
 

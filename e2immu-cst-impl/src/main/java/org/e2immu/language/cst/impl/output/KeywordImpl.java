@@ -51,7 +51,7 @@ public record KeywordImpl(String keyword) implements Keyword {
     public static final Keyword VAR = new KeywordImpl("var");
     public static final Keyword VOLATILE = new KeywordImpl("volatile");
     public static final Keyword WHILE = new KeywordImpl("while");
-    public static final Keyword YIELD = new KeywordImpl("try");
+    public static final Keyword YIELD = new KeywordImpl("yield");
 
     @Override
     public String minimal() {

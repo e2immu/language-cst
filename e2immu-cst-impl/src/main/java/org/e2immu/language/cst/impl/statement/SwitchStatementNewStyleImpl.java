@@ -8,11 +8,9 @@ import org.e2immu.language.cst.api.expression.AnnotationExpression;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
-import org.e2immu.language.cst.api.statement.Statement;
+import org.e2immu.language.cst.api.statement.SwitchEntry;
 import org.e2immu.language.cst.api.statement.SwitchStatementNewStyle;
-import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.variable.DescendMode;
-import org.e2immu.language.cst.api.variable.LocalVariable;
 import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.language.cst.impl.output.*;
 
@@ -24,12 +22,12 @@ import java.util.stream.Stream;
 
 public class SwitchStatementNewStyleImpl extends StatementImpl implements SwitchStatementNewStyle {
     private final Expression selector;
-    private final List<Entry> entries;
+    private final List<SwitchEntry> entries;
 
     public SwitchStatementNewStyleImpl(List<Comment> comments, Source source, List<AnnotationExpression> annotations,
-                                       String label, Expression selector, List<Entry> entries) {
+                                       String label, Expression selector, List<SwitchEntry> entries) {
         super(comments, source, annotations,
-                10 + selector.complexity() + entries.stream().mapToInt(Entry::complexity).sum(), label);
+                10 + selector.complexity() + entries.stream().mapToInt(SwitchEntry::complexity).sum(), label);
         this.selector = selector;
         this.entries = entries;
     }
@@ -40,7 +38,7 @@ public class SwitchStatementNewStyleImpl extends StatementImpl implements Switch
     }
 
     @Override
-    public List<Entry> entries() {
+    public List<SwitchEntry> entries() {
         return entries;
     }
 
@@ -53,7 +51,7 @@ public class SwitchStatementNewStyleImpl extends StatementImpl implements Switch
     public void visit(Predicate<Element> predicate) {
         selector.visit(predicate);
         int i = 0;
-        for (Entry entry : entries) {
+        for (SwitchEntry entry : entries) {
             entry.conditions().forEach(e -> e.visit(predicate));
             if (entry.patternVariable() != null) entry.patternVariable().visit(predicate);
             entry.whenExpression().visit(predicate);
@@ -67,7 +65,7 @@ public class SwitchStatementNewStyleImpl extends StatementImpl implements Switch
         if (visitor.beforeStatement(this)) {
             selector.visit(visitor);
             int i = 0;
-            for (Entry entry : entries) {
+            for (SwitchEntry entry : entries) {
                 entry.conditions().forEach(e -> e.visit(visitor));
                 if (entry.patternVariable() != null) entry.patternVariable().visit(visitor);
                 entry.whenExpression().visit(visitor);
@@ -90,7 +88,7 @@ public class SwitchStatementNewStyleImpl extends StatementImpl implements Switch
         GuideImpl.GuideGenerator guideGenerator = GuideImpl.generatorForBlock();
         outputBuilder.add(guideGenerator.start());
         int i = 0;
-        for (Entry entry : entries) {
+        for (SwitchEntry entry : entries) {
             if (i > 0) outputBuilder.add(guideGenerator.mid());
             outputBuilder.add(entry.print(qualification));
             i++;
@@ -109,90 +107,10 @@ public class SwitchStatementNewStyleImpl extends StatementImpl implements Switch
         return Stream.empty();
     }
 
-    public static class EntryImpl implements Entry {
-        private final List<Expression> conditions;
-        private final LocalVariable patternVariable;
-        private final Expression whenExpression;
-        private final Statement statement;
-
-        public EntryImpl(List<Expression> conditions, LocalVariable patternVariable, Expression whenExpression, Statement statement) {
-            this.conditions = conditions;
-            this.patternVariable = patternVariable;
-            this.whenExpression = whenExpression;
-            this.statement = statement;
-        }
-
-        @Override
-        public int complexity() {
-            return (patternVariable != null ? 1 : 0)
-                   + conditions.stream().mapToInt(Expression::complexity).sum()
-                   + whenExpression.complexity() + statement().complexity();
-        }
-
-        @Override
-        public List<Expression> conditions() {
-            return conditions;
-        }
-
-        @Override
-        public LocalVariable patternVariable() {
-            return patternVariable;
-        }
-
-        @Override
-        public Expression whenExpression() {
-            return whenExpression;
-        }
-
-        @Override
-        public Statement statement() {
-            return statement;
-        }
-
-        @Override
-        public OutputBuilder print(Qualification qualification) {
-            OutputBuilder outputBuilder = new OutputBuilderImpl();
-            boolean containsDefault = conditions.stream().anyMatch(Expression::isEmpty);
-            if (containsDefault) {
-                outputBuilder.add(KeywordImpl.DEFAULT);
-                if (conditions.size() > 1) {
-                    outputBuilder.add(SymbolEnum.COMMA).add(KeywordImpl.CASE);
-                }
-            } else {
-                outputBuilder.add(KeywordImpl.CASE);
-            }
-            outputBuilder.add(SpaceEnum.ONE);
-            boolean first = true;
-            for (Expression condition : conditions) {
-                if (!condition.isEmpty()) {
-                    if (first) {
-                        first = false;
-                    } else {
-                        outputBuilder.add(SymbolEnum.COMMA);
-                    }
-                    outputBuilder.add(condition.print(qualification));
-                }
-            }
-            outputBuilder.add(SymbolEnum.LAMBDA);
-            outputBuilder.add(statement().print(qualification));
-            return outputBuilder;
-        }
-
-        @Override
-        public Entry translate(TranslationMap translationMap) {
-            throw new UnsupportedOperationException("NYI");
-        }
-
-        @Override
-        public Stream<Variable> variables(DescendMode descendMode) {
-            return Stream.concat(whenExpression.variables(descendMode), statement.variables(descendMode));
-        }
-    }
-
     public static class BuilderImpl extends StatementImpl.Builder<SwitchStatementNewStyle.Builder>
             implements SwitchStatementNewStyle.Builder {
         private Expression selector;
-        private final List<Entry> entries = new ArrayList<>();
+        private final List<SwitchEntry> entries = new ArrayList<>();
 
         @Override
         public SwitchStatementNewStyle.Builder setSelector(Expression selector) {
@@ -201,7 +119,7 @@ public class SwitchStatementNewStyleImpl extends StatementImpl implements Switch
         }
 
         @Override
-        public SwitchStatementNewStyle.Builder addSwitchEntries(Collection<Entry> switchEntries) {
+        public SwitchStatementNewStyle.Builder addSwitchEntries(Collection<SwitchEntry> switchEntries) {
             this.entries.addAll(switchEntries);
             return this;
         }
@@ -212,39 +130,4 @@ public class SwitchStatementNewStyleImpl extends StatementImpl implements Switch
         }
     }
 
-    public static class EntryBuilderImpl implements EntryBuilder {
-        private final List<Expression> conditions = new ArrayList<>();
-        private LocalVariable patternVariable;
-        private Expression whenExpression;
-        private Statement statement;
-
-        @Override
-        public EntryBuilder addConditions(Collection<Expression> expressions) {
-            this.conditions.addAll(expressions);
-            return this;
-        }
-
-        @Override
-        public EntryBuilder setStatement(Statement statement) {
-            this.statement = statement;
-            return this;
-        }
-
-        @Override
-        public EntryBuilder setPatternVariable(LocalVariable patternVariable) {
-            this.patternVariable = patternVariable;
-            return this;
-        }
-
-        @Override
-        public EntryBuilder setWhenExpression(Expression whenExpression) {
-            this.whenExpression = whenExpression;
-            return this;
-        }
-
-        @Override
-        public Entry build() {
-            return new EntryImpl(List.copyOf(conditions), patternVariable, whenExpression, statement);
-        }
-    }
 }
