@@ -276,6 +276,10 @@ public interface Factory {
                                          List<SwitchEntry> switchEntries, ParameterizedType parameterizedType,
                                          List<Expression> expressions);
 
+    SwitchStatementOldStyle.Builder newSwitchStatementOldStyleBuilder();
+
+    SwitchStatementOldStyle.SwitchLabel newSwitchLabelOldStyle(Expression literal, int pos);
+
     SynchronizedStatement.Builder newSynchronizedBuilder();
 
     OutputElement newText(String text);

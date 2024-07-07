@@ -979,5 +979,15 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
         ParameterizedType classPt = newParameterizedType(classTypeInfo(), List.of(pt));
         return new ClassExpressionImpl(pt, classPt);
     }
+
+    @Override
+    public SwitchStatementOldStyle.Builder newSwitchStatementOldStyleBuilder() {
+        return new SwitchStatementOldStyleImpl.Builder();
+    }
+
+    @Override
+    public SwitchStatementOldStyle.SwitchLabel newSwitchLabelOldStyle(Expression literal, int pos) {
+        return new SwitchStatementOldStyleImpl.SwitchLabelImpl(literal, pos);
+    }
 }
 
