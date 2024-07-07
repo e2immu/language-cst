@@ -255,4 +255,9 @@ public class TryStatementImpl extends StatementImpl implements TryStatement {
         return Stream.concat(catchClauses.stream().map(CatchClause::block).filter(b -> !b.isEmpty()),
                 finallyBlock.isEmpty() ? Stream.of() : Stream.of(finallyBlock)).toList();
     }
+
+    @Override
+    public boolean hasSubBlocks() {
+        return true;
+    }
 }

@@ -120,4 +120,9 @@ public class BlockImpl extends StatementImpl implements Block {
             return new BlockImpl(comments, source, annotations, label, List.copyOf(statements));
         }
     }
+
+    @Override
+    public boolean hasSubBlocks() {
+        return false;
+    }
 }

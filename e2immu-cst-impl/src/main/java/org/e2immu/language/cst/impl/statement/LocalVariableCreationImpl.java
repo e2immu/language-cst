@@ -208,4 +208,9 @@ public class LocalVariableCreationImpl extends StatementImpl implements LocalVar
         return Stream.concat(Stream.of(tr), Stream.concat(localVariable.assignmentExpression().typesReferenced(),
                 otherLocalVariables.stream().flatMap(lv -> lv.assignmentExpression().typesReferenced())));
     }
+
+    @Override
+    public boolean hasSubBlocks() {
+        return false;
+    }
 }

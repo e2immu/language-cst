@@ -72,4 +72,9 @@ public class ImportStatementImpl extends StatementImpl implements ImportStatemen
     public Stream<Element.TypeReference> typesReferenced() {
         return Stream.empty();
     }
+
+    @Override
+    public boolean hasSubBlocks() {
+        return false;
+    }
 }

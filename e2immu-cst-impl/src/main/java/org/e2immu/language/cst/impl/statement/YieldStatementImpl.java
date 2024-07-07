@@ -103,4 +103,9 @@ public class YieldStatementImpl extends StatementImpl implements YieldStatement 
             return new YieldStatementImpl(comments, source, annotations, label, expression);
         }
     }
+
+    @Override
+    public boolean hasSubBlocks() {
+        return false;
+    }
 }

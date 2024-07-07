@@ -986,8 +986,10 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
-    public SwitchStatementOldStyle.SwitchLabel newSwitchLabelOldStyle(Expression literal, int pos) {
-        return new SwitchStatementOldStyleImpl.SwitchLabelImpl(literal, pos);
+    public SwitchStatementOldStyle.SwitchLabel newSwitchLabelOldStyle(Expression literal, int pos,
+                                                                      LocalVariable patternVariable,
+                                                                      Expression whenExpression) {
+        return new SwitchStatementOldStyleImpl.SwitchLabelImpl(literal, pos, patternVariable, whenExpression);
     }
 }
 

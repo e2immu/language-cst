@@ -9,6 +9,7 @@ import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.variable.DescendMode;
+import org.e2immu.language.cst.api.variable.LocalVariable;
 import org.e2immu.language.cst.api.variable.Variable;
 
 import java.util.Collection;
@@ -21,12 +22,19 @@ public interface SwitchStatementOldStyle extends Statement {
     // selector == expression()
 
     interface SwitchLabel {
+        int startFromPosition();
+
+        Expression literal();
+
+        // null when absent
+        LocalVariable patternVariable();
+
+        // EmptyExpression when absent (Java 21)
+        Expression whenExpression();
+
         OutputBuilder print(Qualification qualification);
 
-        int startFromPosition();
-       Expression literal();
-
-       SwitchLabel translate(TranslationMap translationMap);
+        SwitchLabel translate(TranslationMap translationMap);
     }
 
     List<SwitchLabel> switchLabels();

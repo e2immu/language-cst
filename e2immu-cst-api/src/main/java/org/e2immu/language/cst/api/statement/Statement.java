@@ -11,6 +11,8 @@ import java.util.stream.Stream;
 
 public interface Statement extends Element {
 
+    boolean hasSubBlocks();
+
     default boolean isSynthetic() {
         return false;
     }

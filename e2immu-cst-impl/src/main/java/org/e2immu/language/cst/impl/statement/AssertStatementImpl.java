@@ -125,4 +125,9 @@ public class AssertStatementImpl extends StatementImpl implements AssertStatemen
         if (tex == expression && msg == message) return List.of(this);
         return List.of(new AssertStatementImpl(comments(), source(), annotations(), label(), tex, msg));
     }
+
+    @Override
+    public boolean hasSubBlocks() {
+        return false;
+    }
 }

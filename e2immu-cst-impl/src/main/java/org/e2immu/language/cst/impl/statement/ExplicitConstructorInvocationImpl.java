@@ -137,4 +137,9 @@ public class ExplicitConstructorInvocationImpl extends StatementImpl implements 
     public Stream<Element.TypeReference> typesReferenced() {
         return parameterExpressions.stream().flatMap(Expression::typesReferenced);
     }
+
+    @Override
+    public boolean hasSubBlocks() {
+        return false;
+    }
 }

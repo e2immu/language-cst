@@ -97,4 +97,9 @@ public class ExpressionAsStatementImpl extends StatementImpl implements Expressi
             return new ExpressionAsStatementImpl(comments, source, annotations, label, expression);
         }
     }
+
+    @Override
+    public boolean hasSubBlocks() {
+        return false;
+    }
 }

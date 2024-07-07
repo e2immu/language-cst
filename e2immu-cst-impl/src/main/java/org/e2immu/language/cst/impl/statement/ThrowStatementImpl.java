@@ -108,4 +108,9 @@ public class ThrowStatementImpl extends StatementImpl implements ThrowStatement 
         return List.of(new ThrowStatementImpl(comments(), source(), annotations(), label(),
                 translationMap.translateExpression(expression)));
     }
+
+    @Override
+    public boolean hasSubBlocks() {
+        return true;
+    }
 }

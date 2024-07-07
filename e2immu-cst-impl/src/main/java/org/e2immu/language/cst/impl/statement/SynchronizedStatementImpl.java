@@ -130,4 +130,9 @@ public class SynchronizedStatementImpl extends StatementImpl implements Synchron
         }
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public boolean hasSubBlocks() {
+        return true;
+    }
 }

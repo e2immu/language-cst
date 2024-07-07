@@ -13,6 +13,7 @@ import org.e2immu.language.cst.api.statement.Statement;
 import org.e2immu.language.cst.api.statement.SwitchStatementOldStyle;
 import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.variable.DescendMode;
+import org.e2immu.language.cst.api.variable.LocalVariable;
 import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.language.cst.impl.output.*;
 
@@ -38,10 +39,14 @@ public class SwitchStatementOldStyleImpl extends StatementImpl implements Switch
     public static class SwitchLabelImpl implements SwitchLabel {
         private final Expression literal;
         private final int startFromPosition;
+        private final LocalVariable patternVariable;
+        private final Expression whenExpression;
 
-        public SwitchLabelImpl(Expression literal, int startFromPosition) {
+        public SwitchLabelImpl(Expression literal, int startFromPosition, LocalVariable patternVariable, Expression whenExpression) {
             this.literal = literal;
             this.startFromPosition = startFromPosition;
+            this.patternVariable = patternVariable;
+            this.whenExpression = whenExpression;
         }
 
         @Override
@@ -53,6 +58,13 @@ public class SwitchStatementOldStyleImpl extends StatementImpl implements Switch
                 outputBuilder.add(KeywordImpl.CASE)
                         .add(SpaceEnum.ONE)
                         .add(literal.print(qualification));
+            }
+            if (patternVariable != null) {
+                outputBuilder.add(SpaceEnum.ONE).add(patternVariable.print(qualification));
+
+                if (!whenExpression.isEmpty()) {
+                    outputBuilder.add(SpaceEnum.ONE).add(whenExpression.print(qualification));
+                }
             }
             return outputBuilder.add(SymbolEnum.COLON_LABEL);
         }
@@ -68,10 +80,23 @@ public class SwitchStatementOldStyleImpl extends StatementImpl implements Switch
         }
 
         @Override
+        public Expression whenExpression() {
+            return whenExpression;
+        }
+
+        @Override
+        public LocalVariable patternVariable() {
+            return patternVariable;
+        }
+
+        @Override
         public SwitchLabel translate(TranslationMap translationMap) {
             Expression trLiteral = literal.translate(translationMap);
-            if (trLiteral == literal) return this;
-            return new SwitchLabelImpl(trLiteral, startFromPosition);
+            LocalVariable trPattern = patternVariable == null ? null
+                    : (LocalVariable) translationMap.translateVariable(patternVariable);
+            Expression trWhen = whenExpression.translate(translationMap);
+            if (trLiteral == literal && trPattern == patternVariable && trWhen == whenExpression) return this;
+            return new SwitchLabelImpl(trLiteral, startFromPosition, trPattern, trWhen);
         }
     }
 
@@ -228,5 +253,10 @@ public class SwitchStatementOldStyleImpl extends StatementImpl implements Switch
                 .collect(Collectors.toList());
         return List.of(new SwitchStatementOldStyleImpl(comments(), source(), annotations(), label(), translatedExpression,
                 ensureBlock(block.translate(translationMap)), translatedLabels));
+    }
+
+    @Override
+    public boolean hasSubBlocks() {
+        return true;
     }
 }

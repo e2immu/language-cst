@@ -103,4 +103,9 @@ public class ReturnStatementImpl extends StatementImpl implements ReturnStatemen
             return new ReturnStatementImpl(comments, source, annotations, label, expression);
         }
     }
+
+    @Override
+    public boolean hasSubBlocks() {
+        return false;
+    }
 }

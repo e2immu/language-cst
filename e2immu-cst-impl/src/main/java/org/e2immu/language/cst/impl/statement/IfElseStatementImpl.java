@@ -146,4 +146,9 @@ public class IfElseStatementImpl extends StatementImpl implements IfElseStatemen
     public List<Block> otherBlocks() {
         return elseBlock.isEmpty() ? List.of() : List.of(elseBlock);
     }
+
+    @Override
+    public boolean hasSubBlocks() {
+        return true;
+    }
 }

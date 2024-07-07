@@ -54,4 +54,9 @@ public abstract class BreakOrContinueStatementImpl extends StatementImpl impleme
     public Stream<Element.TypeReference> typesReferenced() {
         return Stream.empty();
     }
+
+    @Override
+    public boolean hasSubBlocks() {
+        return false;
+    }
 }

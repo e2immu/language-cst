@@ -278,7 +278,9 @@ public interface Factory {
 
     SwitchStatementOldStyle.Builder newSwitchStatementOldStyleBuilder();
 
-    SwitchStatementOldStyle.SwitchLabel newSwitchLabelOldStyle(Expression literal, int pos);
+    SwitchStatementOldStyle.SwitchLabel newSwitchLabelOldStyle(Expression literal, int pos,
+                                                               LocalVariable patternVariable,
+                                                               Expression whenExpression);
 
     SynchronizedStatement.Builder newSynchronizedBuilder();
 
