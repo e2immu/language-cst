@@ -57,10 +57,12 @@ public interface TypeInspection extends Inspection {
     MethodInfo singleAbstractMethod();
 
     List<TypeInfo> subTypes();
-    
+
     Set<TypeModifier> modifiers();
 
     boolean fieldsAccessedInRestOfPrimaryType();
 
     MethodInfo enclosingMethod();
+
+    List<TypeInfo> permittedWhenSealed();
 }

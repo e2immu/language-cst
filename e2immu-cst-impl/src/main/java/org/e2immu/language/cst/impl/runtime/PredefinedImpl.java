@@ -93,6 +93,11 @@ public class PredefinedImpl implements Predefined {
     }
 
     @Override
+    public TypeInfo boxedLongTypeInfo() {
+        return boxedLongTypeInfo;
+    }
+
+    @Override
     public ParameterizedType longParameterizedType() {
         return longParameterizedType;
     }
@@ -232,7 +237,8 @@ public class PredefinedImpl implements Predefined {
                 boxedLongTypeInfo, boxedShortTypeInfo, boxedVoidTypeInfo, integerTypeInfo, characterTypeInfo);
         for (TypeInfo ti : boxed) {
             ti.builder().setAccess(InspectionImpl.AccessEnum.PUBLIC);
-            ti.builder().setTypeNature(TypeNatureEnum.CLASS);
+            ti.builder().setTypeNature(TypeNatureEnum.CLASS)
+                            .setParentClass(objectParameterizedType);
             objects.add(ti);
         }
         predefinedObjects = List.copyOf(objects);

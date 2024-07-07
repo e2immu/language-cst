@@ -537,4 +537,9 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     public MethodInfo enclosingMethod() {
         return inspection.get().enclosingMethod();
     }
+
+    @Override
+    public boolean isSealed() {
+        return inspection.get().modifiers().stream().anyMatch(TypeModifier::isSealed);
+    }
 }

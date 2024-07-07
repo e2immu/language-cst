@@ -14,6 +14,8 @@ public interface Predefined extends PredefinedWithoutParameterizedType {
 
     ParameterizedType boxedBooleanParameterizedType();
 
+    TypeInfo boxedLongTypeInfo();
+
     ParameterizedType byteParameterizedType();
 
     ParameterizedType charParameterizedType();

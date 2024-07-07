@@ -24,6 +24,7 @@ public class TypeInspectionImpl extends InspectionImpl implements TypeInspection
     private final List<TypeInfo> subTypes;
     private final boolean fieldsAccessedInRestOfPrimaryType;
     private final MethodInfo enclosingMethod;
+    private final List<TypeInfo> permittedWhenSealed;
 
     public TypeInspectionImpl(Inspection inspection,
                               Set<TypeModifier> typeModifiers,
@@ -37,7 +38,8 @@ public class TypeInspectionImpl extends InspectionImpl implements TypeInspection
                               List<TypeParameter> typeParameters,
                               List<TypeInfo> subTypes,
                               boolean fieldsAccessedInRestOfPrimaryType,
-                              MethodInfo enclosingMethod) {
+                              MethodInfo enclosingMethod,
+                              List<TypeInfo> permittedWhenSealed) {
         super(inspection.access(), inspection.comments(), inspection.source(), inspection.isSynthetic(), inspection.annotations());
         this.typeModifiers = typeModifiers;
         this.methods = methods;
@@ -51,6 +53,12 @@ public class TypeInspectionImpl extends InspectionImpl implements TypeInspection
         this.typeParameters = typeParameters;
         this.fieldsAccessedInRestOfPrimaryType = fieldsAccessedInRestOfPrimaryType;
         this.enclosingMethod = enclosingMethod;
+        this.permittedWhenSealed = permittedWhenSealed;
+    }
+
+    @Override
+    public List<TypeInfo> permittedWhenSealed() {
+        return permittedWhenSealed;
     }
 
     @Override
@@ -116,12 +124,18 @@ public class TypeInspectionImpl extends InspectionImpl implements TypeInspection
         private final List<ParameterizedType> interfacesImplemented = new ArrayList<>();
         private final List<TypeInfo> subTypes = new ArrayList<>();
         private final List<TypeParameter> typeParameters = new ArrayList<>();
+        private final List<TypeInfo> permittedWhenSealed = new ArrayList<>();
         private ParameterizedType parentClass;
         private TypeNature typeNature;
         private MethodInfo singleAbstractMethod;
         private final TypeInfoImpl typeInfo;
         private boolean fieldsAccessedInRestOfPrimaryType;
         private MethodInfo enclosingMethod;
+
+        @Override
+        public List<TypeInfo> permittedWhenSealed() {
+            return permittedWhenSealed;
+        }
 
         @Override
         public boolean fieldsAccessedInRestOfPrimaryType() {
@@ -208,11 +222,17 @@ public class TypeInspectionImpl extends InspectionImpl implements TypeInspection
         }
 
         @Override
+        public TypeInfo.Builder addPermittedType(TypeInfo typeInfo) {
+            permittedWhenSealed.add(typeInfo);
+            return this;
+        }
+
+        @Override
         public void commit() {
             TypeInspection ti = new TypeInspectionImpl(this, Set.copyOf(typeModifiers), List.copyOf(methods),
                     List.copyOf(constructors), List.copyOf(fields), parentClass, typeNature, singleAbstractMethod,
                     List.copyOf(interfacesImplemented), List.copyOf(typeParameters), List.copyOf(subTypes),
-                    fieldsAccessedInRestOfPrimaryType, enclosingMethod);
+                    fieldsAccessedInRestOfPrimaryType, enclosingMethod, List.copyOf(permittedWhenSealed));
             typeInfo.commit(ti);
         }
 

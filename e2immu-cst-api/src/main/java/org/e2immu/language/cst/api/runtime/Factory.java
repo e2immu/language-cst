@@ -85,6 +85,8 @@ public interface Factory {
 
     Lambda.OutputVariant lambdaOutputVariantVar();
 
+    LocalVariableCreation.Modifier localVariableModifierVar();
+
     MethodModifier methodModifierAbstract();
 
     MethodModifier methodModifierDefault();
@@ -224,6 +226,8 @@ public interface Factory {
     LocalVariableCreation newLocalVariableCreation(LocalVariable lvc);
 
     LocalVariableCreation.Builder newLocalVariableCreationBuilder();
+
+    LocalVariableCreation.Modifier localVariableModifierFinal();
 
     LongConstant newLong(long l);
 

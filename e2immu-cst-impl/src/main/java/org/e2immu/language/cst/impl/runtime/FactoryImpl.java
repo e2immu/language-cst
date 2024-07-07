@@ -1002,5 +1002,15 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     public SwitchExpression.Builder newSwitchExpressionBuilder() {
         return new SwitchExpressionImpl.BuilderImpl();
     }
+
+    @Override
+    public LocalVariableCreation.Modifier localVariableModifierFinal() {
+        return LocalVariableCreationImpl.ModifierEnum.FiNAL;
+    }
+
+    @Override
+    public LocalVariableCreation.Modifier localVariableModifierVar() {
+        return LocalVariableCreationImpl.ModifierEnum.VAR;
+    }
 }
 

@@ -43,6 +43,8 @@ public interface TypeInfo extends NamedType, Info {
         return typeNature().isClass() && compilationUnitOrEnclosingType().isRight() && !isStatic();
     }
 
+    boolean isSealed();
+
     String packageName();
 
     // chain of type names Primary.Sub.Sub2
@@ -171,6 +173,8 @@ public interface TypeInfo extends NamedType, Info {
     TypeNature typeNature();
 
     interface Builder extends Info.Builder<Builder> {
+        Builder addPermittedType(TypeInfo typeInfo);
+
         @Fluent
         Builder setEnclosingMethod(MethodInfo methodInfo);
 
