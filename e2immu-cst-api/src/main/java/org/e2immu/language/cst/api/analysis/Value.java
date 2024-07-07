@@ -80,15 +80,17 @@ public interface Value extends Comparable<Value> {
      */
     interface CommutableData extends Value {
         default boolean isDefault() {
-            return par().isBlank() && seq().isBlank() && multi().isBlank();
+            return !isNone() && par().isBlank() && seq().isBlank() && multi().isBlank();
         }
 
+        boolean isNone();
+
         default boolean isParallel() {
-            return !par().isBlank() && seq().isBlank();
+            return !isNone() && !par().isBlank() && seq().isBlank();
         }
 
         default boolean isSequential() {
-            return par().isBlank() && !seq().isBlank();
+            return !isNone() && par().isBlank() && !seq().isBlank();
         }
 
         String multi();

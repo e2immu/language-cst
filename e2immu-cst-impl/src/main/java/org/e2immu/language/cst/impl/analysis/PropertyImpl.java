@@ -39,7 +39,7 @@ public class PropertyImpl implements Property {
     public static final Property PARALLEL_PARAMETER_GROUPS = new PropertyImpl("parallelParameterGroups",
             ValueImpl.ParameterParSeqImpl.EMPTY);
     public static final Property COMMUTABLE_METHODS = new PropertyImpl("commutableMethods",
-            ValueImpl.CommutableDataImpl.BLANK);
+            ValueImpl.CommutableDataImpl.NONE);
     public static final Property GET_SET_FIELD = new PropertyImpl("getSetField",
             ValueImpl.FieldValueImpl.EMPTY);
     public static final Property GET_SET_EQUIVALENT = new PropertyImpl("getSetEquivalent",

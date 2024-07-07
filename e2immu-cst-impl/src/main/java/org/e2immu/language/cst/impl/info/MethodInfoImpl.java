@@ -309,7 +309,7 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
 
     @Override
     public Value.CommutableData commutableData() {
-        return analysis().getOrDefault(PropertyImpl.COMMUTABLE_METHODS, ValueImpl.CommutableDataImpl.BLANK);
+        return analysis().getOrDefault(PropertyImpl.COMMUTABLE_METHODS, ValueImpl.CommutableDataImpl.NONE);
     }
 
     @Override

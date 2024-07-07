@@ -104,12 +104,18 @@ public abstract class ValueImpl implements Value {
     }
 
     public record CommutableDataImpl(String seq, String par, String multi) implements CommutableData {
+        public static final CommutableData NONE = new ValueImpl.CommutableDataImpl(null, null, null);
         public static final CommutableData BLANK = new ValueImpl.CommutableDataImpl("", "", "");
 
         @Override
         public Codec.EncodedValue encode(Codec codec) {
             return codec.encodeList(List.of(codec.encodeString(seq), codec.encodeString(par),
                     codec.encodeString(multi)));
+        }
+
+        @Override
+        public boolean isNone() {
+            return NONE == this;
         }
     }
 

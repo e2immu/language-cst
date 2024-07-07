@@ -85,6 +85,7 @@ public class TestCodec {
             } else fail();
         } else fail();
 
-        Assertions.assertEquals("p2,p3", typeInfo2.analysis().getOrDefault(PropertyImpl.COMMUTABLE_METHODS, ValueImpl.CommutableDataImpl.BLANK).par());
+        Assertions.assertEquals("p2,p3", typeInfo2.analysis().getOrDefault(PropertyImpl.COMMUTABLE_METHODS,
+                ValueImpl.CommutableDataImpl.NONE).par());
     }
 }
