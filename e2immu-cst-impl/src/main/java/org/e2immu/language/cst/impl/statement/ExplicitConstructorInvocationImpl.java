@@ -115,7 +115,7 @@ public class ExplicitConstructorInvocationImpl extends StatementImpl implements 
     @Override
     public OutputBuilder print(Qualification qualification) {
         String name = isSuper ? "super" : "this";
-        OutputBuilder outputBuilder = new OutputBuilderImpl().add(new TextImpl(name));
+        OutputBuilder outputBuilder = outputBuilder(qualification).add(new TextImpl(name));
         if (parameterExpressions.isEmpty()) {
             outputBuilder.add(SymbolEnum.OPEN_CLOSE_PARENTHESIS);
         } else {

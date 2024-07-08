@@ -14,6 +14,8 @@ import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.variable.DescendMode;
 import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.language.cst.impl.element.ElementImpl;
+import org.e2immu.language.cst.impl.output.*;
+import org.e2immu.language.cst.impl.type.DiamondEnum;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -232,7 +234,33 @@ public class TryStatementImpl extends StatementImpl implements TryStatement {
 
     @Override
     public OutputBuilder print(Qualification qualification) {
-        return null;
+        OutputBuilder outputBuilder = outputBuilder(qualification).add(KeywordImpl.TRY);
+        if (!resources.isEmpty()) {
+            outputBuilder.add(SymbolEnum.LEFT_PARENTHESIS)
+                    .add(resources.stream().map(expression -> expression
+                            .print(qualification)).collect(OutputBuilderImpl.joining(SymbolEnum.SEMICOLON)))
+                    .add(SymbolEnum.RIGHT_PARENTHESIS);
+        }
+        outputBuilder.add(block.print(qualification));
+        int i = 1;
+        for (CatchClause cc : catchClauses) {
+            outputBuilder.add(KeywordImpl.CATCH)
+                    .add(SymbolEnum.LEFT_PARENTHESIS)
+                    .add(cc.exceptionTypes().stream()
+                            .map(t -> t.print(qualification, false, DiamondEnum.NO))
+                            .collect(OutputBuilderImpl.joining(SymbolEnum.PIPE)))
+                    .add(SpaceEnum.ONE)
+                    .add(new TextImpl(cc.variableName()))
+                    .add(SymbolEnum.RIGHT_PARENTHESIS)
+                    .add(cc.block().print(qualification));
+            i++;
+        }
+        if (!finallyBlock.isEmpty()) {
+            outputBuilder
+                    .add(KeywordImpl.FINALLY)
+                    .add(finallyBlock.print(qualification));
+        }
+        return outputBuilder;
     }
 
     @Override

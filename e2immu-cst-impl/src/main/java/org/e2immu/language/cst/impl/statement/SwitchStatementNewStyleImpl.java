@@ -80,7 +80,7 @@ public class SwitchStatementNewStyleImpl extends StatementImpl implements Switch
 
     @Override
     public OutputBuilder print(Qualification qualification) {
-        OutputBuilder outputBuilder = new OutputBuilderImpl().add(KeywordImpl.SWITCH)
+        OutputBuilder outputBuilder = outputBuilder(qualification).add(KeywordImpl.SWITCH)
                 .add(SymbolEnum.LEFT_PARENTHESIS)
                 .add(selector.print(qualification))
                 .add(SymbolEnum.RIGHT_PARENTHESIS)
