@@ -113,6 +113,8 @@ public interface Factory {
 
     MethodInfo.MethodType methodTypeMethod();
 
+    MethodInfo.MethodType methodTypeStaticBlock();
+
     MethodInfo.MethodType methodTypeStaticMethod();
 
     MethodInfo.MethodType methodTypeSyntheticConstructor();

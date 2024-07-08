@@ -562,6 +562,11 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
+    public MethodInfo.MethodType methodTypeStaticBlock() {
+        return MethodInfoImpl.MethodTypeEnum.STATIC_BLOCK;
+    }
+
+    @Override
     public Comment newSingleLineComment(String comment) {
         return new SingleLineComment(comment);
     }
