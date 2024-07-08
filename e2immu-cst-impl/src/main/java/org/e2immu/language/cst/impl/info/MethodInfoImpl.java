@@ -374,7 +374,9 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
 
     @Override
     public Map<FieldInfo, Boolean> areOwnFieldsReadModified() {
-        return analysis().getOrDefault(PropertyImpl.OWN_FIELDS_READ_MODIFIED_IN_METHOD, ValueImpl.FieldBooleanMapImpl.EMPTY).map();
+        ValueImpl.FieldBooleanMapImpl value = analysis().getOrNull(PropertyImpl.OWN_FIELDS_READ_MODIFIED_IN_METHOD,
+                ValueImpl.FieldBooleanMapImpl.class);
+        return value == null ? null : value.map();
     }
 
     @Override
@@ -425,6 +427,6 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
     @Override
     public boolean isFactoryMethod() {
         return isStatic() && returnType().typeInfo() != null
-                && returnType().typeInfo().isEnclosedIn(typeInfo);
+               && returnType().typeInfo().isEnclosedIn(typeInfo);
     }
 }

@@ -207,6 +207,8 @@ public interface TypeInfo extends NamedType, Info {
 
         @Fluent
         Builder setSingleAbstractMethod(MethodInfo singleAbstractMethod);
+
+        TypeNature typeNature();
     }
 
     boolean isAtLeastImmutableHC();
