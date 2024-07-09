@@ -7,28 +7,28 @@ import org.e2immu.language.cst.api.variable.DescendMode;
 import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.language.cst.impl.output.OutputBuilderImpl;
 import org.e2immu.language.cst.impl.output.TextImpl;
-import org.e2immu.support.SetOnce;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 public class CompilationUnitImpl extends ElementImpl implements CompilationUnit {
     private final URI uri;
     private final String packageName;
-    private final SetOnce<List<ImportStatement>> importStatements = new SetOnce<>();
+    private final List<ImportStatement> importStatements;
     private final List<Comment> comments;
 
     public CompilationUnitImpl(URI uri,
                                List<Comment> comments,
+                               List<ImportStatement> importStatements,
                                String packageName) {
         this.uri = uri;
         this.packageName = packageName;
         this.comments = comments;
+        this.importStatements = importStatements;
     }
 
     @Override
@@ -43,12 +43,7 @@ public class CompilationUnitImpl extends ElementImpl implements CompilationUnit 
 
     @Override
     public List<ImportStatement> importStatements() {
-        return importStatements.get();
-    }
-
-    @Override
-    public void setImportStatements(List<ImportStatement> importStatements) {
-        this.importStatements.set(importStatements);
+        return importStatements;
     }
 
     @Override
@@ -68,12 +63,12 @@ public class CompilationUnitImpl extends ElementImpl implements CompilationUnit 
 
     @Override
     public void visit(Predicate<Element> predicate) {
-        importStatements.get().forEach(predicate::test);
+        importStatements.forEach(predicate::test);
     }
 
     @Override
     public void visit(Visitor visitor) {
-        importStatements.get().forEach(is -> is.visit(visitor));
+        importStatements.forEach(is -> is.visit(visitor));
     }
 
     @Override
@@ -97,6 +92,13 @@ public class CompilationUnitImpl extends ElementImpl implements CompilationUnit 
     public static class Builder extends ElementImpl.Builder<CompilationUnit.Builder> implements CompilationUnit.Builder {
         private String packageName;
         private URI uri;
+        private final List<ImportStatement> importStatements = new LinkedList<>();
+
+        @Override
+        public CompilationUnit.Builder addImportStatement(ImportStatement importStatement) {
+            this.importStatements.add(importStatement);
+            return this;
+        }
 
         @Override
         public CompilationUnit.Builder setURI(URI uri) {
@@ -123,7 +125,7 @@ public class CompilationUnitImpl extends ElementImpl implements CompilationUnit 
 
         @Override
         public CompilationUnit build() {
-            return new CompilationUnitImpl(uri, comments, packageName);
+            return new CompilationUnitImpl(uri, comments, List.copyOf(importStatements), packageName);
         }
     }
 }

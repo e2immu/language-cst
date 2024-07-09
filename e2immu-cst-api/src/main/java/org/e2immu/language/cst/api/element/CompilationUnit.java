@@ -11,13 +11,12 @@ public interface CompilationUnit extends Element {
 
     String packageName();
 
-    // Exception when not yet set!
     List<ImportStatement> importStatements();
 
-    // can be set exactly once
-    void setImportStatements(List<ImportStatement> importStatements);
-
     interface Builder extends Element.Builder<Builder> {
+
+        @Fluent
+        Builder addImportStatement(ImportStatement importStatement);
 
         @Fluent
         Builder setURI(URI uri);
