@@ -24,6 +24,9 @@ public class ShallowAnalyzer {
 
     public void analyze(TypeInfo typeInfo) {
         try {
+            for (TypeInfo sub : typeInfo.subTypes()) {
+                analyze(sub);
+            }
             for (MethodInfo methodInfo : typeInfo.methods()) {
                 analyze(methodInfo);
             }

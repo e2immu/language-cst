@@ -293,6 +293,7 @@ public record IsAssignableFrom(Predefined runtime,
     }
 
     private boolean isNotSyntheticOrFunctionInterface(MethodInfo methodInfo) {
+        if ("java.lang.Runnable.run()".equals(methodInfo.fullyQualifiedName())) return false;
         String packageName = methodInfo.typeInfo().packageName();
         return !"java.util.function".equals(packageName) && !methodInfo.isSynthetic();
     }
