@@ -15,7 +15,7 @@ public class CommonType {
     }
 
     public ParameterizedType commonType(ParameterizedType pt1, ParameterizedType pt2) {
-        assert pt2 != null;
+        assert pt1 != null && pt2 != null;
 
         if (pt1.equals(pt2)) return pt1;
 

@@ -43,8 +43,9 @@ public class ComputeMethodOverridesImpl implements ComputeMethodOverrides {
             List<MethodInfo> abstractMethods = new ArrayList<>();
 
             for (MethodInfo methodInfo : typeInfo.methods()) {
-                boolean nonStaticNonDefault = !methodInfo.access().isPrivate() && !methodInfo.isStatic()
-                                              && !methodInfo.isDefault() && !methodInfo.isOverloadOfJLOMethod();
+                // NOTE 20240710: I've removed the restriction of "!access().isPrivate()"
+                boolean nonStaticNonDefault = !methodInfo.isStatic() && !methodInfo.isDefault()
+                                              && !methodInfo.isOverloadOfJLOMethod();
                 if (nonStaticNonDefault) {
                     if (overriddenByDefault.stream().noneMatch(override ->
                             isOverrideOf(methodInfo, override, translationMap))) {

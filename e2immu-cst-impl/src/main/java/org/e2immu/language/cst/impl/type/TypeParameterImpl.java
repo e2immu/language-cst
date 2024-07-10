@@ -83,6 +83,7 @@ public class TypeParameterImpl implements TypeParameter {
 
     @Override
     public List<ParameterizedType> typeBounds() {
+        assert typeBounds.isSet() : "Have no type bounds for " + this;
         return typeBounds.get();
     }
 
