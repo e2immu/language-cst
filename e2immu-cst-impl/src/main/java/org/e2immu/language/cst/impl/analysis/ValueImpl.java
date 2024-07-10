@@ -312,7 +312,7 @@ public abstract class ValueImpl implements Value {
 
         @Override
         public Codec.EncodedValue encode(Codec codec) {
-            return codec.encodeInfo(field);
+            return codec.encodeInfo(field, -1);
         }
     }
 

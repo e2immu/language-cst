@@ -101,4 +101,9 @@ public class PropertyImpl implements Property {
     public Class<? extends Value> classOfValue() {
         return defaultValue.getClass();
     }
+
+    @Override
+    public String toString() {
+        return key;
+    }
 }

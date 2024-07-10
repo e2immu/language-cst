@@ -43,7 +43,11 @@ public interface Codec {
 
     EncodedValue encodeExpression(Expression expression);
 
-    EncodedValue encodeInfo(Info info);
+    default EncodedValue encodeInfo(Info info) {
+        return encodeInfo(info, -1);
+    }
+
+    EncodedValue encodeInfo(Info info, int index);
 
     EncodedValue encodeInt(int value);
 
@@ -79,6 +83,6 @@ public interface Codec {
 
     Stream<PropertyValue> decode(PropertyValueMap pvm, Stream<EncodedPropertyValue> encodedPropertyValueStream);
 
-    EncodedValue encode(Element info, Stream<EncodedPropertyValue> encodedPropertyValueStream);
+    EncodedValue encode(Element info, int index, Stream<EncodedPropertyValue> encodedPropertyValueStream);
 }
 

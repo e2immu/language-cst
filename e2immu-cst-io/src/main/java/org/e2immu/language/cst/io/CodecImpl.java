@@ -23,7 +23,7 @@ public class CodecImpl implements Codec {
         this.decoderProvider = decoderProvider;
     }
 
-    record D(Node s) implements EncodedValue {
+    public record D(Node s) implements EncodedValue {
     }
 
     record E(String s) implements EncodedValue {
@@ -121,8 +121,8 @@ public class CodecImpl implements Codec {
     }
 
     @Override
-    public EncodedValue encodeInfo(Info info) {
-        return new E(quote(encodeInfoFqn(info)));
+    public EncodedValue encodeInfo(Info info, int index) {
+        return new E(quote(encodeInfoFqn(info, index)));
     }
 
     @Override
@@ -196,10 +196,10 @@ public class CodecImpl implements Codec {
     }
 
     @Override
-    public EncodedValue encode(Element info, Stream<EncodedPropertyValue> encodedPropertyValueStream) {
+    public EncodedValue encode(Element info, int index, Stream<EncodedPropertyValue> encodedPropertyValueStream) {
         String fqn;
         if (info instanceof Info i) {
-            fqn = encodeInfoFqn(i);
+            fqn = encodeInfoFqn(i, index);
         } else throw new UnsupportedOperationException();
         String pvStream = encodedPropertyValueStream.map(epv -> '"' + epv.key() + "\":" + ((E) epv.encodedValue()).s)
                 .sorted()
@@ -208,18 +208,22 @@ public class CodecImpl implements Codec {
         return new E(all);
     }
 
-    private String encodeInfoFqn(Info info) {
+    private String encodeInfoFqn(Info info, int index) {
         if (info instanceof TypeInfo typeInfo) {
             return "T" + typeInfo.fullyQualifiedName();
         }
         if (info instanceof MethodInfo methodInfo) {
-            return "M" + methodInfo.fullyQualifiedName();
+            if (index < 0) return methodInfo.fullyQualifiedName();
+            if (methodInfo.isConstructor()) {
+                return "C" + methodInfo.typeInfo().fullyQualifiedName() + "(" + index + ")";
+            }
+            return "M" + methodInfo.typeInfo().fullyQualifiedName() + "." + methodInfo.name() + "(" + index + ")";
         }
         if (info instanceof FieldInfo fieldInfo) {
-            return "F" + fieldInfo.fullyQualifiedName();
+            return "F" + fieldInfo.fullyQualifiedName() + (index >= 0 ? "(" + index + ")" : "");
         }
         if (info instanceof ParameterInfo pi) {
-            return "P" + pi.fullyQualifiedName();
+            return "P" + encodeInfoFqn(pi.methodInfo(), index) + ":" + pi.index();
         }
         throw new UnsupportedOperationException();
     }
