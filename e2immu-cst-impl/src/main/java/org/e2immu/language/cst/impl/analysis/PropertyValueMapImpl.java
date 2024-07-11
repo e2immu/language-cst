@@ -48,6 +48,7 @@ public class PropertyValueMapImpl implements PropertyValueMap {
                 MODIFIED_PARAMETER,
                 NOT_NULL_FIELD,
                 NOT_NULL_METHOD,
+                NOT_NULL_PARAMETER,
                 OWN_FIELDS_READ_MODIFIED_IN_METHOD,
                 PARALLEL_PARAMETER_GROUPS,
                 PARAMETER_ASSIGNED_TO_FIELD,

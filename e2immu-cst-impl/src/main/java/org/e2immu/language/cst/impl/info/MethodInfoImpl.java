@@ -116,7 +116,11 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
     }
 
     public void commit(MethodInspection methodInspection) {
-        inspection.setFinal(methodInspection);
+        try {
+            inspection.setFinal(methodInspection);
+        } catch (IllegalStateException ise) {
+            throw new RuntimeException("Have already committed method '" + fullyQualifiedName() + "'");
+        }
     }
 
     @Override

@@ -18,9 +18,11 @@ import java.util.stream.Stream;
 
 public class CodecImpl implements Codec {
     private final DecoderProvider decoderProvider;
+    private final TypeProvider typeProvider;
 
-    public CodecImpl(DecoderProvider decoderProvider) {
+    public CodecImpl(DecoderProvider decoderProvider, TypeProvider typeProvider) {
         this.decoderProvider = decoderProvider;
+        this.typeProvider = typeProvider;
     }
 
     public record D(Node s) implements EncodedValue {
@@ -83,13 +85,51 @@ public class CodecImpl implements Codec {
     }
 
     @Override
-    public MethodInfo decodeMethodInfo(EncodedValue encodedValue) {
+    public MethodInfo decodeMethodInfo(EncodedValue ev) {
+        if (ev instanceof D d && d.s instanceof StringLiteral sl) {
+            String paramFqn = unquote(sl.getSource());
+            int open = paramFqn.indexOf('(');
+            String preOpen = paramFqn.substring(0, open);
+            int dot = preOpen.lastIndexOf('.');
+            String typeFqn = preOpen.substring(0, dot);
+            String methodName = preOpen.substring(dot + 1);
+            TypeInfo typeInfo = typeProvider.get(typeFqn);
+            if ("<init>".equals(methodName)) {
+                return typeInfo.constructors().stream().filter(c -> paramFqn.equals(c.fullyQualifiedName()))
+                        .findFirst().orElseThrow();
+            }
+            return typeInfo.methods().stream().filter(c -> paramFqn.equals(c.fullyQualifiedName()))
+                    .findFirst().orElseThrow();
+        }
         throw new UnsupportedOperationException(); // not implemented here, need type context
     }
 
     @Override
     public ParameterInfo decodeParameterInfo(EncodedValue ev) {
-        throw new UnsupportedOperationException(); // not implemented here, need type context
+        if (ev instanceof D d && d.s instanceof StringLiteral sl) {
+            String paramFqn = unquote(sl.getSource()).substring(1);
+            int open = paramFqn.indexOf('(');
+            String preOpen = paramFqn.substring(0, open);
+            int dot = preOpen.lastIndexOf('.');
+            String typeFqn = preOpen.substring(0, dot);
+            String methodName = preOpen.substring(dot + 1);
+            TypeInfo typeInfo = typeProvider.get(typeFqn);
+            MethodInfo methodInfo;
+            int colon = paramFqn.lastIndexOf(':');
+            String without1Colon = paramFqn.substring(0, colon);
+            int colon2 = without1Colon.lastIndexOf(':');
+            String methodFqn = paramFqn.substring(0, colon2);
+            if ("<init>".equals(methodName)) {
+                methodInfo = typeInfo.constructors().stream().filter(c -> methodFqn.equals(c.fullyQualifiedName()))
+                        .findFirst().orElseThrow();
+            } else {
+                methodInfo = typeInfo.methods().stream().filter(c -> methodFqn.equals(c.fullyQualifiedName()))
+                        .findFirst().orElseThrow();
+            }
+            int paramIndex = Integer.parseInt(paramFqn.substring(colon2 + 1, colon));
+            return methodInfo.parameters().get(paramIndex);
+        }
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -196,11 +236,8 @@ public class CodecImpl implements Codec {
     }
 
     @Override
-    public EncodedValue encode(Element info, int index, Stream<EncodedPropertyValue> encodedPropertyValueStream) {
-        String fqn;
-        if (info instanceof Info i) {
-            fqn = encodeInfoFqn(i, index);
-        } else throw new UnsupportedOperationException();
+    public EncodedValue encode(Info info, int index, Stream<EncodedPropertyValue> encodedPropertyValueStream) {
+        String fqn = encodeInfoFqn(info, index);
         String pvStream = encodedPropertyValueStream.map(epv -> '"' + epv.key() + "\":" + ((E) epv.encodedValue()).s)
                 .sorted()
                 .collect(Collectors.joining(",", "{", "}"));

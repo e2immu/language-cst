@@ -30,6 +30,15 @@ public abstract class ValueImpl implements Value {
             this.value = value;
         }
 
+        public static Value.Bool from(int i) {
+            return switch (i) {
+                case -1 -> BoolImpl.NO_VALUE;
+                case 0 -> BoolImpl.FALSE;
+                case 1 -> BoolImpl.TRUE;
+                default -> throw new UnsupportedOperationException();
+            };
+        }
+
         public static Value.Bool from(boolean b) {
             return b ? TRUE : FALSE;
         }
@@ -81,7 +90,7 @@ public abstract class ValueImpl implements Value {
     }
 
     static {
-        decoderMap.put(BoolImpl.class, (codec, encodedValue) -> new BoolImpl(codec.decodeInt(encodedValue)));
+        decoderMap.put(BoolImpl.class, (codec, encodedValue) -> BoolImpl.from(codec.decodeInt(encodedValue)));
     }
 
     public record ParameterParSeqImpl(ParSeq<ParameterInfo> parSeq) implements Value.ParameterParSeq {
@@ -222,7 +231,7 @@ public abstract class ValueImpl implements Value {
     }
 
     static {
-        decoderMap.put(ImmutableImpl.class, (codec, encodedValue) -> new ImmutableImpl(codec.decodeInt(encodedValue)));
+        decoderMap.put(ImmutableImpl.class, (codec, encodedValue) -> ImmutableImpl.from(codec.decodeInt(encodedValue)));
     }
 
 
@@ -304,7 +313,7 @@ public abstract class ValueImpl implements Value {
     }
 
     static {
-        decoderMap.put(IndependentImpl.class, (codec, encodedValue) -> new IndependentImpl(codec.decodeInt(encodedValue)));
+        decoderMap.put(IndependentImpl.class, (codec, encodedValue) -> IndependentImpl.from(codec.decodeInt(encodedValue)));
     }
 
     public record FieldValueImpl(FieldInfo field) implements FieldValue {
@@ -484,7 +493,7 @@ public abstract class ValueImpl implements Value {
     }
 
     static {
-        decoderMap.put(NotNullImpl.class, (codec, encodedValue) -> new NotNullImpl(codec.decodeInt(encodedValue)));
+        decoderMap.put(NotNullImpl.class, (codec, encodedValue) -> NotNullImpl.from(codec.decodeInt(encodedValue)));
     }
 
 }

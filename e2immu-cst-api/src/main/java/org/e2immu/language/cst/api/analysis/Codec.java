@@ -2,10 +2,7 @@ package org.e2immu.language.cst.api.analysis;
 
 import org.e2immu.language.cst.api.element.Element;
 import org.e2immu.language.cst.api.expression.Expression;
-import org.e2immu.language.cst.api.info.FieldInfo;
-import org.e2immu.language.cst.api.info.Info;
-import org.e2immu.language.cst.api.info.MethodInfo;
-import org.e2immu.language.cst.api.info.ParameterInfo;
+import org.e2immu.language.cst.api.info.*;
 import org.e2immu.language.cst.api.variable.Variable;
 
 import java.util.List;
@@ -76,6 +73,10 @@ public interface Codec {
         BiFunction<Codec, EncodedValue, Value> decoder(Class<? extends Value> clazz);
     }
 
+    interface TypeProvider {
+        TypeInfo get(String fqn);
+    }
+
     // Info level
 
     interface EncodedValue {
@@ -83,6 +84,6 @@ public interface Codec {
 
     Stream<PropertyValue> decode(PropertyValueMap pvm, Stream<EncodedPropertyValue> encodedPropertyValueStream);
 
-    EncodedValue encode(Element info, int index, Stream<EncodedPropertyValue> encodedPropertyValueStream);
+    EncodedValue encode(Info info, int index, Stream<EncodedPropertyValue> encodedPropertyValueStream);
 }
 
