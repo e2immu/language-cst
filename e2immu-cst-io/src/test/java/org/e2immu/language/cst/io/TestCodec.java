@@ -38,14 +38,14 @@ public class TestCodec {
                 new ValueImpl.CommutableDataImpl("p1", "p2,p3", "p4"));
 
         Codec.DecoderProvider decoderProvider = ValueImpl::decoder;
-        Codec codec = new CodecImpl(decoderProvider);
+        Codec codec = new CodecImpl(decoderProvider, fqn -> runtime.getFullyQualified(fqn, true));
         List<Property> properties = List.of(
                 PropertyImpl.IMMUTABLE_TYPE,
                 PropertyImpl.SHALLOW_ANALYZER,
                 PropertyImpl.COMMUTABLE_METHODS);
         Stream<Codec.EncodedPropertyValue> epvStream = properties.stream().map(p ->
                 codec.encode(p, typeInfo.analysis().getOrDefault(p, p.defaultValue())));
-        String s = ((CodecImpl.E) codec.encode(typeInfo, epvStream)).s();
+        String s = ((CodecImpl.E) codec.encode(typeInfo, -1, epvStream)).s();
         assertEquals("""
                 {"fqn": "Ta.b.C", "data":{"immutableType":3,"shallowAnalyzer":true,\
                 "commutableMethods":["p1","p2,p3","p4"]}}\

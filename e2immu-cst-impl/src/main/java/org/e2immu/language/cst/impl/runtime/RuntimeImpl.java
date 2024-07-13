@@ -6,7 +6,7 @@ import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.expression.InstanceOf;
 import org.e2immu.language.cst.api.info.ComputeMethodOverrides;
 import org.e2immu.language.cst.api.info.TypeInfo;
-import org.e2immu.language.cst.api.runtime.Configuration;
+import org.e2immu.language.cst.api.runtime.LanguageConfiguration;
 import org.e2immu.language.cst.api.runtime.Eval;
 import org.e2immu.language.cst.api.runtime.Runtime;
 import org.e2immu.language.cst.api.variable.Variable;
@@ -21,7 +21,7 @@ public class RuntimeImpl extends FactoryImpl implements Runtime {
     private final E2ImmuAnnotationsImpl e2ImmuAnnotations = new E2ImmuAnnotationsImpl();
 
     @Override
-    public Configuration configuration() {
+    public LanguageConfiguration configuration() {
         throw new UnsupportedOperationException();
     }
 

@@ -4,7 +4,7 @@ import org.e2immu.language.cst.api.info.ComputeMethodOverrides;
 
 public interface Runtime extends Predefined, Factory, Eval, Types {
 
-    Configuration configuration();
+    LanguageConfiguration configuration();
 
     ComputeMethodOverrides computeMethodOverrides();
 }
