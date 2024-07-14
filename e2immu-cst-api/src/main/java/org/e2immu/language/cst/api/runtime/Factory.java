@@ -257,7 +257,7 @@ public interface Factory {
 
     ParameterizedType newParameterizedType(TypeInfo typeInfo, int arrays);
 
-    ParameterizedType newParameterizedType(TypeParameter typeParameter, int index, Wildcard wildCard);
+    ParameterizedType newParameterizedType(TypeParameter typeParameter, int arrays, Wildcard wildCard);
 
     ParameterizedType newParameterizedType(TypeInfo typeInfo, int arrays, Wildcard wildCard, List<ParameterizedType> parameters);
 
