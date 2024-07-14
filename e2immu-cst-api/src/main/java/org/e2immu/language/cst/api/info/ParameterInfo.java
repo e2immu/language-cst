@@ -11,9 +11,14 @@ public interface ParameterInfo extends Variable, Info {
 
     boolean isVarArgs();
 
+    boolean isFinal();
+
     Builder builder();
 
     interface Builder extends Info.Builder<Builder> {
+
+        @Fluent
+        Builder setIsFinal(boolean isFinal);
 
         @Fluent
         Builder setVarArgs(boolean varArgs);

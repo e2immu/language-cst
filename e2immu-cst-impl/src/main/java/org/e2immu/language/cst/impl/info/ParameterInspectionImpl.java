@@ -7,11 +7,18 @@ import org.e2immu.language.cst.api.info.ParameterInfo;
 public class ParameterInspectionImpl extends InspectionImpl implements ParameterInspection {
 
     private final boolean varArgs;
+    private final boolean isFinal;
 
-    public ParameterInspectionImpl(Inspection inspection, boolean varArgs) {
+    public ParameterInspectionImpl(Inspection inspection, boolean isFinal, boolean varArgs) {
         super(inspection.access(), inspection.comments(), inspection.source(), inspection.isSynthetic(),
                 inspection.annotations());
         this.varArgs = varArgs;
+        this.isFinal = isFinal;
+    }
+
+    @Override
+    public boolean isFinal() {
+        return isFinal;
     }
 
     @Override
@@ -19,9 +26,10 @@ public class ParameterInspectionImpl extends InspectionImpl implements Parameter
         return varArgs;
     }
 
-    public static class Builder extends InspectionImpl.Builder <ParameterInfo.Builder>
+    public static class Builder extends InspectionImpl.Builder<ParameterInfo.Builder>
             implements ParameterInspection, ParameterInfo.Builder {
         private boolean varArgs;
+        private boolean isFinal;
         private final ParameterInfoImpl parameterInfo;
 
         public Builder(ParameterInfoImpl parameterInfo) {
@@ -31,6 +39,11 @@ public class ParameterInspectionImpl extends InspectionImpl implements Parameter
         @Override
         public boolean isVarArgs() {
             return varArgs;
+        }
+
+        @Override
+        public boolean isFinal() {
+            return isFinal;
         }
 
         @Override
@@ -45,10 +58,18 @@ public class ParameterInspectionImpl extends InspectionImpl implements Parameter
 
         @Override
         public void commit() {
-            ParameterInspection pi = new ParameterInspectionImpl(this, varArgs);
+            ParameterInspection pi = new ParameterInspectionImpl(this, isFinal, varArgs);
             parameterInfo.commit(pi);
         }
 
+        @Override
+        @Fluent
+        public Builder setIsFinal(boolean isFinal) {
+            this.isFinal = isFinal;
+            return this;
+        }
+
+        @Override
         @Fluent
         public Builder setVarArgs(boolean varArgs) {
             this.varArgs = varArgs;

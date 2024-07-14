@@ -108,6 +108,11 @@ public class ParameterInfoImpl implements ParameterInfo {
     }
 
     @Override
+    public boolean isFinal() {
+        return inspection.get().isFinal();
+    }
+
+    @Override
     public String fullyQualifiedName() {
         return methodInfo.fullyQualifiedName() + ":" + index + ":" + name;
     }
