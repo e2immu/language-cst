@@ -48,6 +48,7 @@ public enum TypeNatureEnum implements TypeNature {
         return this != CLASS;
     }
 
+    @Override
     public Keyword keyword() {
         return keyword;
     }

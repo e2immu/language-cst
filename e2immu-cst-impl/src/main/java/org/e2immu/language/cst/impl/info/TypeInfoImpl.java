@@ -440,7 +440,12 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
 
     @Override
     public OutputBuilder print(Qualification qualification) {
-        throw new UnsupportedOperationException();
+        return print(qualification, true);
+    }
+
+    @Override
+    public OutputBuilder print(Qualification qualification, boolean doTypeDeclaration) {
+        return new TypePrinter(this).print(qualification, doTypeDeclaration);
     }
 
     @Override
@@ -450,7 +455,16 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
 
     @Override
     public Stream<TypeReference> typesReferenced() {
-        throw new UnsupportedOperationException();
+        Stream<TypeReference> fromParent = isJavaLangObject() ? Stream.empty() : parentClass().typesReferenced();
+        Stream<TypeReference> fromInterfaces = interfacesImplemented().stream().flatMap(ParameterizedType::typesReferenced);
+        Stream<TypeReference> fromAnnotations = annotations().stream().flatMap(AnnotationExpression::typesReferenced);
+        Stream<TypeReference> fromMethods = methods().stream().flatMap(MethodInfo::typesReferenced);
+        Stream<TypeReference> fromConstructors = constructors().stream().flatMap(MethodInfo::typesReferenced);
+        Stream<TypeReference> fromFields = fields().stream().flatMap(FieldInfo::typesReferenced);
+        Stream<TypeReference> fromSubTypes = subTypes().stream().flatMap(TypeInfo::typesReferenced);
+        return Stream.concat(fromParent,
+                Stream.concat(fromInterfaces, Stream.concat(fromAnnotations, Stream.concat(fromMethods,
+                        Stream.concat(fromConstructors, Stream.concat(fromFields, fromSubTypes))))));
     }
 
     @Override
@@ -490,11 +504,6 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     @Override
     public boolean isAtLeastImmutableHC() {
         return analysis().getOrDefault(PropertyImpl.IMMUTABLE_TYPE, ValueImpl.ImmutableImpl.MUTABLE).isAtLeastImmutableHC();
-    }
-
-    @Override
-    public OutputBuilder print(Qualification qualification, boolean doTypeDeclaration) {
-        return print(qualification); // TODO
     }
 
     @Override

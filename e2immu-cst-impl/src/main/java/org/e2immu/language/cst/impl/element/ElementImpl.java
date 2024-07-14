@@ -17,6 +17,10 @@ import java.util.stream.Stream;
 public abstract class ElementImpl implements Element {
 
     public record TypeReference(TypeInfo typeInfo, boolean explicit) implements Element.TypeReference {
+        @Override
+        public Element.TypeReference withExplicit() {
+            return new TypeReference(typeInfo, true);
+        }
     }
 
     @Override
@@ -32,7 +36,7 @@ public abstract class ElementImpl implements Element {
     @Override
     public String toString() {
         OutputBuilder print = print(QualificationImpl.SIMPLE_NAMES);
-        if(print == null) return "<print returns null>";
+        if (print == null) return "<print returns null>";
         return print.toString();
     }
 
@@ -42,7 +46,9 @@ public abstract class ElementImpl implements Element {
         protected final List<AnnotationExpression> annotations = new ArrayList<>();
         protected Source source;
 
-        public Builder() {}
+        public Builder() {
+        }
+
         public Builder(Element e) {
             addComments(e.comments());
             setSource(e.source());

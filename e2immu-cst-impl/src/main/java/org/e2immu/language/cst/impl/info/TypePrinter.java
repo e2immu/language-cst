@@ -1,6 +1,5 @@
 package org.e2immu.language.cst.impl.info;
 
-import org.e2immu.language.cst.api.element.Comment;
 import org.e2immu.language.cst.api.element.Element;
 import org.e2immu.language.cst.api.expression.ConstructorCall;
 import org.e2immu.language.cst.api.expression.Expression;
@@ -8,9 +7,8 @@ import org.e2immu.language.cst.api.info.*;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.type.ParameterizedType;
-import org.e2immu.language.cst.api.type.TypeNature;
-import org.e2immu.language.cst.api.type.TypeParameter;
 import org.e2immu.language.cst.impl.output.*;
+import org.e2immu.language.cst.impl.type.DiamondEnum;
 import org.e2immu.language.cst.impl.variable.ThisImpl;
 
 import java.util.*;
@@ -19,8 +17,7 @@ import java.util.stream.Stream;
 
 public record TypePrinter(TypeInfo typeInfo) {
 
-    public OutputBuilder output(Qualification qualification, boolean doTypeDeclaration) {
-        TypeNature typeNature;
+    public OutputBuilder print(Qualification qualification, boolean doTypeDeclaration) {
         Set<String> imports;
         Qualification insideType;
         if (typeInfo.isPrimaryType() && typeInfo.hasBeenInspected()) {
@@ -29,142 +26,110 @@ public record TypePrinter(TypeInfo typeInfo) {
             insideType = res.qualification;
         } else {
             imports = Set.of();
-            insideType = typeInfo.hasBeenInspected() && qualification instanceof QualificationImpl ? new QualificationImpl(false, qualification, null) : qualification;
+            insideType = typeInfo.hasBeenInspected() && qualification instanceof QualificationImpl
+                    ? new QualificationImpl(false, qualification, null)
+                    : qualification;
         }
         assert insideType != null;
 
-        List<TypeModifier> typeModifiers;
-        List<FieldInfo> fields;
-        List<MethodInfo> constructors;
-        List<MethodInfo> methods;
-        List<TypeInfo> subTypes;
-        List<ParameterizedType> interfaces;
-        List<TypeParameter> typeParameters;
-        ParameterizedType parentClass;
-        boolean isInterface;
-        boolean isRecord;
-       List< Comment> comments;
-/*
-        if (typeInfo.hasBeenInspected()) {
-            TypeInspection typeInspection = typeInfo.typeInspection.get();
-            typeNature = typeInspection.typeNature();
-            isInterface = typeInspection.isInterface();
-            isRecord = typeInspection.typeNature() == TypeNature.RECORD;
-            typeModifiers = minimalModifiers(typeInspection);
-            fields = typeInspection.fields();
-            constructors = typeInspection.constructors();
-            methods = typeInspection.methods();
-            subTypes = typeInspection.subTypes();
-            typeParameters = typeInspection.typeParameters();
-            parentClass = typeInfo.parentIsNotJavaLangObject() ? typeInspection.parentClass() : null;
-            interfaces = typeInspection.interfacesImplemented();
-            comments = typeInspection.comments();
-
-            // add the methods that we can call without having to qualify (method() instead of super.method())
-            if (insideType instanceof QualificationImpl qi) {
-                addMethodsToQualification(typeInfo, qi);
-                addThisToQualification(typeInfo, qi);
-            }
-        } else {
-            typeNature = TypeNatureEnum.CLASS; // we really have no idea what it is
-            typeModifiers = List.of(TypeModifierEnum.ABSTRACT);
-            fields = List.of();
-            constructors = List.of();
-            methods = List.of();
-            subTypes = List.of();
-            typeParameters = List.of();
-            interfaces = List.of();
-            parentClass = null;
-            isInterface = false;
-            isRecord = false;
-            comments = null;
+        // add the methods that we can call without having to qualify (method() instead of super.method())
+        if (insideType instanceof QualificationImpl qi) {
+            addMethodsToQualification(typeInfo, qi);
+            addThisToQualification(typeInfo, qi);
         }
 
         // PACKAGE AND IMPORTS
 
         OutputBuilder packageAndImports = new OutputBuilderImpl();
         if (typeInfo.isPrimaryType()) {
-            String packageName = typeInfo.packageNameOrEnclosingType.getLeftOrElse("");
+            String packageName = typeInfo.packageName();
             if (!packageName.isEmpty()) {
-                packageAndImports.add(Keyword.PACKAGE).add(Space.ONE).add(new Text(packageName)).add(Symbol.SEMICOLON)
-                        .add(Space.NEWLINE);
+                packageAndImports.add(KeywordImpl.PACKAGE).add(SpaceEnum.ONE).add(new TextImpl(packageName))
+                        .add(SymbolEnum.SEMICOLON)
+                        .add(SpaceEnum.NEWLINE);
             }
-            if (!imports.isEmpty()) {
-                imports.stream().sorted().forEach(i ->
-                        packageAndImports.add(Keyword.IMPORT).add(Space.ONE).add(new Text(i)).add(Symbol.SEMICOLON)
-                                .add(Space.NEWLINE));
-            }
+            imports.stream().sorted().forEach(i -> packageAndImports.add(KeywordImpl.IMPORT).add(SpaceEnum.ONE)
+                    .add(new TextImpl(i)).add(SymbolEnum.SEMICOLON).add(SpaceEnum.NEWLINE));
         }
 
         OutputBuilder afterAnnotations = new OutputBuilderImpl();
         if (doTypeDeclaration) {
             // the class name
             afterAnnotations
-                    .add(typeModifiers.stream().map(mod -> new OutputBuilderImpl().add(mod.keyword))
-                            .collect(OutputBuilder.joining(Space.ONE)))
-                    .add(Space.ONE).add(typeNature.keyword)
-                    .add(Space.ONE).add(new Text(typeInfo.simpleName));
+                    .add(typeInfo.typeModifiers().stream().map(mod -> new OutputBuilderImpl().add(mod.keyword()))
+                            .collect(OutputBuilderImpl.joining(SpaceEnum.ONE)))
+                    .add(SpaceEnum.ONE).add(typeInfo.typeNature().keyword())
+                    .add(SpaceEnum.ONE).add(new TextImpl(typeInfo.simpleName()));
 
-            if (!typeParameters.isEmpty()) {
-                afterAnnotations.add(Symbol.LEFT_ANGLE_BRACKET);
-                afterAnnotations.add(typeParameters.stream().map(tp ->
-                                tp.output(InspectionProvider.DEFAULT, insideType, new HashSet<>()))
-                        .collect(OutputBuilder.joining(Symbol.COMMA)));
-                afterAnnotations.add(Symbol.RIGHT_ANGLE_BRACKET);
+            if (!typeInfo.typeParameters().isEmpty()) {
+                afterAnnotations.add(SymbolEnum.LEFT_ANGLE_BRACKET);
+                afterAnnotations.add(typeInfo.typeParameters().stream().map(tp ->
+                                tp.print(insideType, new HashSet<>()))
+                        .collect(OutputBuilderImpl.joining(SymbolEnum.COMMA)));
+                afterAnnotations.add(SymbolEnum.RIGHT_ANGLE_BRACKET);
             }
-            if (isRecord) {
-                afterAnnotations.add(outputNonStaticFieldsAsParameters(insideType, fields));
+            if (typeInfo.typeNature().isRecord()) {
+                afterAnnotations.add(outputNonStaticFieldsAsParameters(insideType, typeInfo.fields()));
             }
-            if (parentClass != null) {
-                afterAnnotations.add(Space.ONE).add(Keyword.EXTENDS).add(Space.ONE).add(parentClass.output(insideType));
+            if (typeInfo.parentClass() != null && !typeInfo.parentClass().isJavaLangObject()) {
+                afterAnnotations.add(SpaceEnum.ONE).add(KeywordImpl.EXTENDS).add(SpaceEnum.ONE)
+                        .add(typeInfo.parentClass().print(insideType, false, DiamondEnum.SHOW_ALL));
             }
-            if (!interfaces.isEmpty()) {
-                afterAnnotations.add(SpaceEnum.ONE).add(isInterface ? KeywordImpl.EXTENDS : KeywordImpl.IMPLEMENTS).add(SpaceEnum.ONE);
-                afterAnnotations.add(interfaces.stream().map(pi -> pi.print(insideType)).collect(OutputBuilderImpl.joining(SymbolEnum.COMMA)));
+            if (!typeInfo.interfacesImplemented().isEmpty()) {
+                afterAnnotations.add(SpaceEnum.ONE)
+                        .add(typeInfo.isInteger() ? KeywordImpl.EXTENDS : KeywordImpl.IMPLEMENTS)
+                        .add(SpaceEnum.ONE);
+                afterAnnotations.add(typeInfo.interfacesImplemented().stream()
+                        .map(pi -> pi.print(insideType, false, DiamondEnum.SHOW_ALL))
+                        .collect(OutputBuilderImpl.joining(SymbolEnum.COMMA)));
             }
         }
 
         OutputBuilder main = Stream.concat(Stream.concat(Stream.concat(Stream.concat(
                                                 enumConstantStream(typeInfo, insideType),
-                                                fields.stream()
-                                                        .filter(f -> !f.fieldInspection.get().isSynthetic())
-                                                        .map(f -> f.output(insideType, false))),
-                                        subTypes.stream()
-                                                .filter(st -> !st.typeInspection.get().isSynthetic())
-                                                .map(ti -> ti.output(insideType, true))),
-                                constructors.stream()
-                                        .filter(c -> !c.methodInspection.get().isSynthetic())
-                                        .map(c -> c.output(insideType))),
-                        methods.stream()
-                                .filter(m -> !m.methodInspection.get().isSynthetic())
-                                .map(m -> m.output(insideType)))
-                .collect(OutputBuilder.joining(Space.NONE, Symbol.LEFT_BRACE, Symbol.RIGHT_BRACE,
-                        Guide.generatorForBlock()));
+                                                typeInfo.fields().stream()
+                                                        .filter(f -> !f.isSynthetic())
+                                                        .map(f -> f.print(insideType))),
+                                        typeInfo.subTypes().stream()
+                                                .filter(st -> !st.isSynthetic())
+                                                .map(ti -> ti.print(insideType))),
+                                typeInfo.constructors().stream()
+                                        .filter(c -> !c.isSynthetic())
+                                        .map(c -> c.print(insideType))),
+                        typeInfo.methods().stream()
+                                .filter(m -> !m.isSynthetic())
+                                .map(m -> m.print(insideType)))
+                .collect(OutputBuilderImpl.joining(SpaceEnum.NONE, SymbolEnum.LEFT_BRACE, SymbolEnum.RIGHT_BRACE,
+                        GuideImpl.generatorForBlock()));
         afterAnnotations.add(main);
 
         // annotations and the rest of the type are at the same level
-        Stream<OutputBuilder> annotationStream = doTypeDeclaration ? typeInfo.buildAnnotationOutput(insideType) : Stream.of();
-        if (comments != null) packageAndImports.add(comments.output(qualification));
+        Stream<OutputBuilder> annotationStream = doTypeDeclaration
+                ? typeInfo.annotations().stream().map(ae -> ae.print(qualification))
+                : Stream.of();
+        if (typeInfo().comments() != null) {
+            typeInfo.comments().forEach(c -> packageAndImports.add(c.print(qualification)));
+        }
         return packageAndImports.add(Stream.concat(annotationStream, Stream.of(afterAnnotations))
-                .collect(OutputBuilder.joining(Space.ONE_REQUIRED_EASY_SPLIT,
-                        Guide.generatorForAnnotationList())));*/ return null;
+                .collect(OutputBuilderImpl.joining(SpaceEnum.ONE_REQUIRED_EASY_SPLIT,
+                        GuideImpl.generatorForAnnotationList())));
     }
 
-    private static List<TypeModifier> minimalModifiers(TypeInfo typeInspection) {
-        Set<TypeModifier> modifiers = typeInspection.typeModifiers();
+    private static List<TypeModifier> minimalModifiers(TypeInfo typeInfo) {
+        Set<TypeModifier> modifiers = typeInfo.typeModifiers();
         List<TypeModifier> list = new ArrayList<>();
 
         // access
-        Access access = typeInspection.access();
-        Access enclosedAccess = typeInspection.compilationUnitOrEnclosingType().isLeft()
+        Access access = typeInfo.access();
+        Access enclosedAccess = typeInfo.compilationUnitOrEnclosingType().isLeft()
                 ? InspectionImpl.AccessEnum.PUBLIC
-                : typeInspection.compilationUnitOrEnclosingType().getRight().access();
+                : typeInfo.compilationUnitOrEnclosingType().getRight().access();
         if (!enclosedAccess.isPrivate() && !access.isPackage()) {
             list.add(typeModifier(access));
         } // else there really is no point anymore to show any access modifier, let's keep it brief
 
         // 'abstract', 'static'
-        if (typeInspection.typeNature().isClass()) {
+        if (typeInfo.typeNature().isClass()) {
             if (modifiers.contains(TypeModifierEnum.ABSTRACT)) {
                 list.add(TypeModifierEnum.ABSTRACT);
             }
@@ -186,9 +151,9 @@ public record TypePrinter(TypeInfo typeInfo) {
     }
 
     private static TypeModifier typeModifier(Access access) {
-        if(access.isPublic()) return TypeModifierEnum.PUBLIC;
-        if(access.isProtected()) return TypeModifierEnum.PROTECTED;
-        if(access.isPrivate()) return TypeModifierEnum.PRIVATE;
+        if (access.isPublic()) return TypeModifierEnum.PUBLIC;
+        if (access.isProtected()) return TypeModifierEnum.PROTECTED;
+        if (access.isPrivate()) return TypeModifierEnum.PRIVATE;
         throw new UnsupportedOperationException();
     }
 
@@ -275,7 +240,7 @@ public record TypePrinter(TypeInfo typeInfo) {
                 .filter(TypePrinter::allowInImport)
                 .collect(Collectors.toSet());
         Map<String, PerPackage> typesPerPackage = new HashMap<>();
-        QualificationImpl qualification =  new QualificationImpl(false, null);
+        QualificationImpl qualification = new QualificationImpl(false, null);
         typesReferenced.forEach(ti -> {
             String packageName = ti.packageName();
             if (packageName != null && !myPackage.equals(packageName)) {

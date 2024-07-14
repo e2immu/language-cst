@@ -18,7 +18,7 @@ import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.output.FormattingOptions;
 import org.e2immu.language.cst.api.output.TypeNameRequired;
 import org.e2immu.language.cst.api.output.element.TypeName;
-import org.e2immu.language.cst.impl.util.StringUtil;
+import org.e2immu.util.internal.util.StringUtil;
 
 public record TypeNameImpl(String simpleName,
                            String fullyQualifiedName,

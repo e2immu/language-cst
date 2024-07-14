@@ -16,7 +16,7 @@ package org.e2immu.language.cst.impl.output;
 
 import org.e2immu.language.cst.api.output.FormattingOptions;
 import org.e2immu.language.cst.api.output.element.Text;
-import org.e2immu.language.cst.impl.util.StringUtil;
+import org.e2immu.util.internal.util.StringUtil;
 
 public record TextImpl(String text) implements Text {
 

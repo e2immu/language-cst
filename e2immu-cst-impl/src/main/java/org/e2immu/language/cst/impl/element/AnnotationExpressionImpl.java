@@ -1,5 +1,6 @@
 package org.e2immu.language.cst.impl.element;
 
+import org.e2immu.language.cst.api.element.Element;
 import org.e2immu.language.cst.api.expression.AnnotationExpression;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.expression.StringConstant;
@@ -10,6 +11,7 @@ import org.e2immu.language.cst.impl.output.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class AnnotationExpressionImpl implements AnnotationExpression {
     private final TypeInfo typeInfo;
@@ -97,5 +99,11 @@ public class AnnotationExpressionImpl implements AnnotationExpression {
     @Override
     public String toString() {
         return print(QualificationImpl.SIMPLE_NAMES).toString();
+    }
+
+    @Override
+    public Stream<Element.TypeReference> typesReferenced() {
+        return Stream.concat(Stream.of(new ElementImpl.TypeReference(typeInfo, true)),
+                keyValuePairs.stream().flatMap(kv -> kv.value().typesReferenced()));
     }
 }

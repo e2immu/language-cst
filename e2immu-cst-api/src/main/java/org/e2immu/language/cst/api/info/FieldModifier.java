@@ -1,5 +1,7 @@
 package org.e2immu.language.cst.api.info;
 
+import org.e2immu.language.cst.api.output.element.Keyword;
+
 public interface FieldModifier {
     boolean isStatic();
 
@@ -14,4 +16,6 @@ public interface FieldModifier {
     boolean isPrivate();
 
     boolean isProtected();
+
+    Keyword keyword();
 }

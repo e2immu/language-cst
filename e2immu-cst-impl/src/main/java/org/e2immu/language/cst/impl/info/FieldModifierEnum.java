@@ -34,6 +34,10 @@ public enum FieldModifierEnum implements FieldModifier {
         this.keyword = keyword;
     }
 
+    @Override
+    public Keyword keyword() {
+        return keyword;
+    }
 
     @Override
     public boolean isStatic() {

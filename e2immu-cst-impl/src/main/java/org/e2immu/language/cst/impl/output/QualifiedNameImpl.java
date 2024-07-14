@@ -5,7 +5,7 @@ import org.e2immu.language.cst.api.output.element.QualifiedName;
 import org.e2immu.language.cst.api.output.element.Qualifier;
 import org.e2immu.language.cst.api.output.element.ThisName;
 import org.e2immu.language.cst.api.output.element.TypeName;
-import org.e2immu.language.cst.impl.util.StringUtil;
+import org.e2immu.util.internal.util.StringUtil;
 
 public record QualifiedNameImpl(String name, Qualifier qualifier, Required qualifierRequired) implements QualifiedName {
 

@@ -53,7 +53,8 @@ public record MethodPrinter(MethodInfo methodInfo) {
             builder.add(methodInfo.returnType().print(qualification, false, DiamondEnum.SHOW_ALL))
                     .add(SpaceEnum.ONE);
         }
-        builder.add(new TextImpl(methodInfo.name()));
+        String name = methodInfo.isConstructor() ? methodInfo.typeInfo().simpleName() : methodInfo.name();
+        builder.add(new TextImpl(name));
         if (!methodInfo.isCompactConstructor()) {
             if (methodInfo.parameters().isEmpty()) {
                 builder.add(SymbolEnum.OPEN_CLOSE_PARENTHESIS);
@@ -139,6 +140,9 @@ public record MethodPrinter(MethodInfo methodInfo) {
         for (AnnotationExpression annotation : pi.annotations()) {
             outputBuilder.add(annotation.print(qualification));
             outputBuilder.add(SpaceEnum.ONE);
+        }
+        if (pi.isFinal()) {
+            outputBuilder.add(KeywordImpl.FINAL).add(SpaceEnum.ONE);
         }
         if (!pi.parameterizedType().isNoTypeGivenInLambda()) {
             outputBuilder.add(pi.parameterizedType().print(qualification, pi.isVarArgs(), DiamondEnum.SHOW_ALL));

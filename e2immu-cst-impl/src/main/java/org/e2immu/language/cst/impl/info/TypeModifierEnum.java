@@ -76,4 +76,9 @@ public enum TypeModifierEnum implements TypeModifier {
     public boolean isSealed() {
         return this == SEALED;
     }
+
+    @Override
+    public Keyword keyword() {
+        return keyword;
+    }
 }

@@ -16,6 +16,7 @@ import org.e2immu.language.cst.api.variable.DescendMode;
 import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.language.cst.impl.analysis.PropertyImpl;
 import org.e2immu.language.cst.impl.analysis.ValueImpl;
+import org.e2immu.language.cst.impl.element.ElementImpl;
 import org.e2immu.support.EventuallyFinal;
 
 import java.util.List;
@@ -185,7 +186,16 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
 
     @Override
     public Stream<TypeReference> typesReferenced() {
-        throw new UnsupportedOperationException(); // FIXME
+        Stream<TypeReference> fromReturnType = hasReturnValue() && returnType().bestTypeInfo() != null
+                ? Stream.of(new ElementImpl.TypeReference(returnType().bestTypeInfo(), true)) : Stream.empty();
+        Stream<TypeReference> fromParameters = parameters().stream()
+                .flatMap(pi -> pi.parameterizedType().typesReferenced().map(TypeReference::withExplicit));
+        Stream<TypeReference> fromAnnotations = annotations().stream().flatMap(AnnotationExpression::typesReferenced);
+        Stream<TypeReference> fromExceptionTypes = exceptionTypes().stream()
+                .flatMap(et -> et.typesReferenced().map(TypeReference::withExplicit));
+        Stream<TypeReference> fromBody = methodBody().typesReferenced();
+        return Stream.concat(fromReturnType, Stream.concat(fromParameters, Stream.concat(fromAnnotations,
+                Stream.concat(fromExceptionTypes, fromBody))));
     }
 
     @Override

@@ -91,6 +91,8 @@ public interface Element {
         boolean explicit();
 
         TypeInfo typeInfo();
+
+        TypeReference withExplicit();
     }
 
     @NotNull
