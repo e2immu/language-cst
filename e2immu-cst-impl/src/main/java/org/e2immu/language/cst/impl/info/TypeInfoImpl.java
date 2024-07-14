@@ -201,7 +201,7 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
 
     @Override
     public Set<TypeInfo> superTypesExcludingJavaLangObject() {
-        return Set.of(); // FIXME
+        return inspection.get().superTypesExcludingJavaLangObject();
     }
 
     @Override

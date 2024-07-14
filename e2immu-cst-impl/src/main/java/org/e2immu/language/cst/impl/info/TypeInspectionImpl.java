@@ -25,6 +25,7 @@ public class TypeInspectionImpl extends InspectionImpl implements TypeInspection
     private final boolean fieldsAccessedInRestOfPrimaryType;
     private final MethodInfo enclosingMethod;
     private final List<TypeInfo> permittedWhenSealed;
+    private final Set<TypeInfo> superTypesExcludingJavaLangObject;
 
     public TypeInspectionImpl(Inspection inspection,
                               Set<TypeModifier> typeModifiers,
@@ -39,7 +40,8 @@ public class TypeInspectionImpl extends InspectionImpl implements TypeInspection
                               List<TypeInfo> subTypes,
                               boolean fieldsAccessedInRestOfPrimaryType,
                               MethodInfo enclosingMethod,
-                              List<TypeInfo> permittedWhenSealed) {
+                              List<TypeInfo> permittedWhenSealed,
+                              Set<TypeInfo> superTypesExcludingJavaLangObject) {
         super(inspection.access(), inspection.comments(), inspection.source(), inspection.isSynthetic(), inspection.annotations());
         this.typeModifiers = typeModifiers;
         this.methods = methods;
@@ -54,6 +56,12 @@ public class TypeInspectionImpl extends InspectionImpl implements TypeInspection
         this.fieldsAccessedInRestOfPrimaryType = fieldsAccessedInRestOfPrimaryType;
         this.enclosingMethod = enclosingMethod;
         this.permittedWhenSealed = permittedWhenSealed;
+        this.superTypesExcludingJavaLangObject = superTypesExcludingJavaLangObject;
+    }
+
+    @Override
+    public Set<TypeInfo> superTypesExcludingJavaLangObject() {
+        return superTypesExcludingJavaLangObject;
     }
 
     @Override
@@ -125,12 +133,19 @@ public class TypeInspectionImpl extends InspectionImpl implements TypeInspection
         private final List<TypeInfo> subTypes = new ArrayList<>();
         private final List<TypeParameter> typeParameters = new ArrayList<>();
         private final List<TypeInfo> permittedWhenSealed = new ArrayList<>();
+        private final Set<TypeInfo> superTypesExcludingJavaLangObject = new HashSet<>();
+
         private ParameterizedType parentClass;
         private TypeNature typeNature;
         private MethodInfo singleAbstractMethod;
         private final TypeInfoImpl typeInfo;
         private boolean fieldsAccessedInRestOfPrimaryType;
         private MethodInfo enclosingMethod;
+
+        @Override
+        public Set<TypeInfo> superTypesExcludingJavaLangObject() {
+            return superTypesExcludingJavaLangObject;
+        }
 
         @Override
         public List<TypeInfo> permittedWhenSealed() {
@@ -206,12 +221,18 @@ public class TypeInspectionImpl extends InspectionImpl implements TypeInspection
         @Override
         public TypeInfo.Builder setParentClass(ParameterizedType parentClass) {
             this.parentClass = parentClass;
+            if (parentClass != null && !parentClass.isJavaLangObject()) {
+                this.superTypesExcludingJavaLangObject.add(parentClass.typeInfo());
+                this.superTypesExcludingJavaLangObject.addAll(parentClass.typeInfo().superTypesExcludingJavaLangObject());
+            }
             return this;
         }
 
         @Override
         public TypeInfo.Builder addInterfaceImplemented(ParameterizedType interfaceImplemented) {
             this.interfacesImplemented.add(interfaceImplemented);
+            this.superTypesExcludingJavaLangObject.add(interfaceImplemented.typeInfo());
+            this.superTypesExcludingJavaLangObject.addAll(interfaceImplemented.typeInfo().superTypesExcludingJavaLangObject());
             return this;
         }
 
@@ -232,7 +253,8 @@ public class TypeInspectionImpl extends InspectionImpl implements TypeInspection
             TypeInspection ti = new TypeInspectionImpl(this, Set.copyOf(typeModifiers), List.copyOf(methods),
                     List.copyOf(constructors), List.copyOf(fields), parentClass, typeNature, singleAbstractMethod,
                     List.copyOf(interfacesImplemented), List.copyOf(typeParameters), List.copyOf(subTypes),
-                    fieldsAccessedInRestOfPrimaryType, enclosingMethod, List.copyOf(permittedWhenSealed));
+                    fieldsAccessedInRestOfPrimaryType, enclosingMethod, List.copyOf(permittedWhenSealed),
+                    Set.copyOf(superTypesExcludingJavaLangObject));
             typeInfo.commit(ti);
         }
 

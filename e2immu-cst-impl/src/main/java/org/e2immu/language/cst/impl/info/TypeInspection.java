@@ -16,6 +16,8 @@ public interface TypeInspection extends Inspection {
 
     List<FieldInfo> fields();
 
+    Set<TypeInfo> superTypesExcludingJavaLangObject();
+
     List<TypeParameter> typeParameters();
 
     boolean isAbstract();
