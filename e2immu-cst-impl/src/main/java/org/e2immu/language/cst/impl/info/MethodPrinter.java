@@ -4,7 +4,6 @@ import org.e2immu.language.cst.api.expression.AnnotationExpression;
 import org.e2immu.language.cst.api.info.*;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
-import org.e2immu.language.cst.api.output.TypeNameRequired;
 import org.e2immu.language.cst.api.statement.ReturnStatement;
 import org.e2immu.language.cst.api.variable.LocalVariable;
 import org.e2immu.language.cst.api.variable.Variable;
@@ -18,9 +17,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public record MethodPrinterImpl(MethodInfo methodInfo) {
+public record MethodPrinter(MethodInfo methodInfo) {
 
-    public MethodPrinterImpl(MethodInfo methodInfo) {
+    public MethodPrinter(MethodInfo methodInfo) {
         this.methodInfo = methodInfo;
     }
 

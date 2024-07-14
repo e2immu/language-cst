@@ -55,6 +55,8 @@ public interface TypeInfo extends NamedType, Info {
     // from inspection
     Set<TypeInfo> superTypesExcludingJavaLangObject();
 
+    Set<TypeModifier> typeModifiers();
+
     List<TypeParameter> typeParameters();
 
     MethodInfo findUniqueMethod(String methodName, int n);

@@ -205,6 +205,11 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     }
 
     @Override
+    public Set<TypeModifier> typeModifiers() {
+        return inspection.get().modifiers();
+    }
+
+    @Override
     public ParameterizedType asParameterizedType(Predefined runtime) {
         List<ParameterizedType> typeParameters = typeParameters()
                 .stream().map(tp -> tp.asParameterizedType(runtime))

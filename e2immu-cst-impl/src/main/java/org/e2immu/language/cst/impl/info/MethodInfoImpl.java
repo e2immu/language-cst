@@ -174,7 +174,7 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
 
     @Override
     public OutputBuilder print(Qualification qualification) {
-        return new MethodPrinterImpl(this).print(qualification);
+        return new MethodPrinter(this).print(qualification);
     }
 
     @Override
