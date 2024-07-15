@@ -56,7 +56,7 @@ public record TypePrinter(TypeInfo typeInfo) {
         if (doTypeDeclaration) {
             // the class name
             afterAnnotations
-                    .add(typeInfo.typeModifiers().stream().map(mod -> new OutputBuilderImpl().add(mod.keyword()))
+                    .add(minimalModifiers(typeInfo).stream().map(mod -> new OutputBuilderImpl().add(mod.keyword()))
                             .collect(OutputBuilderImpl.joining(SpaceEnum.ONE)))
                     .add(SpaceEnum.ONE).add(typeInfo.typeNature().keyword())
                     .add(SpaceEnum.ONE).add(new TextImpl(typeInfo.simpleName()));
