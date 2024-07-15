@@ -305,7 +305,7 @@ public class MethodCallImpl extends ExpressionImpl implements MethodCall {
         Expression asExpression = translationMap.translateExpression(this);
         if (asExpression != this) return asExpression;
 
-        MethodInfo translatedMethod = translationMap.translateMethod(methodInfo);
+        List<MethodInfo> translatedMethod = translationMap.translateMethod(methodInfo);
         Expression translatedObject = object.translate(translationMap);
         ParameterizedType translatedReturnType = translationMap.translateType(concreteReturnType);
         List<Expression> translatedParameters = parameterExpressions.isEmpty() ? parameterExpressions :
@@ -315,14 +315,14 @@ public class MethodCallImpl extends ExpressionImpl implements MethodCall {
         String newModificationTimes = Objects.requireNonNullElse(
                 translationMap.modificationTimes(this, translatedObject, translatedParameters),
                 modificationTimes);
-        if (translatedMethod == methodInfo && translatedObject == object
+        if (translatedMethod.size() == 1 && translatedMethod.get(0) == methodInfo && translatedObject == object
             && translatedReturnType == concreteReturnType
             && translatedParameters == parameterExpressions
             && newModificationTimes.equals(modificationTimes)) {
             return this;
         }
         MethodCall translatedMc = new MethodCallImpl(source(), comments(), translatedObject, objectIsImplicit,
-                translatedMethod, translatedParameters, translatedReturnType, newModificationTimes);
+                translatedMethod.get(0), translatedParameters, translatedReturnType, newModificationTimes);
         if (translationMap.translateAgain()) {
             return translatedMc.translate(translationMap);
         }

@@ -9,6 +9,7 @@ import org.e2immu.language.cst.api.info.MethodInfo;
 import org.e2immu.language.cst.api.info.ParameterInfo;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
+import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.variable.DescendMode;
 import org.e2immu.language.cst.api.variable.Variable;
@@ -221,5 +222,11 @@ public class ParameterInfoImpl implements ParameterInfo {
     @Override
     public List<AnnotationExpression> annotations() {
         return annotations;
+    }
+
+    @Override
+    public List<ParameterInfo> translate(TranslationMap translationMap) {
+        // TODO
+        return List.of(this);
     }
 }

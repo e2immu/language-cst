@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 public class TranslationMapImpl implements TranslationMap {
 
     private final Map<? extends Variable, ? extends Variable> variables;
-    private final Map<MethodInfo, MethodInfo> methods;
+    private final Map<MethodInfo, List<MethodInfo>> methods;
     private final Map<? extends Expression, ? extends Expression> expressions;
     private final Map<? extends Statement, List<Statement>> statements;
     private final Map<ParameterizedType, ParameterizedType> types;
@@ -40,7 +40,7 @@ public class TranslationMapImpl implements TranslationMap {
                                Map<? extends Expression, ? extends Expression> expressions,
                                Map<? extends Variable, ? extends Expression> variableExpressions,
                                Map<? extends Variable, ? extends Variable> variables,
-                               Map<MethodInfo, MethodInfo> methods,
+                               Map<MethodInfo, List<MethodInfo>> methods,
                                Map<ParameterizedType, ParameterizedType> types,
                                ModificationTimesHandler modificationTimesHandler,
                                boolean expandDelayedWrappedExpressions,
@@ -68,7 +68,7 @@ public class TranslationMapImpl implements TranslationMap {
         private final Map<Variable, Variable> variables = new HashMap<>();
         private final Map<Expression, Expression> expressions = new HashMap<>();
         private final Map<Variable, Expression> variableExpressions = new HashMap<>();
-        private final Map<MethodInfo, MethodInfo> methods = new HashMap<>();
+        private final Map<MethodInfo, List<MethodInfo>> methods = new HashMap<>();
         private final Map<Statement, List<Statement>> statements = new HashMap<>();
         private final Map<ParameterizedType, ParameterizedType> types = new HashMap<>();
         private ModificationTimesHandler modificationTimesHandler;
@@ -119,7 +119,7 @@ public class TranslationMapImpl implements TranslationMap {
         }
 
         @Override
-        public Builder put(MethodInfo template, MethodInfo actual) {
+        public Builder put(MethodInfo template, List<MethodInfo> actual) {
             methods.put(template, actual);
             return this;
         }
@@ -227,8 +227,8 @@ public class TranslationMapImpl implements TranslationMap {
     }
 
     @Override
-    public MethodInfo translateMethod(MethodInfo methodInfo) {
-        return methods.getOrDefault(methodInfo, methodInfo);
+    public List<MethodInfo> translateMethod(MethodInfo methodInfo) {
+        return methods.getOrDefault(methodInfo, List.of(methodInfo));
     }
 
     @Override
@@ -294,7 +294,7 @@ public class TranslationMapImpl implements TranslationMap {
     }
 
     @Override
-    public Map<MethodInfo, MethodInfo> methods() {
+    public Map<MethodInfo, List<MethodInfo>> methods() {
         return methods;
     }
 

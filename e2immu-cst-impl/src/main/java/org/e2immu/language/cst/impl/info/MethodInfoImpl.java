@@ -10,6 +10,8 @@ import org.e2immu.language.cst.api.info.*;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.statement.Block;
+import org.e2immu.language.cst.api.statement.Statement;
+import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.type.TypeParameter;
 import org.e2immu.language.cst.api.variable.DescendMode;
@@ -19,6 +21,7 @@ import org.e2immu.language.cst.impl.analysis.ValueImpl;
 import org.e2immu.language.cst.impl.element.ElementImpl;
 import org.e2immu.support.EventuallyFinal;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -440,8 +443,58 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
     }
 
     @Override
+    public Set<MethodModifier> methodModifiers() {
+        return inspection.get().modifiers();
+    }
+
+    @Override
     public boolean isFactoryMethod() {
         return isStatic() && returnType().typeInfo() != null
                && returnType().typeInfo().isEnclosedIn(typeInfo);
+    }
+
+    @Override
+    public List<MethodInfo> translate(TranslationMap translationMap) {
+        List<MethodInfo> direct = translationMap.translateMethod(this);
+        if (direct.size() != 1 || direct.get(0) != this) {
+            return direct;
+        }
+        ParameterizedType tReturnType = translationMap.translateType(returnType());
+        boolean change = tReturnType != returnType();
+
+        List<Statement> tBody = methodBody().translate(translationMap);
+        change |= tBody.size() != 1 || tBody.get(0) != methodBody();
+
+        List<ParameterInfo> newParameters = new ArrayList<>(2 * parameters().size());
+        for (ParameterInfo pi : parameters()) {
+            List<ParameterInfo> tPi = pi.translate(translationMap);
+            newParameters.addAll(tPi);
+            change |= tPi.size() != 1 || tPi.get(0) != pi;
+        }
+        List<ParameterizedType> exceptionTypeList = exceptionTypes();
+        List<ParameterizedType> newExceptionTypes = exceptionTypeList
+                .stream().map(translationMap::translateType).collect(translationMap.toList(exceptionTypeList));
+        change |= newExceptionTypes != exceptionTypeList;
+
+        if (change) {
+            MethodInfo methodInfo = copyAllButBodyParametersReturnTypeAnnotationsExceptionTypes();
+            MethodInfo.Builder builder = methodInfo.builder();
+            builder.setMethodBody((Block) tBody.get(0));
+            newParameters.forEach(builder::addParameter);
+            newExceptionTypes.forEach(builder::addExceptionType);
+            builder.setReturnType(tReturnType);
+            builder.commit();
+            return List.of(methodInfo);
+        }
+        return List.of(this);
+    }
+
+    private MethodInfo copyAllButBodyParametersReturnTypeAnnotationsExceptionTypes() {
+        MethodInfo methodInfo = new MethodInfoImpl(methodType, name, typeInfo);
+        MethodInfo.Builder builder = methodInfo.builder();
+        builder.setAccess(access()).setSource(source()).setSynthetic(isSynthetic());
+        methodInfo.typeParameters().forEach(builder::addTypeParameter);
+        methodInfo.methodModifiers().forEach(builder::addMethodModifier);
+        return methodInfo;
     }
 }

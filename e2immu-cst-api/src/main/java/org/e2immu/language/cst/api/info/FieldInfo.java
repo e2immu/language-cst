@@ -3,8 +3,10 @@ package org.e2immu.language.cst.api.info;
 import org.e2immu.annotation.Fluent;
 import org.e2immu.language.cst.api.element.CompilationUnit;
 import org.e2immu.language.cst.api.expression.Expression;
+import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 
+import java.util.List;
 import java.util.Set;
 
 public interface FieldInfo extends Info {
@@ -14,6 +16,8 @@ public interface FieldInfo extends Info {
     String name();
 
     TypeInfo owner();
+
+    List<FieldInfo> translate(TranslationMap translationMap);
 
     ParameterizedType type();
 

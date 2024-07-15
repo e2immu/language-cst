@@ -12,6 +12,7 @@ import org.e2immu.language.cst.api.info.FieldModifier;
 import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
+import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.variable.DescendMode;
 import org.e2immu.language.cst.api.variable.Variable;
@@ -258,5 +259,10 @@ public class FieldInfoImpl extends InfoImpl implements FieldInfo {
     @Override
     public boolean hasBeenInspected() {
         return inspection.isFinal();
+    }
+
+    @Override
+    public List<FieldInfo> translate(TranslationMap translationMap) {
+        return List.of(this);
     }
 }

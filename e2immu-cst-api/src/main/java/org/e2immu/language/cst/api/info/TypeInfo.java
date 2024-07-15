@@ -5,6 +5,8 @@ import org.e2immu.annotation.Fluent;
 import org.e2immu.language.cst.api.element.CompilationUnit;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
+import org.e2immu.language.cst.api.statement.Statement;
+import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.type.NamedType;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.type.TypeNature;
@@ -254,4 +256,8 @@ public interface TypeInfo extends NamedType, Info {
     boolean isExtensible();
 
     MethodInfo enclosingMethod();
+
+    default TypeInfo translate(TranslationMap translationMap) {
+        return this;
+    }
 }

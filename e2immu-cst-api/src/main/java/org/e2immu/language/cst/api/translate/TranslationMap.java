@@ -4,7 +4,9 @@ import org.e2immu.annotation.Fluent;
 import org.e2immu.annotation.NotNull;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.expression.MethodCall;
+import org.e2immu.language.cst.api.info.FieldInfo;
 import org.e2immu.language.cst.api.info.MethodInfo;
+import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.statement.Statement;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.variable.Variable;
@@ -24,8 +26,19 @@ public interface TranslationMap {
     }
 
     @NotNull
-    default MethodInfo translateMethod(MethodInfo methodInfo) {
-        return methodInfo;
+    default List<MethodInfo> translateMethod(MethodInfo methodInfo) {
+        return List.of(methodInfo);
+    }
+
+    @NotNull
+    default List<FieldInfo> translateField(FieldInfo fieldInfo) {
+        return List.of(fieldInfo);
+    }
+
+    // contrary to methods and fields, you can always add extra types as subtypes; that's why we're not returning a list
+    @NotNull
+    default TypeInfo translateTypeInfo(TypeInfo typeInfo) {
+        return typeInfo;
     }
 
     @NotNull
@@ -85,7 +98,7 @@ public interface TranslationMap {
         return Map.of();
     }
 
-    default Map<MethodInfo, MethodInfo> methods() {
+    default Map<MethodInfo, List<MethodInfo>> methods() {
         return Map.of();
     }
 
@@ -248,7 +261,7 @@ public interface TranslationMap {
 
         Builder put(Statement template, Statement actual);
 
-        Builder put(MethodInfo template, MethodInfo actual);
+        Builder put(MethodInfo template, List<MethodInfo> actual);
 
         Builder put(Statement template, List<Statement> statements);
 

@@ -5,6 +5,7 @@ import org.e2immu.language.cst.api.element.Element;
 import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
+import org.e2immu.language.cst.api.translate.TranslationMap;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -12,6 +13,8 @@ import java.util.stream.Stream;
 public interface AnnotationExpression {
 
     OutputBuilder print(Qualification qualification);
+
+    List<AnnotationExpression> translate(TranslationMap translationMap);
 
     interface KV {
 

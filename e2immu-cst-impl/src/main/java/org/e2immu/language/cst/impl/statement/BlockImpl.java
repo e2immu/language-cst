@@ -10,6 +10,7 @@ import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.statement.Block;
 import org.e2immu.language.cst.api.statement.Statement;
+import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.variable.DescendMode;
 import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.language.cst.impl.output.GuideImpl;
@@ -124,5 +125,25 @@ public class BlockImpl extends StatementImpl implements Block {
     @Override
     public boolean hasSubBlocks() {
         return false;
+    }
+
+    @Override
+    public List<Statement> translate(TranslationMap translationMap) {
+        List<Statement> direct = translationMap.translateStatement(this);
+        if (haveDirectTranslation(direct, this)) {
+            assert direct.size() == 1 && direct.get(0) instanceof Block;
+            return direct;
+        }
+        boolean change = false;
+        List<Statement> tStatements = new ArrayList<>(2 * statements.size());
+        for (Statement statement : statements) {
+            List<Statement> tStatement = statement.translate(translationMap);
+            tStatements.addAll(tStatement);
+            change |= tStatement.size() != 1 || tStatement.get(0) != statement;
+        }
+        if (change) {
+            return List.of(new BlockImpl(comments(), source(), annotations(), label(), tStatements));
+        }
+        return List.of(this);
     }
 }

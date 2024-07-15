@@ -284,6 +284,12 @@ public class MethodInspectionImpl extends InspectionImpl implements MethodInspec
         public List<ParameterInfo> parameters() {
             return parameters;
         }
+
+        @Override
+        public MethodInfo.Builder addParameter(ParameterInfo parameterInfo) {
+            parameters.add(parameterInfo);
+            return this;
+        }
     }
 
 }

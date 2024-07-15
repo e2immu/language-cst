@@ -6,6 +6,7 @@ import org.e2immu.language.cst.api.info.*;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.runtime.Predefined;
+import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.type.TypeNature;
 import org.e2immu.language.cst.api.type.TypeParameter;
@@ -555,5 +556,69 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     @Override
     public boolean isSealed() {
         return inspection.get().modifiers().stream().anyMatch(TypeModifier::isSealed);
+    }
+
+    @Override
+    public TypeInfo translate(TranslationMap translationMap) {
+        TypeInfo direct = translationMap.translateTypeInfo(this);
+        if (direct != this) {
+            return direct;
+        }
+        boolean change = false;
+        List<MethodInfo> newConstructors = new ArrayList<>(2 * constructors().size());
+        for (MethodInfo methodInfo : constructors()) {
+            List<MethodInfo> tMethod = methodInfo.translate(translationMap);
+            newConstructors.addAll(tMethod);
+            change |= tMethod.size() != 1 || tMethod.get(0) != methodInfo;
+        }
+        List<MethodInfo> newMethods = new ArrayList<>(2 * methods().size());
+        for (MethodInfo methodInfo : methods()) {
+            List<MethodInfo> tMethod = methodInfo.translate(translationMap);
+            newMethods.addAll(tMethod);
+            change |= tMethod.size() != 1 || tMethod.get(0) != methodInfo;
+        }
+        List<FieldInfo> newFields = new ArrayList<>(2 * fields().size());
+        for (FieldInfo fieldInfo : fields()) {
+            List<FieldInfo> tField = fieldInfo.translate(translationMap);
+            newFields.addAll(tField);
+            change |= tField.size() != 1 || tField.get(0) != fieldInfo;
+        }
+        List<TypeInfo> subTypeList = subTypes();
+        List<TypeInfo> newSubTypes = subTypeList.stream().map(st -> st.translate(translationMap))
+                .collect(translationMap.toList(subTypeList));
+        change |= newSubTypes != subTypeList;
+        List<AnnotationExpression> newAnnotations = new ArrayList<>(2 * annotations().size());
+        for (AnnotationExpression ae : annotations()) {
+            List<AnnotationExpression> tAe = ae.translate(translationMap);
+            newAnnotations.addAll(tAe);
+            change |= tAe.size() != 1 || tAe.get(0) != ae;
+        }
+        if (change) {
+            TypeInfo typeInfo = copyAllButConstructorsMethodsFieldsSubTypesAnnotations();
+            TypeInfo.Builder builder = typeInfo.builder();
+            newConstructors.forEach(builder::addConstructor);
+            newMethods.forEach(builder::addMethod);
+            newSubTypes.forEach(builder::addSubType);
+            newFields.forEach(builder::addField);
+            builder.addAnnotations(newAnnotations);
+            builder.commit();
+            return typeInfo;
+        }
+        return this;
+    }
+
+    private TypeInfo copyAllButConstructorsMethodsFieldsSubTypesAnnotations() {
+        TypeInfo typeInfo = compilationUnitOrEnclosingType.isLeft()
+                ? new TypeInfoImpl(compilationUnitOrEnclosingType.getLeft(), simpleName)
+                : new TypeInfoImpl(compilationUnitOrEnclosingType.getRight(), simpleName);
+        TypeInfo.Builder b = typeInfo.builder();
+        b.setAccess(access());
+        b.setTypeNature(typeNature());
+        b.setParentClass(parentClass());
+        b.setSource(source());
+        b.setSynthetic(isSynthetic());
+        interfacesImplemented().forEach(b::addInterfaceImplemented);
+        typeModifiers().forEach(b::addTypeModifier);
+        return typeInfo;
     }
 }

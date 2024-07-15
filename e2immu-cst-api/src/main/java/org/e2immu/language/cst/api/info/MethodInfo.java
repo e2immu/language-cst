@@ -9,6 +9,7 @@ import org.e2immu.language.cst.api.expression.AnnotationExpression;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.statement.Block;
+import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.type.TypeParameter;
 import org.e2immu.language.cst.api.util.ParSeq;
@@ -20,6 +21,8 @@ public interface MethodInfo extends Info {
     List<ParameterizedType> exceptionTypes();
 
     boolean isFactoryMethod();
+
+    Set<MethodModifier> methodModifiers();
 
     boolean noReturnValue();
 
@@ -54,6 +57,8 @@ public interface MethodInfo extends Info {
     boolean isInfix();
 
     boolean isAbstract();
+
+    List<MethodInfo> translate(TranslationMap translationMap);
 
     ParameterizedType typeOfParameterHandleVarargs(int index);
 
@@ -167,6 +172,7 @@ public interface MethodInfo extends Info {
     }
 
     interface Builder extends Info.Builder<Builder> {
+
         /**
          * Intermediate step: the fully qualified name can now be computed, because all
          * parameters are known.
@@ -206,6 +212,10 @@ public interface MethodInfo extends Info {
 
         @Fluent
         Builder addOverrides(Collection<MethodInfo> overrides);
+
+        // used for translations
+        @Fluent
+        Builder addParameter(ParameterInfo parameterInfo);
     }
 
     default boolean isVarargs() {

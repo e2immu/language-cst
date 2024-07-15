@@ -8,8 +8,10 @@ import org.e2immu.language.cst.api.expression.AnnotationExpression;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
+import org.e2immu.language.cst.api.statement.Statement;
 import org.e2immu.language.cst.api.statement.SwitchEntry;
 import org.e2immu.language.cst.api.statement.SwitchStatementNewStyle;
+import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.variable.DescendMode;
 import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.language.cst.impl.output.*;
@@ -105,6 +107,15 @@ public class SwitchStatementNewStyleImpl extends StatementImpl implements Switch
     @Override
     public Stream<Element.TypeReference> typesReferenced() {
         return Stream.empty();
+    }
+
+    @Override
+    public List<Statement> translate(TranslationMap translationMap) {
+        List<Statement> direct = translationMap.translateStatement(this);
+        if (direct.size() != 1 || direct.get(0) != this) {
+            return direct;
+        }
+        throw new UnsupportedOperationException("NYI");
     }
 
     public static class BuilderImpl extends StatementImpl.Builder<SwitchStatementNewStyle.Builder>

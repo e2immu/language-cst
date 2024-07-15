@@ -7,6 +7,7 @@ import org.e2immu.language.cst.api.expression.StringConstant;
 import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
+import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.impl.output.*;
 
 import java.util.ArrayList;
@@ -105,5 +106,10 @@ public class AnnotationExpressionImpl implements AnnotationExpression {
     public Stream<Element.TypeReference> typesReferenced() {
         return Stream.concat(Stream.of(new ElementImpl.TypeReference(typeInfo, true)),
                 keyValuePairs.stream().flatMap(kv -> kv.value().typesReferenced()));
+    }
+
+    @Override
+    public List<AnnotationExpression> translate(TranslationMap translationMap) {
+        return List.of(this);
     }
 }
