@@ -5,6 +5,7 @@ import org.e2immu.language.cst.api.element.Visitor;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
+import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.variable.DescendMode;
 import org.e2immu.language.cst.api.variable.LocalVariable;
@@ -87,5 +88,17 @@ public class LocalVariableImpl extends VariableImpl implements LocalVariable {
     @Override
     public Stream<TypeReference> typesReferenced() {
         return parameterizedType().typesReferenced();
+    }
+
+    @Override
+    public LocalVariable translate(TranslationMap translationMap) {
+        Variable direct = translationMap.translateVariable(this);
+        if (direct != this && direct instanceof LocalVariable lv) return lv;
+        Expression tex = assignmentExpression.translate(translationMap);
+        ParameterizedType type = translationMap.translateType(parameterizedType());
+        if (tex != assignmentExpression || type != parameterizedType()) {
+            return new LocalVariableImpl(name, type, tex);
+        }
+        return this;
     }
 }

@@ -10,6 +10,8 @@ import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.statement.Block;
 import org.e2immu.language.cst.api.statement.IfElseStatement;
+import org.e2immu.language.cst.api.statement.Statement;
+import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.variable.DescendMode;
 import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.language.cst.impl.output.KeywordImpl;
@@ -150,5 +152,18 @@ public class IfElseStatementImpl extends StatementImpl implements IfElseStatemen
     @Override
     public boolean hasSubBlocks() {
         return true;
+    }
+
+    @Override
+    public List<Statement> translate(TranslationMap translationMap) {
+        List<Statement> direct = translationMap.translateStatement(this);
+        if (haveDirectTranslation(direct, this)) return direct;
+        Expression tex = expression.translate(translationMap);
+        Block tIf = (Block) block.translate(translationMap).get(0);
+        Block tElse = elseBlock.isEmpty() ? elseBlock : (Block) elseBlock.translate(translationMap).get(0);
+        if (tex != expression || tIf != block || tElse != elseBlock) {
+            return List.of(new IfElseStatementImpl(comments(), source(), annotations(), label(), tex, tIf, tElse));
+        }
+        return List.of(this);
     }
 }

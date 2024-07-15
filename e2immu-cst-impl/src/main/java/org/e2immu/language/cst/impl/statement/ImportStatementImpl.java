@@ -5,12 +5,15 @@ import org.e2immu.language.cst.api.element.ImportStatement;
 import org.e2immu.language.cst.api.element.Visitor;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
+import org.e2immu.language.cst.api.statement.Statement;
+import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.variable.DescendMode;
 import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.language.cst.impl.output.SpaceEnum;
 import org.e2immu.language.cst.impl.output.SymbolEnum;
 import org.e2immu.language.cst.impl.output.TextImpl;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -76,5 +79,12 @@ public class ImportStatementImpl extends StatementImpl implements ImportStatemen
     @Override
     public boolean hasSubBlocks() {
         return false;
+    }
+
+    @Override
+    public List<Statement> translate(TranslationMap translationMap) {
+        List<Statement> direct = translationMap.translateStatement(this);
+        if (haveDirectTranslation(direct, this)) return direct;
+        return List.of(this);
     }
 }

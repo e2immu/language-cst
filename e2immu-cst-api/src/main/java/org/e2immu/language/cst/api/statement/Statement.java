@@ -47,9 +47,7 @@ public interface Statement extends Element {
         B setLabel(String label);
     }
 
-    default List<Statement> translate(TranslationMap translationMap) {
-        return List.of(this);
-    }
+    List<Statement> translate(TranslationMap translationMap);
 
     // from analysis
     default boolean alwaysEscapes() {

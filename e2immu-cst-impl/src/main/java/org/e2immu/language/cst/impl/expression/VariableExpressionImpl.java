@@ -128,7 +128,7 @@ public class VariableExpressionImpl extends ExpressionImpl implements VariableEx
         //} else {
         outputBuilder.add(variable.print(qualification));
         // }
-        if(suffix != null) outputBuilder.add(suffix.print());
+        if (suffix != null) outputBuilder.add(suffix.print());
         return outputBuilder;
     }
 
@@ -184,7 +184,7 @@ public class VariableExpressionImpl extends ExpressionImpl implements VariableEx
         if (translated2 != null) {
             return translated2;
         }
-        Variable translated3 = translationMap.translateVariable( variable);
+        Variable translated3 = translationMap.translateVariable(variable);
         if (translated3 != variable) {
             return new VariableExpressionImpl(translated3);
         }
@@ -194,31 +194,31 @@ public class VariableExpressionImpl extends ExpressionImpl implements VariableEx
                 if (translated != fr.scope()) {
                     FieldReference newFr = new FieldReferenceImpl(fr.fieldInfo(), translated, null,
                             fr.parameterizedType());
-                  //  if (translated.isDelayed()) {
-                  //      int statementTime = translated instanceof DelayedVariableExpression dve ? dve.statementTime : 0;
-                  //     return DelayedVariableExpression.forField(newFr, statementTime, translated.causesOfDelay());
-                  //  }
+                    //  if (translated.isDelayed()) {
+                    //      int statementTime = translated instanceof DelayedVariableExpression dve ? dve.statementTime : 0;
+                    //     return DelayedVariableExpression.forField(newFr, statementTime, translated.causesOfDelay());
+                    //  }
                     return new VariableExpressionImpl(source(), comments(), newFr, suffix);
                 }
-               // if (!translated.equals(scopeValue)) {
-                    // change the scopeValue to the translated one (see e.g. Basics_21.copy(),
-                    // which translates using RemoveSuffixesTranslationMap)
+                // if (!translated.equals(scopeValue)) {
+                // change the scopeValue to the translated one (see e.g. Basics_21.copy(),
+                // which translates using RemoveSuffixesTranslationMap)
                 //    return new VariableExpression(identifier, fr, suffix, translated, null);
                 //}
             } else if (variable instanceof DependentVariable dv) {
-                Expression translatedScope = dv.arrayExpression().translate( translationMap);
-                Expression translatedIndex = dv.indexExpression().translate( translationMap);
+                Expression translatedScope = dv.arrayExpression().translate(translationMap);
+                Expression translatedIndex = dv.indexExpression().translate(translationMap);
                 if (translatedScope != dv.arrayExpression() || translatedIndex != dv.indexExpression()) {
                     Variable arrayVariable = DependentVariableImpl.makeVariable(translatedScope,
                             DependentVariableImpl.ARRAY_VARIABLE);
                     assert arrayVariable != null;
                     Variable indexVariable = DependentVariableImpl.makeVariable(translatedIndex,
                             DependentVariableImpl.INDEX_VARIABLE);
-                    DependentVariable newDv = new DependentVariableImpl( translatedScope,
+                    DependentVariable newDv = new DependentVariableImpl(translatedScope,
                             arrayVariable, translatedIndex, indexVariable, dv.parameterizedType());
-                  //  if (newDv.causesOfDelay().isDelayed()) {
-                  //      return DelayedVariableExpression.forDependentVariable(newDv, newDv.causesOfDelay());
-                  //  }
+                    //  if (newDv.causesOfDelay().isDelayed()) {
+                    //      return DelayedVariableExpression.forDependentVariable(newDv, newDv.causesOfDelay());
+                    //  }
                     return new VariableExpressionImpl(source(), comments(), newDv, suffix);
                 }
             }

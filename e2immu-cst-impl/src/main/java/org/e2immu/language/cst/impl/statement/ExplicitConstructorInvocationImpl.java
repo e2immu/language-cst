@@ -10,6 +10,8 @@ import org.e2immu.language.cst.api.info.MethodInfo;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.statement.ExplicitConstructorInvocation;
+import org.e2immu.language.cst.api.statement.Statement;
+import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.variable.DescendMode;
 import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.language.cst.impl.output.OutputBuilderImpl;
@@ -141,5 +143,18 @@ public class ExplicitConstructorInvocationImpl extends StatementImpl implements 
     @Override
     public boolean hasSubBlocks() {
         return false;
+    }
+
+    @Override
+    public List<Statement> translate(TranslationMap translationMap) {
+        List<Statement> direct = translationMap.translateStatement(this);
+        if (haveDirectTranslation(direct, this)) return direct;
+        List<Expression> list = parameterExpressions.stream()
+                .map(e -> e.translate(translationMap)).collect(translationMap.toList(parameterExpressions));
+        if (list != parameterExpressions) {
+            return List.of(new ExplicitConstructorInvocationImpl(comments(), source(), annotations(), label(),
+                    isSuper, methodInfo, parameterExpressions));
+        }
+        return List.of(this);
     }
 }

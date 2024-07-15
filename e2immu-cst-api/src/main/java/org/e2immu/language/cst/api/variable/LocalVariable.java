@@ -1,6 +1,7 @@
 package org.e2immu.language.cst.api.variable;
 
 import org.e2immu.language.cst.api.expression.Expression;
+import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 
 /*
@@ -15,6 +16,8 @@ public interface LocalVariable extends Variable {
     default String fullyQualifiedName() {
         return simpleName();
     }
+
+    LocalVariable translate(TranslationMap translationMap);
 
     LocalVariable withType(ParameterizedType type);
 

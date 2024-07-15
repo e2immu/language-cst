@@ -9,7 +9,9 @@ import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.statement.Block;
 import org.e2immu.language.cst.api.statement.LocalVariableCreation;
+import org.e2immu.language.cst.api.statement.Statement;
 import org.e2immu.language.cst.api.statement.TryStatement;
+import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.variable.DescendMode;
 import org.e2immu.language.cst.api.variable.Variable;
@@ -125,6 +127,17 @@ public class TryStatementImpl extends StatementImpl implements TryStatement {
         @Override
         public void visit(Visitor visitor) {
             block.visit(visitor);
+        }
+
+        @Override
+        public CatchClause translate(TranslationMap translationMap) {
+            List<ParameterizedType> list = exceptionTypes.stream()
+                    .map(translationMap::translateType).collect(translationMap.toList(exceptionTypes));
+            Block tBlock = (Block) block.translate(translationMap).get(0);
+            if (list != exceptionTypes || tBlock != block) {
+                return new CatchClauseImpl(list, variableName, tBlock);
+            }
+            return this;
         }
     }
 
@@ -287,5 +300,24 @@ public class TryStatementImpl extends StatementImpl implements TryStatement {
     @Override
     public boolean hasSubBlocks() {
         return true;
+    }
+
+    @Override
+    public List<Statement> translate(TranslationMap translationMap) {
+        List<Statement> direct = translationMap.translateStatement(this);
+        if (haveDirectTranslation(direct, this)) return direct;
+        Block tMain = (Block) block.translate(translationMap).get(0);
+        Block tFinally = (Block) finallyBlock.translate(translationMap).get(0);
+        List<LocalVariableCreation> tResources = resources.stream()
+                .map(st -> (LocalVariableCreation) st.translate(translationMap).get(0))
+                .collect(translationMap.toList(resources));
+        List<CatchClause> tCatch = catchClauses.stream()
+                .map(cc -> cc.translate(translationMap))
+                .collect(translationMap.toList(catchClauses));
+        if (tMain != block || tFinally != finallyBlock) {
+            return List.of(new TryStatementImpl(comments(), source(), annotations(), label(), tResources,
+                    tMain, tCatch, tFinally));
+        }
+        return List.of(this);
     }
 }
