@@ -225,4 +225,9 @@ public class VariableExpressionImpl extends ExpressionImpl implements VariableEx
         }
         return this;
     }
+
+    @Override
+    public boolean isNumeric() {
+        return parameterizedType().isNumeric();
+    }
 }
