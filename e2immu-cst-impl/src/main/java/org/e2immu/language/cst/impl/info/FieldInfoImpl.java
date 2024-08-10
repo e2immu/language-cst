@@ -55,6 +55,11 @@ public class FieldInfoImpl extends InfoImpl implements FieldInfo {
     }
 
     @Override
+    public TypeInfo typeInfo() {
+        return owner;
+    }
+
+    @Override
     public String name() {
         return name;
     }

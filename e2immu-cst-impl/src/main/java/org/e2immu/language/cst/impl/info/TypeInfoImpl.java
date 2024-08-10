@@ -63,6 +63,11 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     }
 
     @Override
+    public TypeInfo typeInfo() {
+        return this;
+    }
+
+    @Override
     public String packageName() {
         if (compilationUnitOrEnclosingType.isLeft()) return compilationUnitOrEnclosingType.getLeft().packageName();
         return compilationUnitOrEnclosingType.getRight().packageName();
