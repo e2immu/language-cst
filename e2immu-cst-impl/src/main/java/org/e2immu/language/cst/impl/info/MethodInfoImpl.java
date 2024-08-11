@@ -132,11 +132,19 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
         return methodType.isConstructor();
     }
 
+    private static final Map<String, Integer> JLO_METHODS = Map.of("clone", 0, "equals", 1,
+            "finalize", 0, "getClass", 0, "hashCode", 0, "notify", 0,
+            "notifyAll", 0, "toString", 0, "wait", 0);
+
     @Override
     public boolean isOverloadOfJLOMethod() {
-        if ("equals".equals(name) && parameters().size() == 1) return true;
-        if ("hashCode".equals(name) && parameters().isEmpty()) return true;
-        return "toString".equals(name()) && parameters().isEmpty();
+        int n = parameters().size();
+        Integer i = JLO_METHODS.get(name);
+        if (i != null) {
+            if (i == n) return true;
+            if ("wait".equals(name)) return i <= 2;
+        }
+        return false;
     }
 
     @Override
