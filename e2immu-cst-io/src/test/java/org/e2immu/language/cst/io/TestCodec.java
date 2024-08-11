@@ -47,8 +47,7 @@ public class TestCodec {
                 codec.encode(p, typeInfo.analysis().getOrDefault(p, p.defaultValue())));
         String s = ((CodecImpl.E) codec.encode(typeInfo, -1, epvStream)).s();
         assertEquals("""
-                {"fqn": "Ta.b.C", "data":{"immutableType":3,"shallowAnalyzer":true,\
-                "commutableMethods":["p1","p2,p3","p4"]}}\
+                {"fqn": "Ta.b.C", "data":{"commutableMethods":["p1","p2,p3","p4"],"immutableType":3,"shallowAnalyzer":1}}\
                 """, s);
         JSONParser parser = new JSONParser(s);
         parser.Root();
