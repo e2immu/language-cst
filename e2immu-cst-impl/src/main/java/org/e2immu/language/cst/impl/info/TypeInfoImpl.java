@@ -237,7 +237,9 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
 
     @Override
     public boolean isInterface() {
-        return typeNature().isInterface();
+        TypeNature typeNature = typeNature();
+        assert typeNature != null : "Type nature of " + fullyQualifiedName + " has not been set";
+        return typeNature.isInterface();
     }
 
     @Override
