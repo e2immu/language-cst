@@ -179,7 +179,9 @@ public class CodecImpl implements Codec {
 
     @Override
     public EncodedValue encodeMap(Map<EncodedValue, EncodedValue> map) {
-        String encoded = map.entrySet().stream().map(e -> ((E) e.getKey()).s + ":" + ((E) e.getValue()).s)
+        String encoded = map.entrySet().stream()
+                .map(e -> ((E) e.getKey()).s + ":" + ((E) e.getValue()).s)
+                .sorted()
                 .collect(Collectors.joining(",", "{", "}"));
         return new E(encoded);
     }
@@ -238,9 +240,15 @@ public class CodecImpl implements Codec {
     @Override
     public EncodedValue encode(Info info, int index, Stream<EncodedPropertyValue> encodedPropertyValueStream) {
         String fqn = encodeInfoFqn(info, index);
-        String pvStream = encodedPropertyValueStream.map(epv -> '"' + epv.key() + "\":" + ((E) epv.encodedValue()).s)
+        String pvStream = encodedPropertyValueStream
+                .filter(epv -> epv.encodedValue() != null)
+                .map(epv -> '"' + epv.key() + "\":" + ((E) epv.encodedValue()).s)
                 .sorted()
                 .collect(Collectors.joining(",", "{", "}"));
+        if ("{}".equalsIgnoreCase(pvStream)) {
+            // no data, we'll not write
+            return null;
+        }
         String all = "{\"fqn\": " + quote(fqn) + ", \"data\":" + pvStream + "}";
         return new E(all);
     }
