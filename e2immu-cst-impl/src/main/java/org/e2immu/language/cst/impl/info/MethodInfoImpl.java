@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class MethodInfoImpl extends InfoImpl implements MethodInfo {
@@ -269,7 +270,11 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
 
     @Override
     public Set<MethodInfo> topOfOverloadingHierarchy() {
-        return Set.of();
+        Set<MethodInfo> overrides = overrides();
+        if (overrides.isEmpty()) return Set.of(this);
+        return overrides.stream()
+                .flatMap(mi -> mi.topOfOverloadingHierarchy().stream())
+                .collect(Collectors.toUnmodifiableSet());
     }
 
     @Override
