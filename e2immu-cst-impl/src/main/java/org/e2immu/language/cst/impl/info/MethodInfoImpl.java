@@ -111,12 +111,12 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
     @Override
     public boolean isPropertyNotNull() {
         if (returnType().isPrimitiveExcludingVoid()) return true;
-        return analysis().getOrDefault(PropertyImpl.NOT_NULL_METHOD, ValueImpl.BoolImpl.FALSE).isTrue();
+        return analysis().getOrDefault(PropertyImpl.NOT_NULL_METHOD, ValueImpl.NotNullImpl.NULLABLE).isAtLeastNotNull();
     }
 
     @Override
     public boolean isPropertyNullable() {
-        return analysis().getOrDefault(PropertyImpl.NOT_NULL_METHOD, ValueImpl.BoolImpl.FALSE).isFalse();
+        return analysis().getOrDefault(PropertyImpl.NOT_NULL_METHOD, ValueImpl.NotNullImpl.NULLABLE).isNullable();
     }
 
     public void commit(MethodInspection methodInspection) {
