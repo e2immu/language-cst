@@ -244,7 +244,9 @@ public class TranslationMapImpl implements TranslationMap {
         }
         if (variable instanceof LocalVariable lv && lv.assignmentExpression() != null) {
             Expression te = lv.assignmentExpression().translate(this);
-            return lv.withAssignmentExpression(te);
+            if(te != lv.assignmentExpression()) {
+                return lv.withAssignmentExpression(te);
+            }
         }
         return variable;
     }

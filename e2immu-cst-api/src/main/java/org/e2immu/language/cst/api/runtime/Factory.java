@@ -249,8 +249,6 @@ public interface Factory {
 
     Comment newMultilineComment(String comment);
 
-    ConstructorCall newObjectCreation(Expression scope, MethodInfo constructor, ParameterizedType parameterizedType, Diamond diamond, List<Expression> newParams);
-
     OutputBuilder newOutputBuilder();
 
     ParameterizedType newParameterizedType(TypeInfo typeInfo, List<ParameterizedType> newParameters);
@@ -335,9 +333,6 @@ public interface Factory {
     Expression nullConstant();
 
     Expression nullValue(TypeInfo typeInfo);
-
-    ConstructorCall objectCreation(Expression scope, MethodInfo constructor, ParameterizedType parameterizedType,
-                                   Diamond diamond, List<Expression> parameterExpressions);
 
     Collector<OutputBuilder, OutputBuilder, OutputBuilder> outputBuilderJoining(OutputElement outputElement);
 

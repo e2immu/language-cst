@@ -264,7 +264,8 @@ public class ConstructorCallImpl extends ExpressionImpl implements ConstructorCa
 
     @Override
     public ConstructorCall withParameterExpressions(List<Expression> newParameterExpressions) {
-        return null;
+        return new ConstructorCallImpl(comments(), source(), constructor, concreteReturnType, diamond, object,
+                parameterExpressions, arrayInitializer, anonymousClass);
     }
 
     @Override

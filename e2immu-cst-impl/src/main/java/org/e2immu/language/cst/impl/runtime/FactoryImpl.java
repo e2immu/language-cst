@@ -70,11 +70,6 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
-    public ConstructorCall newObjectCreation(Expression scope, MethodInfo constructor, ParameterizedType parameterizedType, Diamond diamond, List<Expression> newParams) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public GreaterThanZero newGreaterThanZero(Expression e, boolean allowEquals) {
         throw new UnsupportedOperationException();
     }
@@ -191,11 +186,6 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     @Override
     public StringConstant newStringConstant(String string) {
         return new StringConstantImpl(this, string);
-    }
-
-    @Override
-    public ConstructorCall objectCreation(Expression scope, MethodInfo constructor, ParameterizedType parameterizedType, Diamond diamond, List<Expression> parameterExpressions) {
-        throw new UnsupportedOperationException();
     }
 
     @Override
