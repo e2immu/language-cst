@@ -368,6 +368,8 @@ public interface Factory {
 
     Qualification qualificationFullyQualifiedNames();
 
+    Qualification qualificationSimpleNames();
+
     Split splitNever();
 
     OutputElement symbolColon();

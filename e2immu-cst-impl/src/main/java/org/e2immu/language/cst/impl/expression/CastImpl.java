@@ -117,7 +117,7 @@ public class CastImpl extends ExpressionImpl implements Cast {
     @Override
     public OutputBuilder print(Qualification qualification) {
         return new OutputBuilderImpl().add(SymbolEnum.LEFT_PARENTHESIS)
-                .add(parameterizedType.print(qualification, false, DiamondEnum.YES))
+                .add(parameterizedType.print(qualification, false, DiamondEnum.SHOW_ALL))
                 .add(SymbolEnum.RIGHT_PARENTHESIS)
                 .add(outputInParenthesis(qualification, precedence(), expression));
     }
