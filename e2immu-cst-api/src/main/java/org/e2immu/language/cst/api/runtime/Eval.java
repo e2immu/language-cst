@@ -26,7 +26,7 @@ public interface Eval {
 
     Expression greater(Expression lhs, Expression rhs, boolean allowEquals);
 
-    Expression greaterThanZero(Expression expression);
+    Expression greaterThanZero(Expression expression, boolean allowEquals);
 
     Expression or(List<Expression> expressions);
 
@@ -57,7 +57,7 @@ public interface Eval {
             return and(and.expressions());
         }
         if (expression instanceof GreaterThanZero gt0) {
-            return greaterThanZero(gt0.expression());
+            return greaterThanZero(gt0.expression(), gt0.allowEquals());
         }
         if (expression instanceof Equals equals) {
             return equals(equals.lhs(), equals.rhs());

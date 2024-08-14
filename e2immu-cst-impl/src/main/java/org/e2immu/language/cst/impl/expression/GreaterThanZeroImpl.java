@@ -29,10 +29,6 @@ public class GreaterThanZeroImpl extends ExpressionImpl implements GreaterThanZe
     private final boolean allowEquals;
     private final ParameterizedType booleanPt;
 
-    public GreaterThanZeroImpl(Runtime runtime, Expression expression, boolean allowEquals) {
-        this(runtime.booleanParameterizedType(), expression, allowEquals);
-    }
-
     public GreaterThanZeroImpl(ParameterizedType booleanPt, Expression expression, boolean allowEquals) {
         super(1 + expression.complexity());
         this.expression = expression;

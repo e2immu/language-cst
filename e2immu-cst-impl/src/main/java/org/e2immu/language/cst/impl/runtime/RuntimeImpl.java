@@ -80,8 +80,8 @@ public class RuntimeImpl extends FactoryImpl implements Runtime {
     }
 
     @Override
-    public Expression greaterThanZero(Expression expression) {
-        return eval.greaterThanZero(expression);
+    public Expression greaterThanZero(Expression expression, boolean allowEquals) {
+        return eval.greaterThanZero(expression, allowEquals);
     }
 
     @Override

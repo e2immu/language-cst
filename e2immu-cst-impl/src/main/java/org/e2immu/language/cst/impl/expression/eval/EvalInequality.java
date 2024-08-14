@@ -14,8 +14,8 @@ public class EvalInequality {
         this.runtime = runtime;
     }
 
-    public Expression greaterThanZero(Expression expression) {
-        throw new UnsupportedOperationException();
+    public Expression greaterThanZero(Expression expression, boolean allowEquals) {
+        return compute(expression, allowEquals);
     }
 
     public Expression less(Expression lhs, Expression rhs, boolean allowEquals) {
@@ -62,7 +62,7 @@ public class EvalInequality {
             }
         }
         // fallback
-        return new GreaterThanZeroImpl(runtime, expression, allowEquals);
+        return runtime.newGreaterThanZero(expression, allowEquals);
     }
 
     private GreaterThanZero twoTerms(boolean allowEquals, Expression[] terms, Numeric n0) {
@@ -117,7 +117,7 @@ public class EvalInequality {
                 }
             }
         }
-        return new GreaterThanZeroImpl(runtime, sum, newAllowEquals);
+        return runtime.newGreaterThanZero(sum, newAllowEquals);
     }
 
     private Expression oneTerm(boolean allowEquals, Expression[] terms, Numeric n0) {
@@ -153,6 +153,6 @@ public class EvalInequality {
             newAllowEquals = allowEquals;
         }
         // expr >= 0, expr > 0
-        return new GreaterThanZeroImpl(runtime, term, newAllowEquals);
+        return runtime.newGreaterThanZero(term, newAllowEquals);
     }
 }

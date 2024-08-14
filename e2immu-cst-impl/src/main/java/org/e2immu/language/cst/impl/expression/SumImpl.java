@@ -7,6 +7,7 @@ import org.e2immu.language.cst.api.expression.Sum;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.runtime.Runtime;
+import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.impl.expression.util.ExpressionComparator;
 import org.e2immu.language.cst.impl.output.OutputBuilderImpl;
 import org.e2immu.language.cst.impl.output.SymbolEnum;
@@ -15,10 +16,13 @@ import java.util.List;
 
 
 public class SumImpl extends BinaryOperatorImpl implements Sum {
+    // for translation
+    private final Runtime runtime;
 
     public SumImpl(Runtime runtime, Expression lhs, Expression rhs) {
         super(List.of(), null, runtime.plusOperatorInt(), runtime.precedenceAdditive(), lhs, rhs,
                 runtime.widestType(lhs.parameterizedType(), rhs.parameterizedType()));
+        this.runtime = runtime;
     }
 
     @Override
@@ -77,5 +81,15 @@ public class SumImpl extends BinaryOperatorImpl implements Sum {
             return runtime.sum(nonNumeric, rhs);
         }
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Expression translate(TranslationMap translationMap) {
+        Expression translated = translationMap.translateExpression(this);
+        if (translated != this) return translated;
+        Expression tl = lhs.translate(translationMap);
+        Expression tr = rhs.translate(translationMap);
+        if (tl == lhs && tr == rhs) return this;
+        return new SumImpl(runtime, tl, tr);
     }
 }

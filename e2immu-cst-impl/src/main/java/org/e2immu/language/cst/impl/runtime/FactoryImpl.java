@@ -71,7 +71,7 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
 
     @Override
     public GreaterThanZero newGreaterThanZero(Expression e, boolean allowEquals) {
-        throw new UnsupportedOperationException();
+        return new GreaterThanZeroImpl(booleanParameterizedType(), e, allowEquals);
     }
 
     @Override

@@ -106,8 +106,8 @@ public class EvalImpl implements Eval {
     }
 
     @Override
-    public Expression greaterThanZero(Expression expression) {
-        return evalInequality.greaterThanZero(expression);
+    public Expression greaterThanZero(Expression expression, boolean allowEquals) {
+        return evalInequality.greaterThanZero(expression, allowEquals);
     }
 
     @Override
