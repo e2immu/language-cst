@@ -123,13 +123,14 @@ public class ConstructorCallImpl extends ExpressionImpl implements ConstructorCa
                && Objects.equals(concreteReturnType, that.concreteReturnType)
                && Objects.equals(object, that.object)
                && Objects.equals(parameterExpressions, that.parameterExpressions)
+               && Objects.equals(source(), that.source())
                && Objects.equals(arrayInitializer, that.arrayInitializer)
                && Objects.equals(anonymousClass, that.anonymousClass);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(constructor, concreteReturnType, object, parameterExpressions, arrayInitializer, anonymousClass);
+        return Objects.hash(source(), constructor, concreteReturnType, object, parameterExpressions, arrayInitializer, anonymousClass);
     }
 
     @Override
@@ -260,7 +261,9 @@ public class ConstructorCallImpl extends ExpressionImpl implements ConstructorCa
 
     @Override
     public Stream<Element.TypeReference> typesReferenced() {
-        return Stream.empty();
+        return Stream.concat(object == null ? Stream.of() : object.typesReferenced(),
+                Stream.concat(parameterExpressions.stream().flatMap(Expression::typesReferenced),
+                        Stream.of(new ElementImpl.TypeReference(concreteReturnType.typeInfo(), true))));
     }
 
     @Override

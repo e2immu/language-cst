@@ -3,6 +3,8 @@ package org.e2immu.language.cst.impl.element;
 import org.e2immu.language.cst.api.element.Element;
 import org.e2immu.language.cst.api.element.Source;
 
+import java.util.Objects;
+
 /*
 we must be a bit memory-conscious: no unnecessary fields because there may be millions of elements
  */
@@ -22,6 +24,18 @@ public class SourceImpl implements Source {
         this.beginPos = (short) beginPos;
         this.endLine = (short) endLine;
         this.endPos = (short) endPos;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof SourceImpl source)) return false;
+        return beginLine == source.beginLine && beginPos == source.beginPos && endLine == source.endLine && endPos == source.endPos;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(beginLine, beginPos, endLine, endPos);
     }
 
     @Override
