@@ -120,7 +120,7 @@ public class ConstructorCallImpl extends ExpressionImpl implements ConstructorCa
         if (this == o) return true;
         if (!(o instanceof ConstructorCallImpl that)) return false;
         return Objects.equals(constructor, that.constructor)
-               && Objects.equals(diamond, that.diamond)
+               && Objects.equals(concreteReturnType, that.concreteReturnType)
                && Objects.equals(object, that.object)
                && Objects.equals(parameterExpressions, that.parameterExpressions)
                && Objects.equals(arrayInitializer, that.arrayInitializer)
@@ -129,7 +129,7 @@ public class ConstructorCallImpl extends ExpressionImpl implements ConstructorCa
 
     @Override
     public int hashCode() {
-        return Objects.hash(constructor, diamond, object, parameterExpressions, arrayInitializer, anonymousClass);
+        return Objects.hash(constructor, concreteReturnType, object, parameterExpressions, arrayInitializer, anonymousClass);
     }
 
     @Override
@@ -265,7 +265,7 @@ public class ConstructorCallImpl extends ExpressionImpl implements ConstructorCa
     @Override
     public ConstructorCall withParameterExpressions(List<Expression> newParameterExpressions) {
         return new ConstructorCallImpl(comments(), source(), constructor, concreteReturnType, diamond, object,
-                parameterExpressions, arrayInitializer, anonymousClass);
+                newParameterExpressions, arrayInitializer, anonymousClass);
     }
 
     @Override
