@@ -254,7 +254,8 @@ public class ConstructorCallImpl extends ExpressionImpl implements ConstructorCa
 
     @Override
     public Stream<Variable> variables(DescendMode descendMode) {
-        return Stream.empty();
+        return Stream.concat(object == null ? Stream.of() : object.variables(descendMode),
+                parameterExpressions.stream().flatMap(e -> e.variables(descendMode)));
     }
 
     @Override
