@@ -19,10 +19,11 @@ import java.util.stream.Stream;
 public class RuntimeImpl extends FactoryImpl implements Runtime {
     private final Eval eval = new EvalImpl(this);
     private final E2ImmuAnnotationsImpl e2ImmuAnnotations = new E2ImmuAnnotationsImpl();
+    private final LanguageConfiguration lc = new LanguageConfigurationImpl(true);
 
     @Override
     public LanguageConfiguration configuration() {
-        throw new UnsupportedOperationException();
+        return lc;
     }
 
     @Override
