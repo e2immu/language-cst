@@ -39,13 +39,22 @@ public interface ParameterizedType {
 
     ParameterizedType copyWithOneFewerArrays();
 
-    // identification
-
     ParameterizedType copyWithoutArrays();
 
     // print
 
+    String fullyQualifiedName();
+
     String detailedString();
+
+    // Qualification: SimpleNames, vararg: false, Diamond: ShowAll
+    String simpleString();
+
+    OutputBuilder print(Qualification qualification, boolean varArgs, Diamond diamond);
+
+    String printForMethodFQN(boolean varArgs, Diamond diamond);
+
+    //
 
     ParameterizedType ensureBoxed(Predefined runtime);
 
@@ -64,8 +73,6 @@ public interface ParameterizedType {
     Given Map<K, V>, go from abstract to concrete (HM:K to Map:K, HM:V to Map:V)
     */
     Map<NamedType, ParameterizedType> forwardTypeParameterMap(Predefined runtime);
-
-    String fullyQualifiedName();
 
     /*
        Given a concrete type (List<String>) make a map from the type's abstract parameters to its concrete ones (E -> String)
@@ -130,10 +137,6 @@ public interface ParameterizedType {
                                    ParameterizedType other);
 
     List<ParameterizedType> parameters();
-
-    OutputBuilder print(Qualification qualification, boolean varArgs, Diamond diamond);
-
-    String printForMethodFQN(boolean varArgs, Diamond diamond);
 
     List<ParameterizedType> replaceByTypeBounds();
 

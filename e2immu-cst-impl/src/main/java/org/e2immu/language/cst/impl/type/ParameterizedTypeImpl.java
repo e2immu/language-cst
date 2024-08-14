@@ -290,6 +290,11 @@ public class ParameterizedTypeImpl implements ParameterizedType {
     }
 
     @Override
+    public String simpleString() {
+        return print(QualificationImpl.SIMPLE_NAMES, false, DiamondEnum.SHOW_ALL).toString();
+    }
+
+    @Override
     public TypeInfo toBoxed(PredefinedWithoutParameterizedType runtime) {
         return runtime.boxed(typeInfo);
     }
