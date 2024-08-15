@@ -234,7 +234,16 @@ public class TranslationMapImpl implements TranslationMap {
     @Override
     public Variable translateVariable(Variable variable) {
         Variable v = variables.get(variable);
-        if (v != null) return v;
+        if (v != null) {
+            // if variable -> v, and variable has an assignment expression, but v does not, then we copy variable's,
+            // after translation
+            if (variable instanceof LocalVariable from && from.assignmentExpression() != null
+                && v instanceof LocalVariable to && to.assignmentExpression() == null) {
+                Expression te = from.assignmentExpression().translate(this);
+                return to.withAssignmentExpression(te);
+            }
+            return v;
+        }
         if (variable instanceof FieldReference fr && fr.scopeVariable() != null) {
             Variable scopeTranslated = translateVariable(fr.scopeVariable());
             if (scopeTranslated != fr.scopeVariable()) {
@@ -244,7 +253,7 @@ public class TranslationMapImpl implements TranslationMap {
         }
         if (variable instanceof LocalVariable lv && lv.assignmentExpression() != null) {
             Expression te = lv.assignmentExpression().translate(this);
-            if(te != lv.assignmentExpression()) {
+            if (te != lv.assignmentExpression()) {
                 return lv.withAssignmentExpression(te);
             }
         }
