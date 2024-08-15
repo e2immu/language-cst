@@ -77,6 +77,12 @@ public class FloatConstantImpl extends ConstantExpressionImpl<Float> implements 
 
     @Override
     public Expression negate() {
-        return new FloatConstantImpl(parameterizedType, -value);
+        return new FloatConstantImpl(parameterizedType, value);
     }
+
+    @Override
+    public Expression bitwiseNegation() {
+        throw new UnsupportedOperationException();
+    }
+
 }

@@ -3,6 +3,7 @@ package org.e2immu.language.cst.impl.runtime;
 import org.e2immu.language.cst.api.expression.BinaryOperator;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.expression.InstanceOf;
+import org.e2immu.language.cst.api.expression.UnaryOperator;
 import org.e2immu.language.cst.api.runtime.Eval;
 import org.e2immu.language.cst.api.runtime.Runtime;
 import org.e2immu.language.cst.api.variable.Variable;
@@ -25,6 +26,7 @@ public class EvalImpl implements Eval {
     private final EvalInequality evalInequality;
     private final EvalBinaryOperator evalBinaryOperator;
     private final EvalInstanceOf evalInstanceOf;
+    private final EvalUnaryOperator evalUnaryOperator;
 
     public EvalImpl(Runtime runtime) {
         evalProduct = new EvalProduct(runtime);
@@ -38,6 +40,7 @@ public class EvalImpl implements Eval {
         evalInequality = new EvalInequality(runtime);
         evalBinaryOperator = new EvalBinaryOperator(runtime);
         evalInstanceOf = new EvalInstanceOf(runtime);
+        evalUnaryOperator = new EvalUnaryOperator(runtime);
     }
 
     @Override
@@ -58,6 +61,11 @@ public class EvalImpl implements Eval {
     @Override
     public Expression binaryOperator(BinaryOperator binaryOperator) {
         return evalBinaryOperator.eval(binaryOperator);
+    }
+
+    @Override
+    public Expression unaryOperator(UnaryOperator unaryOperator) {
+        return evalUnaryOperator.eval(unaryOperator);
     }
 
     @Override

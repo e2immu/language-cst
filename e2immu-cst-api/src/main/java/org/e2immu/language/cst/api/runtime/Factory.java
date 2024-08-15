@@ -137,6 +137,8 @@ public interface Factory {
 
     BinaryOperator.Builder newBinaryOperatorBuilder();
 
+    BitwiseNegation newBitwiseNegation(Expression value);
+
     Block.Builder newBlockBuilder();
 
     BooleanConstant newBoolean(boolean value);

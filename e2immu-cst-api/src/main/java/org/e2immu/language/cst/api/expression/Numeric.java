@@ -7,6 +7,8 @@ public interface Numeric extends Expression {
 
     Expression negate();
 
+    Expression bitwiseNegation();
+
     @Override
     default boolean isNegatedOrNumericNegative() {
         return doubleValue() < 0;

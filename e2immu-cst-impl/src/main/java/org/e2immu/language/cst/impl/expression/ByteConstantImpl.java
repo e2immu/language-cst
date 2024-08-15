@@ -79,4 +79,9 @@ public class ByteConstantImpl extends ConstantExpressionImpl<Byte> implements Nu
     public Expression negate() {
         return new ByteConstantImpl(parameterizedType, (byte) -value);
     }
+
+    @Override
+    public Expression bitwiseNegation() {
+        return new ByteConstantImpl(parameterizedType, (byte) ~value);
+    }
 }

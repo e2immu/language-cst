@@ -1,9 +1,6 @@
 package org.e2immu.language.cst.impl.runtime;
 
-import org.e2immu.language.cst.api.expression.AnnotationExpression;
-import org.e2immu.language.cst.api.expression.BinaryOperator;
-import org.e2immu.language.cst.api.expression.Expression;
-import org.e2immu.language.cst.api.expression.InstanceOf;
+import org.e2immu.language.cst.api.expression.*;
 import org.e2immu.language.cst.api.info.ComputeMethodOverrides;
 import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.runtime.LanguageConfiguration;
@@ -24,6 +21,11 @@ public class RuntimeImpl extends FactoryImpl implements Runtime {
     @Override
     public LanguageConfiguration configuration() {
         return lc;
+    }
+
+    @Override
+    public Expression unaryOperator(UnaryOperator unaryOperator) {
+        return eval.unaryOperator(unaryOperator);
     }
 
     @Override

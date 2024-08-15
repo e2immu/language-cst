@@ -78,4 +78,9 @@ public class ShortConstantImpl extends ConstantExpressionImpl<Short> implements 
     public Expression negate() {
         return new ShortConstantImpl(parameterizedType, (short) -value);
     }
+
+    @Override
+    public Expression bitwiseNegation() {
+        return new ShortConstantImpl(parameterizedType, (short) ~value);
+    }
 }

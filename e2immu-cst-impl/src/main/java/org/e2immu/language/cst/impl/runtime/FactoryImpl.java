@@ -1012,5 +1012,10 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     public LocalVariableCreation.Modifier localVariableModifierVar() {
         return LocalVariableCreationImpl.ModifierEnum.VAR;
     }
+
+    @Override
+    public BitwiseNegation newBitwiseNegation(Expression value) {
+        return new BitwiseNegationImpl(bitWiseNotOperatorInt(), PrecedenceEnum.UNARY, value);
+    }
 }
 

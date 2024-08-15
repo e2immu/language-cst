@@ -40,6 +40,8 @@ public interface Eval {
 
     Expression binaryOperator(BinaryOperator binaryOperator);
 
+    Expression unaryOperator(UnaryOperator unaryOperator);
+
     default Expression sortAndSimplify(Expression expression) {
         if (expression instanceof Sum sum) {
             return sum(sum.lhs(), sum.rhs());
@@ -70,6 +72,9 @@ public interface Eval {
         }
         if(expression instanceof BinaryOperator binaryOperator) {
             return binaryOperator(binaryOperator);
+        }
+        if(expression instanceof UnaryOperator unaryOperator) {
+            return unaryOperator(unaryOperator);
         }
         if(expression instanceof InstanceOf instanceOf) {
             return instanceOf(instanceOf);

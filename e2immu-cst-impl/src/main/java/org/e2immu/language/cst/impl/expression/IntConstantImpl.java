@@ -78,4 +78,9 @@ public class IntConstantImpl extends ConstantExpressionImpl<Integer> implements 
     public Expression negate() {
         return new IntConstantImpl(parameterizedType, -value);
     }
+
+    @Override
+    public Expression bitwiseNegation() {
+        return new IntConstantImpl(parameterizedType, ~value);
+    }
 }

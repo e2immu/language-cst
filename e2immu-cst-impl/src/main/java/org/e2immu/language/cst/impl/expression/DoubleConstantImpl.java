@@ -23,7 +23,7 @@ public class DoubleConstantImpl extends ConstantExpressionImpl<Double> implement
     }
 
     protected DoubleConstantImpl(ParameterizedType parameterizedType, double value) {
-        super(0 == value ? 1: 2);
+        super(0 == value ? 1 : 2);
         this.parameterizedType = parameterizedType;
         this.value = value;
     }
@@ -79,6 +79,11 @@ public class DoubleConstantImpl extends ConstantExpressionImpl<Double> implement
     @Override
     public Expression negate() {
         return new DoubleConstantImpl(parameterizedType, -value);
+    }
+
+    @Override
+    public Expression bitwiseNegation() {
+        throw new UnsupportedOperationException();
     }
 
     public static String formatNumber(double d, Class<? extends Numeric> clazz) {

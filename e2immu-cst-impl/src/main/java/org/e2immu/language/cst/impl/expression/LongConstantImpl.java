@@ -79,4 +79,9 @@ public class LongConstantImpl extends ConstantExpressionImpl<Long> implements Nu
     public Expression negate() {
         return new LongConstantImpl(parameterizedType, -value);
     }
+
+    @Override
+    public Expression bitwiseNegation() {
+        return new LongConstantImpl(parameterizedType, ~value);
+    }
 }
