@@ -231,4 +231,9 @@ public class BinaryOperatorImpl extends ExpressionImpl implements BinaryOperator
         return new BinaryOperatorImpl(comments(), source(), operator, precedence, translatedLhs, translatedRhs,
                 parameterizedType);
     }
+
+    @Override
+    public boolean isNumeric() {
+        return parameterizedType().isNumeric();
+    }
 }

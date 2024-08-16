@@ -94,4 +94,9 @@ public class SumImpl extends BinaryOperatorImpl implements Sum {
         if (tl == lhs && tr == rhs) return this;
         return new SumImpl(runtime, tl, tr);
     }
+
+    @Override
+    public boolean isNumeric() {
+        return true;
+    }
 }

@@ -27,4 +27,8 @@ public class ProductImpl extends BinaryOperatorImpl implements Product {
         return new ProductImpl(runtime, tl, tr);
     }
 
+    @Override
+    public boolean isNumeric() {
+        return true;
+    }
 }

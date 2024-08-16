@@ -22,4 +22,9 @@ public class DivideImpl extends BinaryOperatorImpl implements Divide {
         super(List.of(), null, runtime.divideOperatorInt(), runtime.precedenceMultiplicative(), lhs,
                 rhs, runtime.widestTypeUnbox(lhs.parameterizedType(), rhs.parameterizedType()));
     }
+
+    @Override
+    public boolean isNumeric() {
+        return true;
+    }
 }
