@@ -140,7 +140,8 @@ public class EvalImpl implements Eval {
 
     @Override
     public boolean isNotNull0(Expression expression) {
-        return true;
+        // for now, this is the only way we proceed
+        return expression.parameterizedType().isPrimitiveExcludingVoid();
     }
 
     @Override
