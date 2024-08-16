@@ -61,7 +61,7 @@ public class EvalBinaryOperator {
             return runtime.remainder(l, r);
         }
         if (operator == runtime.lessEqualsOperatorInt()) {
-            return runtime.less(l, r, false);
+            return runtime.less(l, r, true);
         }
         if (operator == runtime.lessOperatorInt()) {
             return runtime.less(l, r, false);

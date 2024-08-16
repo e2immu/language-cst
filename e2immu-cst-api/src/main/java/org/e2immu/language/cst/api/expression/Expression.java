@@ -50,7 +50,7 @@ public interface Expression extends Comparable<Expression>, Element {
         return null;
     }
     default boolean isNumeric() {
-        return false;
+        return parameterizedType().isNumeric();
     }
 
     default Expression conditionOfInlineConditional() {
