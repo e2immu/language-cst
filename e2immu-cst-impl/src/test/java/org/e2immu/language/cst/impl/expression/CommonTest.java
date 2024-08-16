@@ -11,7 +11,7 @@ public abstract class CommonTest {
     protected final Runtime r = new RuntimeImpl();
 
     protected final BooleanConstant FALSE = r.constantFalse();
-    protected final BooleanConstant TRUE  = r.constantTrue();
+    protected final BooleanConstant TRUE = r.constantTrue();
     protected final VariableExpression a = r.newVariableExpression(createVariable("a", r.booleanParameterizedType()));
     protected final VariableExpression b = r.newVariableExpression(createVariable("b", r.booleanParameterizedType()));
     protected final VariableExpression c = r.newVariableExpression(createVariable("c", r.booleanParameterizedType()));
@@ -26,6 +26,8 @@ public abstract class CommonTest {
     protected final VariableExpression n = r.newVariableExpression(createVariable("n", r.doubleParameterizedType()));
 
     protected final VariableExpression s = r.newVariableExpression(createVariable("s", r.stringParameterizedType()));
+
+    protected final VariableExpression dd = r.newVariableExpression(createVariable("dd", r.doubleParameterizedType().ensureBoxed(r)));
 
     protected Variable createVariable(String name, ParameterizedType type) {
         return r.newLocalVariable(name, type);

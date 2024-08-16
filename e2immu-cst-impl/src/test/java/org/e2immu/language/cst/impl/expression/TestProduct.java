@@ -45,4 +45,12 @@ public class TestProduct extends CommonTest {
         assertEquals("4+4*i+i*i+4*k+k*k+4*m+m*m+2*i*k+2*i*m+4*k*l+k*l*k*l+2*k*k*l+2*k*m+2*i*k*l+2*m*k*l",
                 product.toString());
     }
+
+    @Test
+    public void test3() {
+        assertEquals("Type Double", dd.variable().parameterizedType().toString());
+        Expression times100 = r.product(dd, r.newInt(100));
+        assertEquals("100*dd", times100.toString());
+        assertEquals("Type double", times100.parameterizedType().toString());
+    }
 }

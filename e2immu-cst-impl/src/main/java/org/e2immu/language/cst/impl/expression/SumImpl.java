@@ -21,8 +21,10 @@ public class SumImpl extends BinaryOperatorImpl implements Sum {
 
     public SumImpl(Runtime runtime, Expression lhs, Expression rhs) {
         super(List.of(), null, runtime.plusOperatorInt(), runtime.precedenceAdditive(), lhs, rhs,
-                runtime.widestType(lhs.parameterizedType(), rhs.parameterizedType()));
+                runtime.widestTypeUnbox(lhs.parameterizedType(), rhs.parameterizedType()));
         this.runtime = runtime;
+        assert lhs.isNumeric() : "Have " + lhs + ", " + lhs.parameterizedType(); // and definitely not StringConstant!
+        assert rhs.isNumeric() : "Have " + rhs + ", " + rhs.parameterizedType();
     }
 
     @Override

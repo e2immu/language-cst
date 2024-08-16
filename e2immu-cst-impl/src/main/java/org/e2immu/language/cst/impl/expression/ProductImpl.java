@@ -13,7 +13,7 @@ public class ProductImpl extends BinaryOperatorImpl implements Product {
 
     public ProductImpl(Runtime runtime, Expression lhs, Expression rhs) {
         super(List.of(), null, runtime.multiplyOperatorInt(), runtime.precedenceMultiplicative(), lhs, rhs,
-                runtime.widestType(lhs.parameterizedType(), rhs.parameterizedType()));
+                runtime.widestTypeUnbox(lhs.parameterizedType(), rhs.parameterizedType()));
         this.runtime = runtime;
     }
 

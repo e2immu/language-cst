@@ -20,6 +20,6 @@ public class DivideImpl extends BinaryOperatorImpl implements Divide {
 
     public DivideImpl(Runtime runtime, Expression lhs, Expression rhs) {
         super(List.of(), null, runtime.divideOperatorInt(), runtime.precedenceMultiplicative(), lhs,
-                rhs, runtime.widestType(lhs.parameterizedType(), rhs.parameterizedType()));
+                rhs, runtime.widestTypeUnbox(lhs.parameterizedType(), rhs.parameterizedType()));
     }
 }
