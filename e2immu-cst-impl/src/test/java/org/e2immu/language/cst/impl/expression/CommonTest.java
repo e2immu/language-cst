@@ -1,6 +1,8 @@
 package org.e2immu.language.cst.impl.expression;
 
 import org.e2immu.language.cst.api.expression.BooleanConstant;
+import org.e2immu.language.cst.api.expression.Expression;
+import org.e2immu.language.cst.api.expression.InstanceOf;
 import org.e2immu.language.cst.api.expression.VariableExpression;
 import org.e2immu.language.cst.api.runtime.Runtime;
 import org.e2immu.language.cst.api.type.ParameterizedType;
@@ -31,5 +33,9 @@ public abstract class CommonTest {
 
     protected Variable createVariable(String name, ParameterizedType type) {
         return r.newLocalVariable(name, type);
+    }
+
+    protected InstanceOf newInstanceOf(Expression e, ParameterizedType testType) {
+        return r.newInstanceOfBuilder().setExpression(e).setTestType(testType).build();
     }
 }

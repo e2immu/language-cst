@@ -85,6 +85,8 @@ public interface Factory {
 
     Lambda.OutputVariant lambdaOutputVariantVar();
 
+    LocalVariableCreation.Modifier localVariableModifierFinal();
+
     LocalVariableCreation.Modifier localVariableModifierVar();
 
     MethodModifier methodModifierAbstract();
@@ -155,6 +157,8 @@ public interface Factory {
 
     CharConstant newChar(char c);
 
+    ClassExpression newClassExpression(TypeInfo typeInfo);
+
     CommaExpression.Builder newCommaBuilder();
 
     CompilationUnit.Builder newCompilationUnitBuilder();
@@ -213,11 +217,7 @@ public interface Factory {
 
     Instance newInstanceForTooComplex(ParameterizedType parameterizedType);
 
-    default InstanceOf newInstanceOf(Expression expression, ParameterizedType parameterizedType) {
-        return newInstanceOf(expression, parameterizedType, null);
-    }
-
-    InstanceOf newInstanceOf(Expression expression, ParameterizedType parameterizedType, LocalVariable patternVariable);
+    InstanceOf.Builder newInstanceOfBuilder();
 
     IntConstant newInt(int i);
 
@@ -231,13 +231,9 @@ public interface Factory {
 
     LocalVariableCreation.Builder newLocalVariableCreationBuilder();
 
-    LocalVariableCreation.Modifier localVariableModifierFinal();
-
     LongConstant newLong(long l);
 
     MethodInfo newMethod(TypeInfo owner, String name, MethodInfo.MethodType methodType);
-
-    MethodCall newMethodCall(Expression object, MethodInfo methodInfo, List<Expression> parameterExpressions);
 
     MethodCall.Builder newMethodCallBuilder();
 
@@ -278,17 +274,17 @@ public interface Factory {
 
     StringConstant newStringConstant(String string);
 
-    SwitchExpression.Builder newSwitchExpressionBuilder();
-
-    SwitchStatementNewStyle.Builder newSwitchStatementNewStyleBuilder();
-
     SwitchEntry.Builder newSwitchEntryBuilder();
 
-    SwitchStatementOldStyle.Builder newSwitchStatementOldStyleBuilder();
+    SwitchExpression.Builder newSwitchExpressionBuilder();
 
     SwitchStatementOldStyle.SwitchLabel newSwitchLabelOldStyle(Expression literal, int pos,
                                                                LocalVariable patternVariable,
                                                                Expression whenExpression);
+
+    SwitchStatementNewStyle.Builder newSwitchStatementNewStyleBuilder();
+
+    SwitchStatementOldStyle.Builder newSwitchStatementOldStyleBuilder();
 
     SynchronizedStatement.Builder newSynchronizedBuilder();
 
@@ -411,6 +407,4 @@ public interface Factory {
     Wildcard wildcardExtends();
 
     Wildcard wildcardSuper();
-
-    ClassExpression newClassExpression(TypeInfo typeInfo);
 }

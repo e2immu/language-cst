@@ -10,22 +10,22 @@ public class TestInstanceOf extends CommonTest {
 
     @Test
     public void test() {
-        Expression e1 = r.newInstanceOf(a, r.newParameterizedType(r.boxedBooleanTypeInfo(), 0));
+        Expression e1 = newInstanceOf(a, r.newParameterizedType(r.boxedBooleanTypeInfo(), 0));
         assertEquals("a instanceof Boolean", e1.toString());
         assertTrue(r.sortAndSimplify(e1).isBoolValueTrue());
 
-        Expression e2 = r.newInstanceOf(a, r.newParameterizedType(r.integerTypeInfo(), 0));
+        Expression e2 = newInstanceOf(a, r.newParameterizedType(r.integerTypeInfo(), 0));
         assertEquals("a instanceof Integer", e2.toString());
         assertTrue(r.sortAndSimplify(e2).isBoolValueFalse());
     }
 
     @Test
     public void test2() {
-        Expression e1 = r.newInstanceOf(a, r.newParameterizedType(r.boxedBooleanTypeInfo(), 0));
+        Expression e1 = newInstanceOf(a, r.newParameterizedType(r.boxedBooleanTypeInfo(), 0));
         assertEquals("a instanceof Boolean", e1.toString());
 
         // object simply disappears!
-        Expression e2 = r.newInstanceOf(a, r.newParameterizedType(r.objectTypeInfo(), 0));
+        Expression e2 = newInstanceOf(a, r.newParameterizedType(r.objectTypeInfo(), 0));
         assertEquals("a instanceof Object", e2.toString());
         assertTrue(r.sortAndSimplify(e2).isBoolValueTrue());
 
@@ -37,11 +37,11 @@ public class TestInstanceOf extends CommonTest {
 
     @Test
     public void test3() {
-        Expression e1 = r.newInstanceOf(a, r.newParameterizedType(r.objectTypeInfo(), 0));
+        Expression e1 = newInstanceOf(a, r.newParameterizedType(r.objectTypeInfo(), 0));
         assertEquals("a instanceof Object", e1.toString());
 
         // object simply disappears!
-        Expression e2 = r.newInstanceOf(a, r.newParameterizedType(r.boxedBooleanTypeInfo(), 0));
+        Expression e2 = newInstanceOf(a, r.newParameterizedType(r.boxedBooleanTypeInfo(), 0));
         assertEquals("a instanceof Boolean", r.and(e1, e2).toString());
 
         // a instanceof Object remains
@@ -53,8 +53,8 @@ public class TestInstanceOf extends CommonTest {
 
     @Test
     public void test4() {
-        Expression e1 = r.newInstanceOf(a, r.newParameterizedType(r.boxedBooleanTypeInfo(), 0));
-        Expression e2 = r.newInstanceOf(a, r.newParameterizedType(r.boxed(r.charTypeInfo()), 0));
+        Expression e1 = newInstanceOf(a, r.newParameterizedType(r.boxedBooleanTypeInfo(), 0));
+        Expression e2 = newInstanceOf(a, r.newParameterizedType(r.boxed(r.charTypeInfo()), 0));
 
         Expression or1 = r.or(r.negate(e1), r.equals(r.nullConstant(), a));
         assertEquals("null==a||!(a instanceof Boolean)", or1.toString());
@@ -73,7 +73,7 @@ public class TestInstanceOf extends CommonTest {
 
     @Test
     public void test5() {
-        Expression e1 = r.newInstanceOf(a, r.newParameterizedType(r.boxedBooleanTypeInfo(), 0));
+        Expression e1 = newInstanceOf(a, r.newParameterizedType(r.boxedBooleanTypeInfo(), 0));
         Expression e2 = r.negate(r.equals(r.nullConstant(), a));
         Expression and = r.and(e2, e1);
         assertEquals("a instanceof Boolean", and.toString());
@@ -81,7 +81,7 @@ public class TestInstanceOf extends CommonTest {
 
     @Test
     public void test6() {
-        Expression e1 = r.newInstanceOf(a, r.newParameterizedType(r.boxedBooleanTypeInfo(), 0));
+        Expression e1 = newInstanceOf(a, r.newParameterizedType(r.boxedBooleanTypeInfo(), 0));
         Expression e2 = r.equals(r.nullConstant(), a);
         Expression and = r.and(e2, e1);
         assertEquals("false", and.toString());

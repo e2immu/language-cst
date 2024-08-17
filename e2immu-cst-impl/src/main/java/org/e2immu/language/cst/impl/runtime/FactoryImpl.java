@@ -59,9 +59,8 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
-    public InstanceOf newInstanceOf(Expression expression, ParameterizedType parameterizedType, LocalVariable patternVariable) {
-        return new InstanceOfImpl(List.of(), null, expression, parameterizedType, patternVariable,
-                booleanParameterizedType());
+    public InstanceOf.Builder newInstanceOfBuilder() {
+        return new InstanceOfImpl.BuilderImpl(booleanParameterizedType());
     }
 
     @Override
@@ -102,15 +101,6 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     @Override
     public ArrayLength newArrayLength(Expression scope) {
         return new ArrayLengthImpl(this, scope);
-    }
-
-    @Override
-    public MethodCall newMethodCall(Expression object, MethodInfo methodInfo, List<Expression> parameterExpressions) {
-        return new MethodCallImpl.Builder()
-                .setObject(object)
-                .setMethodInfo(methodInfo)
-                .setParameterExpressions(parameterExpressions)
-                .build();
     }
 
     @Override

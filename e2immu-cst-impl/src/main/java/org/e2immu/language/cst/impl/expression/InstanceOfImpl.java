@@ -48,6 +48,41 @@ public class InstanceOfImpl extends ExpressionImpl implements InstanceOf {
         this.booleanParameterizedType = booleanParameterizedType;
     }
 
+    public static class BuilderImpl extends ElementImpl.Builder<InstanceOf.Builder> implements InstanceOf.Builder {
+        private final ParameterizedType booleanPt;
+
+        private Expression expression;
+        private ParameterizedType testType;
+        private LocalVariable patternVariable;
+
+        public BuilderImpl(ParameterizedType booleanPt) {
+            this.booleanPt = booleanPt;
+        }
+
+        @Override
+        public InstanceOf.Builder setExpression(Expression expression) {
+            this.expression = expression;
+            return this;
+        }
+
+        @Override
+        public InstanceOf.Builder setPatternVariable(LocalVariable patternVariable) {
+            this.patternVariable = patternVariable;
+            return this;
+        }
+
+        @Override
+        public InstanceOf.Builder setTestType(ParameterizedType testType) {
+            this.testType = testType;
+            return this;
+        }
+
+        @Override
+        public InstanceOf build() {
+            return new InstanceOfImpl(comments, source, expression, testType, patternVariable, booleanPt);
+        }
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -79,12 +79,12 @@ public class TestAbstractValue extends CommonTest {
 
     @Test
     public void testInstanceOf() {
-        Expression iva = r.newInstanceOf(a, r.stringParameterizedType(), null);
+        Expression iva = newInstanceOf(a, r.stringParameterizedType());
         assertEquals("a instanceof String", iva.toString());
-        Expression ivb = r.newInstanceOf(b, r.stringParameterizedType(), null);
+        Expression ivb = newInstanceOf(b, r.stringParameterizedType());
         Expression or = r.or(ivb, iva);
         assertEquals("a instanceof String||b instanceof String", or.toString());
-        Expression iva2 = r.newInstanceOf(a, r.objectParameterizedType(), null);
+        Expression iva2 = newInstanceOf(a, r.objectParameterizedType());
         Expression or2 = r.or(iva, iva2);
         assertEquals("a instanceof Object||a instanceof String", or2.toString());
     }
