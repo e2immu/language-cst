@@ -37,7 +37,7 @@ public class ExtractComponentsOfTooComplex implements Predicate<Element> {
     @Override
     public boolean test(Element e) {
         if (e instanceof Lambda lambda) {
-            variablesToIgnore.addAll(lambda.methodInfo().parameters());
+            variablesToIgnore.addAll(lambda.parameters());
             variablesToIgnore.add(runtime.newThis(lambda.methodInfo().typeInfo()));
             return true;
         }

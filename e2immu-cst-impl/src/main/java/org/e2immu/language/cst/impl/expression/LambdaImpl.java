@@ -31,17 +31,30 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 public class LambdaImpl extends ExpressionImpl implements Lambda {
-
     private final MethodInfo methodInfo;
+    // the following two are stored separately to allow for a degree of flexibility with translations!
+    private final Block methodBody;
+    private final List<ParameterInfo> parameters;
     private final List<OutputVariant> outputVariants;
 
     public LambdaImpl(List<Comment> comments,
                       Source source,
                       MethodInfo methodInfo,
                       List<OutputVariant> outputVariants) {
+        this(comments, source, methodInfo, methodInfo.parameters(), methodInfo.methodBody(), outputVariants);
+    }
+
+    private LambdaImpl(List<Comment> comments,
+                       Source source,
+                       MethodInfo methodInfo,
+                       List<ParameterInfo> parameters,
+                       Block methodBody,
+                       List<OutputVariant> outputVariants) {
         super(comments, source, 1 + methodInfo.complexity());
         this.methodInfo = methodInfo;
         this.outputVariants = outputVariants;
+        this.parameters = parameters;
+        this.methodBody = methodBody;
     }
 
     public enum OutputVariantImpl implements OutputVariant {
@@ -126,6 +139,16 @@ public class LambdaImpl extends ExpressionImpl implements Lambda {
     }
 
     @Override
+    public List<ParameterInfo> parameters() {
+        return parameters;
+    }
+
+    @Override
+    public Block methodBody() {
+        return methodBody;
+    }
+
+    @Override
     public List<OutputVariant> outputVariants() {
         return outputVariants;
     }
@@ -155,14 +178,14 @@ public class LambdaImpl extends ExpressionImpl implements Lambda {
             if (single != null) {
                 single.visit(predicate);
             } else {
-                methodInfo.methodBody().visit(predicate);
+                methodBody.visit(predicate);
             }
         }
     }
 
     private Expression singleExpression() {
-        if (methodInfo.methodBody().statements().size() == 1 &&
-            methodInfo.methodBody().statements().get(0) instanceof ReturnStatement rs) {
+        if (methodBody.statements().size() == 1 &&
+            methodBody.statements().get(0) instanceof ReturnStatement rs) {
             return rs.expression();
         }
         return null;
@@ -176,7 +199,7 @@ public class LambdaImpl extends ExpressionImpl implements Lambda {
                 single.visit(visitor);
             } else {
                 visitor.startSubBlock(0);
-                methodInfo.methodBody().visit(visitor);
+                methodBody.visit(visitor);
                 visitor.endSubBlock(0);
             }
         }
@@ -186,7 +209,6 @@ public class LambdaImpl extends ExpressionImpl implements Lambda {
     @Override
     public OutputBuilder print(Qualification qualification) {
         OutputBuilder outputBuilder = new OutputBuilderImpl();
-        List<ParameterInfo> parameters = methodInfo.parameters();
         if (parameters.isEmpty()) {
             outputBuilder.add(SymbolEnum.OPEN_CLOSE_PARENTHESIS);
         } else if (parameters.size() == 1 && outputVariants.get(0).isEmpty()) {
@@ -205,33 +227,32 @@ public class LambdaImpl extends ExpressionImpl implements Lambda {
         if (singleExpression != null) {
             outputBuilder.add(outputInParenthesis(qualification, precedence(), singleExpression));
         } else {
-            outputBuilder.add(methodInfo.methodBody().print(qualification));
+            outputBuilder.add(methodBody.print(qualification));
         }
         return outputBuilder;
     }
 
     @Override
     public Stream<Variable> variables(DescendMode descendMode) {
-        return methodInfo.methodBody().variables(descendMode);
+        return methodBody.variables(descendMode);
     }
 
     @Override
     public Stream<Element.TypeReference> typesReferenced() {
-        return Stream.concat(methodInfo.parameters().stream().flatMap(ParameterInfo::typesReferenced),
-                methodInfo.methodBody().typesReferenced());
+        return Stream.concat(parameters.stream().flatMap(ParameterInfo::typesReferenced), methodBody.typesReferenced());
     }
 
     @Override
     public Expression translate(TranslationMap translationMap) {
         Expression tLambda = translationMap.translateExpression(this);
         if (tLambda != this) return tLambda;
-        Block tBlock = (Block) methodInfo.methodBody().translate(translationMap).get(0);
-        List<ParameterInfo> tParams = methodInfo.parameters().stream()
+        Block tBlock = (Block) methodBody.translate(translationMap).get(0);
+        List<ParameterInfo> tParams = parameters.stream()
                 .map(pi -> (ParameterInfo) translationMap.translateVariable(pi))
-                .collect(translationMap.toList(methodInfo.parameters()));
-        if (tBlock == methodInfo.methodBody() && tParams == methodInfo.parameters()) {
+                .collect(translationMap.toList(parameters));
+        if (tBlock == methodBody && tParams == parameters) {
             return this;
         }
-        throw new UnsupportedOperationException();
+        return new LambdaImpl(comments(), source(), methodInfo, tParams, tBlock, outputVariants);
     }
 }

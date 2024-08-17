@@ -6,12 +6,17 @@ import org.e2immu.language.cst.api.info.ParameterInfo;
 import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
+import org.e2immu.language.cst.api.statement.Block;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 
 import java.util.List;
 
 public interface Lambda extends Expression {
     MethodInfo methodInfo();
+
+    Block methodBody();
+
+    List<ParameterInfo> parameters();
 
     default TypeInfo abstractFunctionalTypeInfo() {
         return concreteFunctionalType().typeInfo();
