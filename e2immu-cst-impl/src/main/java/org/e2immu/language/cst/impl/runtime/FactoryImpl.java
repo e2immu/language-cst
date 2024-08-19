@@ -84,11 +84,6 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
-    public MethodReference newMethodReference(Expression e, MethodInfo methodInfo, ParameterizedType parameterizedType) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public UnaryOperator newUnaryOperator(MethodInfo operator, Expression e, Precedence precedence) {
         return new UnaryOperatorImpl(operator, e, precedence);
     }

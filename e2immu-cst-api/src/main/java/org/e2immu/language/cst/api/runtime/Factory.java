@@ -239,8 +239,6 @@ public interface Factory {
 
     MethodCall.Builder newMethodCallBuilder(MethodCall methodCall);
 
-    MethodReference newMethodReference(Expression e, MethodInfo methodInfo, ParameterizedType parameterizedType);
-
     MethodReference.Builder newMethodReferenceBuilder();
 
     Expression newMultiExpressions(List<Expression> newExpressions);
