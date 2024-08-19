@@ -36,6 +36,11 @@ public class WhileStatementImpl extends StatementImpl implements WhileStatement 
         this.block = block;
     }
 
+    @Override
+    public Statement withBlocks(List<Block> tSubBlocks) {
+        return new WhileStatementImpl(comments(), source(), annotations(), label(), expression, tSubBlocks.get(0));
+    }
+
     public static class Builder extends StatementImpl.Builder<WhileStatement.Builder> implements WhileStatement.Builder {
         private Expression expression;
         private Block block;

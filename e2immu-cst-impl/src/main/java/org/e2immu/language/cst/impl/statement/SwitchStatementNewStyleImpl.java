@@ -8,6 +8,7 @@ import org.e2immu.language.cst.api.expression.AnnotationExpression;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
+import org.e2immu.language.cst.api.statement.Block;
 import org.e2immu.language.cst.api.statement.Statement;
 import org.e2immu.language.cst.api.statement.SwitchEntry;
 import org.e2immu.language.cst.api.statement.SwitchStatementNewStyle;
@@ -15,6 +16,7 @@ import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.variable.DescendMode;
 import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.language.cst.impl.output.*;
+import org.e2immu.util.internal.util.ZipLists;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -32,6 +34,12 @@ public class SwitchStatementNewStyleImpl extends StatementImpl implements Switch
                 10 + selector.complexity() + entries.stream().mapToInt(SwitchEntry::complexity).sum(), label);
         this.selector = selector;
         this.entries = entries;
+    }
+
+    @Override
+    public Statement withBlocks(List<Block> tSubBlocks) {
+        List<SwitchEntry> newEntries = ZipLists.zip(entries, tSubBlocks).map(z -> z.x().withStatement(z.y())).toList();
+        return new SwitchStatementNewStyleImpl(comments(), source(), annotations(), label(), selector, List.copyOf(newEntries));
     }
 
     @Override

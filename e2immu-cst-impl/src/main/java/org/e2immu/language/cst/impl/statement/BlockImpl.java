@@ -124,7 +124,22 @@ public class BlockImpl extends StatementImpl implements Block {
 
     @Override
     public boolean hasSubBlocks() {
-        return false;
+        return true;
+    }
+
+    @Override
+    public Statement withBlocks(List<Block> tSubBlocks) {
+        return tSubBlocks.get(0);
+    }
+
+    @Override
+    public Block block() {
+        return this;
+    }
+
+    @Override
+    public Stream<Block> subBlockStream() {
+        return Stream.of(this);
     }
 
     @Override

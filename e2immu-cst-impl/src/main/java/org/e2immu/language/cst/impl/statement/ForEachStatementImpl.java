@@ -55,6 +55,12 @@ public class ForEachStatementImpl extends StatementImpl implements ForEachStatem
         return Objects.hash(initializer, expression, block);
     }
 
+    @Override
+    public Statement withBlocks(List<Block> tSubBlocks) {
+        return new ForEachStatementImpl(comments(), source(), annotations(), label(), initializer, expression,
+                tSubBlocks.get(0));
+    }
+
     public static class Builder extends StatementImpl.Builder<ForEachStatement.Builder> implements ForEachStatement.Builder {
         private LocalVariableCreation initializer;
         private Expression expression;

@@ -8,6 +8,7 @@ import org.e2immu.language.cst.api.expression.AnnotationExpression;
 import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
+import org.e2immu.language.cst.api.statement.Block;
 import org.e2immu.language.cst.api.statement.LocalVariableCreation;
 import org.e2immu.language.cst.api.statement.Statement;
 import org.e2immu.language.cst.api.translate.TranslationMap;
@@ -229,5 +230,10 @@ public class LocalVariableCreationImpl extends StatementImpl implements LocalVar
             return List.of(newLvc);
         }
         return List.of(this);
+    }
+
+    @Override
+    public Statement withBlocks(List<Block> tSubBlocks) {
+        return this;// no blocks
     }
 }

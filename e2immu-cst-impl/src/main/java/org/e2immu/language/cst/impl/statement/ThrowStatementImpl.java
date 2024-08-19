@@ -8,6 +8,7 @@ import org.e2immu.language.cst.api.expression.AnnotationExpression;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
+import org.e2immu.language.cst.api.statement.Block;
 import org.e2immu.language.cst.api.statement.Statement;
 import org.e2immu.language.cst.api.statement.ThrowStatement;
 import org.e2immu.language.cst.api.translate.TranslationMap;
@@ -111,6 +112,11 @@ public class ThrowStatementImpl extends StatementImpl implements ThrowStatement 
 
     @Override
     public boolean hasSubBlocks() {
-        return true;
+        return false;
+    }
+
+    @Override
+    public Statement withBlocks(List<Block> tSubBlocks) {
+        return this;// no blocks
     }
 }

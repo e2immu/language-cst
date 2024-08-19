@@ -510,4 +510,18 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
         methodInfo.methodModifiers().forEach(builder::addMethodModifier);
         return methodInfo;
     }
+
+    @Override
+    public MethodInfo withMethodBody(Block newBody) {
+        MethodInfo methodInfo = copyAllButBodyParametersReturnTypeAnnotationsExceptionTypes();
+        MethodInfo.Builder builder = methodInfo.builder();
+        exceptionTypes().forEach(builder::addExceptionType);
+        annotations().forEach(builder::addAnnotation);
+        builder.setReturnType(returnType());
+        parameters().forEach(builder::addParameter);
+        builder.commitParameters();
+        builder.setMethodBody(newBody);
+        builder.commit();
+        return methodInfo;
+    }
 }

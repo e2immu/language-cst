@@ -9,6 +9,7 @@ import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.statement.AssertStatement;
+import org.e2immu.language.cst.api.statement.Block;
 import org.e2immu.language.cst.api.statement.Statement;
 import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.variable.DescendMode;
@@ -129,5 +130,10 @@ public class AssertStatementImpl extends StatementImpl implements AssertStatemen
     @Override
     public boolean hasSubBlocks() {
         return false;
+    }
+
+    @Override
+    public Statement withBlocks(List<Block> tSubBlocks) {
+        return this;// no blocks
     }
 }

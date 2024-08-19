@@ -42,6 +42,8 @@ public interface Statement extends Element {
         return Stream.concat(Stream.ofNullable(block()), otherBlocks().stream());
     }
 
+    Statement withBlocks(List<Block> tSubBlocks);
+
     interface Builder<B extends Builder<?>> extends Element.Builder<B> {
         @Fluent
         B setLabel(String label);

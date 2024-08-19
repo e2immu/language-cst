@@ -8,6 +8,7 @@ import org.e2immu.language.cst.api.expression.AnnotationExpression;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
+import org.e2immu.language.cst.api.statement.Block;
 import org.e2immu.language.cst.api.statement.ExpressionAsStatement;
 import org.e2immu.language.cst.api.statement.Statement;
 import org.e2immu.language.cst.api.translate.TranslationMap;
@@ -114,5 +115,10 @@ public class ExpressionAsStatementImpl extends StatementImpl implements Expressi
             return List.of(new ExpressionAsStatementImpl(comments(), source(), annotations(), label(), tex));
         }
         return List.of(this);
+    }
+
+    @Override
+    public Statement withBlocks(List<Block> tSubBlocks) {
+        return this;// no blocks
     }
 }

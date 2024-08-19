@@ -22,14 +22,4 @@ public interface Block extends Statement {
     default boolean isEmpty() {
         return statements().isEmpty();
     }
-
-    @Override
-    default Block block() {
-        return this;
-    }
-
-    @Override
-    default Stream<Block> subBlockStream() {
-        return Stream.of(this);
-    }
 }

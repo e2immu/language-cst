@@ -62,6 +62,14 @@ public interface MethodInfo extends Info {
 
     ParameterizedType typeOfParameterHandleVarargs(int index);
 
+    /**
+     * Make an exact copy of the object, but with a different method body
+     *
+     * @param newBody the new method body
+     * @return a new MethodInfo instance
+     */
+    MethodInfo withMethodBody(Block newBody);
+
     interface MethodType {
         boolean isCompactConstructor();
 

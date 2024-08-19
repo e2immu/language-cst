@@ -18,6 +18,7 @@ import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.language.cst.impl.element.ElementImpl;
 import org.e2immu.language.cst.impl.output.*;
 import org.e2immu.language.cst.impl.type.DiamondEnum;
+import org.e2immu.util.internal.util.ZipLists;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +48,20 @@ public class TryStatementImpl extends StatementImpl implements TryStatement {
         this.resources = Objects.requireNonNull(resources);
     }
 
+    @Override
+    public Statement withBlocks(List<Block> tSubBlocks) {
+        List<CatchClause> tCatchClauses;
+        if (catchClauses.isEmpty()) {
+            tCatchClauses = List.of();
+        } else {
+            tCatchClauses = ZipLists.zip(catchClauses, tSubBlocks.subList(1, tSubBlocks.size() - 1))
+                    .map(z -> z.x().withBlock(z.y()))
+                    .collect(TranslationMap.staticToList(catchClauses));
+        }
+        return new TryStatementImpl(comments(), source(), annotations(), label(), resources, tSubBlocks.get(0),
+                tCatchClauses, tSubBlocks.get(tSubBlocks.size() - 1));
+    }
+
     public static class CatchClauseImpl implements CatchClause {
         private final List<ParameterizedType> exceptionTypes;
         private final String variableName;
@@ -56,6 +71,11 @@ public class TryStatementImpl extends StatementImpl implements TryStatement {
             this.variableName = variableName;
             this.exceptionTypes = exceptionTypes;
             this.block = block;
+        }
+
+        @Override
+        public CatchClause withBlock(Block newBlock) {
+            return new CatchClauseImpl(exceptionTypes, variableName, newBlock);
         }
 
         public static class Builder implements CatchClause.Builder {

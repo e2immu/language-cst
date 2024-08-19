@@ -4,6 +4,7 @@ import org.e2immu.language.cst.api.element.Element;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
+import org.e2immu.language.cst.api.statement.Block;
 import org.e2immu.language.cst.api.statement.Statement;
 import org.e2immu.language.cst.api.statement.SwitchEntry;
 import org.e2immu.language.cst.api.translate.TranslationMap;
@@ -28,6 +29,11 @@ public class SwitchEntryImpl implements SwitchEntry {
         this.patternVariable = patternVariable;
         this.whenExpression = whenExpression;
         this.statement = statement;
+    }
+
+    @Override
+    public SwitchEntry withStatement(Statement statement) {
+        return new SwitchEntryImpl(conditions, patternVariable, whenExpression, statement);
     }
 
     @Override

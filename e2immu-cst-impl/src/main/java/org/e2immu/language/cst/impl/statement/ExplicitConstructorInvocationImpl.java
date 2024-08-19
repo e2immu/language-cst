@@ -9,6 +9,7 @@ import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.info.MethodInfo;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
+import org.e2immu.language.cst.api.statement.Block;
 import org.e2immu.language.cst.api.statement.ExplicitConstructorInvocation;
 import org.e2immu.language.cst.api.statement.Statement;
 import org.e2immu.language.cst.api.translate.TranslationMap;
@@ -156,5 +157,10 @@ public class ExplicitConstructorInvocationImpl extends StatementImpl implements 
                     isSuper, methodInfo, parameterExpressions));
         }
         return List.of(this);
+    }
+
+    @Override
+    public Statement withBlocks(List<Block> tSubBlocks) {
+        return this;// no blocks
     }
 }

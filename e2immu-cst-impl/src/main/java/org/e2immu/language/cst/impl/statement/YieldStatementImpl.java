@@ -8,6 +8,7 @@ import org.e2immu.language.cst.api.expression.AnnotationExpression;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
+import org.e2immu.language.cst.api.statement.Block;
 import org.e2immu.language.cst.api.statement.Statement;
 import org.e2immu.language.cst.api.statement.YieldStatement;
 import org.e2immu.language.cst.api.translate.TranslationMap;
@@ -118,5 +119,10 @@ public class YieldStatementImpl extends StatementImpl implements YieldStatement 
         Expression tex = expression.translate(translationMap);
         if (tex == expression) return List.of(this);
         return List.of(new YieldStatementImpl(comments(), source(), annotations(), label(), tex));
+    }
+
+    @Override
+    public Statement withBlocks(List<Block> tSubBlocks) {
+        return this;// no blocks
     }
 }

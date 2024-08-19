@@ -44,6 +44,12 @@ public class ForStatementImpl extends StatementImpl implements ForStatement {
         this.expression = expression;
     }
 
+    @Override
+    public Statement withBlocks(List<Block> tSubBlocks) {
+        return new ForStatementImpl(comments(), source(), annotations(), label(), initializers, expression, updaters,
+                tSubBlocks.get(0));
+    }
+
     public static class Builder extends StatementImpl.Builder<ForStatement.Builder> implements ForStatement.Builder {
         private final List<Element> initializers = new ArrayList<>();
         private final List<Expression> updaters = new ArrayList<>();

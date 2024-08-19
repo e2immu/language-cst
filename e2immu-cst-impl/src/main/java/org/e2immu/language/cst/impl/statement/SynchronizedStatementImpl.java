@@ -45,6 +45,11 @@ public class SynchronizedStatementImpl extends StatementImpl implements Synchron
         return Objects.hash(block, expression);
     }
 
+    @Override
+    public Statement withBlocks(List<Block> tSubBlocks) {
+        return new SynchronizedStatementImpl(comments(), source(), annotations(), label(), expression, tSubBlocks.get(0));
+    }
+
     public static class Builder extends StatementImpl.Builder<SynchronizedStatement.Builder> implements SynchronizedStatement.Builder {
         private Block block;
         private Expression expression;

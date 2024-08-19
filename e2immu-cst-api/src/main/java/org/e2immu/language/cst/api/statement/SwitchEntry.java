@@ -37,6 +37,8 @@ public interface SwitchEntry {
 
     Stream<Variable> variables(DescendMode descendMode);
 
+    SwitchEntry withStatement(Statement statement);
+
     interface Builder {
         @Fluent
         Builder addConditions(Collection<Expression> expressions);

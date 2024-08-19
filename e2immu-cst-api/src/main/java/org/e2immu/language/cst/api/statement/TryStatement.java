@@ -33,6 +33,8 @@ public interface TryStatement extends Statement {
 
         void visit(Visitor visitor);
 
+        CatchClause withBlock(Block newBlock);
+
         interface Builder {
             @Fluent
             Builder setBlock(Block block);

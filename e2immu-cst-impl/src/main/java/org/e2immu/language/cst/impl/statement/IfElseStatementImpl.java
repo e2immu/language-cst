@@ -49,6 +49,12 @@ public class IfElseStatementImpl extends StatementImpl implements IfElseStatemen
         return Objects.hash(expression, block, elseBlock);
     }
 
+    @Override
+    public Statement withBlocks(List<Block> tSubBlocks) {
+        return new IfElseStatementImpl(comments(), source(), annotations(), label(), expression,
+                tSubBlocks.get(0), tSubBlocks.get(1));
+    }
+
     public static class Builder extends StatementImpl.Builder<IfElseStatement.Builder> implements IfElseStatement.Builder {
         private Expression expression;
         private Block block;

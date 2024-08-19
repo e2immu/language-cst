@@ -36,6 +36,12 @@ public class SwitchStatementOldStyleImpl extends StatementImpl implements Switch
         this.switchLabels = switchLabels;
     }
 
+    @Override
+    public Statement withBlocks(List<Block> tSubBlocks) {
+        return new SwitchStatementOldStyleImpl(comments(), source(), annotations(), label(), selector,
+                tSubBlocks.get(0), switchLabels);
+    }
+
     public static class SwitchLabelImpl implements SwitchLabel {
         private final Expression literal;
         private final int startFromPosition;

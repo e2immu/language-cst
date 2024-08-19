@@ -5,6 +5,7 @@ import org.e2immu.language.cst.api.element.ImportStatement;
 import org.e2immu.language.cst.api.element.Visitor;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
+import org.e2immu.language.cst.api.statement.Block;
 import org.e2immu.language.cst.api.statement.Statement;
 import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.variable.DescendMode;
@@ -86,5 +87,10 @@ public class ImportStatementImpl extends StatementImpl implements ImportStatemen
         List<Statement> direct = translationMap.translateStatement(this);
         if (haveDirectTranslation(direct, this)) return direct;
         return List.of(this);
+    }
+
+    @Override
+    public Statement withBlocks(List<Block> tSubBlocks) {
+        return this;// no blocks
     }
 }

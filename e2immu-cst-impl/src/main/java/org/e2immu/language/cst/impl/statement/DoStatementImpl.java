@@ -48,6 +48,11 @@ public class DoStatementImpl extends StatementImpl implements DoStatement {
         return Objects.hash(expression, block);
     }
 
+    @Override
+    public Statement withBlocks(List<Block> tSubBlocks) {
+        return new DoStatementImpl(comments(), source(), annotations(), label(), expression, tSubBlocks.get(0));
+    }
+
     public static class Builder extends StatementImpl.Builder<DoStatement.Builder> implements DoStatement.Builder {
         private Expression expression;
         private Block block;
