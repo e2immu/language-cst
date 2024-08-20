@@ -124,4 +124,9 @@ public class QualificationImpl implements Qualification {
             return true;
         }
     }
+
+    @Override
+    public TypeNameRequired typeNameRequired() {
+        return typeNameRequired;
+    }
 }

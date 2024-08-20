@@ -854,6 +854,11 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
+    public Qualification qualificationQualifyFromPrimaryType() {
+        return new QualificationImpl(false, TypeNameImpl.Required.QUALIFIED_FROM_PRIMARY_TYPE);
+    }
+
+    @Override
     public Qualification qualificationSimpleNames() {
         return QualificationImpl.SIMPLE_NAMES;
     }

@@ -16,4 +16,6 @@ public interface Qualification {
     boolean qualifierRequired(MethodInfo methodInfo);
 
     boolean qualifierRequired(Variable variable);
+
+    TypeNameRequired typeNameRequired();
 }

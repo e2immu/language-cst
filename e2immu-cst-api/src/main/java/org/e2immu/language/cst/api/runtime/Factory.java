@@ -364,6 +364,8 @@ public interface Factory {
 
     Qualification qualificationFullyQualifiedNames();
 
+    Qualification qualificationQualifyFromPrimaryType();
+
     Qualification qualificationSimpleNames();
 
     Split splitNever();

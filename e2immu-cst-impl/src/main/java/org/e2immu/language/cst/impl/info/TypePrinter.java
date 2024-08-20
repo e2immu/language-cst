@@ -21,13 +21,13 @@ public record TypePrinter(TypeInfo typeInfo) {
         Set<String> imports;
         Qualification insideType;
         if (typeInfo.isPrimaryType() && typeInfo.hasBeenInspected()) {
-            ResultOfImportComputation res = imports(typeInfo.packageName(), typeInfo);
+            ResultOfImportComputation res = imports(typeInfo.packageName(), typeInfo, qualification);
             imports = res.imports;
             insideType = res.qualification;
         } else {
             imports = Set.of();
             insideType = typeInfo.hasBeenInspected() && qualification instanceof QualificationImpl
-                    ? new QualificationImpl(false, qualification, null)
+                    ? new QualificationImpl(false, qualification, qualification.typeNameRequired())
                     : qualification;
         }
         assert insideType != null;
@@ -233,14 +233,15 @@ public record TypePrinter(TypeInfo typeInfo) {
         boolean allowStar = true;
     }
 
-    private static ResultOfImportComputation imports(String myPackage, TypeInfo typeInfo) {
+    private static ResultOfImportComputation imports(String myPackage, TypeInfo typeInfo, Qualification q) {
         Set<TypeInfo> typesReferenced = typeInfo.typesReferenced()
                 .filter(Element.TypeReference::explicit)
                 .map(Element.TypeReference::typeInfo)
+                .map(TypeInfo::primaryType)
                 .filter(TypePrinter::allowInImport)
                 .collect(Collectors.toSet());
         Map<String, PerPackage> typesPerPackage = new HashMap<>();
-        QualificationImpl qualification = new QualificationImpl(false, null);
+        QualificationImpl qualification = new QualificationImpl(q.doNotQualifyImplicit(), q.typeNameRequired());
         typesReferenced.forEach(ti -> {
             String packageName = ti.packageName();
             if (packageName != null && !myPackage.equals(packageName)) {
