@@ -71,4 +71,11 @@ public interface TryStatement extends Statement {
 
         TryStatement build();
     }
+
+    String NAME = "try";
+
+    @Override
+    default String name() {
+        return NAME;
+    }
 }

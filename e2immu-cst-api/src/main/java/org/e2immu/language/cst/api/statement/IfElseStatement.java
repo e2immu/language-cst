@@ -19,4 +19,11 @@ public interface IfElseStatement extends Statement {
 
         IfElseStatement build();
     }
+
+    String NAME = "ifElse";
+
+    @Override
+    default String name() {
+        return NAME;
+    }
 }

@@ -13,4 +13,11 @@ public interface SynchronizedStatement extends Statement {
 
         SynchronizedStatement build();
     }
+
+    String NAME = "synchronized";
+
+    @Override
+    default String name() {
+        return NAME;
+    }
 }

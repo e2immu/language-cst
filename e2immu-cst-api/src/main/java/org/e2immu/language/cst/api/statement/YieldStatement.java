@@ -11,4 +11,11 @@ public interface YieldStatement extends Statement {
 
         YieldStatement build();
     }
+
+    String NAME = "yield";
+
+    @Override
+    default String name() {
+        return NAME;
+    }
 }

@@ -51,4 +51,11 @@ public interface LocalVariableCreation extends Statement {
 
         LocalVariableCreation build();
     }
+
+    String NAME = "localVariableCreation";
+
+    @Override
+    default String name() {
+        return NAME;
+    }
 }

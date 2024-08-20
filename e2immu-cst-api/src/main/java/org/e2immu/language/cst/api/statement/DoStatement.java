@@ -14,4 +14,11 @@ public interface DoStatement extends LoopStatement {
 
         DoStatement build();
     }
+
+    String NAME = "do";
+
+    @Override
+    default String name() {
+        return NAME;
+    }
 }

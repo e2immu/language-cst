@@ -83,6 +83,11 @@ public class ImportStatementImpl extends StatementImpl implements ImportStatemen
     }
 
     @Override
+    public String name() {
+        return "import";
+    }
+
+    @Override
     public List<Statement> translate(TranslationMap translationMap) {
         List<Statement> direct = translationMap.translateStatement(this);
         if (haveDirectTranslation(direct, this)) return direct;

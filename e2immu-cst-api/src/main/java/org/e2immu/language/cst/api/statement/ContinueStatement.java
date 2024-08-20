@@ -10,4 +10,11 @@ public interface ContinueStatement extends BreakOrContinueStatement {
 
         ContinueStatement build();
     }
+
+    String NAME = "continue";
+
+    @Override
+    default String name() {
+        return NAME;
+    }
 }

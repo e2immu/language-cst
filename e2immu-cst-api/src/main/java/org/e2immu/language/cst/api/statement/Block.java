@@ -24,4 +24,11 @@ public interface Block extends Statement {
     }
 
     Block remove(Statement toRemove);
+
+    String NAME = "block";
+
+    @Override
+    default String name() {
+        return NAME;
+    }
 }

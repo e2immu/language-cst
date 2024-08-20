@@ -11,4 +11,11 @@ public interface ExpressionAsStatement extends Statement {
 
         ExpressionAsStatement build();
     }
+
+    String NAME = "expressionAsStatement";
+
+    @Override
+    default String name() {
+        return NAME;
+    }
 }

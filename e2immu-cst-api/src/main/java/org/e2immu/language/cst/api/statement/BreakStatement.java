@@ -11,4 +11,10 @@ public interface BreakStatement extends BreakOrContinueStatement {
         BreakStatement build();
     }
 
+    String NAME = "break";
+
+    @Override
+    default String name() {
+        return NAME;
+    }
 }

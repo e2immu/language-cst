@@ -52,4 +52,11 @@ public interface SwitchStatementOldStyle extends Statement {
 
         SwitchStatementOldStyle build();
     }
+
+    String NAME = "switchOldStyle";
+
+    @Override
+    default String name() {
+        return NAME;
+    }
 }

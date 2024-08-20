@@ -16,4 +16,11 @@ public interface AssertStatement extends Statement {
 
         AssertStatement build();
     }
+
+    String NAME = "assert";
+
+    @Override
+    default String name() {
+        return NAME;
+    }
 }

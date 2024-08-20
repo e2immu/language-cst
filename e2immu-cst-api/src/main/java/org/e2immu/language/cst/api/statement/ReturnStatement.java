@@ -11,4 +11,11 @@ public interface ReturnStatement extends Statement {
 
         ReturnStatement build();
     }
+
+    String NAME = "return";
+
+    @Override
+    default String name() {
+        return NAME;
+    }
 }

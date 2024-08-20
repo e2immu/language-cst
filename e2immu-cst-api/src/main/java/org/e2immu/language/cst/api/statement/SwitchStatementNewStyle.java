@@ -25,4 +25,11 @@ public interface SwitchStatementNewStyle extends Statement {
         SwitchStatementNewStyle build();
     }
 
+    String NAME = "switchNewStyle";
+
+    @Override
+    default String name() {
+        return NAME;
+    }
+
 }

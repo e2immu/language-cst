@@ -25,6 +25,8 @@ public interface Statement extends Element {
         return null;
     }
 
+    String name();
+
     // all other blocks, except for block()
     @NotNull
     default List<Block> otherBlocks() {

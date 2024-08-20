@@ -28,4 +28,11 @@ public interface ForStatement extends LoopStatement {
 
         ForStatement build();
     }
+
+    String NAME = "for";
+
+    @Override
+    default String name() {
+        return NAME;
+    }
 }

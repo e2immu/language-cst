@@ -14,4 +14,11 @@ public interface WhileStatement extends LoopStatement {
 
         WhileStatement build();
     }
+
+    String NAME = "while";
+
+    @Override
+    default String name() {
+        return NAME;
+    }
 }

@@ -10,4 +10,11 @@ public interface ThrowStatement extends Statement {
 
         ThrowStatement build();
     }
+
+    String NAME = "throw";
+
+    @Override
+    default String name() {
+        return NAME;
+    }
 }

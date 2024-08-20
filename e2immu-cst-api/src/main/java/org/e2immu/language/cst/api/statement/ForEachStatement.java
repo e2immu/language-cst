@@ -19,4 +19,11 @@ public interface ForEachStatement extends LoopStatement {
 
         ForEachStatement build();
     }
+
+    String NAME = "forEach";
+
+    @Override
+    default String name() {
+        return NAME;
+    }
 }

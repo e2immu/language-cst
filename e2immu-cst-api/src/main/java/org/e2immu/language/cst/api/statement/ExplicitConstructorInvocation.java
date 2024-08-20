@@ -26,4 +26,11 @@ public interface ExplicitConstructorInvocation extends Statement {
 
         ExplicitConstructorInvocation build();
     }
+
+    String NAME = "explicitConstructorInvocation";
+
+    @Override
+    default String name() {
+        return NAME;
+    }
 }
