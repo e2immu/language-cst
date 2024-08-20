@@ -16,6 +16,8 @@ public interface Assignment extends Expression {
 
     Boolean prefixPrimitiveOperator();
 
+    boolean assignmentOperatorIsPlus();
+
     MethodInfo binaryOperator();
 
     Assignment withValue(Expression ve);

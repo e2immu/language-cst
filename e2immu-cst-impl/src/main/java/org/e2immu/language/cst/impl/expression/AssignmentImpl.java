@@ -240,4 +240,9 @@ public class AssignmentImpl extends ExpressionImpl implements Assignment {
         }
         return a;
     }
+
+    @Override
+    public boolean assignmentOperatorIsPlus() {
+        return assignmentOperatorIsPlus;
+    }
 }
