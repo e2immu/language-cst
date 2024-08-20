@@ -17,9 +17,11 @@ public interface Block extends Statement {
 
         @Fluent
         Builder addStatement(Statement statement);
-    }
 
+    }
     default boolean isEmpty() {
         return statements().isEmpty();
     }
+
+    Block remove(Statement toRemove);
 }

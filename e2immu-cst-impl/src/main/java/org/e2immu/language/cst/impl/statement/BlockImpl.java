@@ -161,4 +161,10 @@ public class BlockImpl extends StatementImpl implements Block {
         }
         return List.of(this);
     }
+
+    @Override
+    public Block remove(Statement toRemove) {
+        List<Statement> newList = statements.stream().filter(s -> !s.equals(toRemove)).toList();
+        return new BlockImpl(comments(), source(), annotations(), label(), newList);
+    }
 }
