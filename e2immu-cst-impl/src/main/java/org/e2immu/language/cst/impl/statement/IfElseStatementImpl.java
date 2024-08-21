@@ -151,8 +151,8 @@ public class IfElseStatementImpl extends StatementImpl implements IfElseStatemen
     }
 
     @Override
-    public List<Block> otherBlocks() {
-        return elseBlock.isEmpty() ? List.of() : List.of(elseBlock);
+    public Stream<Block> otherBlocksStream() {
+        return Stream.of(elseBlock);
     }
 
     @Override

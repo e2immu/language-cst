@@ -146,11 +146,6 @@ public class SwitchStatementOldStyleImpl extends StatementImpl implements Switch
     }
 
     @Override
-    public List<Block> otherBlocks() {
-        return List.of();
-    }
-
-    @Override
     public List<SwitchLabel> switchLabels() {
         return switchLabels;
     }

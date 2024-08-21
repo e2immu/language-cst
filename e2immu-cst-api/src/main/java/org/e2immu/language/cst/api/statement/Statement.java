@@ -29,8 +29,8 @@ public interface Statement extends Element {
 
     // all other blocks, except for block()
     @NotNull
-    default List<Block> otherBlocks() {
-        return List.of();
+    default Stream<Block> otherBlocksStream() {
+        return Stream.of();
     }
 
     // many have one; if they have one, this is the one (if they have many, this is the first)
@@ -38,10 +38,10 @@ public interface Statement extends Element {
         return null;
     }
 
-    // return all blocks
+    // return all blocks, including empty ones!
     @NotNull
     default Stream<Block> subBlockStream() {
-        return Stream.concat(Stream.ofNullable(block()), otherBlocks().stream());
+        return Stream.concat(Stream.ofNullable(block()), otherBlocksStream());
     }
 
     Statement withBlocks(List<Block> tSubBlocks);

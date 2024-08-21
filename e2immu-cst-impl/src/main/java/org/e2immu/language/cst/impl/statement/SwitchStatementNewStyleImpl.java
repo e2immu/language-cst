@@ -58,6 +58,11 @@ public class SwitchStatementNewStyleImpl extends StatementImpl implements Switch
     }
 
     @Override
+    public Stream<Block> otherBlocksStream() {
+        throw new UnsupportedOperationException("? sometimes the switch entries are statements, rather than blocks");
+    }
+
+    @Override
     public void visit(Predicate<Element> predicate) {
         selector.visit(predicate);
         int i = 0;

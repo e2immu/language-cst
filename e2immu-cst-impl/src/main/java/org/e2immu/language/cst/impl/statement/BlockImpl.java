@@ -138,11 +138,6 @@ public class BlockImpl extends StatementImpl implements Block {
     }
 
     @Override
-    public Stream<Block> subBlockStream() {
-        return Stream.of(this);
-    }
-
-    @Override
     public List<Statement> translate(TranslationMap translationMap) {
         List<Statement> direct = translationMap.translateStatement(this);
         if (haveDirectTranslation(direct, this)) {
