@@ -5,6 +5,7 @@ import org.e2immu.annotation.Nullable;
 import org.e2immu.language.cst.api.element.Element;
 import org.e2immu.language.cst.api.element.Visitor;
 import org.e2immu.language.cst.api.expression.Expression;
+import org.e2immu.language.cst.api.expression.TypeExpression;
 import org.e2immu.language.cst.api.expression.VariableExpression;
 import org.e2immu.language.cst.api.info.FieldInfo;
 import org.e2immu.language.cst.api.output.OutputBuilder;
@@ -55,7 +56,7 @@ public class FieldReferenceImpl extends VariableImpl implements FieldReference {
             this.scope = scope == null
                     ? new TypeExpressionImpl(fieldInfo.owner().asSimpleParameterizedType(), DiamondEnum.NO)
                     : scope;
-            isDefaultScope = true;
+            isDefaultScope = scope instanceof TypeExpression te && fieldInfo.owner() == te.parameterizedType().typeInfo();
             this.scopeVariable = null;
         } else if (scope == null) {
             scopeVariable = new ThisImpl(fieldInfo.owner());
@@ -74,6 +75,7 @@ public class FieldReferenceImpl extends VariableImpl implements FieldReference {
         }
         this.fullyQualifiedName = computeFqn();
         assert (scopeVariable == null) == fieldInfo.isStatic();
+        assert !(scopeIsRecursivelyThis() && fieldInfo.isStatic());
         // know that: assert this.scope != null;
     }
 
