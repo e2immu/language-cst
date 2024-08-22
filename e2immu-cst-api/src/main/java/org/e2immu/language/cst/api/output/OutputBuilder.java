@@ -1,6 +1,7 @@
 package org.e2immu.language.cst.api.output;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -23,4 +24,8 @@ public interface OutputBuilder {
     boolean isEmpty();
 
     boolean notStart();
+
+    default String generateJavaForDebugging() {
+        return list().stream().map(OutputElement::generateJavaForDebugging).collect(Collectors.joining("\n"));
+    }
 }

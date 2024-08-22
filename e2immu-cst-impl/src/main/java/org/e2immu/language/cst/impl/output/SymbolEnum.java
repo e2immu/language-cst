@@ -110,7 +110,7 @@ public record SymbolEnum(String symbol, Space left, Space right, String constant
 
     @Override
     public String generateJavaForDebugging() {
-        return ".add(Symbol" + (constant != null ? "." + constant : ".binaryOperator(" + StringUtil.quote(symbol) + ")") + ")";
+        return ".add(SymbolEnum" + (constant != null ? "." + constant : ".binaryOperator(" + StringUtil.quote(symbol) + ")") + ")";
     }
 
     @Override

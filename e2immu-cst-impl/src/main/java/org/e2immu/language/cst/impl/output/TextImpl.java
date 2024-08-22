@@ -41,6 +41,6 @@ public record TextImpl(String text) implements Text {
 
     @Override
     public String generateJavaForDebugging() {
-        return ".add(new TextEnum(" + StringUtil.quote(text) + "))";
+        return ".add(new TextImpl(" + StringUtil.quote(text) + "))";
     }
 }

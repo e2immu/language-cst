@@ -76,7 +76,7 @@ public enum SpaceEnum implements Space {
 
     @Override
     public String generateJavaForDebugging() {
-        return ".add(Space." + this.name() + ")";
+        return ".add(SpaceEnum." + this.name() + ")";
     }
 
     @Override
