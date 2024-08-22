@@ -19,6 +19,8 @@ import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.language.cst.impl.analysis.PropertyImpl;
 import org.e2immu.language.cst.impl.analysis.ValueImpl;
 import org.e2immu.language.cst.impl.element.ElementImpl;
+import org.e2immu.language.cst.impl.type.TypeParameterImpl;
+import org.e2immu.support.Either;
 import org.e2immu.support.EventuallyFinal;
 
 import java.util.ArrayList;
@@ -506,8 +508,11 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
         MethodInfo methodInfo = new MethodInfoImpl(methodType, name, typeInfo);
         MethodInfo.Builder builder = methodInfo.builder();
         builder.setAccess(access()).setSource(source()).setSynthetic(isSynthetic());
-        methodInfo.typeParameters().forEach(builder::addTypeParameter);
-        methodInfo.methodModifiers().forEach(builder::addMethodModifier);
+        typeParameters()
+                .stream()
+                .map(t -> new TypeParameterImpl(t.getIndex(), t.simpleName(), Either.right(methodInfo), t.annotations()))
+                .forEach(builder::addTypeParameter);
+        methodModifiers().forEach(builder::addMethodModifier);
         return methodInfo;
     }
 
