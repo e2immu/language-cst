@@ -62,6 +62,7 @@ public class StringConstantImpl extends ConstantExpressionImpl<String> implement
 
     @Override
     public OutputBuilder print(Qualification qualification) {
-        return new OutputBuilderImpl().add(new TextImpl(StringUtil.quote(constant)));
+        String quoted = StringUtil.quote(constant);
+        return new OutputBuilderImpl().add(new TextImpl(quoted));
     }
 }

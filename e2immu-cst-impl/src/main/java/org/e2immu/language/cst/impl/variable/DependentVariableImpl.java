@@ -13,6 +13,7 @@ import org.e2immu.language.cst.api.variable.DependentVariable;
 import org.e2immu.language.cst.api.variable.DescendMode;
 import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.language.cst.impl.output.OutputBuilderImpl;
+import org.e2immu.language.cst.impl.output.SymbolEnum;
 import org.e2immu.language.cst.impl.output.TextImpl;
 
 import java.util.Objects;
@@ -101,7 +102,11 @@ public class DependentVariableImpl extends VariableImpl implements DependentVari
 
     @Override
     public OutputBuilder print(Qualification qualification) {
-        return new OutputBuilderImpl().add(new TextImpl(simpleName));
+        return new OutputBuilderImpl()
+                .add(arrayExpression.print(qualification))
+                .add(SymbolEnum.LEFT_BRACKET)
+                .add(indexExpression.print(qualification))
+                .add(SymbolEnum.RIGHT_BRACKET);
     }
 
     @Override

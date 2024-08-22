@@ -18,6 +18,7 @@ import org.e2immu.language.cst.api.variable.DescendMode;
 import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.language.cst.impl.analysis.PropertyImpl;
 import org.e2immu.language.cst.impl.analysis.ValueImpl;
+import org.e2immu.language.cst.impl.element.ElementImpl;
 import org.e2immu.language.cst.impl.output.*;
 import org.e2immu.language.cst.impl.type.DiamondEnum;
 import org.e2immu.support.EventuallyFinal;
@@ -223,7 +224,8 @@ public class FieldInfoImpl extends InfoImpl implements FieldInfo {
     @Override
     public Stream<TypeReference> typesReferenced() {
         Expression initializer = inspection.get().initializer();
-        return Stream.concat(type.typesReferenced(), initializer == null ? Stream.of() : initializer.typesReferenced());
+        return Stream.concat(type.typesReferenced().map(t -> new ElementImpl.TypeReference(t.typeInfo(), true)),
+                initializer == null ? Stream.of() : initializer.typesReferenced());
     }
 
     @Override
