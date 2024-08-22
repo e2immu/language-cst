@@ -328,6 +328,21 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
+    public Precedence precedenceShift() {
+        return PrecedenceEnum.SHIFT;
+    }
+
+    @Override
+    public Precedence precedenceBitwiseXor() {
+        return PrecedenceEnum.XOR;
+    }
+
+    @Override
+    public Precedence precedenceRelational() {
+        return PrecedenceEnum.RELATIONAL;
+    }
+
+    @Override
     public Precedence precedenceEquality() {
         return PrecedenceEnum.EQUALITY;
     }
@@ -348,12 +363,17 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
-    public Precedence precedenceGreaterThan() {
-        return PrecedenceEnum.EQUALITY;
+    public Precedence precedenceLogicalAnd() {
+        return PrecedenceEnum.LOGICAL_AND;
     }
 
     @Override
-    public Precedence precedenceAnd() {
+    public Precedence precedenceLogicalOr() {
+        return PrecedenceEnum.LOGICAL_OR;
+    }
+
+    @Override
+    public Precedence precedenceBitwiseAnd() {
         return PrecedenceEnum.AND;
     }
 
@@ -363,7 +383,7 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
-    public Precedence precedenceOr() {
+    public Precedence precedenceBitwiseOr() {
         return PrecedenceEnum.OR;
     }
 

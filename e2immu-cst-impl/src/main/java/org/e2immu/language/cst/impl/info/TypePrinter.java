@@ -121,6 +121,7 @@ public record TypePrinter(TypeInfo typeInfo) {
 
         // access
         Access access = typeInfo.access();
+        assert access != null : "Access has not yet been computed on " + typeInfo.fullyQualifiedName();
         Access enclosedAccess = typeInfo.compilationUnitOrEnclosingType().isLeft()
                 ? InspectionImpl.AccessEnum.PUBLIC
                 : typeInfo.compilationUnitOrEnclosingType().getRight().access();
@@ -241,7 +242,12 @@ public record TypePrinter(TypeInfo typeInfo) {
                 .filter(TypePrinter::allowInImport)
                 .collect(Collectors.toSet());
         Map<String, PerPackage> typesPerPackage = new HashMap<>();
-        QualificationImpl qualification = new QualificationImpl(q.doNotQualifyImplicit(), q.typeNameRequired());
+        QualificationImpl qualification;
+        if (q == null) {
+            qualification = new QualificationImpl(false, TypeNameImpl.Required.QUALIFIED_FROM_PRIMARY_TYPE);
+        } else {
+            qualification = new QualificationImpl(q.doNotQualifyImplicit(), q.typeNameRequired());
+        }
         typesReferenced.forEach(ti -> {
             String packageName = ti.packageName();
             if (packageName != null && !myPackage.equals(packageName)) {

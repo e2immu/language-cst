@@ -17,6 +17,10 @@ import java.util.stream.Stream;
 public abstract class ElementImpl implements Element {
 
     public record TypeReference(TypeInfo typeInfo, boolean explicit) implements Element.TypeReference {
+        public TypeReference {
+            assert typeInfo != null;
+        }
+
         @Override
         public Element.TypeReference withExplicit() {
             return new TypeReference(typeInfo, true);

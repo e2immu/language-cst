@@ -340,7 +340,7 @@ public interface Factory {
 
     Precedence precedenceAdditive();
 
-    Precedence precedenceAnd();
+    Precedence precedenceBitwiseAnd();
 
     Precedence precedenceArrayAccess();
 
@@ -350,15 +350,23 @@ public interface Factory {
 
     Precedence precedenceEquality();
 
-    Precedence precedenceGreaterThan();
+    Precedence precedenceRelational();
 
     Precedence precedenceMultiplicative();
 
-    Precedence precedenceOr();
+    Precedence precedenceBitwiseOr();
+
+    Precedence precedenceShift();
 
     Precedence precedenceTop();
 
     Precedence precedenceUnary();
+
+    Precedence precedenceBitwiseXor();
+
+    Precedence precedenceLogicalAnd();
+
+    Precedence precedenceLogicalOr();
 
     Qualification qualificationDoNotQualifyImplicit();
 

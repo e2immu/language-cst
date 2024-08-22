@@ -245,7 +245,7 @@ public class ConstructorCallImpl extends ExpressionImpl implements ConstructorCa
             //    }
         }
         if (anonymousClass != null) {
-            outputBuilder.add(anonymousClass.print(qualification, true));
+            outputBuilder.add(anonymousClass.print(qualification, false));
         }
         if (arrayInitializer != null) {
             outputBuilder.add(arrayInitializer.print(qualification));
@@ -261,9 +261,11 @@ public class ConstructorCallImpl extends ExpressionImpl implements ConstructorCa
 
     @Override
     public Stream<Element.TypeReference> typesReferenced() {
-        return Stream.concat(object == null ? Stream.of() : object.typesReferenced(),
+        return
+                Stream.concat(anonymousClass == null ? Stream.of(): anonymousClass.typesReferenced(),
+                Stream.concat(object == null ? Stream.of() : object.typesReferenced(),
                 Stream.concat(parameterExpressions.stream().flatMap(Expression::typesReferenced),
-                        Stream.of(new ElementImpl.TypeReference(concreteReturnType.typeInfo(), true))));
+                        Stream.of(new ElementImpl.TypeReference(concreteReturnType.typeInfo(), true)))));
     }
 
     @Override
