@@ -326,6 +326,8 @@ public interface Factory {
 
     YieldStatement.Builder newYieldBuilder();
 
+    Expression notNull(Expression expression);
+
     Expression nullConstant();
 
     Expression nullValue(TypeInfo typeInfo);

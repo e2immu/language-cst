@@ -285,6 +285,11 @@ public class ParameterizedTypeImpl implements ParameterizedType {
     }
 
     @Override
+    public int numericIsAssignableFrom(Predefined runtime, ParameterizedType other) {
+        return new IsAssignableFrom(runtime, this, other).execute(false, IsAssignableFrom.Mode.COVARIANT);
+    }
+
+    @Override
     public String detailedString() {
         return printForMethodFQN(false, DiamondEnum.SHOW_ALL);
     }

@@ -88,6 +88,8 @@ public interface ParameterizedType {
     // TODO consider moving this to "runtime"
     boolean isAssignableFrom(Predefined runtime, ParameterizedType other);
 
+    int numericIsAssignableFrom(Predefined runtime, ParameterizedType other);
+
     boolean isBoolean();
 
     boolean isBooleanOrBoxedBoolean();

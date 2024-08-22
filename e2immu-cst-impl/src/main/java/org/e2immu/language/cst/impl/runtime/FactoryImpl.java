@@ -445,6 +445,17 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
+    public Expression notNull(Expression expression) {
+        return newBinaryOperatorBuilder()
+                .setLhs(nullConstant())
+                .setOperator(notEqualsOperatorObject())
+                .setRhs(expression)
+                .setPrecedence(precedenceEquality())
+                .setParameterizedType(booleanParameterizedType())
+                .build();
+    }
+
+    @Override
     public Expression nullConstant() {
         return new NullConstantImpl(parameterizedTypeNullConstant());
     }
