@@ -64,23 +64,26 @@ public class TryStatementImpl extends StatementImpl implements TryStatement {
 
     public static class CatchClauseImpl implements CatchClause {
         private final List<ParameterizedType> exceptionTypes;
+        private final boolean isFinal;
         private final String variableName;
         private final Block block;
 
-        public CatchClauseImpl(List<ParameterizedType> exceptionTypes, String variableName, Block block) {
+        public CatchClauseImpl(List<ParameterizedType> exceptionTypes, boolean isFinal, String variableName, Block block) {
             this.variableName = variableName;
             this.exceptionTypes = exceptionTypes;
             this.block = block;
+            this.isFinal = isFinal;
         }
 
         @Override
         public CatchClause withBlock(Block newBlock) {
-            return new CatchClauseImpl(exceptionTypes, variableName, newBlock);
+            return new CatchClauseImpl(exceptionTypes, isFinal, variableName, newBlock);
         }
 
         public static class Builder implements CatchClause.Builder {
             private final List<ParameterizedType> exceptionTypes = new ArrayList<>();
             private String variableName;
+            private boolean isFinal;
             private Block block;
 
             @Override
@@ -102,9 +105,20 @@ public class TryStatementImpl extends StatementImpl implements TryStatement {
             }
 
             @Override
-            public CatchClause build() {
-                return new CatchClauseImpl(exceptionTypes, variableName, block);
+            public Builder setFinal(boolean isFinal) {
+                this.isFinal = isFinal;
+                return this;
             }
+
+            @Override
+            public CatchClause build() {
+                return new CatchClauseImpl(exceptionTypes, isFinal, variableName, block);
+            }
+        }
+
+        @Override
+        public boolean isFinal() {
+            return isFinal;
         }
 
         @Override
@@ -155,7 +169,7 @@ public class TryStatementImpl extends StatementImpl implements TryStatement {
                     .map(translationMap::translateType).collect(translationMap.toList(exceptionTypes));
             Block tBlock = (Block) block.translate(translationMap).get(0);
             if (list != exceptionTypes || tBlock != block) {
-                return new CatchClauseImpl(list, variableName, tBlock);
+                return new CatchClauseImpl(list, isFinal, variableName, tBlock);
             }
             return this;
         }
@@ -278,7 +292,11 @@ public class TryStatementImpl extends StatementImpl implements TryStatement {
         int i = 1;
         for (CatchClause cc : catchClauses) {
             outputBuilder.add(KeywordImpl.CATCH)
-                    .add(SymbolEnum.LEFT_PARENTHESIS)
+                    .add(SymbolEnum.LEFT_PARENTHESIS);
+            if(cc.isFinal()) {
+                outputBuilder.add(KeywordImpl.FINAL).add(SpaceEnum.ONE);
+            }
+            outputBuilder
                     .add(cc.exceptionTypes().stream()
                             .map(t -> t.print(qualification, false, DiamondEnum.NO))
                             .collect(OutputBuilderImpl.joining(SymbolEnum.PIPE)))

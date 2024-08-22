@@ -17,6 +17,8 @@ public interface TryStatement extends Statement {
     interface CatchClause {
         List<ParameterizedType> exceptionTypes();
 
+        boolean isFinal();
+
         CatchClause translate(TranslationMap translationMap);
 
         String variableName();
@@ -41,6 +43,9 @@ public interface TryStatement extends Statement {
 
             @Fluent
             Builder addType(ParameterizedType type);
+
+            @Fluent
+            Builder setFinal(boolean isFinal);
 
             @Fluent
             Builder setVariableName(String name);
