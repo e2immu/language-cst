@@ -40,6 +40,9 @@ public class ForStatementImpl extends StatementImpl implements ForStatement {
                                              + updaters.stream().mapToInt(Expression::complexity).sum(), label);
         this.block = block;
         this.initializers = initializers;
+        assert initializers.isEmpty()
+               || initializers.get(0) instanceof LocalVariableCreation && initializers.size() == 1
+               || initializers.stream().allMatch(i -> i instanceof Expression);
         this.updaters = updaters;
         this.expression = expression;
     }
@@ -146,12 +149,16 @@ public class ForStatementImpl extends StatementImpl implements ForStatement {
     @Override
     public OutputBuilder print(Qualification qualification) {
         OutputBuilder outputBuilder = outputBuilder(qualification);
-        return outputBuilder.add(KeywordImpl.FOR)
-                .add(SymbolEnum.LEFT_PARENTHESIS)
-                .add(initializers.stream().map(expression1 -> expression1.print(qualification))
-                        .collect(OutputBuilderImpl.joining(SymbolEnum.COMMA)))
-                .add(SymbolEnum.SEMICOLON)
-                .add(expression.print(qualification))
+        outputBuilder.add(KeywordImpl.FOR)
+                .add(SymbolEnum.LEFT_PARENTHESIS);
+        if (initializers.size() == 1 && initializers.get(0) instanceof LocalVariableCreation lvc) {
+            outputBuilder.add(lvc.print(qualification)); // already contains the semicolon
+        } else {
+            outputBuilder.add(initializers.stream().map(expression1 -> expression1.print(qualification))
+                            .collect(OutputBuilderImpl.joining(SymbolEnum.COMMA)))
+                    .add(SymbolEnum.SEMICOLON);
+        }
+        return outputBuilder.add(expression.print(qualification))
                 .add(SymbolEnum.SEMICOLON)
                 .add(updaters.stream().map(expression2 -> expression2.print(qualification))
                         .collect(OutputBuilderImpl.joining(SymbolEnum.COMMA)))
