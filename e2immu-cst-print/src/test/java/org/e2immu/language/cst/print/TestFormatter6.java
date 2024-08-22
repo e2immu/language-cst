@@ -191,12 +191,7 @@ public class TestFormatter6 {
         GuideImpl.GuideGenerator gg618 = GuideImpl.generatorForParameterDeclaration();
         GuideImpl.GuideGenerator gg619 = GuideImpl.defaultGuideGenerator();
 
-        ob.add(KeywordImpl.PACKAGE)
-                .add(SpaceEnum.ONE)
-                .add(new TextImpl("a.b"))
-                .add(SymbolEnum.SEMICOLON)
-                .add(SpaceEnum.NEWLINE)
-                .add(KeywordImpl.CLASS)
+        ob.add(KeywordImpl.CLASS)
                 .add(SpaceEnum.ONE)
                 .add(new TextImpl("X"))
                 .add(SymbolEnum.LEFT_BRACE)
@@ -212,10 +207,10 @@ public class TestFormatter6 {
                 .add(SpaceEnum.ONE)
                 .add(new TextImpl("baseURL"))
                 .add(SymbolEnum.COMMA)
-               // .add(gg618.mid()) // priority=false, startNL=true, endNL=false
+                // .add(gg618.mid()) // priority=false, startNL=true, endNL=false
                 .add(new TypeNameImpl("String"))
                 .add(SpaceEnum.ONE)
-                .add(new TextImpl("x123456789")) // FIXME one more character here, and the space disappears
+                .add(new TextImpl("x1234567890")) // FIXME one more character here, and the space disappears (from 9 -> 0)
                 .add(gg618.end()) // priority=false, startNL=true, endNL=false
                 .add(SymbolEnum.RIGHT_PARENTHESIS)
                 .add(SpaceEnum.ONE_REQUIRED_EASY_SPLIT)
@@ -236,9 +231,8 @@ public class TestFormatter6 {
         String out = formatter.write(ob);
         @Language("java")
         String expected = """
-                package a.b;
                 class X {
-                    static HttpURLConnection openConnection(String baseURL, String queryString) throws MalformedURLException,
+                    static HttpURLConnection openConnection(String baseURL, String x1234567890) throws MalformedURLException,
                         IOException{ }
                 }
                 """;

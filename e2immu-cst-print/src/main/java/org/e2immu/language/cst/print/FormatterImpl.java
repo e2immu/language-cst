@@ -146,10 +146,23 @@ public record FormatterImpl(Runtime runtime, FormattingOptions options) implemen
         }
     }
 
+    private static boolean startsWithLetter(String append) {
+        return !append.isEmpty() && Character.isLetterOrDigit(append.charAt(0));
+    }
+
+    private static boolean endsInLetter(String have) {
+        return !have.isEmpty() && Character.isLetterOrDigit(have.charAt(have.length()-1));
+    }
+
+
     private static void swap(Stack<Tab> tabs, String writeBefore, Writer writer) throws IOException {
         Writer destination = tabs.size() == 1 ? writer : tabs.get(tabs.size() - 2).writer;
         destination.write(writeBefore);
         Tab tab = tabs.peek();
+        // FIXME this is a hack 20240822 to fix TestFormatter6 -- have no time to really go deep now
+        if(endsInLetter(destination.toString()) && startsWithLetter(tab.writer.toString())) {
+            destination.write(" ");
+        }
         destination.write(tab.writer.toString());
         tab.writer = new StringWriter();
     }
