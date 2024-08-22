@@ -565,7 +565,7 @@ public class ParameterizedTypeImpl implements ParameterizedType {
         if (stablePt.typeInfo() == null) {
             throw new UnsupportedOperationException("? input " + stablePt + " has no type");
         }
-        return new ParameterizedTypeImpl(stablePt.typeInfo(), recursivelyMappedParameters);
+        return new ParameterizedTypeImpl(stablePt.typeInfo(), null, recursivelyMappedParameters, arrays, wildcard);
     }
 
     @Override

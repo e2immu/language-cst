@@ -3,6 +3,7 @@ package org.e2immu.language.cst.impl.variable;
 import org.e2immu.annotation.NotNull;
 import org.e2immu.annotation.Nullable;
 import org.e2immu.language.cst.api.element.Element;
+import org.e2immu.language.cst.api.element.Source;
 import org.e2immu.language.cst.api.element.Visitor;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.expression.VariableExpression;
@@ -52,7 +53,9 @@ public class DependentVariableImpl extends VariableImpl implements DependentVari
         if ((ve = expression.asInstanceOf(VariableExpression.class)) != null) {
             return ve.variable();
         }
-        String name = variablePrefix + expression.source().compact();
+        Source source = expression.source();
+        assert source != null : "Expression " + expression.getClass() + " has no source";
+        String name = variablePrefix + source.compact();
         return new LocalVariableImpl(name, expression.parameterizedType(), null);
     }
 

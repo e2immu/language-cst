@@ -623,8 +623,8 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
-    public EnclosedExpression newEnclosedExpression(Expression inner) {
-        return new EnclosedExpressionImpl(inner);
+    public EnclosedExpression.Builder newEnclosedExpressionBuilder() {
+        return new EnclosedExpressionImpl.Builder();
     }
 
     @Override

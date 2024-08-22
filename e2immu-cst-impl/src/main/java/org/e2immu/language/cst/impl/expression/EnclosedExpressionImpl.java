@@ -1,6 +1,8 @@
 package org.e2immu.language.cst.impl.expression;
 
+import org.e2immu.language.cst.api.element.Comment;
 import org.e2immu.language.cst.api.element.Element;
+import org.e2immu.language.cst.api.element.Source;
 import org.e2immu.language.cst.api.element.Visitor;
 import org.e2immu.language.cst.api.expression.EnclosedExpression;
 import org.e2immu.language.cst.api.expression.Expression;
@@ -11,10 +13,12 @@ import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.variable.DescendMode;
 import org.e2immu.language.cst.api.variable.Variable;
+import org.e2immu.language.cst.impl.element.ElementImpl;
 import org.e2immu.language.cst.impl.expression.util.PrecedenceEnum;
 import org.e2immu.language.cst.impl.output.OutputBuilderImpl;
 import org.e2immu.language.cst.impl.output.SymbolEnum;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -22,8 +26,8 @@ import java.util.stream.Stream;
 public class EnclosedExpressionImpl extends ExpressionImpl implements EnclosedExpression {
     private final Expression inner;
 
-    public EnclosedExpressionImpl(Expression inner) {
-        super(1 + inner.complexity());
+    public EnclosedExpressionImpl(List<Comment> comments, Source source, Expression inner) {
+        super(comments, source, 1 + inner.complexity());
         this.inner = inner;
     }
 
@@ -103,6 +107,21 @@ public class EnclosedExpressionImpl extends ExpressionImpl implements EnclosedEx
 
         Expression translatedInner = inner.translate(translationMap);
         if (translatedInner == inner) return this;
-        return new EnclosedExpressionImpl(translatedInner);
+        return new EnclosedExpressionImpl(comments(), source(), translatedInner);
+    }
+
+    public static class Builder extends ElementImpl.Builder<EnclosedExpression.Builder> implements EnclosedExpression.Builder {
+        private Expression expression;
+
+        @Override
+        public EnclosedExpression.Builder setExpression(Expression expression) {
+            this.expression = expression;
+            return this;
+        }
+
+        @Override
+        public EnclosedExpression build() {
+            return new EnclosedExpressionImpl(comments, source, expression);
+        }
     }
 }

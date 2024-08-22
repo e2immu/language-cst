@@ -183,7 +183,7 @@ public interface Factory {
 
     EmptyExpression newEmptyExpression(String msg);
 
-    EnclosedExpression newEnclosedExpression(Expression inner);
+    EnclosedExpression.Builder newEnclosedExpressionBuilder();
 
     Equals newEquals(Expression lhs, Expression rhs);
 
