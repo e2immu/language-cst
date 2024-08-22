@@ -351,7 +351,7 @@ public class TryStatementImpl extends StatementImpl implements TryStatement {
         List<CatchClause> tCatch = catchClauses.stream()
                 .map(cc -> cc.translate(translationMap))
                 .collect(translationMap.toList(catchClauses));
-        if (tMain != block || tFinally != finallyBlock) {
+        if (tMain != block || tFinally != finallyBlock || tCatch != catchClauses || tResources != resources) {
             return List.of(new TryStatementImpl(comments(), source(), annotations(), label(), tResources,
                     tMain, tCatch, tFinally));
         }
