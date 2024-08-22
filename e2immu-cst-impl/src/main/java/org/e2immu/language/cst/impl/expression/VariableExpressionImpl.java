@@ -7,14 +7,12 @@ import org.e2immu.language.cst.api.element.Visitor;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.expression.Precedence;
 import org.e2immu.language.cst.api.expression.VariableExpression;
+import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.type.ParameterizedType;
-import org.e2immu.language.cst.api.variable.DependentVariable;
-import org.e2immu.language.cst.api.variable.DescendMode;
-import org.e2immu.language.cst.api.variable.FieldReference;
-import org.e2immu.language.cst.api.variable.Variable;
+import org.e2immu.language.cst.api.variable.*;
 import org.e2immu.language.cst.impl.element.ElementImpl;
 import org.e2immu.language.cst.impl.expression.util.ExpressionComparator;
 import org.e2immu.language.cst.impl.expression.util.InternalCompareToException;
@@ -23,6 +21,7 @@ import org.e2immu.language.cst.impl.output.OutputBuilderImpl;
 import org.e2immu.language.cst.impl.output.TextImpl;
 import org.e2immu.language.cst.impl.variable.DependentVariableImpl;
 import org.e2immu.language.cst.impl.variable.FieldReferenceImpl;
+import org.e2immu.language.cst.impl.variable.ThisImpl;
 
 import java.util.List;
 import java.util.Objects;
@@ -220,6 +219,22 @@ public class VariableExpressionImpl extends ExpressionImpl implements VariableEx
                     //      return DelayedVariableExpression.forDependentVariable(newDv, newDv.causesOfDelay());
                     //  }
                     return new VariableExpressionImpl(source(), comments(), newDv, suffix);
+                }
+            } else if (variable instanceof This thisVar) {
+                ParameterizedType thisVarPt = thisVar.parameterizedType();
+                ParameterizedType translatedType = translationMap.translateType(thisVarPt);
+                TypeInfo tExplicitly;
+                if (thisVar.explicitlyWriteType() == null) {
+                    tExplicitly = null;
+                } else {
+                    ParameterizedType explicitlyPt = thisVar.explicitlyWriteType().asSimpleParameterizedType();
+                    ParameterizedType tExplicitlyPt = translationMap.translateType(explicitlyPt);
+                    tExplicitly = tExplicitlyPt.typeInfo();
+                }
+                if (translatedType != thisVarPt && !translatedType.typeInfo().equals(thisVar.typeInfo()) ||
+                    !Objects.equals(thisVar.explicitlyWriteType(), tExplicitly)) {
+                    This newThisVar = new ThisImpl(translatedType.typeInfo(), tExplicitly, thisVar.writeSuper());
+                    return new VariableExpressionImpl(source(), comments(), newThisVar, suffix);
                 }
             }
         }

@@ -50,9 +50,11 @@ public class FieldReferenceImpl extends VariableImpl implements FieldReference {
                               ParameterizedType parameterizedType) {
         super(parameterizedType);
         this.fieldInfo = Objects.requireNonNull(fieldInfo);
+        // NOTE: for the sake of translations: if the scope is given, we take it, even if the result may not compile
         if (fieldInfo.isStatic()) {
-            // IMPORTANT: the owner doesn't necessarily have a decent identifier, but the field should have one
-            this.scope = new TypeExpressionImpl(fieldInfo.owner().asSimpleParameterizedType(), DiamondEnum.NO);
+            this.scope = scope == null
+                    ? new TypeExpressionImpl(fieldInfo.owner().asSimpleParameterizedType(), DiamondEnum.NO)
+                    : scope;
             isDefaultScope = true;
             this.scopeVariable = null;
         } else if (scope == null) {
@@ -60,24 +62,12 @@ public class FieldReferenceImpl extends VariableImpl implements FieldReference {
             this.scope = new VariableExpressionImpl(scopeVariable);
             isDefaultScope = true;
         } else {
+            this.scope = scope;
             if (scope instanceof VariableExpression ve) {
-                if (ve.variable() instanceof This thisVar) {
-                    if (thisVar.typeInfo() == fieldInfo.owner()) {
-                        this.scope = scope;
-                        scopeVariable = ve.variable();
-                    } else {
-                        scopeVariable = new ThisImpl(fieldInfo.owner());
-                        this.scope = new VariableExpressionImpl(scopeVariable);
-                    }
-                    isDefaultScope = true;
-                } else {
-                    this.scope = scope;
-                    isDefaultScope = false;
-                    scopeVariable = ve.variable();
-                }
+                scopeVariable = ve.variable();
+                isDefaultScope = ve.variable() instanceof This thisVar && thisVar.typeInfo() == fieldInfo.owner();
             } else {
                 // the scope is not a variable, we must introduce a new scope variable
-                this.scope = scope;
                 isDefaultScope = false;
                 scopeVariable = overrideScopeVariable != null ? overrideScopeVariable : newScopeVariable(scope);
             }
