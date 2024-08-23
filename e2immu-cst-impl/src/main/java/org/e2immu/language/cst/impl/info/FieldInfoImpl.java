@@ -270,6 +270,19 @@ public class FieldInfoImpl extends InfoImpl implements FieldInfo {
 
     @Override
     public List<FieldInfo> translate(TranslationMap translationMap) {
-        return List.of(this);
+        Expression init = initializer();
+        Expression tInit = init == null ? null : init.translate(translationMap);
+        TypeInfo tOwner = translationMap.translateType(owner.asSimpleParameterizedType()).typeInfo();
+        ParameterizedType tType = translationMap.translateType(type);
+
+        if (tOwner == owner && tInit == init && tType == type) {
+            return List.of(this);
+        }
+        FieldInfoImpl newField = new FieldInfoImpl(name, isStatic, tType, tOwner);
+        newField.builder().setInitializer(tInit);
+        modifiers().forEach(newField.builder()::addFieldModifier);
+        newField.builder().computeAccess();
+        newField.builder().commit();
+        return List.of(newField);
     }
 }
