@@ -348,16 +348,19 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
-    public Expression nullValue(TypeInfo typeInfo) {
-        if (typeInfo != null) {
-            if (typeInfo.isBoolean()) return newBoolean(false);
-            if (typeInfo.isInt()) return zero;
-            if (typeInfo.isLong()) return newLong(0L);
-            if (typeInfo.isShort()) return newShort((short) 0);
-            if (typeInfo.isByte()) return newByte((byte) 0);
-            if (typeInfo.isFloat()) return newFloat(0);
-            if (typeInfo.isDouble()) return newDouble(0);
-            if (typeInfo.isChar()) return newChar('\0');
+    public Expression nullValue(ParameterizedType parameterizedType) {
+        if (parameterizedType.arrays() == 0) {
+            TypeInfo typeInfo = parameterizedType.bestTypeInfo();
+            if (typeInfo != null) {
+                if (typeInfo.isBoolean()) return newBoolean(false);
+                if (typeInfo.isInt()) return zero;
+                if (typeInfo.isLong()) return newLong(0L);
+                if (typeInfo.isShort()) return newShort((short) 0);
+                if (typeInfo.isByte()) return newByte((byte) 0);
+                if (typeInfo.isFloat()) return newFloat(0);
+                if (typeInfo.isDouble()) return newDouble(0);
+                if (typeInfo.isChar()) return newChar('\0');
+            }
         }
         return nullConstant();
     }

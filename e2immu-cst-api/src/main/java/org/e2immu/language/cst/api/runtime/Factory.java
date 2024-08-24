@@ -332,7 +332,7 @@ public interface Factory {
 
     Expression nullConstant();
 
-    Expression nullValue(TypeInfo typeInfo);
+    Expression nullValue(ParameterizedType parameterizedType);
 
     Collector<OutputBuilder, OutputBuilder, OutputBuilder> outputBuilderJoining(OutputElement outputElement);
 
