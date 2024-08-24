@@ -64,7 +64,7 @@ public class ClassExpressionImpl extends ConstantExpressionImpl<ParameterizedTyp
 
     @Override
     public Stream<Element.TypeReference> typesReferenced() {
-        return Stream.of(new ElementImpl.TypeReference(parameterizedType().typeInfo(), true));
+        return parameterizedType.typesReferencedMadeExplicit();
     }
 
     @Override

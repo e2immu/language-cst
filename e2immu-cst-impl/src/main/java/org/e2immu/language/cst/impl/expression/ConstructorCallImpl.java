@@ -262,10 +262,10 @@ public class ConstructorCallImpl extends ExpressionImpl implements ConstructorCa
     @Override
     public Stream<Element.TypeReference> typesReferenced() {
         return
-                Stream.concat(anonymousClass == null ? Stream.of(): anonymousClass.typesReferenced(),
-                Stream.concat(object == null ? Stream.of() : object.typesReferenced(),
-                Stream.concat(parameterExpressions.stream().flatMap(Expression::typesReferenced),
-                        Stream.of(new ElementImpl.TypeReference(concreteReturnType.typeInfo(), true)))));
+                Stream.concat(anonymousClass == null ? Stream.of() : anonymousClass.typesReferenced(),
+                        Stream.concat(object == null ? Stream.of() : object.typesReferenced(),
+                                Stream.concat(parameterExpressions.stream().flatMap(Expression::typesReferenced),
+                                        Stream.of(new ElementImpl.TypeReference(concreteReturnType.typeInfo(), true)))));
     }
 
     @Override
@@ -293,10 +293,12 @@ public class ConstructorCallImpl extends ExpressionImpl implements ConstructorCa
                 .collect(translationMap.toList(parameterExpressions));
         ArrayInitializer translatedInitializer = arrayInitializer == null ? null :
                 (ArrayInitializer) arrayInitializer.translate(translationMap);
+        TypeInfo tAnonymous = anonymousClass == null ? null : anonymousClass.translate(translationMap);
         if (translatedObject == object
             && translatedType == this.parameterizedType()
             && translatedParameterExpressions == this.parameterExpressions
-            && translatedInitializer == arrayInitializer) {
+            && translatedInitializer == arrayInitializer
+            && tAnonymous == anonymousClass) {
             return this;
         }
         return new ConstructorCallImpl(comments(), source(),
@@ -305,6 +307,7 @@ public class ConstructorCallImpl extends ExpressionImpl implements ConstructorCa
                 diamond,
                 object,
                 translatedParameterExpressions,
-                translatedInitializer, anonymousClass);
+                translatedInitializer,
+                tAnonymous);
     }
 }

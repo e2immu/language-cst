@@ -103,7 +103,7 @@ public class AssertStatementImpl extends StatementImpl implements AssertStatemen
                 .add(SpaceEnum.ONE)
                 .add(expression.print(qualification))
                 .add(message.isEmpty() ? new OutputBuilderImpl()
-                        : new OutputBuilderImpl().add(SymbolEnum.COMMA).add(message.print(qualification)))
+                        : new OutputBuilderImpl().add(SymbolEnum.COLON).add(message.print(qualification)))
                 .add(SymbolEnum.SEMICOLON);
     }
 
