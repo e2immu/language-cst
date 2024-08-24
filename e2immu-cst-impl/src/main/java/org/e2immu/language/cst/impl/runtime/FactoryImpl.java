@@ -483,6 +483,11 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
+    public EmptyStatement.Builder newEmptyStatementBuilder() {
+        return new EmptyStatementImpl.Builder();
+    }
+
+    @Override
     public LocalVariableCreation newLocalVariableCreation(LocalVariable localVariable) {
         return new LocalVariableCreationImpl(localVariable);
     }

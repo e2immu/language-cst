@@ -40,6 +40,16 @@ public class EnclosedExpressionImpl extends ExpressionImpl implements EnclosedEx
     }
 
     @Override
+    public Expression expression() {
+        return inner;
+    }
+
+    @Override
+    public int wrapperOrder() {
+        return 1;
+    }
+
+    @Override
     public int hashCode() {
         return Objects.hashCode(inner);
     }

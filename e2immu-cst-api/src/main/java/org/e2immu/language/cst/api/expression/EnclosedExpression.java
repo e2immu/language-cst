@@ -2,7 +2,7 @@ package org.e2immu.language.cst.api.expression;
 
 import org.e2immu.language.cst.api.element.Element;
 
-public interface EnclosedExpression extends Expression {
+public interface EnclosedExpression extends Expression, ExpressionWrapper {
     Expression inner();
 
     interface Builder extends Element.Builder<Builder> {
