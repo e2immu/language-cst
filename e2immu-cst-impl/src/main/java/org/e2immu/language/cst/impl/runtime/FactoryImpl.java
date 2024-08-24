@@ -94,8 +94,8 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
-    public ArrayLength newArrayLength(Expression scope) {
-        return new ArrayLengthImpl(this, scope);
+    public ArrayLength.Builder newArrayLengthBuilder() {
+        return new ArrayLengthImpl.Builder(intParameterizedType());
     }
 
     @Override

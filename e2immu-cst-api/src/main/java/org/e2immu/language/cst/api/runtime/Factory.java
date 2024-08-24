@@ -129,7 +129,7 @@ public interface Factory {
 
     ArrayInitializer newArrayInitializer(List<Expression> expressions, ParameterizedType commonType);
 
-    ArrayLength newArrayLength(Expression e);
+    ArrayLength.Builder newArrayLengthBuilder();
 
     AssertStatement.Builder newAssertBuilder();
 

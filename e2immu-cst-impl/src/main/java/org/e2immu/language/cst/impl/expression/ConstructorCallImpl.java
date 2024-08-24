@@ -195,6 +195,8 @@ public class ConstructorCallImpl extends ExpressionImpl implements ConstructorCa
         if (predicate.test(this)) {
             if (object != null) object.visit(predicate);
             parameterExpressions.forEach(p -> p.visit(predicate));
+            if (arrayInitializer != null) arrayInitializer.visit(predicate);
+            //currently not implemented. if (anonymousClass != null) anonymousClass.visit(predicate);
         }
     }
 
@@ -203,6 +205,8 @@ public class ConstructorCallImpl extends ExpressionImpl implements ConstructorCa
         if (visitor.beforeExpression(this)) {
             if (object != null) object.visit(visitor);
             parameterExpressions.forEach(p -> p.visit(visitor));
+            if (arrayInitializer != null) arrayInitializer.visit(visitor);
+            //currently not implemented. if (anonymousClass != null) anonymousClass.visit(visitor);
         }
         visitor.afterExpression(this);
     }

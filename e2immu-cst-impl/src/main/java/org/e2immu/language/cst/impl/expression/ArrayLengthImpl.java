@@ -1,6 +1,8 @@
 package org.e2immu.language.cst.impl.expression;
 
+import org.e2immu.language.cst.api.element.Comment;
 import org.e2immu.language.cst.api.element.Element;
+import org.e2immu.language.cst.api.element.Source;
 import org.e2immu.language.cst.api.element.Visitor;
 import org.e2immu.language.cst.api.expression.ArrayLength;
 import org.e2immu.language.cst.api.expression.Expression;
@@ -12,6 +14,7 @@ import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.variable.DescendMode;
 import org.e2immu.language.cst.api.variable.Variable;
+import org.e2immu.language.cst.impl.element.ElementImpl;
 import org.e2immu.language.cst.impl.expression.util.ExpressionComparator;
 import org.e2immu.language.cst.impl.expression.util.InternalCompareToException;
 import org.e2immu.language.cst.impl.expression.util.PrecedenceEnum;
@@ -19,6 +22,7 @@ import org.e2immu.language.cst.impl.output.KeywordImpl;
 import org.e2immu.language.cst.impl.output.OutputBuilderImpl;
 import org.e2immu.language.cst.impl.output.SymbolEnum;
 
+import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -26,14 +30,30 @@ public class ArrayLengthImpl extends ExpressionImpl implements ArrayLength {
     private final Expression scope;
     private final ParameterizedType intPt;
 
-    public ArrayLengthImpl(Predefined predefined, Expression scope) {
-        this(predefined.intParameterizedType(), scope);
-    }
-
-    private ArrayLengthImpl(ParameterizedType intPt, Expression scope) {
-        super(1 + scope.complexity());
+    private ArrayLengthImpl(List<Comment> comments, Source source, ParameterizedType intPt, Expression scope) {
+        super(comments, source, 1 + scope.complexity());
         this.scope = scope;
         this.intPt = intPt;
+    }
+
+    public static class Builder extends ElementImpl.Builder<ArrayLength.Builder> implements ArrayLength.Builder {
+        private Expression expression;
+        private final ParameterizedType intParameterizedType;
+
+        public Builder(ParameterizedType intParameterizedType) {
+            this.intParameterizedType = intParameterizedType;
+        }
+
+        @Override
+        public Builder setExpression(Expression expression) {
+            this.expression = expression;
+            return this;
+        }
+
+        @Override
+        public ArrayLength build() {
+            return new ArrayLengthImpl(comments, source, intParameterizedType, expression);
+        }
     }
 
     @Override
@@ -115,6 +135,6 @@ public class ArrayLengthImpl extends ExpressionImpl implements ArrayLength {
 
         Expression translatedScope = scope.translate(translationMap);
         if (translatedScope == scope) return this;
-        return new ArrayLengthImpl(intPt, translatedScope);
+        return new ArrayLengthImpl(comments(), source(), intPt, translatedScope);
     }
 }
