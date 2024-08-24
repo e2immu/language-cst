@@ -177,7 +177,7 @@ public class ParameterInfoImpl implements ParameterInfo {
 
     @Override
     public Stream<TypeReference> typesReferenced() {
-        return Stream.empty();
+        return parameterizedType.typesReferencedMadeExplicit();
     }
 
     @Override

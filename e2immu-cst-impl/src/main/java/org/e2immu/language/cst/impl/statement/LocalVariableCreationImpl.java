@@ -206,9 +206,7 @@ public class LocalVariableCreationImpl extends StatementImpl implements LocalVar
 
     @Override
     public Stream<Element.TypeReference> typesReferenced() {
-        TypeInfo typeInfo = localVariable.parameterizedType().typeInfo();
-        Stream<Element.TypeReference> trStream = typeInfo == null ? Stream.empty() :
-                Stream.of(new ElementImpl.TypeReference(typeInfo, true));
+        Stream<Element.TypeReference> trStream = localVariable.parameterizedType().typesReferencedMadeExplicit();
         return Stream.concat(trStream, Stream.concat(localVariable.assignmentExpression().typesReferenced(),
                 otherLocalVariables.stream().flatMap(lv -> lv.assignmentExpression().typesReferenced())));
     }

@@ -155,6 +155,8 @@ public interface ParameterizedType {
 
     Stream<Element.TypeReference> typesReferenced();
 
+    Stream<Element.TypeReference> typesReferencedMadeExplicit();
+
     Wildcard wildcard();
 
     ParameterizedType withParameters(List<ParameterizedType> parameterizedTypes);

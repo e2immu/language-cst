@@ -306,7 +306,7 @@ public class TryStatementImpl extends StatementImpl implements TryStatement {
                     .add(cc.block().print(qualification));
             i++;
         }
-        if (!finallyBlock.isEmpty()) {
+        if (!finallyBlock.isEmpty() || catchClauses.isEmpty() && resources.isEmpty()) {
             outputBuilder
                     .add(KeywordImpl.FINALLY)
                     .add(finallyBlock.print(qualification));

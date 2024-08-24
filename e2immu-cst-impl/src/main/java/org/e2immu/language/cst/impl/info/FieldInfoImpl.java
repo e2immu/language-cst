@@ -224,7 +224,7 @@ public class FieldInfoImpl extends InfoImpl implements FieldInfo {
     @Override
     public Stream<TypeReference> typesReferenced() {
         Expression initializer = inspection.get().initializer();
-        return Stream.concat(type.typesReferenced().map(t -> new ElementImpl.TypeReference(t.typeInfo(), true)),
+        return Stream.concat(type.typesReferencedMadeExplicit(),
                 initializer == null ? Stream.of() : initializer.typesReferenced());
     }
 

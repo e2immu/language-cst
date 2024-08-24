@@ -144,6 +144,12 @@ public class ParameterizedTypeImpl implements ParameterizedType {
     }
 
     @Override
+    public Stream<Element.TypeReference> typesReferencedMadeExplicit() {
+        return typesReferenced().map(Element.TypeReference::typeInfo).filter(Objects::nonNull)
+                .map(ti -> new ElementImpl.TypeReference(ti, true));
+    }
+
+    @Override
     public ParameterizedType erased() {
         if (arrays == 0 && wildcard == null && parameters.isEmpty()) return this;
         return new ParameterizedTypeImpl(typeInfo, typeParameter, List.of(), 0, null);
