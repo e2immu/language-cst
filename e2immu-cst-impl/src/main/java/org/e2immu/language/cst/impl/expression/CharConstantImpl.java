@@ -45,6 +45,7 @@ public class CharConstantImpl extends ConstantExpressionImpl<Character> implemen
 
     public static String escaped(char constant) {
         return switch (constant) {
+            case '\0' -> "\\0";
             case '\t' -> "\\t";
             case '\b' -> "\\b";
             case '\n' -> "\\n";
@@ -53,8 +54,11 @@ public class CharConstantImpl extends ConstantExpressionImpl<Character> implemen
             case '\'' -> "\\'";
             case '\"' -> "\\\"";
             case '\\' -> "\\\\";
-            default -> constant >= 32 && constant <= 127 ? Character.toString(constant) :
-                    "\\u" + Integer.toString(constant, 16);
+            default -> {
+                if (constant >= 32 && constant <= 127) yield Character.toString(constant);
+                String hex = Integer.toString(constant, 16);
+                yield "\\u" + "0".repeat(Math.max(0, 4 - hex.length())) + hex;
+            }
         };
     }
 
