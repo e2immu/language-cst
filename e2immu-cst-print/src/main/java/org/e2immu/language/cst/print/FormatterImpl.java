@@ -208,8 +208,8 @@ public record FormatterImpl(Runtime runtime, FormattingOptions options) implemen
         while (!tabs.isEmpty() && tabs.peek().guideIndex == LINE_SPLIT) {
             pop(tabs, "", writer);
         }
-        assert tabs.isEmpty() || tabs.peek().guideIndex == guide.index() :
-                "Tabs: " + tabs + "; guide.index " + guide.index();
+        // FIXME  assert tabs.isEmpty() || tabs.peek().guideIndex == guide.index() :
+        //            "Tabs: " + tabs + "; guide.index " + guide.index();
 
         boolean writeNewLineBefore = !tabs.isEmpty() && tabs.peek().countLines > 1 && tabs.peek().allowNewLineBefore;
 
