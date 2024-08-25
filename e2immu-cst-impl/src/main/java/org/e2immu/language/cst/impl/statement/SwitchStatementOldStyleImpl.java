@@ -180,7 +180,7 @@ public class SwitchStatementOldStyleImpl extends StatementImpl implements Switch
         if (!block.isEmpty()) {
             GuideImpl.GuideGenerator guideGenerator = GuideImpl.generatorForBlock();
             outputBuilder.add(guideGenerator.start());
-            print(qualification, outputBuilder, guideGenerator, block, switchLabelMap(block));
+            print(qualification, outputBuilder, guideGenerator, block, switchLabelMap());
             outputBuilder.add(guideGenerator.end());
         }
         return outputBuilder.add(SymbolEnum.RIGHT_BRACE);
@@ -218,7 +218,8 @@ public class SwitchStatementOldStyleImpl extends StatementImpl implements Switch
         }
     }
 
-    private Map<String, List<SwitchLabel>> switchLabelMap(Block block) {
+    @Override
+    public Map<String, List<SwitchLabel>> switchLabelMap() {
         Map<String, List<SwitchLabel>> res = new HashMap<>();
         int i = 0;
         int labelIndex = 0;

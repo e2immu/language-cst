@@ -14,6 +14,7 @@ import org.e2immu.language.cst.api.variable.Variable;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -59,4 +60,7 @@ public interface SwitchStatementOldStyle extends Statement {
     default String name() {
         return NAME;
     }
+
+    // helper method, useful for analysis; used by print()
+    Map<String, List<SwitchLabel>> switchLabelMap();
 }

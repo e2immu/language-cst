@@ -37,4 +37,6 @@ public interface Source extends Comparable<Source> {
     default String compact() {
         return beginLine() + "-" + beginPos();
     }
+
+    Source withIndex(String newIndex);
 }
