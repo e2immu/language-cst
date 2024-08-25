@@ -14,7 +14,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 
-public interface SwitchEntry {
+public interface SwitchEntry extends Comparable<SwitchEntry> {
     int complexity();
 
     // EmptyExpression for 'default', NullConstant for 'null'

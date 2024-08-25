@@ -12,6 +12,7 @@ import org.e2immu.language.cst.api.variable.DescendMode;
 import org.e2immu.language.cst.api.variable.LocalVariable;
 import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.language.cst.impl.output.*;
+import org.e2immu.language.cst.impl.util.ListUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,6 +30,11 @@ public class SwitchEntryImpl implements SwitchEntry {
         this.patternVariable = patternVariable;
         this.whenExpression = whenExpression;
         this.statement = statement;
+    }
+
+    @Override
+    public int compareTo(SwitchEntry o) {
+        return ListUtil.compare(conditions, o.conditions());
     }
 
     @Override
@@ -95,7 +101,19 @@ public class SwitchEntryImpl implements SwitchEntry {
 
     @Override
     public SwitchEntry translate(TranslationMap translationMap) {
-        throw new UnsupportedOperationException("NYI");
+        List<Expression> tConditions = conditions.stream().map(c -> c.translate(translationMap))
+                .collect(translationMap.toList(conditions));
+        LocalVariable tPattern = patternVariable == null ? null
+                : (LocalVariable) translationMap.translateVariable(patternVariable);
+        Expression tWhen = whenExpression == null ? null : whenExpression.translate(translationMap);
+        List<Statement> tStatements = statement.translate(translationMap);
+        Statement tStatement = tStatements.isEmpty() ? null : tStatements.get(0);
+        if (tConditions == conditions && tPattern == patternVariable && tWhen == whenExpression
+            && tStatement == statement) {
+            return this;
+        }
+        if (tStatement == null) return null; // a way for the entry to disappear
+        return new SwitchEntryImpl(tConditions, tPattern, tWhen, tStatement);
     }
 
     @Override

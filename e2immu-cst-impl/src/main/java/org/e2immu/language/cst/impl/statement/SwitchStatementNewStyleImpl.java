@@ -21,6 +21,7 @@ import org.e2immu.util.internal.util.ZipLists;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -59,7 +60,13 @@ public class SwitchStatementNewStyleImpl extends StatementImpl implements Switch
 
     @Override
     public Stream<Block> otherBlocksStream() {
-        throw new UnsupportedOperationException("? sometimes the switch entries are statements, rather than blocks");
+        return entries.stream()
+                .map(SwitchEntry::statement)
+                .map(statement -> {
+                    if (statement instanceof Block b) return b;
+                    // NOTE: using the statement's source is not correct index-wise, but it may be better than nothing
+                    return new BlockImpl(List.of(), statement.source(), List.of(), null, List.of(statement));
+                });
     }
 
     @Override
@@ -128,7 +135,12 @@ public class SwitchStatementNewStyleImpl extends StatementImpl implements Switch
         if (direct.size() != 1 || direct.get(0) != this) {
             return direct;
         }
-        throw new UnsupportedOperationException("NYI");
+        Expression tSelector = selector.translate(translationMap);
+        List<SwitchEntry> tEntries = entries.stream().map(e -> e.translate(translationMap))
+                .filter(Objects::nonNull) // see translation of switch entry
+                .collect(translationMap.toList(entries));
+        if (tEntries == entries && tSelector == selector) return List.of(this);
+        return List.of(new SwitchStatementNewStyleImpl(comments(), source(), annotations(), label(), tSelector, tEntries));
     }
 
     public static class BuilderImpl extends StatementImpl.Builder<SwitchStatementNewStyle.Builder>

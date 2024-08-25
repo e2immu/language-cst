@@ -51,7 +51,7 @@ public class StringConstantImpl extends ConstantExpressionImpl<String> implement
 
     @Override
     public int order() {
-        return ExpressionComparator.ORDER_CONSTANT_BOOLEAN;
+        return ExpressionComparator.ORDER_CONSTANT_STRING;
     }
 
     @Override
