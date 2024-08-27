@@ -121,4 +121,9 @@ public class ExpressionAsStatementImpl extends StatementImpl implements Expressi
     public Statement withBlocks(List<Block> tSubBlocks) {
         return this;// no blocks
     }
+
+    @Override
+    public ExpressionAsStatement withSource(Source newSource) {
+        return new ExpressionAsStatementImpl(comments(), newSource, annotations(), label(), expression);
+    }
 }

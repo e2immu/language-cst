@@ -1,6 +1,7 @@
 package org.e2immu.language.cst.api.statement;
 
 import org.e2immu.annotation.Fluent;
+import org.e2immu.language.cst.api.element.Source;
 import org.e2immu.language.cst.api.variable.LocalVariable;
 
 import java.util.List;
@@ -58,4 +59,7 @@ public interface LocalVariableCreation extends Statement {
     default String name() {
         return NAME;
     }
+
+    LocalVariableCreation withSource(Source newSource);
+
 }

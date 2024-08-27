@@ -235,4 +235,10 @@ public class LocalVariableCreationImpl extends StatementImpl implements LocalVar
     public Statement withBlocks(List<Block> tSubBlocks) {
         return this;// no blocks
     }
+
+    @Override
+    public LocalVariableCreation withSource(Source newSource) {
+        return new LocalVariableCreationImpl(comments(), newSource, annotations(), label(), localVariable,
+                otherLocalVariables, modifiers);
+    }
 }
