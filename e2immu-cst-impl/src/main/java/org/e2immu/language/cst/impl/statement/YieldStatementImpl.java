@@ -125,4 +125,9 @@ public class YieldStatementImpl extends StatementImpl implements YieldStatement 
     public Statement withBlocks(List<Block> tSubBlocks) {
         return this;// no blocks
     }
+
+    @Override
+    public YieldStatement withSource(Source newSource) {
+        return new YieldStatementImpl(comments(), newSource, annotations(), label(), expression);
+    }
 }

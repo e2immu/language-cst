@@ -125,4 +125,9 @@ public class ReturnStatementImpl extends StatementImpl implements ReturnStatemen
     public Statement withBlocks(List<Block> tSubBlocks) {
         return this;// no blocks
     }
+
+    @Override
+    public ReturnStatement withSource(Source newSource) {
+        return new ReturnStatementImpl(comments(), newSource, annotations(), label(), expression);
+    }
 }

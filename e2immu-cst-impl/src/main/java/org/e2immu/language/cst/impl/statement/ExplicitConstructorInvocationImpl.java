@@ -163,4 +163,10 @@ public class ExplicitConstructorInvocationImpl extends StatementImpl implements 
     public Statement withBlocks(List<Block> tSubBlocks) {
         return this;// no blocks
     }
+
+    @Override
+    public ExplicitConstructorInvocation withSource(Source newSource) {
+        return new ExplicitConstructorInvocationImpl(comments(), newSource, annotations(), label(), isSuper,
+                methodInfo, parameterExpressions);
+    }
 }

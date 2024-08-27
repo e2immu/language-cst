@@ -119,4 +119,9 @@ public class ThrowStatementImpl extends StatementImpl implements ThrowStatement 
     public Statement withBlocks(List<Block> tSubBlocks) {
         return this;// no blocks
     }
+
+    @Override
+    public ThrowStatement withSource(Source newSource) {
+        return new ThrowStatementImpl(comments(), newSource, annotations(), label(), expression);
+    }
 }

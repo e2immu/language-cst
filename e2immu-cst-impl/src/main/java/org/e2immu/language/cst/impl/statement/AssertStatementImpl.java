@@ -136,4 +136,9 @@ public class AssertStatementImpl extends StatementImpl implements AssertStatemen
     public Statement withBlocks(List<Block> tSubBlocks) {
         return this;// no blocks
     }
+
+    @Override
+    public AssertStatement withSource(Source newSource) {
+        return new AssertStatementImpl(comments(), newSource, annotations(), label(), expression, message);
+    }
 }
