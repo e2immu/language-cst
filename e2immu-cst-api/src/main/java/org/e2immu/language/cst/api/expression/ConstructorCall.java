@@ -48,4 +48,11 @@ public interface ConstructorCall extends Expression {
         @Fluent
         Builder setConcreteReturnType(ParameterizedType returnType);
     }
+
+    String NAME = "constructorCall";
+
+    @Override
+    default String name() {
+        return NAME;
+    }
 }

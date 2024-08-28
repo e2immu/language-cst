@@ -17,4 +17,11 @@ public interface And extends Expression {
 
         And build();
     }
+
+    String NAME = "and";
+
+    @Override
+    default String name() {
+        return NAME;
+    }
 }

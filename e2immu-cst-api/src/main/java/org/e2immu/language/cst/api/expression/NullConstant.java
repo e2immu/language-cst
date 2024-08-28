@@ -6,4 +6,11 @@ public interface NullConstant extends Expression {
     default boolean isNullConstant() {
         return true;
     }
+
+    String NAME = "nullConstant";
+
+    @Override
+    default String name() {
+        return NAME;
+    }
 }

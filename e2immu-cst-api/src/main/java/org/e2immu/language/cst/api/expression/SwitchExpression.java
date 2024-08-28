@@ -28,4 +28,10 @@ public interface SwitchExpression extends Expression {
         SwitchExpression build();
     }
 
+    String NAME = "switchExpression";
+
+    @Override
+    default String name() {
+        return NAME;
+    }
 }

@@ -46,4 +46,11 @@ public interface MethodCall extends Expression, OneVariable {
         Builder setConcreteReturnType(ParameterizedType returnType);
 
     }
+
+    String NAME = "methodCall";
+
+    @Override
+    default String name() {
+        return NAME;
+    }
 }

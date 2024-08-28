@@ -8,4 +8,11 @@ public interface UnaryOperator extends Expression {
     MethodInfo operator();
 
     Precedence precedence();
+
+    String NAME = "unaryOperator";
+
+    @Override
+    default String name() {
+        return NAME;
+    }
 }

@@ -41,11 +41,6 @@ public class ExtractComponentsOfTooComplex implements Predicate<Element> {
             variablesToIgnore.add(runtime.newThis(lambda.methodInfo().typeInfo()));
             return true;
         }
-        if (e instanceof InlinedMethod im) {
-            variablesToIgnore.addAll(im.myParameters());
-            variablesToIgnore.add(runtime.newThis(im.methodInfo().typeInfo()));
-            return true;
-        }
         if (e instanceof VariableExpression ve) {
             add(ve.variable(), ve);
             return false;

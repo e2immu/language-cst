@@ -7,4 +7,11 @@ public interface ClassExpression extends ConstantExpression<ParameterizedType> {
 
     // String.class -> String
     ParameterizedType type();
+
+    String NAME = "classLiteral";
+
+    @Override
+    default String name() {
+        return NAME;
+    }
 }

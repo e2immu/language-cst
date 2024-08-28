@@ -11,7 +11,16 @@ public interface GreaterThanZero extends Expression {
 
     interface XB {
         Expression x();
+
         double b();
+
         boolean lessThan();
+    }
+
+    String NAME = "greaterThanZero";
+
+    @Override
+    default String name() {
+        return NAME;
     }
 }

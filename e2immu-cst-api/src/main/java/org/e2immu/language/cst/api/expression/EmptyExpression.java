@@ -15,4 +15,10 @@ public interface EmptyExpression extends Expression {
 
     String msg();
 
+    String NAME = "emptyExpression";
+
+    @Override
+    default String name() {
+        return NAME;
+    }
 }

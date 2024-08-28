@@ -16,4 +16,11 @@ public interface Cast extends Expression {
 
         Cast build();
     }
+
+    String NAME = "cast";
+
+    @Override
+    default String name() {
+        return NAME;
+    }
 }

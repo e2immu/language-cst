@@ -24,4 +24,11 @@ public interface InstanceOf extends Expression {
 
         InstanceOf build();
     }
+
+    String NAME = "instanceOf";
+
+    @Override
+    default String name() {
+        return NAME;
+    }
 }

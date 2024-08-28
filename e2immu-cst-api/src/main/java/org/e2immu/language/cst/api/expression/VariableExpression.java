@@ -39,4 +39,11 @@ public interface VariableExpression extends Expression {
 
         VariableExpression build();
     }
+
+    String NAME = "variableExpression";
+
+    @Override
+    default String name() {
+        return NAME;
+    }
 }

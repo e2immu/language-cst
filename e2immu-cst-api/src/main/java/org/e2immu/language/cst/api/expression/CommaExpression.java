@@ -18,4 +18,11 @@ public interface CommaExpression extends Expression {
 
         CommaExpression build();
     }
+
+    String NAME = "comma";
+
+    @Override
+    default String name() {
+        return NAME;
+    }
 }

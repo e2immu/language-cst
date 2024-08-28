@@ -21,4 +21,11 @@ public interface MethodReference extends Expression {
 
         MethodReference build();
     }
+
+    String NAME = "methodReference";
+
+    @Override
+    default String name() {
+        return NAME;
+    }
 }

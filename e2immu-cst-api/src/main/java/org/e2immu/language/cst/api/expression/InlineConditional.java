@@ -23,4 +23,11 @@ public interface InlineConditional extends Expression {
 
         InlineConditional build(Factory factory);
     }
+
+    String NAME = "inlineConditional";
+
+    @Override
+    default String name() {
+        return NAME;
+    }
 }

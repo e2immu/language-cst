@@ -43,4 +43,11 @@ public interface Assignment extends Expression {
 
         Assignment build();
     }
+
+    String NAME = "assignment";
+
+    @Override
+    default String name() {
+        return NAME;
+    }
 }

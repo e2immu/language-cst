@@ -18,4 +18,11 @@ public interface Or extends Expression {
 
         Or build();
     }
+
+    String NAME = "or";
+
+    @Override
+    default String name() {
+        return NAME;
+    }
 }

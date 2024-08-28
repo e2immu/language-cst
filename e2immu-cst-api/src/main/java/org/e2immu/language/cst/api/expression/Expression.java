@@ -6,6 +6,10 @@ import org.e2immu.language.cst.api.type.ParameterizedType;
 
 public interface Expression extends Comparable<Expression>, Element {
 
+    default String name() {
+        return "?";
+    }
+
     ParameterizedType parameterizedType();
 
     Precedence precedence();
@@ -49,6 +53,7 @@ public interface Expression extends Comparable<Expression>, Element {
     default Double numericValue() {
         return null;
     }
+
     default boolean isNumeric() {
         return parameterizedType().isNumeric();
     }

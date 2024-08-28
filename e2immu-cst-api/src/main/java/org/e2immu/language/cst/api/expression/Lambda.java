@@ -60,4 +60,11 @@ public interface Lambda extends Expression {
 
         Lambda build();
     }
+
+    String NAME = "lambda";
+
+    @Override
+    default String name() {
+        return NAME;
+    }
 }

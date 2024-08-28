@@ -10,4 +10,11 @@ public interface EnclosedExpression extends Expression, ExpressionWrapper {
 
         EnclosedExpression build();
     }
+
+    String NAME = "enclosedExpression";
+
+    @Override
+    default String name() {
+        return NAME;
+    }
 }

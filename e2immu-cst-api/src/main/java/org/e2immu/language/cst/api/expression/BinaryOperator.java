@@ -32,4 +32,11 @@ public interface BinaryOperator extends Expression {
 
         BinaryOperator build();
     }
+
+    String NAME = "binaryOperator";
+
+    @Override
+    default String name() {
+        return NAME;
+    }
 }

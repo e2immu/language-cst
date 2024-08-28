@@ -18,4 +18,11 @@ public interface BooleanConstant extends ConstantExpression<Boolean> {
     default boolean isBoolValueTrue() {
         return constant();
     }
+
+    String NAME = "booleanConstant";
+
+    @Override
+    default String name() {
+        return NAME;
+    }
 }

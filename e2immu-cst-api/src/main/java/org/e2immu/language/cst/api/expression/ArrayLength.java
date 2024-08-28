@@ -10,4 +10,11 @@ public interface ArrayLength extends Expression {
 
         ArrayLength build();
     }
+
+    String NAME = "arrayLength";
+
+    @Override
+    default String name() {
+        return NAME;
+    }
 }
