@@ -123,6 +123,8 @@ public interface Factory {
 
     AnnotationExpression.Builder newAnnotationExpressionBuilder();
 
+    And.Builder newAndBuilder();
+
     TypeInfo newAnonymousType(TypeInfo enclosingType, int index);
 
     MethodInfo newArrayCreationConstructor(ParameterizedType returnType);
@@ -246,6 +248,8 @@ public interface Factory {
     Expression newMultiExpressions(List<Expression> newExpressions);
 
     Comment newMultilineComment(String comment);
+
+    Or.Builder newOrBuilder();
 
     OutputBuilder newOutputBuilder();
 

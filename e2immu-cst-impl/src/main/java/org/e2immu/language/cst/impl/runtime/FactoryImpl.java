@@ -179,6 +179,11 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
+    public Or.Builder newOrBuilder() {
+        return new OrImpl.Builder().setBooleanParameterizedType(booleanParameterizedType());
+    }
+
+    @Override
     public TypeInfo newTypeInfo(CompilationUnit cu, String simpleName) {
         return new TypeInfoImpl(cu, simpleName);
     }
@@ -848,6 +853,11 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     @Override
     public ImportStatement newImportStatement(String importString, boolean isStatic) {
         return new ImportStatementImpl(importString, isStatic);
+    }
+
+    @Override
+    public And.Builder newAndBuilder() {
+        return new AndImpl.Builder().setBooleanParameterizedType(booleanParameterizedType());
     }
 
     @Override

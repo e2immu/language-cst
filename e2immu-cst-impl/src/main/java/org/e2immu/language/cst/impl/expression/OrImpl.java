@@ -1,6 +1,8 @@
 package org.e2immu.language.cst.impl.expression;
 
+import org.e2immu.language.cst.api.element.Comment;
 import org.e2immu.language.cst.api.element.Element;
+import org.e2immu.language.cst.api.element.Source;
 import org.e2immu.language.cst.api.element.Visitor;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.expression.Or;
@@ -12,12 +14,14 @@ import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.variable.DescendMode;
 import org.e2immu.language.cst.api.variable.Variable;
+import org.e2immu.language.cst.impl.element.ElementImpl;
 import org.e2immu.language.cst.impl.expression.util.ExpressionComparator;
 import org.e2immu.language.cst.impl.expression.util.PrecedenceEnum;
 import org.e2immu.language.cst.impl.output.OutputBuilderImpl;
 import org.e2immu.language.cst.impl.output.SymbolEnum;
 import org.e2immu.language.cst.impl.util.ListUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
@@ -35,6 +39,12 @@ public class OrImpl extends ExpressionImpl implements Or {
 
     private OrImpl(ParameterizedType booleanPt, List<Expression> expressions) {
         super(1 + expressions.stream().mapToInt(Expression::complexity).sum());
+        this.expressions = expressions;
+        this.booleanPt = booleanPt;
+    }
+
+    public OrImpl(List<Comment> comments, Source source, ParameterizedType booleanPt, List<Expression> expressions) {
+        super(comments, source, 1 + expressions.stream().mapToInt(Expression::complexity).sum());
         this.expressions = expressions;
         this.booleanPt = booleanPt;
     }
@@ -121,6 +131,33 @@ public class OrImpl extends ExpressionImpl implements Or {
                 expressions.stream().map(e -> e.translate(translationMap))
                         .collect(translationMap.toList(expressions));
         if (expressions == translatedExpressions) return this;
-        return new OrImpl(booleanPt, translatedExpressions);
+        return new OrImpl(comments(), source(), booleanPt, translatedExpressions);
+    }
+
+    public static class Builder extends ElementImpl.Builder<Or.Builder> implements Or.Builder {
+        private final List<Expression> expressions = new ArrayList<>();
+        private ParameterizedType booleanPt;
+
+        @Override
+        public Or.Builder addExpressions(List<Expression> expressions) {
+            this.expressions.addAll(expressions);
+            return this;
+        }
+
+        @Override
+        public Or.Builder addExpression(Expression expression) {
+            this.expressions.add(expression);
+            return this;
+        }
+
+        public Or.Builder setBooleanParameterizedType(ParameterizedType parameterizedType) {
+            this.booleanPt = parameterizedType;
+            return this;
+        }
+
+        @Override
+        public Or build() {
+            return new OrImpl(comments, source, booleanPt, List.copyOf(expressions));
+        }
     }
 }
