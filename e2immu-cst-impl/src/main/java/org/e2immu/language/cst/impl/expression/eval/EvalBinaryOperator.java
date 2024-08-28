@@ -15,7 +15,8 @@ public class EvalBinaryOperator {
     public Expression eval(BinaryOperator operator) {
         Expression l = runtime.sortAndSimplify(operator.lhs());
         Expression r = runtime.sortAndSimplify(operator.rhs());
-        return determineValue(l, r, operator.operator());
+        Expression evaluated = determineValue(l, r, operator.operator());
+        return evaluated != null ? evaluated : operator;
     }
 
     private Expression determineValue(Expression l, Expression r, MethodInfo operator) {
@@ -82,30 +83,8 @@ public class EvalBinaryOperator {
             return runtime.or(l, r);
         }
 
-        // more obscure operators
-/*
-        if (operator == runtime.xorOperatorBool()) {
-            return BooleanXor.booleanXor(identifier, context, l, r);
-        }
-        if (operator == runtime.andOperatorInt()) {
-            return BitwiseAnd.bitwiseAnd(identifier, context, l, r);
-        }
-        if (operator == runtime.orOperatorInt()) {
-            return BitwiseOr.bitwiseOr(identifier, context, l, r);
-        }
-        if (operator == runtime.bitwiseXorOperatorInt()) {
-            return BitwiseXor.bitwiseXor(identifier, context, l, r);
-        }
-        if (operator == runtime.leftShiftOperatorInt()) {
-            return ShiftLeft.shiftLeft(identifier, context, l, r);
-        }
-        if (operator == runtime.signedRightShiftOperatorInt()) {
-            return SignedShiftRight.shiftRight(identifier, context, l, r);
-        }
-        if (operator == runtime.unsignedRightShiftOperatorInt()) {
-            return UnsignedShiftRight.unsignedShiftRight(identifier, context, l, r);
-        }*/
-        throw new UnsupportedOperationException("Operator " + operator.fullyQualifiedName());
+        // more obscure operators: ignore
+        return null;
     }
 
 }

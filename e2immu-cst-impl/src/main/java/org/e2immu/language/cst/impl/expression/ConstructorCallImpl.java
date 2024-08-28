@@ -265,11 +265,11 @@ public class ConstructorCallImpl extends ExpressionImpl implements ConstructorCa
 
     @Override
     public Stream<Element.TypeReference> typesReferenced() {
-        return
+        return Stream.concat(arrayInitializer == null ? Stream.of() : arrayInitializer.typesReferenced(),
                 Stream.concat(anonymousClass == null ? Stream.of() : anonymousClass.typesReferenced(),
                         Stream.concat(object == null ? Stream.of() : object.typesReferenced(),
                                 Stream.concat(parameterExpressions.stream().flatMap(Expression::typesReferenced),
-                                        Stream.of(new ElementImpl.TypeReference(concreteReturnType.typeInfo(), true)))));
+                                        Stream.of(new ElementImpl.TypeReference(concreteReturnType.typeInfo(), true))))));
     }
 
     @Override
