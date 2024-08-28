@@ -59,4 +59,9 @@ public class BreakStatementImpl extends BreakOrContinueStatementImpl implements 
         if (haveDirectTranslation(direct, this)) return direct;
         return List.of(this);
     }
+
+    @Override
+    public BreakStatement withSource(Source newSource) {
+        return new BreakStatementImpl(comments(), newSource, annotations(), label(), goToLabel());
+    }
 }
