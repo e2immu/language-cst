@@ -83,7 +83,7 @@ public class SourceImpl implements Source {
 
     @Override
     public String toString() {
-        return beginLine + ":" + beginPos + "-" + endLine + ":" + endPos;
+        return index + "@" + beginLine + ":" + beginPos + "-" + endLine + ":" + endPos;
     }
 
     @Override
