@@ -60,4 +60,9 @@ public class ContinueStatementImpl extends BreakOrContinueStatementImpl implemen
         if (haveDirectTranslation(direct, this)) return direct;
         return List.of(this);
     }
+
+    @Override
+    public ContinueStatement withSource(Source newSource) {
+        return new ContinueStatementImpl(comments(), newSource, annotations(), label(), goToLabel());
+    }
 }
