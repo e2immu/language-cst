@@ -19,10 +19,15 @@ public interface Block extends Statement {
         Builder addStatement(Statement statement);
 
     }
+
     default boolean isEmpty() {
         return statements().isEmpty();
     }
 
+    /*
+    Remove statement from statements list in block.
+    This method descends into Block statements!
+     */
     Block remove(Statement toRemove);
 
     String NAME = "block";

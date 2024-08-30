@@ -159,7 +159,16 @@ public class BlockImpl extends StatementImpl implements Block {
 
     @Override
     public Block remove(Statement toRemove) {
-        List<Statement> newList = statements.stream().filter(s -> !s.equals(toRemove)).toList();
+        List<Statement> newList = new ArrayList<>(statements.size());
+        for (Statement statement : statements) {
+            if (!toRemove.equals(statement)) {
+                if (statement instanceof Block b) {
+                    newList.add(b.remove(toRemove));
+                } else {
+                    newList.add(statement);
+                }
+            }
+        }
         return new BlockImpl(comments(), source(), annotations(), label(), newList);
     }
 }
