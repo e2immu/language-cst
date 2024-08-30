@@ -20,7 +20,6 @@ import org.e2immu.language.cst.impl.expression.TypeExpressionImpl;
 import org.e2immu.language.cst.impl.expression.VariableExpressionImpl;
 import org.e2immu.language.cst.impl.output.*;
 import org.e2immu.language.cst.impl.type.DiamondEnum;
-import org.e2immu.language.cst.impl.output.*;
 
 import java.util.Objects;
 import java.util.function.Predicate;
@@ -96,8 +95,8 @@ public class FieldReferenceImpl extends VariableImpl implements FieldReference {
     }
 
     @Override
-    public boolean isLocal() {
-        return false;
+    public boolean containsLocalComponent(boolean parametersAreLocal) {
+        return scopeVariable != null && scopeVariable.containsLocalComponent(parametersAreLocal);
     }
 
     @Override

@@ -18,7 +18,7 @@ public interface Variable extends Comparable<Variable>, Element, OneVariable {
     @NotNull
     ParameterizedType parameterizedType();
 
-    boolean isLocal();
+    boolean containsLocalComponent(boolean parametersAreLocal);
 
     @Override
     default int compareTo(Variable o) {

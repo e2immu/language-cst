@@ -15,7 +15,6 @@ import org.e2immu.language.cst.api.variable.DescendMode;
 import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.language.cst.impl.output.OutputBuilderImpl;
 import org.e2immu.language.cst.impl.output.SymbolEnum;
-import org.e2immu.language.cst.impl.output.TextImpl;
 
 import java.util.Objects;
 import java.util.function.Predicate;
@@ -135,8 +134,9 @@ public class DependentVariableImpl extends VariableImpl implements DependentVari
     }
 
     @Override
-    public boolean isLocal() {
-        return arrayVariable.isLocal() && (indexVariable == null || indexVariable.isLocal());
+    public boolean containsLocalComponent(boolean parametersAreLocal) {
+        return arrayVariable.containsLocalComponent(parametersAreLocal)
+               && (indexVariable == null || indexVariable.containsLocalComponent(parametersAreLocal));
     }
 
     @Override

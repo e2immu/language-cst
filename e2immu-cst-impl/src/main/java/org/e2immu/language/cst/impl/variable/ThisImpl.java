@@ -61,7 +61,7 @@ public class ThisImpl extends VariableImpl implements This {
     }
 
     @Override
-    public boolean isLocal() {
+    public boolean containsLocalComponent(boolean parametersAreLocal) {
         return false;
     }
 

@@ -135,8 +135,8 @@ public class ParameterInfoImpl implements ParameterInfo {
     }
 
     @Override
-    public boolean isLocal() {
-        return false;
+    public boolean containsLocalComponent(boolean parametersAreLocal) {
+        return parametersAreLocal;
     }
 
     @Override

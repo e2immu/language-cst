@@ -52,7 +52,7 @@ public class LocalVariableImpl extends VariableImpl implements LocalVariable {
     }
 
     @Override
-    public boolean isLocal() {
+    public boolean containsLocalComponent(boolean parametersAreLocal) {
         return true;
     }
 
