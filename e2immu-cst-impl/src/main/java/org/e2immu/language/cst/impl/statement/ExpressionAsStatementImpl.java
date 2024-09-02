@@ -112,6 +112,7 @@ public class ExpressionAsStatementImpl extends StatementImpl implements Expressi
         if (haveDirectTranslation(direct, this)) return direct;
         Expression tex = expression.translate(translationMap);
         if (tex != expression) {
+            if (tex == null || tex.isEmpty()) return List.of();
             return List.of(new ExpressionAsStatementImpl(comments(), source(), annotations(), label(), tex));
         }
         return List.of(this);
