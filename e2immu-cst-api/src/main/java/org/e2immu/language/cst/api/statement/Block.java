@@ -18,6 +18,12 @@ public interface Block extends Statement {
         @Fluent
         Builder addStatement(Statement statement);
 
+        @Fluent
+        Builder addStatements(int index, List<Statement> statements);
+
+        @Fluent
+        Builder addStatement(int index, Statement statement);
+
     }
 
     default boolean isEmpty() {

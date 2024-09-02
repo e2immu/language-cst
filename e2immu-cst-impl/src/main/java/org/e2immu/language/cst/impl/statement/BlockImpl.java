@@ -117,6 +117,21 @@ public class BlockImpl extends StatementImpl implements Block {
         }
 
         @Override
+        @Fluent
+        public Builder addStatement(int index, Statement statement) {
+            assert statement != null;
+            statements.add(index, statement);
+            return this;
+        }
+
+        @Override
+        @Fluent
+        public Builder addStatements(int index, List<Statement> statements) {
+            this.statements.addAll(index, statements);
+            return this;
+        }
+
+        @Override
         public Block build() {
             return new BlockImpl(comments, source, annotations, label, List.copyOf(statements));
         }
