@@ -194,6 +194,8 @@ public class PredefinedImpl implements Predefined {
 
     private final MethodInfo bitWiseNotOperatorInt = createOperator(intTypeInfo, "~", List.of(intParameterizedType), intParameterizedType);
     private final MethodInfo logicalNotOperatorBool = createOperator(booleanTypeInfo, "!", List.of(booleanParameterizedType), booleanParameterizedType);
+    private final MethodInfo assignOrOperatorBool = createOperator(booleanTypeInfo, "|=", List.of(booleanParameterizedType), booleanParameterizedType);
+    private final MethodInfo assignAndOperatorBool = createOperator(booleanTypeInfo, "&=", List.of(booleanParameterizedType), booleanParameterizedType);
     private final MethodInfo orOperatorBool = createOperator(booleanTypeInfo, "||", boolBool, booleanParameterizedType);
     private final MethodInfo andOperatorBool = createOperator(booleanTypeInfo, "&&", boolBool, booleanParameterizedType);
     private final MethodInfo xorOperatorBool = createOperator(booleanTypeInfo, "^", boolBool, booleanParameterizedType);
@@ -223,7 +225,7 @@ public class PredefinedImpl implements Predefined {
         for (TypeInfo ti : List.of(stringTypeInfo, objectTypeInfo, classTypeInfo, functionalInterface)) {
             ti.builder().setAccess(InspectionImpl.AccessEnum.PUBLIC);
             ti.builder().setTypeNature(TypeNatureEnum.CLASS);
-            if(ti != objectTypeInfo) {
+            if (ti != objectTypeInfo) {
                 ti.builder().setParentClass(objectParameterizedType);
             }
             objects.add(ti);
@@ -238,7 +240,7 @@ public class PredefinedImpl implements Predefined {
         for (TypeInfo ti : boxed) {
             ti.builder().setAccess(InspectionImpl.AccessEnum.PUBLIC);
             ti.builder().setTypeNature(TypeNatureEnum.CLASS)
-                            .setParentClass(objectParameterizedType);
+                    .setParentClass(objectParameterizedType);
             objects.add(ti);
         }
         predefinedObjects = List.copyOf(objects);
@@ -391,6 +393,16 @@ public class PredefinedImpl implements Predefined {
             return voidTypeInfo;
         }
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public MethodInfo assignAndOperatorBool() {
+        return assignAndOperatorBool;
+    }
+
+    @Override
+    public MethodInfo assignOrOperatorBool() {
+        return assignOrOperatorBool;
     }
 
     @Override

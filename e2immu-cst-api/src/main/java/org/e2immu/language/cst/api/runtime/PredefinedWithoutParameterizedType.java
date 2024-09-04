@@ -9,6 +9,8 @@ public interface PredefinedWithoutParameterizedType {
 
     MethodInfo andOperatorInt();
 
+    MethodInfo assignAndOperatorBool();
+
     MethodInfo assignAndOperatorInt();
 
     MethodInfo assignDivideOperatorInt();
@@ -20,6 +22,8 @@ public interface PredefinedWithoutParameterizedType {
     MethodInfo assignMultiplyOperatorInt();
 
     MethodInfo assignOperatorInt();
+
+    MethodInfo assignOrOperatorBool();
 
     MethodInfo assignOrOperatorInt();
 
