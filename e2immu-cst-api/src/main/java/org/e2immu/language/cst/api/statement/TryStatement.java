@@ -6,6 +6,7 @@ import org.e2immu.language.cst.api.element.Visitor;
 import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.variable.DescendMode;
+import org.e2immu.language.cst.api.variable.LocalVariable;
 import org.e2immu.language.cst.api.variable.Variable;
 
 import java.util.List;
@@ -21,7 +22,7 @@ public interface TryStatement extends Statement {
 
         CatchClause translate(TranslationMap translationMap);
 
-        String variableName();
+        LocalVariable catchVariable();
 
         Block block();
 
@@ -48,7 +49,7 @@ public interface TryStatement extends Statement {
             Builder setFinal(boolean isFinal);
 
             @Fluent
-            Builder setVariableName(String name);
+            Builder setCatchVariable(LocalVariable catchVariable);
 
             CatchClause build();
         }

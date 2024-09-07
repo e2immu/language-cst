@@ -48,6 +48,7 @@ public class MethodCallImpl extends ExpressionImpl implements MethodCall {
         this.concreteReturnType = Objects.requireNonNull(concreteReturnType);
         this.methodInfo = Objects.requireNonNull(methodInfo);
         this.modificationTimes = Objects.requireNonNull(modificationTimes);
+        assert !(object instanceof TypeExpression) || methodInfo.isStatic();
     }
 
     public static class Builder extends ElementImpl.Builder<MethodCall.Builder> implements MethodCall.Builder {

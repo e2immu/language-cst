@@ -14,6 +14,7 @@ import org.e2immu.language.cst.api.statement.TryStatement;
 import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.variable.DescendMode;
+import org.e2immu.language.cst.api.variable.LocalVariable;
 import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.language.cst.impl.element.ElementImpl;
 import org.e2immu.language.cst.impl.output.*;
@@ -65,11 +66,11 @@ public class TryStatementImpl extends StatementImpl implements TryStatement {
     public static class CatchClauseImpl implements CatchClause {
         private final List<ParameterizedType> exceptionTypes;
         private final boolean isFinal;
-        private final String variableName;
+        private final LocalVariable catchVariable;
         private final Block block;
 
-        public CatchClauseImpl(List<ParameterizedType> exceptionTypes, boolean isFinal, String variableName, Block block) {
-            this.variableName = variableName;
+        public CatchClauseImpl(List<ParameterizedType> exceptionTypes, boolean isFinal, LocalVariable catchVariable, Block block) {
+            this.catchVariable = catchVariable;
             this.exceptionTypes = exceptionTypes;
             this.block = block;
             this.isFinal = isFinal;
@@ -77,12 +78,12 @@ public class TryStatementImpl extends StatementImpl implements TryStatement {
 
         @Override
         public CatchClause withBlock(Block newBlock) {
-            return new CatchClauseImpl(exceptionTypes, isFinal, variableName, newBlock);
+            return new CatchClauseImpl(exceptionTypes, isFinal, catchVariable, newBlock);
         }
 
         public static class Builder implements CatchClause.Builder {
             private final List<ParameterizedType> exceptionTypes = new ArrayList<>();
-            private String variableName;
+            private LocalVariable catchVariable;
             private boolean isFinal;
             private Block block;
 
@@ -99,8 +100,8 @@ public class TryStatementImpl extends StatementImpl implements TryStatement {
             }
 
             @Override
-            public Builder setVariableName(String variableName) {
-                this.variableName = variableName;
+            public Builder setCatchVariable(LocalVariable catchVariable) {
+                this.catchVariable = catchVariable;
                 return this;
             }
 
@@ -112,7 +113,7 @@ public class TryStatementImpl extends StatementImpl implements TryStatement {
 
             @Override
             public CatchClause build() {
-                return new CatchClauseImpl(exceptionTypes, isFinal, variableName, block);
+                return new CatchClauseImpl(exceptionTypes, isFinal, catchVariable, block);
             }
         }
 
@@ -122,8 +123,8 @@ public class TryStatementImpl extends StatementImpl implements TryStatement {
         }
 
         @Override
-        public String variableName() {
-            return variableName;
+        public LocalVariable catchVariable() {
+            return catchVariable;
         }
 
         @Override
@@ -169,7 +170,7 @@ public class TryStatementImpl extends StatementImpl implements TryStatement {
                     .map(translationMap::translateType).collect(translationMap.toList(exceptionTypes));
             Block tBlock = (Block) block.translate(translationMap).get(0);
             if (list != exceptionTypes || tBlock != block) {
-                return new CatchClauseImpl(list, isFinal, variableName, tBlock);
+                return new CatchClauseImpl(list, isFinal, catchVariable, tBlock);
             }
             return this;
         }
@@ -301,7 +302,7 @@ public class TryStatementImpl extends StatementImpl implements TryStatement {
                             .map(t -> t.print(qualification, false, DiamondEnum.NO))
                             .collect(OutputBuilderImpl.joining(SymbolEnum.PIPE)))
                     .add(SpaceEnum.ONE)
-                    .add(new TextImpl(cc.variableName()))
+                    .add(cc.catchVariable().print(qualification))
                     .add(SymbolEnum.RIGHT_PARENTHESIS)
                     .add(cc.block().print(qualification));
             i++;
