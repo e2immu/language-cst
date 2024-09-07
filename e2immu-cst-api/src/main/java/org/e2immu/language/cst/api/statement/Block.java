@@ -24,6 +24,7 @@ public interface Block extends Statement {
         @Fluent
         Builder addStatement(int index, Statement statement);
 
+        List<Statement> statements();
     }
 
     default boolean isEmpty() {

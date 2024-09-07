@@ -135,6 +135,11 @@ public class BlockImpl extends StatementImpl implements Block {
         public Block build() {
             return new BlockImpl(comments, source, annotations, label, List.copyOf(statements));
         }
+
+        @Override
+        public List<Statement> statements() {
+            return statements;
+        }
     }
 
     @Override
