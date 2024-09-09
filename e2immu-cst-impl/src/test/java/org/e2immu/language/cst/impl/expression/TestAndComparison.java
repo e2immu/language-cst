@@ -28,6 +28,7 @@ public class TestAndComparison extends CommonTest {
         assertEquals("false", and.toString());
     }
 */
+    // NOTE: this test also fails in the old e2immu version
     @Disabled("Current system sees 0.0 as 0, and treats less than as <=; this is not a good combination")
     @Test
     public void test2() {
@@ -37,5 +38,25 @@ public class TestAndComparison extends CommonTest {
         assertEquals("l<0", lLT0.toString());
         Expression and = r.and(lGE0, lLT0);
         assertEquals("false", and.toString());
+    }
+
+    @Test
+    public void test1() {
+        Expression iEq5 = r.equals(i, r.newInt(5));
+        assertEquals("5==i", iEq5.toString());
+        Expression iGe0 = r.greaterThanZero(i, true);
+        assertEquals("i>=0", iGe0.toString());
+        Expression and = r.and(iEq5, iGe0);
+        assertEquals(iEq5, and);
+    }
+
+    @Test
+    public void test1b() {
+        Expression iEq5 = r.equals(i, r.newInt(5));
+        assertEquals("5==i", iEq5.toString());
+        Expression iGe0 = r.less(i, r.intZero(), false);
+        assertEquals("i<0", iGe0.toString());
+        Expression and = r.and(iEq5, iGe0);
+        assertEquals(r.constantFalse(), and);
     }
 }

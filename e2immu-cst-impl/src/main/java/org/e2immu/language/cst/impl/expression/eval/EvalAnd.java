@@ -262,6 +262,9 @@ public class EvalAnd {
         Action actionEqEq = analyseEqEq(prev, value, newConcat);
         if (actionEqEq != null) return actionEqEq;
 
+        Action actionGeEq = analyseGeEq(prev, value);
+        if(actionGeEq != null) return actionGeEq;
+
         Action actionGeNotEqual = analyseGeNotEq(newConcat, prev, value);
         if (actionGeNotEqual != null) return actionGeNotEqual;
 
@@ -319,6 +322,33 @@ public class EvalAnd {
         return null;
     }
 
+    private Action analyseGeEq(Expression prev, Expression value) {
+        GreaterThanZero ge;
+        if (prev != null && (ge = prev.asInstanceOf(GreaterThanZero.class)) != null) {
+            Equals ev1;
+            if((ev1 = value.asInstanceOf(Equals.class)) != null) {
+                GreaterThanZero.XB xb = ge.extract(runtime);
+                Numeric ev1ln;
+                if ((ev1ln = ev1.lhs().asInstanceOf(Numeric.class)) != null && ev1.rhs().equals(xb.x())) {
+                    double y = ev1ln.doubleValue();
+                    if (xb.lessThan()) {
+                        // y==x and x <= b
+                        if (ge.allowEquals() && y <= xb.b() || !ge.allowEquals() && y < xb.b()) {
+                            return Action.REPLACE;
+                        }
+                    } else {
+                        // y==x and x >= b
+                        if (ge.allowEquals() && y >= xb.b() || !ge.allowEquals() && y > xb.b()) {
+                            return Action.REPLACE;
+                        }
+                    }
+                    return Action.FALSE;
+                }
+            }
+        }
+        return null;
+    }
+
     private Action analyseEqEq(Expression prev, Expression value, ArrayList<Expression> newConcat) {
         Equals ev1;
         if (prev != null && (ev1 = prev.asInstanceOf(Equals.class)) != null) {
@@ -354,28 +384,6 @@ public class EvalAnd {
                 // 3 == a && not (4 == a)  (the situation 3 == a && not (3 == a) has been solved as A && not A == False
                 if (ev1.rhs().equals(ev3.rhs()) && !ev1.lhs().equals(ev3.lhs())) {
                     return Action.SKIP;
-                }
-            }
-
-            // GE and EQ (note: GE always comes after EQ)
-            GreaterThanZero ge;
-            if ((ge = value.asInstanceOf(GreaterThanZero.class)) != null) {
-                GreaterThanZero.XB xb = ge.extract(runtime);
-                Numeric ev1ln;
-                if ((ev1ln = ev1.lhs().asInstanceOf(Numeric.class)) != null && ev1.rhs().equals(xb.x())) {
-                    double y = ev1ln.doubleValue();
-                    if (xb.lessThan()) {
-                        // y==x and x <= b
-                        if (ge.allowEquals() && y <= xb.b() || !ge.allowEquals() && y < xb.b()) {
-                            return Action.SKIP;
-                        }
-                    } else {
-                        // y==x and x >= b
-                        if (ge.allowEquals() && y >= xb.b() || !ge.allowEquals() && y > xb.b()) {
-                            return Action.SKIP;
-                        }
-                    }
-                    return Action.FALSE;
                 }
             }
         }
