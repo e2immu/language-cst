@@ -135,11 +135,6 @@ public class ParameterInfoImpl implements ParameterInfo {
     }
 
     @Override
-    public boolean containsLocalComponent(boolean parametersAreLocal) {
-        return parametersAreLocal;
-    }
-
-    @Override
     public int complexity() {
         return 2;
     }

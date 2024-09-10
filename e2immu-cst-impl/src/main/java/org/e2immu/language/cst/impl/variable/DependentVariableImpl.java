@@ -134,12 +134,6 @@ public class DependentVariableImpl extends VariableImpl implements DependentVari
     }
 
     @Override
-    public boolean containsLocalComponent(boolean parametersAreLocal) {
-        return arrayVariable.containsLocalComponent(parametersAreLocal)
-               && (indexVariable == null || indexVariable.containsLocalComponent(parametersAreLocal));
-    }
-
-    @Override
     public Variable indexVariable() {
         return indexVariable;
     }

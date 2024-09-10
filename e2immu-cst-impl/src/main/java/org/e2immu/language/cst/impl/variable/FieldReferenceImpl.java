@@ -95,11 +95,6 @@ public class FieldReferenceImpl extends VariableImpl implements FieldReference {
     }
 
     @Override
-    public boolean containsLocalComponent(boolean parametersAreLocal) {
-        return scopeVariable != null && scopeVariable.containsLocalComponent(parametersAreLocal);
-    }
-
-    @Override
     public boolean isStatic() {
         return fieldInfo.isStatic();
     }

@@ -52,11 +52,6 @@ public class LocalVariableImpl extends VariableImpl implements LocalVariable {
     }
 
     @Override
-    public boolean containsLocalComponent(boolean parametersAreLocal) {
-        return true;
-    }
-
-    @Override
     public int complexity() {
         return 2;
     }
