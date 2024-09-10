@@ -21,6 +21,7 @@ public class QualificationImpl implements Qualification {
 
     private final TypeNameRequired typeNameRequired;
     private final Set<FieldInfo> unqualifiedFields = new HashSet<>();
+    private final Set<FieldInfo> qualifiedFields = new HashSet<>();
     private final Set<MethodInfo> unqualifiedMethods = new HashSet<>();
     private final Set<This> unqualifiedThis = new HashSet<>();
     private final Map<TypeInfo, TypeNameImpl.Required> typesNotImported;
@@ -78,6 +79,7 @@ public class QualificationImpl implements Qualification {
     @Override
     public boolean qualifierRequired(Variable variable) {
         if (variable instanceof FieldReference fieldReference) {
+            if (qualifiedFields.contains(fieldReference.fieldInfo())) return true;
             if (unqualifiedFields.contains(fieldReference.fieldInfo())) return false;
             return parent == null || parent.qualifierRequired(variable);
         }
@@ -91,6 +93,10 @@ public class QualificationImpl implements Qualification {
             return !levelWithData.unqualifiedThis.contains(thisVar);
         }
         return false;
+    }
+
+    public void fieldMaskedByLocal(FieldInfo fieldInfo) {
+        qualifiedFields.add(fieldInfo);
     }
 
     public void addField(FieldInfo fieldInfo) {

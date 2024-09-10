@@ -285,4 +285,11 @@ public class FieldInfoImpl extends InfoImpl implements FieldInfo {
         newField.builder().commit();
         return List.of(newField);
     }
+
+    @Override
+    public FieldInfo withOwnerVariableBuilder(TypeInfo newOwner) {
+        FieldInfoImpl fi = new FieldInfoImpl(name, isStatic, type, newOwner);
+        fi.inspection.setVariable(new FieldInspectionImpl.Builder(fi, inspection.get()));
+        return fi;
+    }
 }

@@ -53,6 +53,8 @@ public interface FieldInfo extends Info {
 
     Expression initializer();
 
+    FieldInfo withOwnerVariableBuilder(TypeInfo newOwner);
+
     interface Builder extends Info.Builder<Builder> {
 
         @Fluent

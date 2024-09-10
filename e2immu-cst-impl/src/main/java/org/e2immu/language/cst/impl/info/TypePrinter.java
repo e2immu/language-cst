@@ -86,6 +86,10 @@ public record TypePrinter(TypeInfo typeInfo) {
             }
         }
 
+        /*
+        we allow for a different type when translating types, see TypeInfoImpl.translate()... where
+        method ownership is not changed correctly.
+         */
         OutputBuilder main = Stream.concat(Stream.concat(Stream.concat(Stream.concat(
                                                 enumConstantStream(typeInfo, insideType),
                                                 typeInfo.fields().stream()
@@ -96,10 +100,10 @@ public record TypePrinter(TypeInfo typeInfo) {
                                                 .map(ti -> ti.print(insideType))),
                                 typeInfo.constructors().stream()
                                         .filter(c -> !c.isSynthetic())
-                                        .map(c -> c.print(insideType))),
+                                        .map(c -> new MethodPrinter(typeInfo, c).print(insideType))),
                         typeInfo.methods().stream()
                                 .filter(m -> !m.isSynthetic())
-                                .map(m -> m.print(insideType)))
+                                .map(m -> new MethodPrinter(typeInfo, m).print(insideType)))
                 .collect(OutputBuilderImpl.joining(SpaceEnum.NONE, SymbolEnum.LEFT_BRACE, SymbolEnum.RIGHT_BRACE,
                         GuideImpl.generatorForBlock()));
         afterAnnotations.add(main);

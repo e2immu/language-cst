@@ -17,7 +17,15 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public record MethodPrinter(MethodInfo methodInfo) {
+/*
+we allow for a different type when translating types, see TypePrinter, TypeInfoImpl.translate()... where
+method ownership is not changed correctly.
+ */
+public record MethodPrinter(TypeInfo typeInfo, MethodInfo methodInfo) {
+
+    public MethodPrinter(MethodInfo methodInfo) {
+        this(methodInfo.typeInfo(), methodInfo);
+    }
 
     public OutputBuilder print(Qualification qualification) {
         if (methodInfo.isStaticBlock()) {
@@ -49,7 +57,7 @@ public record MethodPrinter(MethodInfo methodInfo) {
             builder.add(methodInfo.returnType().print(qualification, false, DiamondEnum.SHOW_ALL))
                     .add(SpaceEnum.ONE);
         }
-        String name = methodInfo.isConstructor() ? methodInfo.typeInfo().simpleName() : methodInfo.name();
+        String name = methodInfo.isConstructor() ? typeInfo.simpleName() : methodInfo.name();
         builder.add(new TextImpl(name));
         if (!methodInfo.isCompactConstructor()) {
             if (methodInfo.parameters().isEmpty()) {
@@ -69,7 +77,7 @@ public record MethodPrinter(MethodInfo methodInfo) {
         }
         if (methodInfo.isAbstract()) {
             builder.add(SymbolEnum.SEMICOLON);
-        } else if (methodInfo.typeInfo().typeNature().isAnnotation()) {
+        } else if (typeInfo.typeNature().isAnnotation()) {
             // default value when the method is not abstract
             OutputBuilder expression = methodInfo.methodBody().asInstanceOf(ReturnStatement.class).expression()
                     .print(qualification);
@@ -87,8 +95,8 @@ public record MethodPrinter(MethodInfo methodInfo) {
     private List<MethodModifier> minimalModifiers() {
         List<MethodModifier> result = new ArrayList<>();
         Access access = methodInfo.access();
-        boolean inInterface = methodInfo.typeInfo().isInterface();
-        boolean inAnnotation = methodInfo.typeInfo().isAnnotation();
+        boolean inInterface = typeInfo.isInterface();
+        boolean inAnnotation = typeInfo.isAnnotation();
         boolean isAbstract = methodInfo.isAbstract();
         boolean isDefault = methodInfo.isDefault();
         if (!access.isPackage() && !(inInterface && (isAbstract || isDefault))) {
@@ -121,10 +129,10 @@ public record MethodPrinter(MethodInfo methodInfo) {
             Set<String> localNames = Stream.concat(localNamesFromBody.stream(), parameterNames.stream())
                     .collect(Collectors.toUnmodifiableSet());
 
-            List<FieldInfo> visibleFields = methodInfo.typeInfo().fields();
+            List<FieldInfo> visibleFields = typeInfo.fields();
             QualificationImpl res = new QualificationImpl(qi.doNotQualifyImplicit(), qi,
                     TypeNameImpl.Required.QUALIFIED_FROM_PRIMARY_TYPE);
-            visibleFields.stream().filter(fieldInfo -> !localNames.contains(fieldInfo.name())).forEach(res::addField);
+            visibleFields.stream().filter(fieldInfo -> localNames.contains(fieldInfo.name())).forEach(res::fieldMaskedByLocal);
 
             return res;
         }

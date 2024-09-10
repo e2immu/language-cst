@@ -184,6 +184,12 @@ public class TranslationMapImpl implements TranslationMap {
         }
 
         @Override
+        public TranslationMap.Builder replaceTarget(ParameterizedType from, ParameterizedType to) {
+            types.replaceAll((f,t )-> from.equals(t) ? to: t);
+            return this;
+        }
+
+        @Override
         public boolean isEmpty() {
             return statements.isEmpty()
                    && expressions.isEmpty()

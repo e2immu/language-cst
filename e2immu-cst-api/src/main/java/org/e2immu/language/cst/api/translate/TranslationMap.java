@@ -283,6 +283,8 @@ public interface TranslationMap {
 
         Builder setModificationTimesHandler(ModificationTimesHandler modificationTimesHandler);
 
+        Builder replaceTarget(ParameterizedType from, ParameterizedType to);
+
         boolean isEmpty();
     }
 }

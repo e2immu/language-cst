@@ -2,6 +2,7 @@ package org.e2immu.language.cst.impl.info;
 
 import org.e2immu.language.cst.api.element.*;
 import org.e2immu.language.cst.api.expression.AnnotationExpression;
+import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.info.*;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
@@ -14,7 +15,9 @@ import org.e2immu.language.cst.api.variable.DescendMode;
 import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.language.cst.impl.analysis.PropertyImpl;
 import org.e2immu.language.cst.impl.analysis.ValueImpl;
+import org.e2immu.language.cst.impl.translate.TranslationMapImpl;
 import org.e2immu.language.cst.impl.type.ParameterizedTypeImpl;
+import org.e2immu.language.cst.impl.variable.FieldReferenceImpl;
 import org.e2immu.support.Either;
 import org.e2immu.support.EventuallyFinalOnDemand;
 
@@ -568,12 +571,37 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     }
 
     @Override
-    public TypeInfo translate(TranslationMap translationMap) {
-        TypeInfo direct = translationMap.translateTypeInfo(this);
+    public TypeInfo translate(TranslationMap translationMapIn) {
+        TypeInfo direct = translationMapIn.translateTypeInfo(this);
         if (direct != this) {
             return direct;
         }
+        // if there is any change, this will be the new typeInfo.
+        TypeInfo typeInfo = copyAllButConstructorsMethodsFieldsSubTypesAnnotations();
+        List<FieldInfo> newFields = new ArrayList<>(2 * fields().size());
+
+        TranslationMap.Builder tmb = new TranslationMapImpl.Builder(translationMapIn);
+        tmb.replaceTarget(asSimpleParameterizedType(), typeInfo.asSimpleParameterizedType());
+        for (FieldInfo fieldInfo : fields()) {
+            FieldInfo newField = fieldInfo.withOwnerVariableBuilder(typeInfo);
+            newFields.add(newField);
+            tmb.put(new FieldReferenceImpl(fieldInfo), new FieldReferenceImpl(newField));
+        }
+        TranslationMap translationMap = tmb.build();
+
         boolean change = false;
+        for (FieldInfo fieldInfo : newFields) {
+            Expression init = fieldInfo.initializer();
+            Expression tInit = init == null ? null : init.translate(translationMap);
+            if (init != tInit) {
+                change = true;
+                fieldInfo.builder().setInitializer(tInit);
+            }
+        }
+        for (FieldInfo fieldInfo : newFields) {
+            fieldInfo.builder().computeAccess().commit();
+        }
+
         List<MethodInfo> newConstructors = new ArrayList<>(2 * constructors().size());
         for (MethodInfo methodInfo : constructors()) {
             List<MethodInfo> tMethod = methodInfo.translate(translationMap);
@@ -586,12 +614,6 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
             newMethods.addAll(tMethod);
             change |= tMethod.size() != 1 || tMethod.get(0) != methodInfo;
         }
-        List<FieldInfo> newFields = new ArrayList<>(2 * fields().size());
-        for (FieldInfo fieldInfo : fields()) {
-            List<FieldInfo> tField = fieldInfo.translate(translationMap);
-            newFields.addAll(tField);
-            change |= tField.size() != 1 || tField.get(0) != fieldInfo;
-        }
         List<TypeInfo> subTypeList = subTypes();
         List<TypeInfo> newSubTypes = subTypeList.stream().map(st -> st.translate(translationMap))
                 .collect(translationMap.toList(subTypeList));
@@ -603,7 +625,6 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
             change |= tAe.size() != 1 || tAe.get(0) != ae;
         }
         if (change) {
-            TypeInfo typeInfo = copyAllButConstructorsMethodsFieldsSubTypesAnnotations();
             TypeInfo.Builder builder = typeInfo.builder();
             newConstructors.forEach(builder::addConstructor);
             newMethods.forEach(builder::addMethod);

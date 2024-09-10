@@ -41,6 +41,12 @@ public class FieldInspectionImpl extends InspectionImpl implements FieldInspecti
             this.fieldInfo = fieldInfo;
         }
 
+        public Builder(FieldInfoImpl fieldInfo, FieldInspection fi) {
+           this.fieldInfo = fieldInfo;
+           this.initializer = fi.initializer();
+           this.fieldModifiers.addAll(fi.fieldModifiers());
+        }
+
         @Override
         public Builder computeAccess() {
             Access fromType = fieldInfo.owner().access();
