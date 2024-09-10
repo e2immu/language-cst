@@ -146,7 +146,7 @@ public record IsAssignableFrom(Predefined runtime,
             return targetIsATypeParameter(mode);
         }
         // if wildcard is unbound, I am <?>; anything goes
-        return target.wildcard().isUnbound() ? UNBOUND_WILDCARD : NOT_ASSIGNABLE;
+        return target.wildcard() == null || target.wildcard().isUnbound() ? UNBOUND_WILDCARD : NOT_ASSIGNABLE;
     }
 
     private int targetIsATypeParameter(Mode mode) {

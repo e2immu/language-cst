@@ -12,6 +12,7 @@ import org.e2immu.language.cst.api.statement.Block;
 import org.e2immu.language.cst.api.statement.LocalVariableCreation;
 import org.e2immu.language.cst.api.statement.Statement;
 import org.e2immu.language.cst.api.translate.TranslationMap;
+import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.variable.DescendMode;
 import org.e2immu.language.cst.api.variable.LocalVariable;
 import org.e2immu.language.cst.api.variable.Variable;
@@ -62,9 +63,10 @@ public class LocalVariableCreationImpl extends StatementImpl implements LocalVar
         super(comments, source, annotations, 0, label);
         assert localVariable.assignmentExpression() != null;
         this.localVariable = localVariable;
+        ParameterizedType baseType = localVariable.parameterizedType().copyWithoutArrays();
         assert otherLocalVariables.stream()
                 .allMatch(lv -> lv.assignmentExpression() != null
-                                && lv.parameterizedType().equals(localVariable.parameterizedType()));
+                                && lv.parameterizedType().copyWithoutArrays().equals(baseType));
         this.otherLocalVariables = otherLocalVariables;
         this.modifiers = modifiers;
     }
@@ -186,8 +188,15 @@ public class LocalVariableCreationImpl extends StatementImpl implements LocalVar
         if (!localVariable.assignmentExpression().isEmpty()) {
             first.add(SymbolEnum.assignment("=")).add(localVariable.assignmentExpression().print(qualification));
         }
+        ParameterizedType base = localVariable().parameterizedType();
         Stream<OutputBuilder> rest = otherLocalVariables.stream().map(d -> {
             OutputBuilder ob = new OutputBuilderImpl().add(new TextImpl(d.simpleName()));
+            // old-style array declarations, see TestParseArray,3C
+            if(d.parameterizedType().arrays() != base.arrays()) {
+                for(int i=0; i<d.parameterizedType().arrays(); i++) {
+                    ob.add(SymbolEnum.OPEN_CLOSE_BRACKETS);
+                }
+            }
             if (!d.assignmentExpression().isEmpty()) {
                 ob.add(SymbolEnum.assignment("="))
                         .add(d.assignmentExpression().print(qualification));

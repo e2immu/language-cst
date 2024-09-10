@@ -42,7 +42,7 @@ public class LongConstantImpl extends ConstantExpressionImpl<Long> implements Nu
 
     @Override
     public OutputBuilder print(Qualification qualification) {
-        return new OutputBuilderImpl().add(new TextImpl(Long.toString(value)));
+        return new OutputBuilderImpl().add(new TextImpl(value+"L"));
     }
 
     @Override
