@@ -34,6 +34,7 @@ public record TypePrinter(TypeInfo typeInfo) {
 
         // add the methods that we can call without having to qualify (method() instead of super.method())
         if (insideType instanceof QualificationImpl qi) {
+            typeInfo.fields().forEach(qi::addField);
             addMethodsToQualification(typeInfo, qi);
             addThisToQualification(typeInfo, qi);
         }

@@ -19,10 +19,6 @@ import java.util.stream.Stream;
 
 public record MethodPrinter(MethodInfo methodInfo) {
 
-    public MethodPrinter(MethodInfo methodInfo) {
-        this.methodInfo = methodInfo;
-    }
-
     public OutputBuilder print(Qualification qualification) {
         if (methodInfo.isStaticBlock()) {
             OutputBuilder result = new OutputBuilderImpl().add(KeywordImpl.STATIC);
