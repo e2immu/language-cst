@@ -42,7 +42,7 @@ public class FloatConstantImpl extends ConstantExpressionImpl<Float> implements 
 
     @Override
     public OutputBuilder print(Qualification qualification) {
-        return new OutputBuilderImpl().add(new TextImpl(Float.toString(value)));
+        return new OutputBuilderImpl().add(new TextImpl(value + "F"));
     }
 
     @Override
