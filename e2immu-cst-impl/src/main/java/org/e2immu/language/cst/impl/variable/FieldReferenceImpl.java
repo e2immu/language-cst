@@ -16,6 +16,7 @@ import org.e2immu.language.cst.api.variable.DescendMode;
 import org.e2immu.language.cst.api.variable.FieldReference;
 import org.e2immu.language.cst.api.variable.This;
 import org.e2immu.language.cst.api.variable.Variable;
+import org.e2immu.language.cst.impl.element.ElementImpl;
 import org.e2immu.language.cst.impl.expression.TypeExpressionImpl;
 import org.e2immu.language.cst.impl.expression.VariableExpressionImpl;
 import org.e2immu.language.cst.impl.output.*;
@@ -161,8 +162,10 @@ public class FieldReferenceImpl extends VariableImpl implements FieldReference {
 
     @Override
     public Stream<TypeReference> typesReferenced() {
-        if (scope != null && !scopeIsThis()) {
-            return Stream.concat(scope.typesReferenced(), parameterizedType().typesReferenced());
+        if (scope != null) {
+            Stream<TypeReference> nonDefault = isDefaultScope ? Stream.of()
+                    : Stream.of(new ElementImpl.TypeReference( fieldInfo.owner(), true));
+            return Stream.concat(nonDefault, Stream.concat(scope.typesReferenced(), parameterizedType().typesReferenced()));
         }
         return parameterizedType().typesReferenced();
     }
