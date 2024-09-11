@@ -6,10 +6,8 @@ import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.runtime.Predefined;
-import org.e2immu.language.cst.api.runtime.Runtime;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.type.TypeParameter;
-import org.e2immu.language.cst.impl.output.*;
 import org.e2immu.language.cst.impl.output.*;
 import org.e2immu.support.Either;
 import org.e2immu.support.FirstThen;
@@ -37,6 +35,13 @@ public class TypeParameterImpl implements TypeParameter {
 
     private void commit(List<ParameterizedType> typeBounds) {
         this.typeBounds.set(typeBounds);
+    }
+
+    @Override
+    public TypeParameter withOwner(MethodInfo methodInfo) {
+        TypeParameterImpl tpi = new TypeParameterImpl(getIndex(), simpleName(), Either.right(methodInfo), annotations());
+        tpi.typeBounds.set(typeBounds().stream().map(pt -> pt.replaceTypeParameter(this, tpi)).toList());
+        return tpi;
     }
 
     @Override

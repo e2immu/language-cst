@@ -35,6 +35,8 @@ public interface TypeParameter extends NamedType {
 
     Builder builder();
 
+    TypeParameter withOwner(MethodInfo methodInfo);
+
     interface Builder {
         @Fluent
         Builder setTypeBounds(List<ParameterizedType> typeBounds);

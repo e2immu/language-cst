@@ -670,4 +670,13 @@ public class ParameterizedTypeImpl implements ParameterizedType {
         }
         return false;
     }
+
+    @Override
+    public ParameterizedType replaceTypeParameter(TypeParameter oldTp, TypeParameter newPt) {
+        if (oldTp.equals(typeParameter)) return new ParameterizedTypeImpl(newPt, arrays);
+        if (!parameters.isEmpty()) {
+            return withParameters(parameters.stream().map(pt -> pt.replaceTypeParameter(oldTp, newPt)).toList());
+        }
+        return this;
+    }
 }

@@ -508,7 +508,7 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
         builder.setAccess(access()).setSource(source()).setSynthetic(isSynthetic());
         typeParameters()
                 .stream()
-                .map(t -> new TypeParameterImpl(t.getIndex(), t.simpleName(), Either.right(methodInfo), t.annotations()))
+                .map(t -> t.withOwner(methodInfo))
                 .forEach(builder::addTypeParameter);
         methodModifiers().forEach(builder::addMethodModifier);
         return methodInfo;

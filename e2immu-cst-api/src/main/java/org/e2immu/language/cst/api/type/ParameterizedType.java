@@ -4,10 +4,8 @@ import org.e2immu.language.cst.api.element.Element;
 import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
-import org.e2immu.language.cst.api.runtime.Factory;
 import org.e2immu.language.cst.api.runtime.Predefined;
 import org.e2immu.language.cst.api.runtime.PredefinedWithoutParameterizedType;
-import org.e2immu.language.cst.api.runtime.Predefined;
 
 import java.util.List;
 import java.util.Map;
@@ -164,4 +162,6 @@ public interface ParameterizedType {
     ParameterizedType withWildcard(Wildcard wildcard);
 
     boolean hasTypeParameters();
+
+    ParameterizedType replaceTypeParameter(TypeParameter oldTp, TypeParameter newPt);
 }
