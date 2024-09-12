@@ -5,7 +5,6 @@ import org.e2immu.annotation.Fluent;
 import org.e2immu.language.cst.api.element.CompilationUnit;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
-import org.e2immu.language.cst.api.statement.Statement;
 import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.type.NamedType;
 import org.e2immu.language.cst.api.type.ParameterizedType;
@@ -249,8 +248,8 @@ public interface TypeInfo extends NamedType, Info {
     }
 
 
-    default Stream<MethodInfo> methodAndConstructorStream() {
-        return Stream.concat(methodStream(), constructors().stream());
+    default Stream<MethodInfo> constructorAndMethodStream() {
+        return Stream.concat(constructors().stream(), methodStream());
     }
 
     boolean isExtensible();
