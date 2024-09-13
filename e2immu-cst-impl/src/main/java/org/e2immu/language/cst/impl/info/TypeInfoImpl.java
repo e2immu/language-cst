@@ -576,12 +576,25 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
         if (direct != this) {
             return direct;
         }
+
         // if there is any change, this will be the new typeInfo.
         TypeInfo typeInfo = copyAllButConstructorsMethodsFieldsSubTypesAnnotations();
-        List<FieldInfo> newFields = new ArrayList<>(2 * fields().size());
+        ParameterizedType simpleParameterizedType = asSimpleParameterizedType();
+        boolean change = false;
 
         TranslationMap.Builder tmb = new TranslationMapImpl.Builder(translationMapIn);
-        tmb.replaceTarget(asSimpleParameterizedType(), typeInfo.asSimpleParameterizedType());
+
+        List<TypeParameter> newTypeParameters = new ArrayList<>();
+        for (TypeParameter tp : typeParameters()) {
+            TypeParameter newTp = tp.withOwnerVariableTypeBounds(typeInfo);
+            newTypeParameters.add(newTp);
+            change |= this != tp.getOwner().getLeft();
+            tmb.put(new ParameterizedTypeImpl(tp, 0), new ParameterizedTypeImpl(newTp, 0));
+        }
+
+        List<FieldInfo> newFields = new ArrayList<>(2 * fields().size());
+
+        tmb.replaceTarget(simpleParameterizedType, typeInfo.asSimpleParameterizedType());
         for (FieldInfo fieldInfo : fields()) {
             FieldInfo newField = fieldInfo.withOwnerVariableBuilder(typeInfo);
             newFields.add(newField);
@@ -589,7 +602,12 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
         }
         TranslationMap translationMap = tmb.build();
 
-        boolean change = false;
+        for (TypeParameter tp : newTypeParameters) {
+            List<ParameterizedType> newTypeBounds = tp.builder().getTypeBounds()
+                    .stream().map(translationMap::translateType)
+                    .toList();
+            tp.builder().setTypeBounds(newTypeBounds).commit();
+        }
         for (FieldInfo fieldInfo : newFields) {
             Expression init = fieldInfo.initializer();
             Expression tInit = init == null ? null : init.translate(translationMap);
@@ -597,8 +615,6 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
                 change = true;
                 fieldInfo.builder().setInitializer(tInit);
             }
-        }
-        for (FieldInfo fieldInfo : newFields) {
             fieldInfo.builder().computeAccess().commit();
         }
 
@@ -626,6 +642,7 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
         }
         if (change) {
             TypeInfo.Builder builder = typeInfo.builder();
+            newTypeParameters.forEach(builder::addTypeParameter);
             newConstructors.forEach(builder::addConstructor);
             newMethods.forEach(builder::addMethod);
             newSubTypes.forEach(builder::addSubType);

@@ -6,6 +6,7 @@ import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.runtime.Predefined;
+import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.type.TypeParameter;
 import org.e2immu.language.cst.impl.output.*;
@@ -14,6 +15,7 @@ import org.e2immu.support.FirstThen;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 public class TypeParameterImpl implements TypeParameter {
@@ -33,14 +35,37 @@ public class TypeParameterImpl implements TypeParameter {
         this.annotations = annotations;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof TypeParameterImpl that)) return false;
+        return getIndex() == that.getIndex() && Objects.equals(getOwner(), that.getOwner());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getIndex(), getOwner());
+    }
+
     private void commit(List<ParameterizedType> typeBounds) {
         this.typeBounds.set(typeBounds);
     }
 
     @Override
-    public TypeParameter withOwner(MethodInfo methodInfo) {
-        TypeParameterImpl tpi = new TypeParameterImpl(getIndex(), simpleName(), Either.right(methodInfo), annotations());
-        tpi.typeBounds.set(typeBounds().stream().map(pt -> pt.replaceTypeParameter(this, tpi)).toList());
+    public TypeParameter withOwnerVariableTypeBounds(MethodInfo methodInfo) {
+        return withOwner(Either.right(methodInfo));
+    }
+
+    @Override
+    public TypeParameter withOwnerVariableTypeBounds(TypeInfo typeInfo) {
+        return withOwner(Either.left(typeInfo));
+    }
+
+    private TypeParameter withOwner(Either<TypeInfo, MethodInfo> owner) {
+        TypeParameterImpl tpi = new TypeParameterImpl(getIndex(), simpleName(), owner, annotations());
+        List<ParameterizedType> newBounds = typeBounds().stream()
+                .map(pt -> pt.replaceTypeParameter(this, tpi)).toList();
+        tpi.builder().setTypeBounds(newBounds);
         return tpi;
     }
 
@@ -73,6 +98,11 @@ public class TypeParameterImpl implements TypeParameter {
         public TypeParameter commit() {
             typeParameter.commit(List.copyOf(typeBounds));
             return typeParameter;
+        }
+
+        @Override
+        public List<ParameterizedType> getTypeBounds() {
+            return typeBounds;
         }
     }
 

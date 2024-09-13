@@ -106,8 +106,7 @@ public class ThrowStatementImpl extends StatementImpl implements ThrowStatement 
 
         Expression tex = expression.translate(translationMap);
         if (tex == expression) return List.of(this);
-        return List.of(new ThrowStatementImpl(comments(), source(), annotations(), label(),
-                translationMap.translateExpression(expression)));
+        return List.of(new ThrowStatementImpl(comments(), source(), annotations(), label(), tex));
     }
 
     @Override

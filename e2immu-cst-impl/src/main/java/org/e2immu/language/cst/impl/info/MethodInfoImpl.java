@@ -490,7 +490,7 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
         change |= newExceptionTypes != exceptionTypeList;
 
         if (change) {
-            MethodInfo methodInfo = copyAllButBodyParametersReturnTypeAnnotationsExceptionTypes();
+            MethodInfo methodInfo = copyAllButBodyParametersReturnTypeAnnotationsExceptionTypes(translationMap);
             MethodInfo.Builder builder = methodInfo.builder();
             builder.setMethodBody((Block) tBody.get(0));
             newParameters.forEach(builder::addParameter);
@@ -502,13 +502,23 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
         return List.of(this);
     }
 
-    private MethodInfo copyAllButBodyParametersReturnTypeAnnotationsExceptionTypes() {
+    private MethodInfo copyAllButBodyParametersReturnTypeAnnotationsExceptionTypes(TranslationMap translationMap) {
         MethodInfo methodInfo = new MethodInfoImpl(methodType, name, typeInfo);
         MethodInfo.Builder builder = methodInfo.builder();
         builder.setAccess(access()).setSource(source()).setSynthetic(isSynthetic());
         typeParameters()
                 .stream()
-                .map(t -> t.withOwner(methodInfo))
+                .map(tp0 -> {
+                    TypeParameter tp = tp0.withOwnerVariableTypeBounds(methodInfo);
+                    if(translationMap != null) {
+                        List<ParameterizedType> newTypeBounds = tp.builder().getTypeBounds().stream()
+                                .map(translationMap::translateType)
+                                .toList();
+                        tp.builder().setTypeBounds(newTypeBounds);
+                    }
+                    tp.builder().commit();
+                    return tp;
+                })
                 .forEach(builder::addTypeParameter);
         methodModifiers().forEach(builder::addMethodModifier);
         return methodInfo;
@@ -516,7 +526,7 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
 
     @Override
     public MethodInfo withMethodBody(Block newBody) {
-        MethodInfo methodInfo = copyAllButBodyParametersReturnTypeAnnotationsExceptionTypes();
+        MethodInfo methodInfo = copyAllButBodyParametersReturnTypeAnnotationsExceptionTypes(null);
         MethodInfo.Builder builder = methodInfo.builder();
         exceptionTypes().forEach(builder::addExceptionType);
         annotations().forEach(builder::addAnnotation);
