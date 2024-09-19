@@ -15,9 +15,9 @@ import java.util.Map;
 import java.util.Set;
 
 public class QualificationImpl implements Qualification {
-    public static final Qualification FULLY_QUALIFIED_NAMES = new QualificationImpl(false, TypeNameImpl.Required.FQN);
-    public static final Qualification SIMPLE_NAMES = new QualificationImpl(false, TypeNameImpl.Required.SIMPLE);
-    public static final Qualification SIMPLE_ONLY = new QualificationImpl(true, TypeNameImpl.Required.SIMPLE);
+    public static final Qualification FULLY_QUALIFIED_NAMES = new QualificationImpl(false, TypeNameImpl.Required.FQN, null);
+    public static final Qualification SIMPLE_NAMES = new QualificationImpl(false, TypeNameImpl.Required.SIMPLE, null);
+    public static final Qualification SIMPLE_ONLY = new QualificationImpl(true, TypeNameImpl.Required.SIMPLE, null);
 
     private final TypeNameRequired typeNameRequired;
     private final Set<FieldInfo> unqualifiedFields = new HashSet<>();
@@ -30,22 +30,27 @@ public class QualificationImpl implements Qualification {
     private final QualificationImpl top;
     private final boolean doNotQualifyImplicit;
 
-    public QualificationImpl(boolean doNotQualifyImplicit, TypeNameRequired typeNameRequired) {
+    private final Decorator decorator;
+
+    public QualificationImpl(boolean doNotQualifyImplicit, TypeNameRequired typeNameRequired, Decorator decorator) {
         parent = null;
         top = this;
         this.typeNameRequired = typeNameRequired;
         typesNotImported = new HashMap<>();
         simpleTypeNames = new HashSet<>();
         this.doNotQualifyImplicit = doNotQualifyImplicit;
+        this.decorator = decorator;
     }
 
     public QualificationImpl(boolean doNotQualifyImplicit, Qualification parent, TypeNameRequired typeNameRequired) {
-        this.parent = (QualificationImpl) parent;
-        top = ((QualificationImpl) parent).top;
+        QualificationImpl pi = (QualificationImpl) parent;
+        this.parent = pi;
+        top = pi.top;
         typesNotImported = null;
         simpleTypeNames = null;
         this.typeNameRequired = typeNameRequired;
         this.doNotQualifyImplicit = doNotQualifyImplicit;
+        this.decorator = pi.decorator;
     }
 
     @Override
@@ -134,5 +139,10 @@ public class QualificationImpl implements Qualification {
     @Override
     public TypeNameRequired typeNameRequired() {
         return typeNameRequired;
+    }
+
+    @Override
+    public Decorator decorator() {
+        return decorator;
     }
 }

@@ -39,6 +39,12 @@ public record MethodPrinter(TypeInfo typeInfo, MethodInfo methodInfo) {
             builder.add(annotation.print(qualification));
             builder.add(SpaceEnum.ONE);
         }
+        if (qualification.decorator() != null) {
+            for (AnnotationExpression annotation : qualification.decorator().annotations(methodInfo)) {
+                builder.add(annotation.print(qualification));
+                builder.add(SpaceEnum.ONE);
+            }
+        }
         List<MethodModifier> modifiers = minimalModifiers();
         builder.add(modifiers.stream()
                 .map(mod -> new OutputBuilderImpl().add(mod.keyword()))
@@ -144,6 +150,12 @@ public record MethodPrinter(TypeInfo typeInfo, MethodInfo methodInfo) {
         for (AnnotationExpression annotation : pi.annotations()) {
             outputBuilder.add(annotation.print(qualification));
             outputBuilder.add(SpaceEnum.ONE);
+        }
+        if (qualification.decorator() != null) {
+            for (AnnotationExpression annotation : qualification.decorator().annotations(pi)) {
+                outputBuilder.add(annotation.print(qualification));
+                outputBuilder.add(SpaceEnum.ONE);
+            }
         }
         if (pi.isFinal()) {
             outputBuilder.add(KeywordImpl.FINAL).add(SpaceEnum.ONE);

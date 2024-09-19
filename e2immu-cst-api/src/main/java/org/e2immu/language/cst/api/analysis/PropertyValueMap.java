@@ -5,8 +5,8 @@ import java.util.stream.Stream;
 public interface PropertyValueMap {
 
     record PropertyValue(Property property, Value value) {
-    }
 
+    }
     Property property(String key);
 
     <V extends Value> V getOrDefault(Property property, V defaultValue);
@@ -24,4 +24,6 @@ public interface PropertyValueMap {
     Stream<PropertyValue> propertyValueStream();
 
     <V extends Value> void set(Property property, V value);
+
+    void setAll(PropertyValueMap analysis);
 }

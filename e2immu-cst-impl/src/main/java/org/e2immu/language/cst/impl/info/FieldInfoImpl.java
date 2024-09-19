@@ -148,7 +148,10 @@ public class FieldInfoImpl extends InfoImpl implements FieldInfo {
     }
 
     public OutputBuilder print(Qualification qualification, boolean asParameter) {
-        Stream<OutputBuilder> annotationStream = annotations().stream().map(ae -> ae.print(qualification));
+        Stream<OutputBuilder> annotationStream = Stream.concat(annotations().stream(),
+                        qualification.decorator() == null ? Stream.of()
+                                : qualification.decorator().annotations(this).stream())
+                .map(ae -> ae.print(qualification));
 
         OutputBuilder outputBuilder = new OutputBuilderImpl();
         if (hasBeenCommitted() && !asParameter) {

@@ -1,6 +1,7 @@
 package org.e2immu.language.cst.impl.info;
 
 import org.e2immu.language.cst.api.element.Element;
+import org.e2immu.language.cst.api.expression.AnnotationExpression;
 import org.e2immu.language.cst.api.expression.ConstructorCall;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.info.*;
@@ -109,11 +110,16 @@ public record TypePrinter(TypeInfo typeInfo) {
         afterAnnotations.add(main);
 
         // annotations and the rest of the type are at the same level
+        Stream<AnnotationExpression> allAnnots = Stream.concat(typeInfo.annotations().stream(),
+                qualification.decorator() == null ? Stream.of() : qualification.decorator().annotations(typeInfo).stream());
         Stream<OutputBuilder> annotationStream = doTypeDeclaration
-                ? typeInfo.annotations().stream().map(ae -> ae.print(qualification))
+                ? allAnnots.map(ae -> ae.print(qualification))
                 : Stream.of();
         if (typeInfo().comments() != null) {
             typeInfo.comments().forEach(c -> packageAndImports.add(c.print(qualification)));
+        }
+        if (qualification.decorator() != null && typeInfo.isPrimaryType()) {
+            qualification.decorator().importStatements().forEach(is -> packageAndImports.add(is.print(qualification)));
         }
         return packageAndImports.add(Stream.concat(annotationStream, Stream.of(afterAnnotations))
                 .collect(OutputBuilderImpl.joining(SpaceEnum.ONE_REQUIRED_EASY_SPLIT,
@@ -249,9 +255,9 @@ public record TypePrinter(TypeInfo typeInfo) {
         Map<String, PerPackage> typesPerPackage = new HashMap<>();
         QualificationImpl qualification;
         if (q == null) {
-            qualification = new QualificationImpl(false, TypeNameImpl.Required.QUALIFIED_FROM_PRIMARY_TYPE);
+            qualification = new QualificationImpl(false, TypeNameImpl.Required.QUALIFIED_FROM_PRIMARY_TYPE, null);
         } else {
-            qualification = new QualificationImpl(q.doNotQualifyImplicit(), q.typeNameRequired());
+            qualification = new QualificationImpl(q.doNotQualifyImplicit(), q.typeNameRequired(), q.decorator());
         }
         typesReferenced.forEach(ti -> {
             String packageName = ti.packageName();

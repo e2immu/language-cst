@@ -56,7 +56,7 @@ public class PropertyValueMapImpl implements PropertyValueMap {
                 PRECONDITION_METHOD,
                 SHALLOW_ANALYZER,
                 STATIC_SIDE_EFFECTS_METHOD
-                );
+        );
         properties.forEach(p -> propertyMap.put(p.key(), p));
     }
 
@@ -96,4 +96,8 @@ public class PropertyValueMapImpl implements PropertyValueMap {
         map.put(property, value);
     }
 
+    @Override
+    public void setAll(PropertyValueMap analysis) {
+        propertyValueStream().forEach(pv -> map.put(pv.property(), pv.value()));
+    }
 }

@@ -376,11 +376,11 @@ public interface Factory {
 
     Precedence precedenceLogicalOr();
 
-    Qualification qualificationDoNotQualifyImplicit();
-
     Qualification qualificationFullyQualifiedNames();
 
     Qualification qualificationQualifyFromPrimaryType();
+
+    Qualification qualificationQualifyFromPrimaryType(Qualification.Decorator decorator);
 
     Qualification qualificationSimpleNames();
 
