@@ -7,14 +7,13 @@ import org.e2immu.language.cst.api.info.ParameterInfo;
 import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.runtime.Predefined;
 import org.e2immu.language.cst.api.type.ParameterizedType;
-import org.e2immu.language.cst.impl.element.AnnotationExpressionImpl;
+import org.e2immu.language.cst.impl.expression.AnnotationExpressionImpl;
 import org.e2immu.language.cst.impl.element.CompilationUnitImpl;
 import org.e2immu.language.cst.impl.info.InspectionImpl;
 import org.e2immu.language.cst.impl.info.MethodInfoImpl;
 import org.e2immu.language.cst.impl.info.TypeInfoImpl;
 import org.e2immu.language.cst.impl.info.TypeNatureEnum;
 
-import java.net.URI;
 import java.util.*;
 
 public class PredefinedImpl implements Predefined {
@@ -141,7 +140,7 @@ public class PredefinedImpl implements Predefined {
 
     private final TypeInfo functionalInterface = new TypeInfoImpl(JAVA_LANG, "FunctionalInterface");
     private final AnnotationExpression functionalInterfaceAnnotationExpression =
-            new AnnotationExpressionImpl(functionalInterface, List.of());
+            new AnnotationExpressionImpl(List.of(), null, functionalInterface, List.of());
 
     private final TypeInfo classTypeInfo = new TypeInfoImpl(JAVA_LANG, "Class");
 

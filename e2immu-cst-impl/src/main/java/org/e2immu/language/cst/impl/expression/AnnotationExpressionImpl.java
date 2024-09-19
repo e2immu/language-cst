@@ -1,25 +1,39 @@
-package org.e2immu.language.cst.impl.element;
+package org.e2immu.language.cst.impl.expression;
 
+import org.e2immu.language.cst.api.element.Comment;
 import org.e2immu.language.cst.api.element.Element;
+import org.e2immu.language.cst.api.element.Source;
+import org.e2immu.language.cst.api.element.Visitor;
 import org.e2immu.language.cst.api.expression.AnnotationExpression;
 import org.e2immu.language.cst.api.expression.Expression;
+import org.e2immu.language.cst.api.expression.Precedence;
 import org.e2immu.language.cst.api.expression.StringConstant;
 import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.translate.TranslationMap;
+import org.e2immu.language.cst.api.type.ParameterizedType;
+import org.e2immu.language.cst.api.variable.DescendMode;
+import org.e2immu.language.cst.api.variable.Variable;
+import org.e2immu.language.cst.impl.element.ElementImpl;
+import org.e2immu.language.cst.impl.expression.util.ExpressionComparator;
+import org.e2immu.language.cst.impl.expression.util.InternalCompareToException;
+import org.e2immu.language.cst.impl.expression.util.PrecedenceEnum;
 import org.e2immu.language.cst.impl.output.*;
+import org.e2immu.language.cst.impl.type.ParameterizedTypeImpl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class AnnotationExpressionImpl implements AnnotationExpression {
+public class AnnotationExpressionImpl extends ExpressionImpl implements AnnotationExpression {
     private final TypeInfo typeInfo;
-
     private final List<KV> keyValuePairs;
 
-    public AnnotationExpressionImpl(TypeInfo typeInfo, List<KV> keyValuePairs) {
+    public AnnotationExpressionImpl(List<Comment> comments, Source source, TypeInfo typeInfo, List<KV> keyValuePairs) {
+        super(comments, source, 1 + keyValuePairs.stream().mapToInt(kv -> kv.value().complexity()).sum());
         this.typeInfo = typeInfo;
         this.keyValuePairs = keyValuePairs;
     }
@@ -32,6 +46,16 @@ public class AnnotationExpressionImpl implements AnnotationExpression {
     @Override
     public List<KV> keyValuePairs() {
         return keyValuePairs;
+    }
+
+    @Override
+    public void visit(Predicate<Element> predicate) {
+
+    }
+
+    @Override
+    public void visit(Visitor visitor) {
+
     }
 
     @Override
@@ -51,14 +75,26 @@ public class AnnotationExpressionImpl implements AnnotationExpression {
         return outputBuilder;
     }
 
+    @Override
+    public Stream<Variable> variables(DescendMode descendMode) {
+        return Stream.empty();
+    }
+
     public record KVI(String key, Expression value) implements AnnotationExpression.KV {
         @Override
         public boolean keyIsDefault() {
             return "value".equals(key);
         }
+
+        @Override
+        public KV translate(TranslationMap translationMap) {
+            Expression tex = value.translate(translationMap);
+            if (tex != value) return new KVI(key, tex);
+            return this;
+        }
     }
 
-    public static class Builder implements AnnotationExpression.Builder {
+    public static class Builder extends ElementImpl.Builder<AnnotationExpression.Builder> implements AnnotationExpression.Builder {
         private TypeInfo typeInfo;
 
         private final List<KV> keyValuePairs = new ArrayList<>();
@@ -78,7 +114,7 @@ public class AnnotationExpressionImpl implements AnnotationExpression {
 
         @Override
         public AnnotationExpression build() {
-            return new AnnotationExpressionImpl(typeInfo, List.copyOf(keyValuePairs));
+            return new AnnotationExpressionImpl(comments, source, typeInfo, List.copyOf(keyValuePairs));
         }
     }
 
@@ -109,7 +145,41 @@ public class AnnotationExpressionImpl implements AnnotationExpression {
     }
 
     @Override
-    public List<AnnotationExpression> translate(TranslationMap translationMap) {
-        return List.of(this);
+    public ParameterizedType parameterizedType() {
+        return ParameterizedTypeImpl.TYPE_OF_EMPTY_EXPRESSION;
+    }
+
+    @Override
+    public Precedence precedence() {
+        return PrecedenceEnum.BOTTOM;
+    }
+
+    @Override
+    public int order() {
+        return ExpressionComparator.ORDER_ANNOTATION_EXPRESSION;
+    }
+
+    @Override
+    public int internalCompareTo(Expression expression) {
+        if (expression instanceof AnnotationExpression ae) {
+            int c = typeInfo.fullyQualifiedName().compareTo(ae.typeInfo().fullyQualifiedName());
+            if (c != 0) return 0;
+            return keyValuePairs().toString().compareTo(ae.keyValuePairs().toString());
+        }
+        throw new InternalCompareToException();
+    }
+
+    @Override
+    public AnnotationExpression translate(TranslationMap translationMap) {
+        Expression te = translationMap.translateExpression(this);
+        if (te != this) return (AnnotationExpression) te;
+        ParameterizedType pt = typeInfo.asSimpleParameterizedType();
+        ParameterizedType tpt = translationMap.translateType(pt);
+        List<KV> newKv = keyValuePairs.stream()
+                .map(kv -> kv.translate(translationMap)).collect(translationMap.toList(keyValuePairs));
+        if (pt != tpt || newKv != keyValuePairs) {
+            return new AnnotationExpressionImpl(comments(), source(), tpt.typeInfo(), newKv);
+        }
+        return this;
     }
 }

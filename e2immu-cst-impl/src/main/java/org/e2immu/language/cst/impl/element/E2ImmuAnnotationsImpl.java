@@ -15,6 +15,7 @@ import org.e2immu.annotation.type.Singleton;
 import org.e2immu.annotation.type.UtilityClass;
 import org.e2immu.language.cst.api.element.CompilationUnit;
 import org.e2immu.language.cst.api.expression.AnnotationExpression;
+import org.e2immu.language.cst.impl.expression.AnnotationExpressionImpl;
 import org.e2immu.language.cst.impl.info.TypeInfoImpl;
 
 import java.util.HashMap;
@@ -92,7 +93,7 @@ public class E2ImmuAnnotationsImpl {
      */
     private AnnotationExpression create(Class<?> clazz) {
         CompilationUnit cu = new CompilationUnitImpl.Builder().setPackageName(clazz.getPackageName()).build();
-        return new AnnotationExpressionImpl(new TypeInfoImpl(cu, clazz.getSimpleName()), List.of());
+        return new AnnotationExpressionImpl(List.of(), null, new TypeInfoImpl(cu, clazz.getSimpleName()), List.of());
     }
 
     public AnnotationExpression get(String name) {

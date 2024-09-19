@@ -636,9 +636,9 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
         change |= newSubTypes != subTypeList;
         List<AnnotationExpression> newAnnotations = new ArrayList<>(2 * annotations().size());
         for (AnnotationExpression ae : annotations()) {
-            List<AnnotationExpression> tAe = ae.translate(translationMap);
-            newAnnotations.addAll(tAe);
-            change |= tAe.size() != 1 || tAe.get(0) != ae;
+            AnnotationExpression tAe = (AnnotationExpression) ae.translate(translationMap);
+            newAnnotations.add(tAe);
+            change |= tAe != ae;
         }
         if (change) {
             TypeInfo.Builder builder = typeInfo.builder();
