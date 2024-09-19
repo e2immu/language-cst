@@ -3,6 +3,7 @@ package org.e2immu.language.cst.api.statement;
 import org.e2immu.annotation.Fluent;
 import org.e2immu.language.cst.api.element.Element;
 import org.e2immu.language.cst.api.element.Visitor;
+import org.e2immu.language.cst.api.expression.AnnotationExpression;
 import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.variable.DescendMode;
@@ -15,7 +16,7 @@ import java.util.stream.Stream;
 
 public interface TryStatement extends Statement {
 
-    interface CatchClause {
+    interface CatchClause extends Element {
         List<ParameterizedType> exceptionTypes();
 
         boolean isFinal();
@@ -26,19 +27,10 @@ public interface TryStatement extends Statement {
 
         Block block();
 
-        int complexity();
-
-        Stream<TypeReference> typesReferenced();
-
-        Stream<Variable> variables(DescendMode descendMode);
-
-        void visit(Predicate<Element> predicate);
-
-        void visit(Visitor visitor);
-
         CatchClause withBlock(Block newBlock);
 
-        interface Builder {
+        interface Builder extends Element.Builder<Builder> {
+
             @Fluent
             Builder setBlock(Block block);
 

@@ -63,13 +63,22 @@ public class TryStatementImpl extends StatementImpl implements TryStatement {
                 tCatchClauses, tSubBlocks.get(tSubBlocks.size() - 1));
     }
 
-    public static class CatchClauseImpl implements CatchClause {
+    public static class CatchClauseImpl extends ElementImpl implements CatchClause {
         private final List<ParameterizedType> exceptionTypes;
         private final boolean isFinal;
         private final LocalVariable catchVariable;
         private final Block block;
+        private final Source source;
+        private final List<Comment> comments;
+        private final List<AnnotationExpression> annotations;
 
-        public CatchClauseImpl(List<ParameterizedType> exceptionTypes, boolean isFinal, LocalVariable catchVariable, Block block) {
+        public CatchClauseImpl(List<Comment> comments,
+                               Source source,
+                               List<AnnotationExpression> annotations,
+                               List<ParameterizedType> exceptionTypes, boolean isFinal, LocalVariable catchVariable, Block block) {
+            this.comments = comments;
+            this.annotations = annotations;
+            this.source = source;
             this.catchVariable = catchVariable;
             this.exceptionTypes = exceptionTypes;
             this.block = block;
@@ -78,10 +87,10 @@ public class TryStatementImpl extends StatementImpl implements TryStatement {
 
         @Override
         public CatchClause withBlock(Block newBlock) {
-            return new CatchClauseImpl(exceptionTypes, isFinal, catchVariable, newBlock);
+            return new CatchClauseImpl(comments, source, annotations, exceptionTypes, isFinal, catchVariable, newBlock);
         }
 
-        public static class Builder implements CatchClause.Builder {
+        public static class Builder extends ElementImpl.Builder<CatchClause.Builder> implements CatchClause.Builder {
             private final List<ParameterizedType> exceptionTypes = new ArrayList<>();
             private LocalVariable catchVariable;
             private boolean isFinal;
@@ -113,7 +122,7 @@ public class TryStatementImpl extends StatementImpl implements TryStatement {
 
             @Override
             public CatchClause build() {
-                return new CatchClauseImpl(exceptionTypes, isFinal, catchVariable, block);
+                return new CatchClauseImpl(comments, source, annotations, exceptionTypes, isFinal, catchVariable, block);
             }
         }
 
@@ -143,6 +152,21 @@ public class TryStatementImpl extends StatementImpl implements TryStatement {
         }
 
         @Override
+        public List<Comment> comments() {
+            return comments;
+        }
+
+        @Override
+        public Source source() {
+            return source;
+        }
+
+        @Override
+        public List<AnnotationExpression> annotations() {
+            return annotations;
+        }
+
+        @Override
         public Stream<Element.TypeReference> typesReferenced() {
             return Stream.concat(exceptionTypes.stream()
                             .map(et -> new ElementImpl.TypeReference(et.typeInfo(), true)),
@@ -165,12 +189,17 @@ public class TryStatementImpl extends StatementImpl implements TryStatement {
         }
 
         @Override
+        public OutputBuilder print(Qualification qualification) {
+            return null;
+        }
+
+        @Override
         public CatchClause translate(TranslationMap translationMap) {
             List<ParameterizedType> list = exceptionTypes.stream()
                     .map(translationMap::translateType).collect(translationMap.toList(exceptionTypes));
             Block tBlock = (Block) block.translate(translationMap).get(0);
             if (list != exceptionTypes || tBlock != block) {
-                return new CatchClauseImpl(list, isFinal, catchVariable, tBlock);
+                return new CatchClauseImpl(comments, source, annotations, list, isFinal, catchVariable, tBlock);
             }
             return this;
         }
