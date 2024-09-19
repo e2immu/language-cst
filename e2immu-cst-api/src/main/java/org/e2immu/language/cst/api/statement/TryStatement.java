@@ -59,7 +59,7 @@ public interface TryStatement extends Statement {
 
     List<CatchClause> catchClauses();
 
-    List<LocalVariableCreation> resources();
+    List<Element> resources();
 
     interface Builder extends Statement.Builder<Builder> {
 
@@ -73,7 +73,7 @@ public interface TryStatement extends Statement {
         Builder addCatchClause(CatchClause catchClause);
 
         @Fluent
-        Builder addResource(LocalVariableCreation localVariableCreation);
+        Builder addResource(Element resource);
 
         TryStatement build();
     }

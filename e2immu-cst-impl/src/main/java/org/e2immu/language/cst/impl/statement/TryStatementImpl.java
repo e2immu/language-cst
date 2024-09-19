@@ -5,10 +5,10 @@ import org.e2immu.language.cst.api.element.Element;
 import org.e2immu.language.cst.api.element.Source;
 import org.e2immu.language.cst.api.element.Visitor;
 import org.e2immu.language.cst.api.expression.AnnotationExpression;
+import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.statement.Block;
-import org.e2immu.language.cst.api.statement.LocalVariableCreation;
 import org.e2immu.language.cst.api.statement.Statement;
 import org.e2immu.language.cst.api.statement.TryStatement;
 import org.e2immu.language.cst.api.translate.TranslationMap;
@@ -31,13 +31,13 @@ public class TryStatementImpl extends StatementImpl implements TryStatement {
     private final Block block;
     private final Block finallyBlock;
     private final List<CatchClause> catchClauses;
-    private final List<LocalVariableCreation> resources;
+    private final List<Element> resources; // either LVC, or VE
 
     public TryStatementImpl(List<Comment> comments,
                             Source source,
                             List<AnnotationExpression> annotations,
                             String label,
-                            List<LocalVariableCreation> resources,
+                            List<Element> resources,
                             Block block,
                             List<CatchClause> catchClauses,
                             Block finallyBlock) {
@@ -180,7 +180,7 @@ public class TryStatementImpl extends StatementImpl implements TryStatement {
         private Block block;
         private Block finallyBlock;
         private final List<CatchClause> catchClauses = new ArrayList<>();
-        private final List<LocalVariableCreation> resources = new ArrayList<>();
+        private final List<Element> resources = new ArrayList<>();
 
         @Override
         public TryStatement.Builder setBlock(Block block) {
@@ -201,7 +201,7 @@ public class TryStatementImpl extends StatementImpl implements TryStatement {
         }
 
         @Override
-        public TryStatement.Builder addResource(LocalVariableCreation resource) {
+        public TryStatement.Builder addResource(Element resource) {
             resources.add(resource);
             return this;
         }
@@ -237,7 +237,7 @@ public class TryStatementImpl extends StatementImpl implements TryStatement {
     }
 
     @Override
-    public List<LocalVariableCreation> resources() {
+    public List<Element> resources() {
         return resources;
     }
 
@@ -290,11 +290,10 @@ public class TryStatementImpl extends StatementImpl implements TryStatement {
                     .add(SymbolEnum.RIGHT_PARENTHESIS);
         }
         outputBuilder.add(block.print(qualification));
-        int i = 1;
         for (CatchClause cc : catchClauses) {
             outputBuilder.add(KeywordImpl.CATCH)
                     .add(SymbolEnum.LEFT_PARENTHESIS);
-            if(cc.isFinal()) {
+            if (cc.isFinal()) {
                 outputBuilder.add(KeywordImpl.FINAL).add(SpaceEnum.ONE);
             }
             outputBuilder
@@ -305,7 +304,6 @@ public class TryStatementImpl extends StatementImpl implements TryStatement {
                     .add(cc.catchVariable().print(qualification))
                     .add(SymbolEnum.RIGHT_PARENTHESIS)
                     .add(cc.block().print(qualification));
-            i++;
         }
         if (!finallyBlock.isEmpty() || catchClauses.isEmpty() && resources.isEmpty()) {
             outputBuilder
@@ -325,7 +323,7 @@ public class TryStatementImpl extends StatementImpl implements TryStatement {
 
     @Override
     public Stream<Element.TypeReference> typesReferenced() {
-        return Stream.concat(resources.stream().flatMap(LocalVariableCreation::typesReferenced),
+        return Stream.concat(resources.stream().flatMap(Element::typesReferenced),
                 Stream.concat(block.typesReferenced(), Stream.concat(catchClauses.stream().flatMap(CatchClause::typesReferenced),
                         finallyBlock.typesReferenced())));
     }
@@ -346,8 +344,11 @@ public class TryStatementImpl extends StatementImpl implements TryStatement {
         if (haveDirectTranslation(direct, this)) return direct;
         Block tMain = (Block) block.translate(translationMap).get(0);
         Block tFinally = (Block) finallyBlock.translate(translationMap).get(0);
-        List<LocalVariableCreation> tResources = resources.stream()
-                .map(st -> (LocalVariableCreation) st.translate(translationMap).get(0))
+        List<Element> tResources = resources.stream()
+                .map(e -> {
+                    if (e instanceof Statement st) return st.translate(translationMap).get(0);
+                    return ((Expression) e).translate(translationMap);
+                })
                 .collect(translationMap.toList(resources));
         List<CatchClause> tCatch = catchClauses.stream()
                 .map(cc -> cc.translate(translationMap))

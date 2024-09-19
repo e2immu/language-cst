@@ -23,6 +23,12 @@ public class SingleLineComment implements Comment {
 
     @Override
     public OutputBuilder print(Qualification qualification) {
-        return new OutputBuilderImpl().add(SymbolEnum.SINGLE_LINE_COMMENT).add(new TextImpl(comment)).add(SpaceEnum.NEWLINE);
+        OutputBuilder ob = new OutputBuilderImpl().add(SymbolEnum.SINGLE_LINE_COMMENT);
+        if (!comment.isEmpty()) ob.add(new TextImpl(comment));
+        return ob.add(SpaceEnum.NEWLINE);
+    }
+
+    public String comment() {
+        return comment;
     }
 }
