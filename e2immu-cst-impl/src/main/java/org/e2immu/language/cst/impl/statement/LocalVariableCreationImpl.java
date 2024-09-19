@@ -127,6 +127,11 @@ public class LocalVariableCreationImpl extends StatementImpl implements LocalVar
     }
 
     @Override
+    public boolean isFinal() {
+        return modifiers.stream().anyMatch(Modifier::isFinal);
+    }
+
+    @Override
     public LocalVariable localVariable() {
         return localVariable;
     }
@@ -192,8 +197,8 @@ public class LocalVariableCreationImpl extends StatementImpl implements LocalVar
         Stream<OutputBuilder> rest = otherLocalVariables.stream().map(d -> {
             OutputBuilder ob = new OutputBuilderImpl().add(new TextImpl(d.simpleName()));
             // old-style array declarations, see TestParseArray,3C
-            if(d.parameterizedType().arrays() != base.arrays()) {
-                for(int i=0; i<d.parameterizedType().arrays(); i++) {
+            if (d.parameterizedType().arrays() != base.arrays()) {
+                for (int i = 0; i < d.parameterizedType().arrays(); i++) {
                     ob.add(SymbolEnum.OPEN_CLOSE_BRACKETS);
                 }
             }

@@ -11,6 +11,8 @@ import java.util.stream.Stream;
 
 public interface LocalVariableCreation extends Statement {
 
+    boolean isFinal();
+
     interface Modifier {
         boolean isFinal(); // the only one in Java; in Kotlin, this represents "val"
 
