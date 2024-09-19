@@ -160,11 +160,11 @@ public class BlockImpl extends StatementImpl implements Block {
     @Override
     public List<Statement> translate(TranslationMap translationMap) {
         List<Statement> direct = translationMap.translateStatement(this);
-        if (haveDirectTranslation(direct, this)) {
+        if (hasBeenTranslated(direct, this)) {
             assert direct.size() == 1 && direct.get(0) instanceof Block;
             return direct;
         }
-        boolean change = false;
+        boolean change = !analysis().isEmpty() && translationMap.isClearAnalysis();
         List<Statement> tStatements = new ArrayList<>(2 * statements.size());
         for (Statement statement : statements) {
             List<Statement> tStatement = statement.translate(translationMap);
@@ -172,7 +172,9 @@ public class BlockImpl extends StatementImpl implements Block {
             change |= tStatement.size() != 1 || tStatement.get(0) != statement;
         }
         if (change) {
-            return List.of(new BlockImpl(comments(), source(), annotations(), label(), tStatements));
+            Block newB = new BlockImpl(comments(), source(), annotations(), label(), tStatements);
+            if (!translationMap.isClearAnalysis()) newB.analysis().setAll(analysis());
+            return List.of(newB);
         }
         return List.of(this);
     }

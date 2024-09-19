@@ -187,7 +187,7 @@ public class ForStatementImpl extends StatementImpl implements ForStatement {
     @Override
     public List<Statement> translate(TranslationMap translationMap) {
         List<Statement> direct = translationMap.translateStatement(this);
-        if (haveDirectTranslation(direct, this)) return direct;
+        if (hasBeenTranslated(direct, this)) return direct;
 
         // translations in order of appearance
         List<Element> initializers = initializers().stream()
@@ -202,7 +202,9 @@ public class ForStatementImpl extends StatementImpl implements ForStatement {
                 collect(Collectors.toList());
         List<Statement> translatedBlock = block().translate(translationMap);
 
-        return List.of(new ForStatementImpl(comments(), source(), annotations(), label(), initializers,
-                tex, updaters, ensureBlock(translatedBlock)));
+        ForStatementImpl fs = new ForStatementImpl(comments(), source(), annotations(), label(), initializers,
+                tex, updaters, ensureBlock(translatedBlock));
+        if (!translationMap.isClearAnalysis()) fs.analysis().setAll(analysis());
+        return List.of(fs);
     }
 }

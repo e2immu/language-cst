@@ -100,4 +100,9 @@ public class PropertyValueMapImpl implements PropertyValueMap {
     public void setAll(PropertyValueMap analysis) {
         propertyValueStream().forEach(pv -> map.put(pv.property(), pv.value()));
     }
+
+    @Override
+    public boolean isEmpty() {
+        return map.isEmpty();
+    }
 }

@@ -122,12 +122,12 @@ public class SynchronizedStatementImpl extends StatementImpl implements Synchron
     @Override
     public List<Statement> translate(TranslationMap translationMap) {
         List<Statement> direct = translationMap.translateStatement(this);
-        if (haveDirectTranslation(direct, this)) return direct;
+        if (hasBeenTranslated(direct, this)) return direct;
 
         // translations in order of appearance
         Expression tex = translationMap.translateExpression(expression);
         List<Statement> translatedBlock = block.translate(translationMap);
-        if (tex == expression && !haveDirectTranslation(translatedBlock, block)) {
+        if (tex == expression && !hasBeenTranslated(translatedBlock, block)) {
             return List.of(this);
         }
         if (translatedBlock.size() == 1 && translatedBlock.get(0) instanceof Block b) {

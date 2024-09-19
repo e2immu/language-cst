@@ -100,7 +100,7 @@ public abstract class StatementImpl extends ElementImpl implements Statement {
         }
     }
 
-    protected boolean haveDirectTranslation(List<Statement> resultOfTranslation, Statement statement) {
+    protected boolean hasBeenTranslated(List<Statement> resultOfTranslation, Statement statement) {
         return resultOfTranslation.size() != 1 || resultOfTranslation.get(0) != statement;
     }
 

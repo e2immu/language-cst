@@ -8,16 +8,12 @@ import org.e2immu.language.cst.api.expression.AnnotationExpression;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
-import org.e2immu.language.cst.api.statement.AssertStatement;
 import org.e2immu.language.cst.api.statement.Block;
 import org.e2immu.language.cst.api.statement.EmptyStatement;
 import org.e2immu.language.cst.api.statement.Statement;
 import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.variable.DescendMode;
 import org.e2immu.language.cst.api.variable.Variable;
-import org.e2immu.language.cst.impl.output.KeywordImpl;
-import org.e2immu.language.cst.impl.output.OutputBuilderImpl;
-import org.e2immu.language.cst.impl.output.SpaceEnum;
 import org.e2immu.language.cst.impl.output.SymbolEnum;
 
 import java.util.List;
@@ -83,7 +79,9 @@ public class EmptyStatementImpl extends StatementImpl implements EmptyStatement 
     @Override
     public List<Statement> translate(TranslationMap translationMap) {
         List<Statement> direct = translationMap.translateStatement(this);
-        if (haveDirectTranslation(direct, this)) return direct;
+        if (hasBeenTranslated(direct, this)) return direct;
+        if (!analysis().isEmpty() && translationMap.isClearAnalysis())
+            return List.of(new EmptyStatementImpl(comments(), source(), annotations(), label()));
         return List.of(this);
     }
 

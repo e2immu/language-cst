@@ -129,13 +129,16 @@ public class DoStatementImpl extends StatementImpl implements DoStatement {
     @Override
     public List<Statement> translate(TranslationMap translationMap) {
         List<Statement> direct = translationMap.translateStatement(this);
-        if (haveDirectTranslation(direct, this)) return direct;
+        if (hasBeenTranslated(direct, this)) return direct;
 
         Expression tex = expression.translate(translationMap);
         List<Statement> translatedBlock = block.translate(translationMap);
-        if (tex == expression && !haveDirectTranslation(translatedBlock, block)) return List.of(this);
-        DoStatement newDo = new DoStatementImpl(comments(), source(), annotations(), label(), tex,
-                ensureBlock(translatedBlock));
-        return List.of(newDo);
+        if (tex != expression || hasBeenTranslated(translatedBlock, block) || !analysis().isEmpty() && translationMap.isClearAnalysis()) {
+            DoStatement newDo = new DoStatementImpl(comments(), source(), annotations(), label(), tex,
+                    ensureBlock(translatedBlock));
+            if (!translationMap.isClearAnalysis()) newDo.analysis().setAll(analysis());
+            return List.of(newDo);
+        }
+        return List.of(this);
     }
 }

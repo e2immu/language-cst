@@ -370,7 +370,7 @@ public class TryStatementImpl extends StatementImpl implements TryStatement {
     @Override
     public List<Statement> translate(TranslationMap translationMap) {
         List<Statement> direct = translationMap.translateStatement(this);
-        if (haveDirectTranslation(direct, this)) return direct;
+        if (hasBeenTranslated(direct, this)) return direct;
         Block tMain = (Block) block.translate(translationMap).get(0);
         Block tFinally = (Block) finallyBlock.translate(translationMap).get(0);
         List<Element> tResources = resources.stream()

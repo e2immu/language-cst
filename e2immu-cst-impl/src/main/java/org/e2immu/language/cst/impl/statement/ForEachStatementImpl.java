@@ -18,7 +18,6 @@ import org.e2immu.language.cst.api.variable.LocalVariable;
 import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.language.cst.impl.output.*;
 import org.e2immu.language.cst.impl.type.DiamondEnum;
-import org.e2immu.language.cst.impl.output.*;
 
 import java.util.List;
 import java.util.Objects;
@@ -156,16 +155,21 @@ public class ForEachStatementImpl extends StatementImpl implements ForEachStatem
     @Override
     public List<Statement> translate(TranslationMap translationMap) {
         List<Statement> direct = translationMap.translateStatement(this);
-        if (haveDirectTranslation(direct, this)) return direct;
+        if (hasBeenTranslated(direct, this)) return direct;
 
         // translations in order of appearance
         LocalVariableCreation translatedLvc = (LocalVariableCreation) initializer.translate(translationMap).get(0);
         Expression translated = expression.translate(translationMap);
         List<Statement> translatedBlock = block.translate(translationMap);
-        if (translatedLvc == initializer && expression == translated && translatedBlock.get(0) == block) {
-            return List.of(this);
+        if (translatedLvc != initializer
+            || expression != translated
+            || translatedBlock.get(0) != block
+            || !analysis().isEmpty() && translationMap.isClearAnalysis()) {
+            ForEachStatementImpl fs = new ForEachStatementImpl(comments(), source(), annotations(), label(), translatedLvc, translated,
+                    ensureBlock(translatedBlock));
+            if (!translationMap.isClearAnalysis()) fs.analysis().setAll(analysis());
+            return List.of(fs);
         }
-        return List.of(new ForEachStatementImpl(comments(), source(), annotations(), label(), translatedLvc, translated,
-                ensureBlock(translatedBlock)));
+        return List.of(this);
     }
 }

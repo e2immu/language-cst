@@ -102,7 +102,7 @@ public class ThrowStatementImpl extends StatementImpl implements ThrowStatement 
     @Override
     public List<Statement> translate(TranslationMap translationMap) {
         List<Statement> direct = translationMap.translateStatement(this);
-        if (haveDirectTranslation(direct, this)) return direct;
+        if (hasBeenTranslated(direct, this)) return direct;
 
         Expression tex = expression.translate(translationMap);
         if (tex == expression) return List.of(this);

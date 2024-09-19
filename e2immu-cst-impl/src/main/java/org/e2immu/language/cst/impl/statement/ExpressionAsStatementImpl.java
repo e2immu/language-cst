@@ -109,11 +109,14 @@ public class ExpressionAsStatementImpl extends StatementImpl implements Expressi
     @Override
     public List<Statement> translate(TranslationMap translationMap) {
         List<Statement> direct = translationMap.translateStatement(this);
-        if (haveDirectTranslation(direct, this)) return direct;
+        if (hasBeenTranslated(direct, this)) return direct;
         Expression tex = expression.translate(translationMap);
-        if (tex != expression) {
+        if (tex != expression || !analysis().isEmpty() && translationMap.isClearAnalysis()) {
             if (tex == null || tex.isEmpty()) return List.of();
-            return List.of(new ExpressionAsStatementImpl(comments(), source(), annotations(), label(), tex));
+            ExpressionAsStatement newEas
+                    = new ExpressionAsStatementImpl(comments(), source(), annotations(), label(), tex);
+            if (!translationMap.isClearAnalysis()) newEas.analysis().setAll(analysis());
+            return List.of(newEas);
         }
         return List.of(this);
     }

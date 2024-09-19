@@ -90,7 +90,8 @@ public class ImportStatementImpl extends StatementImpl implements ImportStatemen
     @Override
     public List<Statement> translate(TranslationMap translationMap) {
         List<Statement> direct = translationMap.translateStatement(this);
-        if (haveDirectTranslation(direct, this)) return direct;
+        if (hasBeenTranslated(direct, this)) return direct;
+        if (translationMap.isClearAnalysis()) return List.of(new ImportStatementImpl(importString, isStatic));
         return List.of(this);
     }
 

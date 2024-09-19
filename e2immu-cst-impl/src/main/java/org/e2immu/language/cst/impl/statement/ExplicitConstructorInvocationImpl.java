@@ -149,12 +149,14 @@ public class ExplicitConstructorInvocationImpl extends StatementImpl implements 
     @Override
     public List<Statement> translate(TranslationMap translationMap) {
         List<Statement> direct = translationMap.translateStatement(this);
-        if (haveDirectTranslation(direct, this)) return direct;
+        if (hasBeenTranslated(direct, this)) return direct;
         List<Expression> list = parameterExpressions.stream()
                 .map(e -> e.translate(translationMap)).collect(translationMap.toList(parameterExpressions));
-        if (list != parameterExpressions) {
-            return List.of(new ExplicitConstructorInvocationImpl(comments(), source(), annotations(), label(),
-                    isSuper, methodInfo, parameterExpressions));
+        if (list != parameterExpressions || !analysis().isEmpty() && translationMap.isClearAnalysis()) {
+            ExplicitConstructorInvocation eci = new ExplicitConstructorInvocationImpl(comments(), source(), annotations(), label(),
+                    isSuper, methodInfo, parameterExpressions);
+            if (!translationMap.isClearAnalysis()) eci.analysis().setAll(analysis());
+            return List.of(eci);
         }
         return List.of(this);
     }

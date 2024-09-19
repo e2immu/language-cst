@@ -120,11 +120,15 @@ public class AssertStatementImpl extends StatementImpl implements AssertStatemen
     @Override
     public List<Statement> translate(TranslationMap translationMap) {
         List<Statement> direct = translationMap.translateStatement(this);
-        if (haveDirectTranslation(direct, this)) return direct;
+        if (hasBeenTranslated(direct, this)) return direct;
         Expression tex = expression.translate(translationMap);
         Expression msg = message.translate(translationMap);
-        if (tex == expression && msg == message) return List.of(this);
-        return List.of(new AssertStatementImpl(comments(), source(), annotations(), label(), tex, msg));
+        if (tex != expression || msg != message || !analysis().isEmpty() && translationMap.isClearAnalysis()) {
+            AssertStatement as = new AssertStatementImpl(comments(), source(), annotations(), label(), tex, msg);
+            if(!translationMap.isClearAnalysis()) as.analysis().setAll(analysis());
+            return List.of(as);
+        }
+        return List.of(this);
     }
 
     @Override

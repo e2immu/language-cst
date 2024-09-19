@@ -110,6 +110,8 @@ public interface TranslationMap {
         return Map.of();
     }
 
+    default boolean isClearAnalysis() { return true; }
+
     /*
     used by CM
      */
@@ -284,6 +286,8 @@ public interface TranslationMap {
         Builder setModificationTimesHandler(ModificationTimesHandler modificationTimesHandler);
 
         Builder replaceTarget(ParameterizedType from, ParameterizedType to);
+
+        Builder setClearAnalysis(boolean clearAnalysis);
 
         boolean isEmpty();
     }

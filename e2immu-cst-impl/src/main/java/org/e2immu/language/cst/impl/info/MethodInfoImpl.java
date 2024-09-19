@@ -473,7 +473,7 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
             return direct;
         }
         ParameterizedType tReturnType = translationMap.translateType(returnType());
-        boolean change = tReturnType != returnType();
+        boolean change = tReturnType != returnType() || !analysis().isEmpty() && translationMap.isClearAnalysis();
 
         List<Statement> tBody = methodBody().translate(translationMap);
         change |= tBody.size() != 1 || tBody.get(0) != methodBody();
@@ -497,6 +497,9 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
             newExceptionTypes.forEach(builder::addExceptionType);
             builder.setReturnType(tReturnType);
             builder.commit();
+            if (!translationMap.isClearAnalysis()) {
+                methodInfo.analysis().setAll(analysis());
+            }
             return List.of(methodInfo);
         }
         return List.of(this);
@@ -510,7 +513,7 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
                 .stream()
                 .map(tp0 -> {
                     TypeParameter tp = tp0.withOwnerVariableTypeBounds(methodInfo);
-                    if(translationMap != null) {
+                    if (translationMap != null) {
                         List<ParameterizedType> newTypeBounds = tp.builder().getTypeBounds().stream()
                                 .map(translationMap::translateType)
                                 .toList();

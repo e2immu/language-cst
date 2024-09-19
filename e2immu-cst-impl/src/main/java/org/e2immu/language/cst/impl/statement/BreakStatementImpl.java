@@ -56,7 +56,11 @@ public class BreakStatementImpl extends BreakOrContinueStatementImpl implements 
     @Override
     public List<Statement> translate(TranslationMap translationMap) {
         List<Statement> direct = translationMap.translateStatement(this);
-        if (haveDirectTranslation(direct, this)) return direct;
+        if (hasBeenTranslated(direct, this)) return direct;
+        if (!analysis().isEmpty() && translationMap.isClearAnalysis()) {
+            BreakStatement bs = new BreakStatementImpl(comments(), source(), annotations(), label(), goToLabel());
+            return List.of(bs);
+        }
         return List.of(this);
     }
 

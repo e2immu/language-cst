@@ -4,6 +4,8 @@ import java.util.stream.Stream;
 
 public interface PropertyValueMap {
 
+    boolean isEmpty();
+
     record PropertyValue(Property property, Value value) {
 
     }

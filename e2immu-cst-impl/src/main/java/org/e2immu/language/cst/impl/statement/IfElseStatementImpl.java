@@ -163,12 +163,14 @@ public class IfElseStatementImpl extends StatementImpl implements IfElseStatemen
     @Override
     public List<Statement> translate(TranslationMap translationMap) {
         List<Statement> direct = translationMap.translateStatement(this);
-        if (haveDirectTranslation(direct, this)) return direct;
+        if (hasBeenTranslated(direct, this)) return direct;
         Expression tex = expression.translate(translationMap);
         Block tIf = (Block) block.translate(translationMap).get(0);
         Block tElse = elseBlock.isEmpty() ? elseBlock : (Block) elseBlock.translate(translationMap).get(0);
-        if (tex != expression || tIf != block || tElse != elseBlock) {
-            return List.of(new IfElseStatementImpl(comments(), source(), annotations(), label(), tex, tIf, tElse));
+        if (tex != expression || tIf != block || tElse != elseBlock || !analysis().isEmpty() && translationMap.isClearAnalysis()) {
+            IfElseStatement ie = new IfElseStatementImpl(comments(), source(), annotations(), label(), tex, tIf, tElse);
+            if (!translationMap.isClearAnalysis()) ie.analysis().setAll(analysis());
+            return List.of(ie);
         }
         return List.of(this);
     }

@@ -127,11 +127,11 @@ public class WhileStatementImpl extends StatementImpl implements WhileStatement 
     @Override
     public List<Statement> translate(TranslationMap translationMap) {
         List<Statement> direct = translationMap.translateStatement(this);
-        if (haveDirectTranslation(direct, this)) return direct;
+        if (hasBeenTranslated(direct, this)) return direct;
 
         Expression tex = expression.translate(translationMap);
         List<Statement> translatedBlock = block.translate(translationMap);
-        if (tex == expression && !haveDirectTranslation(translatedBlock, block)) return List.of(this);
+        if (tex == expression && !hasBeenTranslated(translatedBlock, block)) return List.of(this);
         WhileStatement newWhile = new WhileStatementImpl(comments(), source(), annotations(), label(), tex,
                 ensureBlock(translatedBlock));
         return List.of(newWhile);

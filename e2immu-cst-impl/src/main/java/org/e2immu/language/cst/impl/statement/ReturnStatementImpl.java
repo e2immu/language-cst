@@ -115,7 +115,7 @@ public class ReturnStatementImpl extends StatementImpl implements ReturnStatemen
     @Override
     public List<Statement> translate(TranslationMap translationMap) {
         List<Statement> direct = translationMap.translateStatement(this);
-        if (haveDirectTranslation(direct, this)) return direct;
+        if (hasBeenTranslated(direct, this)) return direct;
         Expression tex = expression.translate(translationMap);
         if (tex == expression) return List.of(this);
         return List.of(new ReturnStatementImpl(comments(), source(), annotations(), label(), tex));

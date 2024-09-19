@@ -247,7 +247,7 @@ public class SwitchStatementOldStyleImpl extends StatementImpl implements Switch
     @Override
     public List<Statement> translate(TranslationMap translationMap) {
         List<Statement> direct = translationMap.translateStatement(this);
-        if (haveDirectTranslation(direct, this)) return direct;
+        if (hasBeenTranslated(direct, this)) return direct;
 
         Expression translatedExpression = selector.translate(translationMap);
         List<SwitchLabel> translatedLabels = switchLabels.stream()

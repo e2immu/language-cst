@@ -5,7 +5,6 @@ import org.e2immu.language.cst.api.element.Element;
 import org.e2immu.language.cst.api.element.Source;
 import org.e2immu.language.cst.api.element.Visitor;
 import org.e2immu.language.cst.api.expression.AnnotationExpression;
-import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.statement.Block;
@@ -16,10 +15,8 @@ import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.variable.DescendMode;
 import org.e2immu.language.cst.api.variable.LocalVariable;
 import org.e2immu.language.cst.api.variable.Variable;
-import org.e2immu.language.cst.impl.element.ElementImpl;
 import org.e2immu.language.cst.impl.output.*;
 import org.e2immu.language.cst.impl.type.DiamondEnum;
-import org.e2immu.language.cst.impl.output.*;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -233,7 +230,7 @@ public class LocalVariableCreationImpl extends StatementImpl implements LocalVar
     @Override
     public List<Statement> translate(TranslationMap translationMap) {
         List<Statement> direct = translationMap.translateStatement(this);
-        if (haveDirectTranslation(direct, this)) return direct;
+        if (hasBeenTranslated(direct, this)) return direct;
         LocalVariable tlv = localVariable.translate(translationMap);
         List<LocalVariable> tList = otherLocalVariables.stream()
                 .map(lv -> lv.translate(translationMap)).collect(translationMap.toList(otherLocalVariables));
