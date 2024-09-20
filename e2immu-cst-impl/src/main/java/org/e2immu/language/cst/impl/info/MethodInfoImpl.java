@@ -498,6 +498,8 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
                 ParameterInfo original = parameters().get(dvc.index());
                 ParameterizedType type = dvc == original ? tTypes.get(dvc.index()) : dvc.parameterizedType();
                 ParameterInfo newPi = builder.addParameter(dvc.simpleName(), type, dvc.comments(), dvc.source(), dvc.annotations());
+                newPi.builder().setVarArgs(dvc.isVarArgs());
+                newPi.builder().setIsFinal(dvc.isFinal());
                 if (!translationMap.isClearAnalysis()) {
                     newPi.analysis().setAll(original.analysis());
                 }
