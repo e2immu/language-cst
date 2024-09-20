@@ -198,7 +198,7 @@ public class TryStatementImpl extends StatementImpl implements TryStatement {
             List<ParameterizedType> list = exceptionTypes.stream()
                     .map(translationMap::translateType).collect(translationMap.toList(exceptionTypes));
             Block tBlock = (Block) block.translate(translationMap).get(0);
-            if (list != exceptionTypes || tBlock != block || !analysis().isEmpty() && translationMap.isClearAnalysis()) {
+            if (list != exceptionTypes || tBlock != block) {
                 CatchClause cc = new CatchClauseImpl(comments, source, annotations, list, isFinal, catchVariable, tBlock);
                 if (!translationMap.isClearAnalysis()) cc.analysis().setAll(analysis());
             }
@@ -289,19 +289,25 @@ public class TryStatementImpl extends StatementImpl implements TryStatement {
     @Override
     public void visit(Visitor visitor) {
         if (visitor.beforeStatement(this)) {
-            resources.forEach(e -> e.visit(visitor));
-            visitor.startSubBlock(0);
+            int i = 0;
+            if (!resources.isEmpty()) {
+                visitor.startSubBlock(0);
+                resources.forEach(e -> e.visit(visitor));
+                visitor.endSubBlock(0);
+                ++i;
+            }
+            visitor.startSubBlock(i);
             block.visit(visitor);
-            visitor.endSubBlock(0);
-            int i = 1;
+            visitor.endSubBlock(i);
             for (CatchClause cc : catchClauses) {
+                ++i;
                 visitor.startSubBlock(i);
                 cc.visit(visitor);
                 cc.visit(visitor);
                 visitor.endSubBlock(i);
-                i++;
             }
             if (!finallyBlock.isEmpty()) {
+                ++i;
                 visitor.startSubBlock(i);
                 finallyBlock.visit(visitor);
                 visitor.endSubBlock(i);
