@@ -139,8 +139,13 @@ public class SwitchStatementNewStyleImpl extends StatementImpl implements Switch
         List<SwitchEntry> tEntries = entries.stream().map(e -> e.translate(translationMap))
                 .filter(Objects::nonNull) // see translation of switch entry
                 .collect(translationMap.toList(entries));
-        if (tEntries == entries && tSelector == selector) return List.of(this);
-        return List.of(new SwitchStatementNewStyleImpl(comments(), source(), annotations(), label(), tSelector, tEntries));
+        if (tEntries != entries || tSelector != selector || !analysis().isEmpty() && translationMap.isClearAnalysis()) {
+            SwitchStatementNewStyleImpl ssns = new SwitchStatementNewStyleImpl(comments(), source(), annotations(),
+                    label(), tSelector, tEntries);
+            if (!translationMap.isClearAnalysis()) ssns.analysis().setAll(analysis());
+            return List.of(ssns);
+        }
+        return List.of(this);
     }
 
     public static class BuilderImpl extends StatementImpl.Builder<SwitchStatementNewStyle.Builder>

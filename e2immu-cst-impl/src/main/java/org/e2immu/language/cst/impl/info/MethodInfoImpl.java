@@ -478,22 +478,32 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
         List<Statement> tBody = methodBody().translate(translationMap);
         change |= tBody.size() != 1 || tBody.get(0) != methodBody();
 
-        List<ParameterInfo> newParameters = new ArrayList<>(2 * parameters().size());
-        for (ParameterInfo pi : parameters()) {
-            List<ParameterInfo> tPi = pi.translate(translationMap);
-            newParameters.addAll(tPi);
-            change |= tPi.size() != 1 || tPi.get(0) != pi;
-        }
         List<ParameterizedType> exceptionTypeList = exceptionTypes();
         List<ParameterizedType> newExceptionTypes = exceptionTypeList
                 .stream().map(translationMap::translateType).collect(translationMap.toList(exceptionTypeList));
         change |= newExceptionTypes != exceptionTypeList;
 
+        List<ParameterInfo> directVariableChanges = parameters().stream().map(pi -> (ParameterInfo) translationMap.translateVariable(pi)).collect(translationMap.toList(parameters()));
+        change |= directVariableChanges != parameters();
+        List<ParameterizedType> parameterTypes = parameters().stream().map(ParameterInfo::parameterizedType).toList();
+        List<ParameterizedType> tTypes = parameterTypes.stream().map(translationMap::translateType).collect(translationMap.toList(parameterTypes));
+        change |= parameterTypes != tTypes;
+
         if (change) {
             MethodInfo methodInfo = copyAllButBodyParametersReturnTypeAnnotationsExceptionTypes(translationMap);
             MethodInfo.Builder builder = methodInfo.builder();
             builder.setMethodBody((Block) tBody.get(0));
-            newParameters.forEach(builder::addParameter);
+
+            for (ParameterInfo dvc : directVariableChanges) {
+                ParameterInfo original = parameters().get(dvc.index());
+                ParameterizedType type = dvc == original ? tTypes.get(dvc.index()) : dvc.parameterizedType();
+                ParameterInfo newPi = builder.addParameter(dvc.simpleName(), type, dvc.comments(), dvc.source(), dvc.annotations());
+                if (!translationMap.isClearAnalysis()) {
+                    newPi.analysis().setAll(original.analysis());
+                }
+            }
+            builder.commitParameters();
+
             newExceptionTypes.forEach(builder::addExceptionType);
             builder.setReturnType(tReturnType);
             builder.commit();

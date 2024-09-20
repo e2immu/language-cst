@@ -131,9 +131,13 @@ public class WhileStatementImpl extends StatementImpl implements WhileStatement 
 
         Expression tex = expression.translate(translationMap);
         List<Statement> translatedBlock = block.translate(translationMap);
-        if (tex == expression && !hasBeenTranslated(translatedBlock, block)) return List.of(this);
-        WhileStatement newWhile = new WhileStatementImpl(comments(), source(), annotations(), label(), tex,
-                ensureBlock(translatedBlock));
-        return List.of(newWhile);
+        if (tex != expression || hasBeenTranslated(translatedBlock, block)
+            || !analysis().isEmpty() && translationMap.isClearAnalysis()) {
+            WhileStatement newWhile = new WhileStatementImpl(comments(), source(), annotations(), label(), tex,
+                    ensureBlock(translatedBlock));
+            if (!translationMap.isClearAnalysis()) newWhile.analysis().setAll(analysis());
+            return List.of(newWhile);
+        }
+        return List.of(this);
     }
 }

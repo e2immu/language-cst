@@ -198,8 +198,9 @@ public class TryStatementImpl extends StatementImpl implements TryStatement {
             List<ParameterizedType> list = exceptionTypes.stream()
                     .map(translationMap::translateType).collect(translationMap.toList(exceptionTypes));
             Block tBlock = (Block) block.translate(translationMap).get(0);
-            if (list != exceptionTypes || tBlock != block) {
-                return new CatchClauseImpl(comments, source, annotations, list, isFinal, catchVariable, tBlock);
+            if (list != exceptionTypes || tBlock != block || !analysis().isEmpty() && translationMap.isClearAnalysis()) {
+                CatchClause cc = new CatchClauseImpl(comments, source, annotations, list, isFinal, catchVariable, tBlock);
+                if (!translationMap.isClearAnalysis()) cc.analysis().setAll(analysis());
             }
             return this;
         }
@@ -382,9 +383,12 @@ public class TryStatementImpl extends StatementImpl implements TryStatement {
         List<CatchClause> tCatch = catchClauses.stream()
                 .map(cc -> cc.translate(translationMap))
                 .collect(translationMap.toList(catchClauses));
-        if (tMain != block || tFinally != finallyBlock || tCatch != catchClauses || tResources != resources) {
-            return List.of(new TryStatementImpl(comments(), source(), annotations(), label(), tResources,
-                    tMain, tCatch, tFinally));
+        if (tMain != block || tFinally != finallyBlock || tCatch != catchClauses
+            || tResources != resources || !analysis().isEmpty() && translationMap.isClearAnalysis()) {
+            TryStatementImpl ts = new TryStatementImpl(comments(), source(), annotations(), label(), tResources,
+                    tMain, tCatch, tFinally);
+            if (!translationMap.isClearAnalysis()) ts.analysis().setAll(analysis());
+            return List.of(ts);
         }
         return List.of(this);
     }

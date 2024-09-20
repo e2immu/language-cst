@@ -227,7 +227,6 @@ public class ParameterInfoImpl implements ParameterInfo {
 
     @Override
     public List<ParameterInfo> translate(TranslationMap translationMap) {
-        // TODO
-        return List.of(this);
+        throw new UnsupportedOperationException("because of the back-link, translation takes place in MethodImpl");
     }
 }

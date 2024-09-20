@@ -253,8 +253,10 @@ public class SwitchStatementOldStyleImpl extends StatementImpl implements Switch
         List<SwitchLabel> translatedLabels = switchLabels.stream()
                 .map(l -> l.translate(translationMap))
                 .collect(Collectors.toList());
-        return List.of(new SwitchStatementOldStyleImpl(comments(), source(), annotations(), label(), translatedExpression,
-                ensureBlock(block.translate(translationMap)), translatedLabels));
+        SwitchStatementOldStyleImpl ssos = new SwitchStatementOldStyleImpl(comments(), source(), annotations(),
+                label(), translatedExpression, ensureBlock(block.translate(translationMap)), translatedLabels);
+        if (!translationMap.isClearAnalysis()) ssos.analysis().setAll(analysis());
+        return List.of(ssos);
     }
 
     @Override

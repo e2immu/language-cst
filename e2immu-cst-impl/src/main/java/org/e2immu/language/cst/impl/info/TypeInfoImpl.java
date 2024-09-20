@@ -580,7 +580,7 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
         // if there is any change, this will be the new typeInfo.
         TypeInfo typeInfo = copyAllButConstructorsMethodsFieldsSubTypesAnnotations();
         ParameterizedType simpleParameterizedType = asSimpleParameterizedType();
-        boolean change = false;
+        boolean change = !analysis().isEmpty() && translationMapIn.isClearAnalysis();
 
         TranslationMap.Builder tmb = new TranslationMapImpl.Builder(translationMapIn);
 
@@ -649,6 +649,9 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
             newFields.forEach(builder::addField);
             builder.addAnnotations(newAnnotations);
             builder.commit();
+            if (!translationMap.isClearAnalysis()) {
+                typeInfo.analysis().setAll(analysis());
+            }
             return typeInfo;
         }
         return this;
