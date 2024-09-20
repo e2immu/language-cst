@@ -25,6 +25,7 @@ import org.e2immu.support.EventuallyFinal;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -49,6 +50,18 @@ public class FieldInfoImpl extends InfoImpl implements FieldInfo {
         this.owner = owner;
         inspection = new EventuallyFinal<>();
         inspection.setVariable(new FieldInspectionImpl.Builder(this));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof FieldInfoImpl fieldInfo)) return false;
+        return Objects.equals(fullyQualifiedName, fieldInfo.fullyQualifiedName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(fullyQualifiedName);
     }
 
     public boolean hasBeenCommitted() {

@@ -23,10 +23,7 @@ import org.e2immu.language.cst.impl.type.TypeParameterImpl;
 import org.e2immu.support.Either;
 import org.e2immu.support.EventuallyFinal;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -98,6 +95,18 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
 
     public boolean hasBeenCommitted() {
         return inspection.isFinal();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof MethodInfoImpl that)) return false;
+        return fullyQualifiedName().equals(that.fullyQualifiedName());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(fullyQualifiedName());
     }
 
     @Override
