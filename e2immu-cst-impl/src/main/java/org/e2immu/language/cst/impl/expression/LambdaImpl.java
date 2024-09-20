@@ -184,7 +184,7 @@ public class LambdaImpl extends ExpressionImpl implements Lambda {
     }
 
     private Expression singleExpression() {
-        if (methodBody.statements().size() == 1 &&
+        if (methodBody.size() == 1 &&
             methodBody.statements().get(0) instanceof ReturnStatement rs) {
             return rs.expression();
         }

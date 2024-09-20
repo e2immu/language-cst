@@ -6,6 +6,10 @@ import java.util.List;
 import java.util.stream.Stream;
 
 public interface Block extends Statement {
+    default int size() {
+        return statements().size();
+    }
+
     List<Statement> statements();
 
     interface Builder extends Statement.Builder<Builder> {
