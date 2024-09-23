@@ -3,9 +3,14 @@ package org.e2immu.language.cst.api.statement;
 import org.e2immu.annotation.Fluent;
 
 import java.util.List;
-import java.util.stream.Stream;
 
 public interface Block extends Statement {
+
+    default Statement lastStatement() {
+        int size = size();
+        return size == 0 ? null : statements().get(size - 1);
+    }
+
     default int size() {
         return statements().size();
     }
