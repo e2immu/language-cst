@@ -97,12 +97,12 @@ public class SwitchStatementOldStyleImpl extends StatementImpl implements Switch
 
         @Override
         public SwitchLabel translate(TranslationMap translationMap) {
-            Expression trLiteral = literal.translate(translationMap);
-            LocalVariable trPattern = patternVariable == null ? null
+            Expression tLiteral = literal.translate(translationMap);
+            LocalVariable tPatternVariable = patternVariable == null ? null
                     : (LocalVariable) translationMap.translateVariable(patternVariable);
-            Expression trWhen = whenExpression.translate(translationMap);
-            if (trLiteral == literal && trPattern == patternVariable && trWhen == whenExpression) return this;
-            return new SwitchLabelImpl(trLiteral, startFromPosition, trPattern, trWhen);
+            Expression tWhen = whenExpression.translate(translationMap);
+            if (tLiteral == literal && tPatternVariable == patternVariable && tWhen == whenExpression) return this;
+            return new SwitchLabelImpl(tLiteral, startFromPosition, tPatternVariable, tWhen);
         }
     }
 
@@ -249,14 +249,19 @@ public class SwitchStatementOldStyleImpl extends StatementImpl implements Switch
         List<Statement> direct = translationMap.translateStatement(this);
         if (hasBeenTranslated(direct, this)) return direct;
 
-        Expression translatedExpression = selector.translate(translationMap);
+        Expression tSelector = selector.translate(translationMap);
         List<SwitchLabel> translatedLabels = switchLabels.stream()
                 .map(l -> l.translate(translationMap))
-                .collect(Collectors.toList());
-        SwitchStatementOldStyleImpl ssos = new SwitchStatementOldStyleImpl(comments(), source(), annotations(),
-                label(), translatedExpression, ensureBlock(block.translate(translationMap)), translatedLabels);
-        if (!translationMap.isClearAnalysis()) ssos.analysis().setAll(analysis());
-        return List.of(ssos);
+                .collect(translationMap.toList(switchLabels));
+        Statement tBlock = block.translate(translationMap).get(0);
+        if (tBlock != block || tSelector != selector || translatedLabels != switchLabels
+            || !analysis().isEmpty() && translationMap.isClearAnalysis()) {
+            SwitchStatementOldStyleImpl ssos = new SwitchStatementOldStyleImpl(comments(), source(), annotations(),
+                    label(), tSelector, ensureBlock(block.translate(translationMap)), translatedLabels);
+            if (!translationMap.isClearAnalysis()) ssos.analysis().setAll(analysis());
+            return List.of(ssos);
+        }
+        return List.of(this);
     }
 
     @Override
