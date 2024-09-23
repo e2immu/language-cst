@@ -17,6 +17,9 @@ public interface SwitchStatementNewStyle extends Statement {
     interface Builder extends Statement.Builder<Builder> {
 
         @Fluent
+        Builder addSwitchEntry(SwitchEntry switchEntry);
+
+        @Fluent
         Builder setSelector(Expression selector);
 
         @Fluent

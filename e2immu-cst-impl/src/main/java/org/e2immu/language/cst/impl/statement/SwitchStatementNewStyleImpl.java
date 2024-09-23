@@ -160,6 +160,12 @@ public class SwitchStatementNewStyleImpl extends StatementImpl implements Switch
         }
 
         @Override
+        public SwitchStatementNewStyle.Builder addSwitchEntry(SwitchEntry switchEntry) {
+            this.entries.add(switchEntry);
+            return this;
+        }
+
+        @Override
         public SwitchStatementNewStyle.Builder addSwitchEntries(Collection<SwitchEntry> switchEntries) {
             this.entries.addAll(switchEntries);
             return this;
