@@ -12,6 +12,8 @@ public interface ForStatement extends LoopStatement {
 
     List<Expression> updaters();
 
+    ForStatement withInitializers(List<Element> elements);
+
     interface Builder extends Statement.Builder<Builder> {
 
         @Fluent

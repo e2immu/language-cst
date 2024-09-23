@@ -207,4 +207,9 @@ public class ForStatementImpl extends StatementImpl implements ForStatement {
         if (!translationMap.isClearAnalysis()) fs.analysis().setAll(analysis());
         return List.of(fs);
     }
+
+    @Override
+    public ForStatement withInitializers(List<Element> elements) {
+        return new ForStatementImpl(comments(), source(), annotations(), label(), elements, expression, updaters, block);
+    }
 }
