@@ -1,5 +1,7 @@
 package org.e2immu.language.cst.api.output;
 
+import org.e2immu.language.cst.api.output.element.Symbol;
+
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -18,6 +20,9 @@ public interface OutputBuilder {
     OutputBuilder add(OutputBuilder... outputBuilders);
 
     List<OutputElement> list();
+
+    // remove the first
+    void removeLast();
 
     Stream<OutputElement> stream();
 

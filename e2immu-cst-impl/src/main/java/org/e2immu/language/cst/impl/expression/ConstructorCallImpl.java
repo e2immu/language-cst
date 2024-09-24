@@ -291,9 +291,7 @@ public class ConstructorCallImpl extends ExpressionImpl implements ConstructorCa
         Expression translatedObject = object == null ? null : translationMap.translateExpression(object);
         ParameterizedType translatedType = translationMap.translateType(this.parameterizedType());
         List<Expression> translatedParameterExpressions = parameterExpressions.isEmpty() ? parameterExpressions
-                : parameterExpressions.stream()
-                .map(e -> e.translate(translationMap))
-                .filter(e -> !e.isEmpty())
+                : parameterExpressions.stream().map(e -> e.translate(translationMap))
                 .collect(translationMap.toList(parameterExpressions));
         ArrayInitializer translatedInitializer = arrayInitializer == null ? null :
                 (ArrayInitializer) arrayInitializer.translate(translationMap);

@@ -41,6 +41,13 @@ public class OutputBuilderImpl implements OutputBuilder {
     }
 
     @Override
+    public void removeLast() {
+        if (!list.isEmpty()) {
+            list.remove(list.size() - 1);
+        }
+    }
+
+    @Override
     public boolean isEmpty() {
         return list.isEmpty();
     }

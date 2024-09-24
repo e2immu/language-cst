@@ -320,12 +320,12 @@ public class TryStatementImpl extends StatementImpl implements TryStatement {
     public OutputBuilder print(Qualification qualification) {
         OutputBuilder outputBuilder = outputBuilder(qualification).add(KeywordImpl.TRY);
         if (!resources.isEmpty()) {
-            Element last = resources.get(resources.size() - 1);
+            Statement last = resources.get(resources.size() - 1);
             outputBuilder.add(SymbolEnum.LEFT_PARENTHESIS)
-                    .add(resources.stream().map(element -> {
-                                OutputBuilder ob = element.print(qualification);
-                                if (element instanceof Expression && element != last) {
-                                    ob.add(SymbolEnum.SEMICOLON);
+                    .add(resources.stream().map(st -> {
+                                OutputBuilder ob = st.print(qualification);
+                                if (st == last) {
+                                    ob.removeLast();
                                 }
                                 return ob;
                             })
