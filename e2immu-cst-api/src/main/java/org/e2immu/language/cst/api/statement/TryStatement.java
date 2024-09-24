@@ -51,7 +51,8 @@ public interface TryStatement extends Statement {
 
     List<CatchClause> catchClauses();
 
-    List<Element> resources();
+    /* either LVC or EAS with VE */
+    List<Statement> resources();
 
     interface Builder extends Statement.Builder<Builder> {
 
@@ -65,7 +66,7 @@ public interface TryStatement extends Statement {
         Builder addCatchClause(CatchClause catchClause);
 
         @Fluent
-        Builder addResource(Element resource);
+        Builder addResource(Statement resource);
 
         TryStatement build();
     }

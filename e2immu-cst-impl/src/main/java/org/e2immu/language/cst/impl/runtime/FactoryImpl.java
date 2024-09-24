@@ -1056,15 +1056,5 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     public BitwiseNegation newBitwiseNegation(Expression value) {
         return new BitwiseNegationImpl(bitWiseNotOperatorInt(), PrecedenceEnum.UNARY, value);
     }
-
-    @Override
-    public List<Statement> resourcesAsStatements(TryStatement ts) {
-        return ts.resources().stream().map(e -> {
-            if (e instanceof LocalVariableCreation lvc) return lvc;
-            if (e instanceof VariableExpression ve)
-                return newExpressionAsStatementBuilder().setSource(ve.source()).setExpression(ve).build();
-            throw new UnsupportedOperationException();
-        }).toList();
-    }
 }
 

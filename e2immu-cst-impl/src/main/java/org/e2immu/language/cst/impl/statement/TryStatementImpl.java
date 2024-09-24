@@ -31,13 +31,13 @@ public class TryStatementImpl extends StatementImpl implements TryStatement {
     private final Block block;
     private final Block finallyBlock;
     private final List<CatchClause> catchClauses;
-    private final List<Element> resources; // either LVC, or VE
+    private final List<Statement> resources; // either LVC, or VE
 
     public TryStatementImpl(List<Comment> comments,
                             Source source,
                             List<AnnotationExpression> annotations,
                             String label,
-                            List<Element> resources,
+                            List<Statement> resources,
                             Block block,
                             List<CatchClause> catchClauses,
                             Block finallyBlock) {
@@ -210,7 +210,7 @@ public class TryStatementImpl extends StatementImpl implements TryStatement {
         private Block block;
         private Block finallyBlock;
         private final List<CatchClause> catchClauses = new ArrayList<>();
-        private final List<Element> resources = new ArrayList<>();
+        private final List<Statement> resources = new ArrayList<>();
 
         @Override
         public TryStatement.Builder setBlock(Block block) {
@@ -231,7 +231,7 @@ public class TryStatementImpl extends StatementImpl implements TryStatement {
         }
 
         @Override
-        public TryStatement.Builder addResource(Element resource) {
+        public TryStatement.Builder addResource(Statement resource) {
             resources.add(resource);
             return this;
         }
@@ -267,7 +267,7 @@ public class TryStatementImpl extends StatementImpl implements TryStatement {
     }
 
     @Override
-    public List<Element> resources() {
+    public List<Statement> resources() {
         return resources;
     }
 
@@ -387,11 +387,12 @@ public class TryStatementImpl extends StatementImpl implements TryStatement {
         if (hasBeenTranslated(direct, this)) return direct;
         Block tMain = (Block) block.translate(translationMap).get(0);
         Block tFinally = (Block) finallyBlock.translate(translationMap).get(0);
-        List<Element> tResources = resources.stream()
-                .map(e -> {
-                    if (e instanceof Statement st) return st.translate(translationMap).get(0);
-                    return ((Expression) e).translate(translationMap);
+        List<Statement> tResources = resources.stream()
+                .map(st -> {
+                    List<Statement> translated = st.translate(translationMap);
+                    return translated.isEmpty() ? null : translated.get(0);
                 })
+                .filter(Objects::nonNull)
                 .collect(translationMap.toList(resources));
         List<CatchClause> tCatch = catchClauses.stream()
                 .map(cc -> cc.translate(translationMap))
