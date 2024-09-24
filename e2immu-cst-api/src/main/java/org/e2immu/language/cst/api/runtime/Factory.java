@@ -384,6 +384,8 @@ public interface Factory {
 
     Qualification qualificationSimpleNames();
 
+    List<Statement> resourcesAsStatements(TryStatement ts);
+
     Split splitNever();
 
     OutputElement symbolColon();

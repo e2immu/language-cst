@@ -245,4 +245,9 @@ public class VariableExpressionImpl extends ExpressionImpl implements VariableEx
     public boolean isNumeric() {
         return parameterizedType().isNumeric();
     }
+
+    @Override
+    public VariableExpression withSource(Source newSource) {
+        return new VariableExpressionImpl(newSource, comments(), variable, suffix);
+    }
 }

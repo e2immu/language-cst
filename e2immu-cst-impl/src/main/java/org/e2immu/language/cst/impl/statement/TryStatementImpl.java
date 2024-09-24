@@ -289,13 +289,13 @@ public class TryStatementImpl extends StatementImpl implements TryStatement {
     @Override
     public void visit(Visitor visitor) {
         if (visitor.beforeStatement(this)) {
-            int i = 0;
+            // we'll use -1 as a special indicator for the resources block
             if (!resources.isEmpty()) {
-                visitor.startSubBlock(0);
+                visitor.startSubBlock(-1);
                 resources.forEach(e -> e.visit(visitor));
-                visitor.endSubBlock(0);
-                ++i;
+                visitor.endSubBlock(-1);
             }
+            int i = 0;
             visitor.startSubBlock(i);
             block.visit(visitor);
             visitor.endSubBlock(i);
@@ -320,9 +320,16 @@ public class TryStatementImpl extends StatementImpl implements TryStatement {
     public OutputBuilder print(Qualification qualification) {
         OutputBuilder outputBuilder = outputBuilder(qualification).add(KeywordImpl.TRY);
         if (!resources.isEmpty()) {
+            Element last = resources.get(resources.size() - 1);
             outputBuilder.add(SymbolEnum.LEFT_PARENTHESIS)
-                    .add(resources.stream().map(expression -> expression
-                            .print(qualification)).collect(OutputBuilderImpl.joining(SymbolEnum.SEMICOLON)))
+                    .add(resources.stream().map(element -> {
+                                OutputBuilder ob = element.print(qualification);
+                                if (element instanceof Expression && element != last) {
+                                    ob.add(SymbolEnum.SEMICOLON);
+                                }
+                                return ob;
+                            })
+                            .collect(OutputBuilderImpl.joining()))
                     .add(SymbolEnum.RIGHT_PARENTHESIS);
         }
         outputBuilder.add(block.print(qualification));
