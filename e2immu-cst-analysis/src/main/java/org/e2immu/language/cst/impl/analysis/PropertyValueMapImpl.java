@@ -98,7 +98,7 @@ public class PropertyValueMapImpl implements PropertyValueMap {
 
     @Override
     public void setAll(PropertyValueMap analysis) {
-        propertyValueStream().forEach(pv -> map.put(pv.property(), pv.value()));
+        analysis.propertyValueStream().forEach(pv -> map.put(pv.property(), pv.value()));
     }
 
     @Override
