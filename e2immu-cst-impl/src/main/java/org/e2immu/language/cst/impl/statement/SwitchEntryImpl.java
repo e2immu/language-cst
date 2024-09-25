@@ -4,7 +4,6 @@ import org.e2immu.language.cst.api.element.Element;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
-import org.e2immu.language.cst.api.statement.Block;
 import org.e2immu.language.cst.api.statement.Statement;
 import org.e2immu.language.cst.api.statement.SwitchEntry;
 import org.e2immu.language.cst.api.translate.TranslationMap;
@@ -12,7 +11,7 @@ import org.e2immu.language.cst.api.variable.DescendMode;
 import org.e2immu.language.cst.api.variable.LocalVariable;
 import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.language.cst.impl.output.*;
-import org.e2immu.language.cst.impl.util.ListUtil;
+import org.e2immu.util.internal.util.ListUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;

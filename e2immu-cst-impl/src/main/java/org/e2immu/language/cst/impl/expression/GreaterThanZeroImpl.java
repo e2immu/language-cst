@@ -18,7 +18,7 @@ import org.e2immu.language.cst.impl.expression.util.PrecedenceEnum;
 import org.e2immu.language.cst.impl.output.OutputBuilderImpl;
 import org.e2immu.language.cst.impl.output.SymbolEnum;
 import org.e2immu.language.cst.impl.output.TextImpl;
-import org.e2immu.language.cst.impl.util.IntUtil;
+import org.e2immu.util.internal.util.IntUtil;
 
 import java.util.Objects;
 import java.util.function.Predicate;

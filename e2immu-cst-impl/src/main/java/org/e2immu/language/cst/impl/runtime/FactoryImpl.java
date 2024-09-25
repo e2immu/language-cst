@@ -20,7 +20,7 @@ import org.e2immu.language.cst.impl.output.*;
 import org.e2immu.language.cst.impl.statement.*;
 import org.e2immu.language.cst.impl.translate.TranslationMapImpl;
 import org.e2immu.language.cst.impl.type.*;
-import org.e2immu.language.cst.impl.util.IntUtil;
+import org.e2immu.util.internal.util.IntUtil;
 import org.e2immu.language.cst.impl.variable.*;
 import org.e2immu.language.cst.api.type.*;
 import org.e2immu.language.cst.api.variable.*;

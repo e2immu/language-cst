@@ -25,7 +25,7 @@ import org.e2immu.language.cst.impl.output.KeywordImpl;
 import org.e2immu.language.cst.impl.output.OutputBuilderImpl;
 import org.e2immu.language.cst.impl.output.SpaceEnum;
 import org.e2immu.language.cst.impl.output.SymbolEnum;
-import org.e2immu.language.cst.impl.util.ListUtil;
+import org.e2immu.util.internal.util.ListUtil;
 
 import java.util.List;
 import java.util.Objects;

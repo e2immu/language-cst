@@ -6,7 +6,6 @@ import org.e2immu.language.cst.api.element.Source;
 import org.e2immu.language.cst.api.element.Visitor;
 import org.e2immu.language.cst.api.expression.And;
 import org.e2immu.language.cst.api.expression.Expression;
-import org.e2immu.language.cst.api.expression.Or;
 import org.e2immu.language.cst.api.expression.Precedence;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
@@ -20,7 +19,7 @@ import org.e2immu.language.cst.impl.expression.util.ExpressionComparator;
 import org.e2immu.language.cst.impl.expression.util.PrecedenceEnum;
 import org.e2immu.language.cst.impl.output.OutputBuilderImpl;
 import org.e2immu.language.cst.impl.output.SymbolEnum;
-import org.e2immu.language.cst.impl.util.ListUtil;
+import org.e2immu.util.internal.util.ListUtil;
 
 import java.util.ArrayList;
 import java.util.List;

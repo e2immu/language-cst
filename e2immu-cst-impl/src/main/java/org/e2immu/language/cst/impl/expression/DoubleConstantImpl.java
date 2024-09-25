@@ -11,7 +11,7 @@ import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.impl.expression.util.ExpressionComparator;
 import org.e2immu.language.cst.impl.output.OutputBuilderImpl;
 import org.e2immu.language.cst.impl.output.TextImpl;
-import org.e2immu.language.cst.impl.util.IntUtil;
+import org.e2immu.util.internal.util.IntUtil;
 
 public class DoubleConstantImpl extends ConstantExpressionImpl<Double> implements Numeric, DoubleConstant {
 

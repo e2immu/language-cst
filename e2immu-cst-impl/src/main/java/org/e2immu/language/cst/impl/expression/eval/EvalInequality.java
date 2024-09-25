@@ -2,8 +2,7 @@ package org.e2immu.language.cst.impl.expression.eval;
 
 import org.e2immu.language.cst.api.expression.*;
 import org.e2immu.language.cst.api.runtime.Runtime;
-import org.e2immu.language.cst.impl.expression.GreaterThanZeroImpl;
-import org.e2immu.language.cst.impl.util.IntUtil;
+import org.e2immu.util.internal.util.IntUtil;
 
 import java.util.Arrays;
 

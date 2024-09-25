@@ -5,8 +5,8 @@ import org.e2immu.language.cst.api.runtime.Runtime;
 import org.e2immu.language.cst.impl.expression.ExpressionImpl;
 import org.e2immu.language.cst.impl.expression.OrImpl;
 import org.e2immu.language.cst.impl.expression.util.AndOrSorter;
-import org.e2immu.language.cst.impl.util.IntUtil;
-import org.e2immu.language.cst.impl.util.ListUtil;
+import org.e2immu.util.internal.util.IntUtil;
+import org.e2immu.util.internal.util.ListUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

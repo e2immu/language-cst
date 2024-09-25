@@ -4,11 +4,10 @@ import org.e2immu.language.cst.api.info.MethodInfo;
 import org.e2immu.language.cst.api.info.ParameterInfo;
 import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.runtime.Predefined;
-import org.e2immu.language.cst.api.runtime.Runtime;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.type.TypeParameter;
 import org.e2immu.language.cst.api.type.Wildcard;
-import org.e2immu.language.cst.impl.util.ListUtil;
+import org.e2immu.util.internal.util.ListUtil;
 
 import java.util.List;
 import java.util.Objects;

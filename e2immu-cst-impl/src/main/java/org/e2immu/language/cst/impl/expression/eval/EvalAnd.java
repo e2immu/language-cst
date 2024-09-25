@@ -9,7 +9,7 @@ import org.e2immu.language.cst.impl.expression.SumImpl;
 import org.e2immu.language.cst.impl.expression.util.AndOrSorter;
 import org.e2immu.language.cst.impl.expression.util.InequalitySolver;
 import org.e2immu.language.cst.impl.expression.util.LhsRhs;
-import org.e2immu.language.cst.impl.util.IntUtil;
+import org.e2immu.util.internal.util.IntUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
