@@ -37,6 +37,8 @@ public interface AnnotationExpression extends Expression {
         AnnotationExpression build();
     }
 
+    int[] extractIntArray(String key);
+
     boolean extractBoolean(String key);
 
     String extractString(String key, String defaultValue);

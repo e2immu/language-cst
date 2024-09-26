@@ -63,6 +63,8 @@ public interface Value extends Comparable<Value> {
         Independent max(Independent other);
 
         boolean isIndependentHc();
+
+        Map<Integer, Integer> linkToParametersReturnValue();
     }
 
     interface NotNull extends Value {

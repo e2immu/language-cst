@@ -71,6 +71,14 @@ public class CodecImpl implements Codec {
     }
 
     @Override
+    public boolean isList(EncodedValue encodedValue) {
+        if (encodedValue instanceof D d) {
+            return d.s instanceof Array;
+        }
+        throw new UnsupportedOperationException("Expect D object, not E object");
+    }
+
+    @Override
     public Map<EncodedValue, EncodedValue> decodeMap(EncodedValue encodedValue) {
         Map<EncodedValue, EncodedValue> map = new LinkedHashMap<>();
         if (encodedValue instanceof D d && d.s instanceof JSONObject jo && jo.size() > 2) {

@@ -58,6 +58,8 @@ public interface Codec {
 
     EncodedValue encodeVariable(Variable variable);
 
+    boolean isList(EncodedValue encodedValue);
+
     record EncodedPropertyValue(String key, EncodedValue encodedValue) {
     }
 

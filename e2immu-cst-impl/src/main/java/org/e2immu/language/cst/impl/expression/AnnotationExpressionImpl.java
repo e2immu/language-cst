@@ -4,10 +4,7 @@ import org.e2immu.language.cst.api.element.Comment;
 import org.e2immu.language.cst.api.element.Element;
 import org.e2immu.language.cst.api.element.Source;
 import org.e2immu.language.cst.api.element.Visitor;
-import org.e2immu.language.cst.api.expression.AnnotationExpression;
-import org.e2immu.language.cst.api.expression.Expression;
-import org.e2immu.language.cst.api.expression.Precedence;
-import org.e2immu.language.cst.api.expression.StringConstant;
+import org.e2immu.language.cst.api.expression.*;
 import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
@@ -123,6 +120,15 @@ public class AnnotationExpressionImpl extends ExpressionImpl implements Annotati
         return keyValuePairs.stream()
                 .filter(kv -> key.equals(kv.key())).map(kv -> kv.value().isBoolValueTrue())
                 .findFirst().orElse(false);
+    }
+
+    @Override
+    public int[] extractIntArray(String key) {
+        return keyValuePairs.stream()
+                .filter(kv -> key.equals(kv.key()))
+                .map(kv -> ((ArrayInitializer) kv.value()).expressions().stream()
+                        .mapToInt(e -> ((IntConstant) e).constant()).toArray())
+                .findFirst().orElse(null);
     }
 
     @Override

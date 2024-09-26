@@ -234,19 +234,49 @@ public abstract class ValueImpl implements Value {
         decoderMap.put(ImmutableImpl.class, (codec, encodedValue) -> ImmutableImpl.from(codec.decodeInt(encodedValue)));
     }
 
+    public static final int INDEX_RETURN_VALUE = -1;
 
     public static class IndependentImpl implements Independent {
         private final int value;
+        private final Map<Integer, Integer> linkToParametersReturnValue;
 
         private IndependentImpl(int value) {
             this.value = value;
+            this.linkToParametersReturnValue = Map.of();
+        }
+
+        // public: testing in cst-io
+        public IndependentImpl(int value, Map<Integer, Integer> linkToParametersReturnValue) {
+            this.value = value;
+            this.linkToParametersReturnValue = linkToParametersReturnValue;
+        }
+
+        public static Map<Integer, Integer> makeMap(int[] dependentParameters,
+                                                    int[] hcParameters,
+                                                    Boolean dependentReturnValue,
+                                                    Boolean hcReturnValue) {
+            Map<Integer, Integer> map = new HashMap<>();
+            if (hcReturnValue != null && hcReturnValue) map.put(-1, 1);
+            if (dependentReturnValue != null && dependentReturnValue) map.put(-1, 0);
+            if (dependentParameters != null) {
+                for (int i : dependentParameters) map.put(i, 0);
+            }
+            if (hcParameters != null) {
+                for (int i : hcParameters) map.put(i, 1);
+            }
+            return Map.copyOf(map);
+        }
+
+        @Override
+        public Map<Integer, Integer> linkToParametersReturnValue() {
+            return linkToParametersReturnValue;
         }
 
         public static final Independent DEPENDENT = new IndependentImpl(0);
         public static final Independent INDEPENDENT_HC = new IndependentImpl(1);
         public static final Independent INDEPENDENT = new IndependentImpl(2);
 
-        public static Value from(int level) {
+        public static Independent from(int level) {
             return switch (level) {
                 case 0 -> DEPENDENT;
                 case 1 -> INDEPENDENT_HC;
@@ -277,7 +307,11 @@ public abstract class ValueImpl implements Value {
 
         @Override
         public Codec.EncodedValue encode(Codec codec) {
-            return codec.encodeInt(value);
+            if (linkToParametersReturnValue.isEmpty()) return codec.encodeInt(value);
+            Map<Codec.EncodedValue, Codec.EncodedValue> encodedMap = linkToParametersReturnValue.entrySet().stream()
+                    .collect(Collectors.toUnmodifiableMap(e -> codec.encodeString("" + e.getKey()),
+                            e -> codec.encodeInt(e.getValue())));
+            return codec.encodeList(List.of(codec.encodeInt(value), codec.encodeMap(encodedMap)));
         }
 
         @Override
@@ -303,17 +337,57 @@ public abstract class ValueImpl implements Value {
 
         @Override
         public String toString() {
+            String linkString = computeLinkString();
             return switch (value) {
-                case 0 -> "@Dependent";
-                case 1 -> "@Independent(hc=true)";
-                case 2 -> "@Independent";
+                case 0 -> "@Dependent" + (linkString.isEmpty() ? "" : "(" + linkString + ")");
+                case 1 -> "@Independent(hc=true" + (linkString.isEmpty() ? "" : ", " + linkString) + ")";
+                case 2 -> "@Independent" + (linkString.isEmpty() ? "" : "(" + linkString + ")");
                 default -> throw new UnsupportedOperationException();
             };
         }
+
+        private String computeLinkString() {
+            List<String> list = new ArrayList<>();
+            List<String> hcList = new ArrayList<>();
+            List<String> depList = new ArrayList<>();
+            for (Map.Entry<Integer, Integer> e : linkToParametersReturnValue.entrySet().stream()
+                    .sorted(Comparator.comparingInt(Map.Entry::getKey)).toList()) {
+                int index = e.getKey();
+                int independentLevel = e.getValue();
+                if (e.getKey() == INDEX_RETURN_VALUE) {
+                    if (0 == independentLevel) list.add("dependentReturnValue=true");
+                    else if (1 == independentLevel) list.add("hcReturnValue=true");
+                } else if (0 == independentLevel) {
+                    depList.add(Integer.toString(index));
+                } else if (1 == independentLevel) {
+                    hcList.add(Integer.toString(index));
+                }
+            }
+            if (!depList.isEmpty()) {
+                list.add("dependentParameters={" + String.join(", ", depList) + "}");
+            }
+            if (!hcList.isEmpty()) {
+                list.add("hcParameters={" + String.join(", ", hcList) + "}");
+            }
+            return String.join(", ", list);
+        }
+    }
+
+    public static Independent decodeIndependentImpl(Codec codec, Codec.EncodedValue encodedValue) {
+        if (codec.isList(encodedValue)) {
+            List<Codec.EncodedValue> encodedList = codec.decodeList(encodedValue);
+            int value = codec.decodeInt(encodedList.get(0));
+            Map<Codec.EncodedValue, Codec.EncodedValue> encodedMap = codec.decodeMap(encodedList.get(1));
+            Map<Integer, Integer> map = encodedMap.entrySet().stream().collect(Collectors.toUnmodifiableMap(
+                    e -> Integer.parseInt(codec.decodeString(e.getKey())),
+                    e -> codec.decodeInt(e.getValue())));
+            return new IndependentImpl(value, map);
+        }
+        return IndependentImpl.from(codec.decodeInt(encodedValue));
     }
 
     static {
-        decoderMap.put(IndependentImpl.class, (codec, encodedValue) -> IndependentImpl.from(codec.decodeInt(encodedValue)));
+        decoderMap.put(IndependentImpl.class, ValueImpl::decodeIndependentImpl);
     }
 
     public record FieldValueImpl(FieldInfo field) implements FieldValue {
