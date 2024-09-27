@@ -119,6 +119,10 @@ public interface TranslationMap {
         return false;
     }
 
+    default TranslationMap delegate() {
+        return null;
+    }
+
     interface ModificationTimesHandler {
         String modificationTimes(MethodCall beforeTranslation,
                                  Expression translatedObject, List<Expression> translatedParameters);
@@ -285,9 +289,9 @@ public interface TranslationMap {
 
         Builder setModificationTimesHandler(ModificationTimesHandler modificationTimesHandler);
 
-        Builder replaceTarget(ParameterizedType from, ParameterizedType to);
-
         Builder setClearAnalysis(boolean clearAnalysis);
+
+        Builder setDelegate(TranslationMap delegate);
 
         boolean isEmpty();
     }

@@ -578,11 +578,11 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
         }
 
         // if there is any change, this will be the new typeInfo.
-        TypeInfo typeInfo = copyAllButConstructorsMethodsFieldsSubTypesAnnotations();
+        TypeInfo typeInfo = copyAllButConstructorsMethodsFieldsSubTypesAnnotations(translationMapIn);
         ParameterizedType simpleParameterizedType = asSimpleParameterizedType();
         boolean change = !analysis().isEmpty() && translationMapIn.isClearAnalysis();
 
-        TranslationMap.Builder tmb = new TranslationMapImpl.Builder(translationMapIn);
+        TranslationMap.Builder tmb = new TranslationMapImpl.Builder().setDelegate(translationMapIn);
 
         List<TypeParameter> newTypeParameters = new ArrayList<>();
         for (TypeParameter tp : typeParameters()) {
@@ -594,7 +594,7 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
 
         List<FieldInfo> newFields = new ArrayList<>(2 * fields().size());
 
-        tmb.replaceTarget(simpleParameterizedType, typeInfo.asSimpleParameterizedType());
+        tmb.put(simpleParameterizedType, typeInfo.asSimpleParameterizedType());
         for (FieldInfo fieldInfo : fields()) {
             FieldInfo newField = fieldInfo.withOwnerVariableBuilder(typeInfo);
             newFields.add(newField);
@@ -657,10 +657,16 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
         return this;
     }
 
-    private TypeInfo copyAllButConstructorsMethodsFieldsSubTypesAnnotations() {
-        TypeInfo typeInfo = compilationUnitOrEnclosingType.isLeft()
-                ? new TypeInfoImpl(compilationUnitOrEnclosingType.getLeft(), simpleName)
-                : new TypeInfoImpl(compilationUnitOrEnclosingType.getRight(), simpleName);
+    private TypeInfo copyAllButConstructorsMethodsFieldsSubTypesAnnotations(TranslationMap translationMap) {
+        TypeInfo typeInfo;
+        if (compilationUnitOrEnclosingType.isRight()) {
+            TypeInfo enclosing = compilationUnitOrEnclosingType.getRight();
+            TypeInfo tEnclosing = translationMap == null ? enclosing
+                    : translationMap.translateType(enclosing.asSimpleParameterizedType()).typeInfo();
+            typeInfo = new TypeInfoImpl(tEnclosing, simpleName);
+        } else {
+            typeInfo = new TypeInfoImpl(compilationUnitOrEnclosingType.getLeft(), simpleName);
+        }
         TypeInfo.Builder b = typeInfo.builder();
         b.setAccess(access());
         b.setTypeNature(typeNature());

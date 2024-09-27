@@ -19,6 +19,7 @@ import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.language.cst.impl.analysis.PropertyImpl;
 import org.e2immu.language.cst.impl.analysis.ValueImpl;
 import org.e2immu.language.cst.impl.element.ElementImpl;
+import org.e2immu.language.cst.impl.translate.TranslationMapImpl;
 import org.e2immu.language.cst.impl.type.TypeParameterImpl;
 import org.e2immu.support.Either;
 import org.e2immu.support.EventuallyFinal;
@@ -485,17 +486,23 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
         boolean change = tReturnType != returnType() || !analysis().isEmpty() && translationMap.isClearAnalysis();
 
         List<Statement> tBody = methodBody().translate(translationMap);
-        change |= tBody.size() != 1 || tBody.get(0) != methodBody();
+        ParameterizedType ownerPt = typeInfo.asSimpleParameterizedType();
+        boolean ownerChange = translationMap.translateType(ownerPt) != ownerPt;
+        change |= tBody.size() != 1 || tBody.get(0) != methodBody() || ownerChange;
 
         List<ParameterizedType> exceptionTypeList = exceptionTypes();
         List<ParameterizedType> newExceptionTypes = exceptionTypeList
                 .stream().map(translationMap::translateType).collect(translationMap.toList(exceptionTypeList));
         change |= newExceptionTypes != exceptionTypeList;
 
-        List<ParameterInfo> directVariableChanges = parameters().stream().map(pi -> (ParameterInfo) translationMap.translateVariable(pi)).collect(translationMap.toList(parameters()));
+        List<ParameterInfo> directVariableChanges = parameters().stream()
+                .map(pi -> (ParameterInfo) translationMap.translateVariable(pi))
+                .collect(translationMap.toList(parameters()));
         change |= directVariableChanges != parameters();
+
         List<ParameterizedType> parameterTypes = parameters().stream().map(ParameterInfo::parameterizedType).toList();
-        List<ParameterizedType> tTypes = parameterTypes.stream().map(translationMap::translateType).collect(translationMap.toList(parameterTypes));
+        List<ParameterizedType> tTypes = parameterTypes.stream().map(translationMap::translateType)
+                .collect(translationMap.toList(parameterTypes));
         change |= parameterTypes != tTypes;
 
         if (change) {
@@ -527,7 +534,9 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
     }
 
     private MethodInfo copyAllButBodyParametersReturnTypeAnnotationsExceptionTypes(TranslationMap translationMap) {
-        MethodInfo methodInfo = new MethodInfoImpl(methodType, name, typeInfo);
+        TypeInfo translatedTypeInfo = translationMap == null ? typeInfo
+                : translationMap.translateType(typeInfo.asSimpleParameterizedType()).typeInfo();
+        MethodInfo methodInfo = new MethodInfoImpl(methodType, name, translatedTypeInfo);
         MethodInfo.Builder builder = methodInfo.builder();
         builder.setAccess(access()).setSource(source()).setSynthetic(isSynthetic());
         typeParameters()
@@ -550,15 +559,7 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
 
     @Override
     public MethodInfo withMethodBody(Block newBody) {
-        MethodInfo methodInfo = copyAllButBodyParametersReturnTypeAnnotationsExceptionTypes(null);
-        MethodInfo.Builder builder = methodInfo.builder();
-        exceptionTypes().forEach(builder::addExceptionType);
-        annotations().forEach(builder::addAnnotation);
-        builder.setReturnType(returnType());
-        parameters().forEach(builder::addParameter);
-        builder.commitParameters();
-        builder.setMethodBody(newBody);
-        builder.commit();
-        return methodInfo;
+        TranslationMap tm = new TranslationMapImpl.Builder().put(methodBody(), newBody).build();
+        return translate(tm).get(0);
     }
 }

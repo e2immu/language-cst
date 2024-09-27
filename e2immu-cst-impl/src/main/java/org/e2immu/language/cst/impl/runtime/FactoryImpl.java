@@ -512,7 +512,9 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
 
     @Override
     public TranslationMap.Builder newTranslationMapBuilder(TranslationMap startingPoint) {
-        return new TranslationMapImpl.Builder(startingPoint);
+        if (startingPoint instanceof TranslationMapImpl tmi) {
+            return new TranslationMapImpl.Builder(tmi);
+        } else throw new UnsupportedOperationException("Incompatible. You'll need a wrapper rather than a copy");
     }
 
     @Override

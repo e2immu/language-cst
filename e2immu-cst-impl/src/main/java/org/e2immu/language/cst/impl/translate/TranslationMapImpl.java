@@ -2,6 +2,7 @@ package org.e2immu.language.cst.impl.translate;
 
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.expression.MethodCall;
+import org.e2immu.language.cst.api.expression.VariableExpression;
 import org.e2immu.language.cst.api.info.MethodInfo;
 import org.e2immu.language.cst.api.statement.Statement;
 import org.e2immu.language.cst.api.translate.TranslationMap;
@@ -20,6 +21,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class TranslationMapImpl implements TranslationMap {
 
@@ -36,6 +38,7 @@ public class TranslationMapImpl implements TranslationMap {
     private final boolean translateAgain;
     private final boolean clearAnalysis;
     private final ModificationTimesHandler modificationTimesHandler;
+    private final TranslationMap delegate;
 
     private TranslationMapImpl(Map<? extends Statement, List<Statement>> statements,
                                Map<? extends Expression, ? extends Expression> expressions,
@@ -48,7 +51,8 @@ public class TranslationMapImpl implements TranslationMap {
                                boolean recurseIntoScopeVariables,
                                boolean yieldIntoReturn,
                                boolean translateAgain,
-                               boolean clearAnalysis) {
+                               boolean clearAnalysis,
+                               TranslationMap delegate) {
         this.variables = variables;
         this.expressions = expressions;
         this.variableExpressions = variableExpressions;
@@ -64,6 +68,7 @@ public class TranslationMapImpl implements TranslationMap {
         this.translateAgain = translateAgain;
         this.modificationTimesHandler = modificationTimesHandler;
         this.clearAnalysis = clearAnalysis;
+        this.delegate = delegate;
     }
 
     public static class Builder implements TranslationMap.Builder {
@@ -80,11 +85,14 @@ public class TranslationMapImpl implements TranslationMap {
         private boolean yieldIntoReturn;
         private boolean translateAgain;
         private boolean clearAnalysis;
+        private TranslationMap delegate;
 
         public Builder() {
         }
 
-        public Builder(TranslationMap other) {
+        // IMPORTANT: we explicitly write TMI here rather than TM, because otherwise functionality might get lost:
+        // it looks like you make a wrapper, but you don't.
+        public Builder(TranslationMapImpl other) {
             variables.putAll(other.variables());
             expressions.putAll(other.expressions());
             variableExpressions.putAll(other.variableExpressions());
@@ -95,6 +103,7 @@ public class TranslationMapImpl implements TranslationMap {
             recurseIntoScopeVariables = other.recurseIntoScopeVariables();
             yieldIntoReturn = other.translateYieldIntoReturn();
             translateAgain = other.translateAgain();
+            delegate = other.delegate();
         }
 
         @Override
@@ -102,7 +111,13 @@ public class TranslationMapImpl implements TranslationMap {
             return new TranslationMapImpl(statements, expressions, variableExpressions, variables, methods, types,
                     modificationTimesHandler,
                     expandDelayedWrappedExpressions, recurseIntoScopeVariables, yieldIntoReturn, translateAgain,
-                    clearAnalysis);
+                    clearAnalysis, delegate);
+        }
+
+        @Override
+        public Builder setDelegate(TranslationMap delegate) {
+            this.delegate = delegate;
+            return this;
         }
 
         @Override
@@ -189,12 +204,6 @@ public class TranslationMapImpl implements TranslationMap {
         }
 
         @Override
-        public TranslationMap.Builder replaceTarget(ParameterizedType from, ParameterizedType to) {
-            types.replaceAll((f, t) -> from.equals(t) ? to : t);
-            return this;
-        }
-
-        @Override
         public TranslationMap.Builder setClearAnalysis(boolean clearAnalysis) {
             this.clearAnalysis = clearAnalysis;
             return this;
@@ -238,18 +247,28 @@ public class TranslationMapImpl implements TranslationMap {
         return recurseIntoScopeVariables;
     }
 
+    private TranslationMap withoutDelegate() {
+        return new TranslationMapImpl(statements, expressions, variableExpressions, variables, methods, types,
+                modificationTimesHandler, expandDelayedWrappedExpressions, recurseIntoScopeVariables, yieldIntoReturn,
+                translateAgain, clearAnalysis, null);
+    }
+
     @Override
     public Expression translateExpression(Expression expression) {
+        if (delegate != null) {
+            Expression translatedExpression = expression.translate(delegate);
+            return translatedExpression.translate(withoutDelegate());
+        }
         return Objects.requireNonNullElse(expressions.get(expression), expression);
     }
 
     @Override
-    public List<MethodInfo> translateMethod(MethodInfo methodInfo) {
-        return methods.getOrDefault(methodInfo, List.of(methodInfo));
+    public Variable translateVariable(Variable variable) {
+        Variable v = delegate == null ? variable : delegate.translateVariable(variable);
+        return internalTranslateVariable(v);
     }
 
-    @Override
-    public Variable translateVariable(Variable variable) {
+    private Variable internalTranslateVariable(Variable variable) {
         Variable v = variables.get(variable);
         if (v != null) {
             // if variable -> v, and variable has an assignment expression, but v does not, then we copy variable's,
@@ -279,17 +298,45 @@ public class TranslationMapImpl implements TranslationMap {
 
     @Override
     public Expression translateVariableExpressionNullIfNotTranslated(Variable variable) {
+        if (delegate != null) {
+            Expression e = delegate.translateVariableExpressionNullIfNotTranslated(variable);
+            if (e instanceof VariableExpression ve) {
+                return variableExpressions.get(ve.variable());
+            }
+            if (e != null) {
+                return e; // not a variable expression, so we cannot delegate easily
+            }
+        }
         return variableExpressions.get(variable);
     }
 
     @Override
+    public List<MethodInfo> translateMethod(MethodInfo methodInfo) {
+        if (delegate != null) {
+            List<MethodInfo> list = delegate.translateMethod(methodInfo);
+            TranslationMap withoutDelegate = withoutDelegate();
+            return list.stream().flatMap(mi -> mi.translate(withoutDelegate).stream()).toList();
+        }
+        return methods.getOrDefault(methodInfo, List.of(methodInfo));
+    }
+
+    @Override
     public List<Statement> translateStatement(Statement statement) {
+        if (delegate != null) {
+            List<Statement> translated = statement.translate(delegate);
+            TranslationMap withoutDelegate = withoutDelegate();
+            return translated.stream().flatMap(s -> s.translate(withoutDelegate).stream()).toList();
+        }
         List<Statement> list = statements.get(statement);
         return list == null ? List.of(statement) : list;
     }
 
-    @Override
     public ParameterizedType translateType(ParameterizedType parameterizedType) {
+        ParameterizedType pt = delegate == null ? parameterizedType : delegate.translateType(parameterizedType);
+        return internalTranslateType(pt);
+    }
+
+    private ParameterizedType internalTranslateType(ParameterizedType parameterizedType) {
         ParameterizedType inMap = types.get(parameterizedType);
         if (inMap != null) return inMap;
         List<ParameterizedType> params = parameterizedType.parameters();
@@ -339,6 +386,11 @@ public class TranslationMapImpl implements TranslationMap {
     @Override
     public boolean translateAgain() {
         return translateAgain;
+    }
+
+    @Override
+    public TranslationMap delegate() {
+        return delegate;
     }
 
     @Override
