@@ -272,12 +272,14 @@ public abstract class ValueImpl implements Value {
             return linkToParametersReturnValue;
         }
 
+        public static final Independent INDEPENDENT_DELAYED = new IndependentImpl(-1);
         public static final Independent DEPENDENT = new IndependentImpl(0);
         public static final Independent INDEPENDENT_HC = new IndependentImpl(1);
         public static final Independent INDEPENDENT = new IndependentImpl(2);
 
         public static Independent from(int level) {
             return switch (level) {
+                case -1 -> INDEPENDENT_DELAYED;
                 case 0 -> DEPENDENT;
                 case 1 -> INDEPENDENT_HC;
                 case 2 -> INDEPENDENT;
@@ -339,6 +341,7 @@ public abstract class ValueImpl implements Value {
         public String toString() {
             String linkString = computeLinkString();
             return switch (value) {
+                case -1 -> "<independent delayed>";
                 case 0 -> "@Dependent" + (linkString.isEmpty() ? "" : "(" + linkString + ")");
                 case 1 -> "@Independent(hc=true" + (linkString.isEmpty() ? "" : ", " + linkString) + ")";
                 case 2 -> "@Independent" + (linkString.isEmpty() ? "" : "(" + linkString + ")");
