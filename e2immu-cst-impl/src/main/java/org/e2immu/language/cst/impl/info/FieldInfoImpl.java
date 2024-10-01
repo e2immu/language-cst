@@ -18,7 +18,6 @@ import org.e2immu.language.cst.api.variable.DescendMode;
 import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.language.cst.impl.analysis.PropertyImpl;
 import org.e2immu.language.cst.impl.analysis.ValueImpl;
-import org.e2immu.language.cst.impl.element.ElementImpl;
 import org.e2immu.language.cst.impl.output.*;
 import org.e2immu.language.cst.impl.type.DiamondEnum;
 import org.e2immu.support.EventuallyFinal;
@@ -57,6 +56,11 @@ public class FieldInfoImpl extends InfoImpl implements FieldInfo {
         if (this == o) return true;
         if (!(o instanceof FieldInfoImpl fieldInfo)) return false;
         return Objects.equals(fullyQualifiedName, fieldInfo.fullyQualifiedName);
+    }
+
+    @Override
+    public String toString() {
+        return fullyQualifiedName;
     }
 
     @Override
