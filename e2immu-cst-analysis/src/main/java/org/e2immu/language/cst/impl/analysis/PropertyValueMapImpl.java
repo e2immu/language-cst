@@ -55,7 +55,8 @@ public class PropertyValueMapImpl implements PropertyValueMap {
                 POST_CONDITIONS_METHOD,
                 PRECONDITION_METHOD,
                 SHALLOW_ANALYZER,
-                STATIC_SIDE_EFFECTS_METHOD
+                STATIC_SIDE_EFFECTS_METHOD,
+                MODIFIED_FI_COMPONENTS_PARAMETER
         );
         properties.forEach(p -> propertyMap.put(p.key(), p));
     }

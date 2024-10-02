@@ -47,6 +47,8 @@ public class PropertyImpl implements Property {
 
     // parameter
     public static final Property MODIFIED_PARAMETER = new PropertyImpl("modifiedParameter");
+    public static final Property MODIFIED_FI_COMPONENTS_PARAMETER = new PropertyImpl("modifiedFunctionalInterfaceComponentsParameter",
+            ValueImpl.FieldBooleanMapImpl.EMPTY);
     public static final Property IGNORE_MODIFICATIONS_PARAMETER = new PropertyImpl("ignoreModsParameter");
     public static final Property PARAMETER_ASSIGNED_TO_FIELD = new PropertyImpl("parameterAssignedToField",
             ValueImpl.AssignedToFieldImpl.EMPTY);

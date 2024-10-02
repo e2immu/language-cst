@@ -418,6 +418,12 @@ public abstract class ValueImpl implements Value {
                             e -> codec.encodeBoolean(e.getValue())));
             return codec.encodeMap(encodedMap);
         }
+
+        @Override
+        public String toString() {
+            return map.entrySet().stream().map(e -> e.getKey() + "=" + e.getValue()).sorted()
+                    .collect(Collectors.joining(", "));
+        }
     }
 
     static {
