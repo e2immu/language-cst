@@ -21,8 +21,6 @@ public interface FieldInfo extends Info {
 
     ParameterizedType type();
 
-    String fullyQualifiedName();
-
     // inspection
 
     boolean isStatic();

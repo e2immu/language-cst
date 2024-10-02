@@ -20,8 +20,6 @@ import java.util.stream.Stream;
 
 public interface TypeInfo extends NamedType, Info {
 
-    String fullyQualifiedName();
-
     // for java, that will be packageName == "java.lang"
     boolean doesNotRequirePackage();
 

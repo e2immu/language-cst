@@ -9,6 +9,8 @@ public interface Info extends Element {
 
     CompilationUnit compilationUnit();
 
+    String fullyQualifiedName();
+
     boolean isSynthetic();
 
     TypeInfo typeInfo();

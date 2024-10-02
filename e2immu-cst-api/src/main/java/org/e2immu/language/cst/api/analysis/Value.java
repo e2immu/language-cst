@@ -2,10 +2,12 @@ package org.e2immu.language.cst.api.analysis;
 
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.info.FieldInfo;
+import org.e2immu.language.cst.api.info.Info;
 import org.e2immu.language.cst.api.info.MethodInfo;
 import org.e2immu.language.cst.api.info.ParameterInfo;
 import org.e2immu.language.cst.api.util.ParSeq;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -139,5 +141,10 @@ public interface Value extends Comparable<Value> {
 
     interface IndicesOfEscapes extends Value {
         Set<String> indices();
+    }
+
+    // general
+    interface SetOfInfo extends Value {
+        Set<? extends Info> infoSet();
     }
 }

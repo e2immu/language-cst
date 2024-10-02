@@ -53,6 +53,11 @@ public class CodecImpl implements Codec {
     }
 
     @Override
+    public Info decodeInfo(EncodedValue ev) {
+        throw new UnsupportedOperationException();// TODO
+    }
+
+    @Override
     public int decodeInt(EncodedValue encodedValue) {
         if (encodedValue instanceof D d && d.s instanceof Literal l) {
             return Integer.parseInt(l.getSource());

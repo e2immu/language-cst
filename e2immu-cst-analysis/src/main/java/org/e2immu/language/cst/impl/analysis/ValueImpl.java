@@ -4,6 +4,7 @@ import org.e2immu.language.cst.api.analysis.Codec;
 import org.e2immu.language.cst.api.analysis.Value;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.info.FieldInfo;
+import org.e2immu.language.cst.api.info.Info;
 import org.e2immu.language.cst.api.info.MethodInfo;
 import org.e2immu.language.cst.api.info.ParameterInfo;
 import org.e2immu.language.cst.api.util.ParSeq;
@@ -573,4 +574,22 @@ public abstract class ValueImpl implements Value {
         decoderMap.put(NotNullImpl.class, (codec, encodedValue) -> NotNullImpl.from(codec.decodeInt(encodedValue)));
     }
 
+    public record SetOfInfoImpl(Set<? extends Info> infoSet) implements SetOfInfo {
+
+        @Override
+        public Codec.EncodedValue encode(Codec codec) {
+            List<Codec.EncodedValue> encodedValues = infoSet.stream().sorted().map(codec::encodeInfo).toList();
+            return codec.encodeList(encodedValues);
+        }
+
+        public static SetOfInfo from(Codec codec, Codec.EncodedValue encodedList) {
+            List<Codec.EncodedValue> encodedValues = codec.decodeList(encodedList);
+            Set<Info> set = encodedValues.stream().map(codec::decodeInfo).collect(Collectors.toUnmodifiableSet());
+            return new SetOfInfoImpl(set);
+        }
+    }
+
+    static {
+        decoderMap.put(SetOfInfoImpl.class, (SetOfInfoImpl::from));
+    }
 }

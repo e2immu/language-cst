@@ -84,8 +84,6 @@ public interface MethodInfo extends Info {
 
     String name();
 
-    String fullyQualifiedName();
-
     boolean isStatic();
 
     ParameterizedType returnType();

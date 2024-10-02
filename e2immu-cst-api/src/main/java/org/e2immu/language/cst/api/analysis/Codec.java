@@ -22,6 +22,8 @@ public interface Codec {
 
     FieldInfo decodeFieldInfo(EncodedValue encodedValue);
 
+    Info decodeInfo(EncodedValue ev);
+
     int decodeInt(EncodedValue encodedValue);
 
     List<EncodedValue> decodeList(EncodedValue encodedValue);
