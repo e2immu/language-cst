@@ -5,6 +5,7 @@ import org.e2immu.language.cst.api.info.MethodInfo;
 import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface Predefined extends PredefinedWithoutParameterizedType {
@@ -39,6 +40,8 @@ public interface Predefined extends PredefinedWithoutParameterizedType {
     ParameterizedType objectParameterizedType();
 
     List<TypeInfo> predefinedObjects();
+
+    Collection<TypeInfo> primitives();
 
     int primitiveTypeOrder(ParameterizedType pt);
 

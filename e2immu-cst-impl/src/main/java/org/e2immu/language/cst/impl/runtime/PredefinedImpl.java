@@ -232,7 +232,6 @@ public class PredefinedImpl implements Predefined {
         for (TypeInfo ti : List.of(functionalInterface)) {
             ti.builder().setAccess(InspectionImpl.AccessEnum.PUBLIC);
             ti.builder().setTypeNature(TypeNatureEnum.ANNOTATION);
-            objects.add(ti);
         }
         Set<TypeInfo> boxed = Set.of(boxedBooleanTypeInfo, boxedByteTypeInfo, boxedDoubleTypeInfo, boxedFloatTypeInfo,
                 boxedLongTypeInfo, boxedShortTypeInfo, boxedVoidTypeInfo, integerTypeInfo, characterTypeInfo);
@@ -248,6 +247,11 @@ public class PredefinedImpl implements Predefined {
     @Override
     public List<TypeInfo> predefinedObjects() {
         return predefinedObjects;
+    }
+
+    @Override
+    public Collection<TypeInfo> primitives() {
+        return primitiveByName.values();
     }
 
     @Override
