@@ -6,8 +6,9 @@ import org.e2immu.language.cst.api.info.Info;
 import org.e2immu.language.cst.api.info.MethodInfo;
 import org.e2immu.language.cst.api.info.ParameterInfo;
 import org.e2immu.language.cst.api.util.ParSeq;
+import org.e2immu.language.cst.api.variable.FieldReference;
+import org.e2immu.language.cst.api.variable.Variable;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -111,6 +112,10 @@ public interface Value extends Comparable<Value> {
 
     interface FieldBooleanMap extends Value {
         Map<FieldInfo, Boolean> map();
+    }
+
+    interface VariableBooleanMap extends Value {
+        Map<Variable, Boolean> map();
     }
 
     // meant for the "GetSetEquivalent" property

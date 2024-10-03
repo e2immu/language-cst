@@ -48,6 +48,11 @@ public class CodecImpl implements Codec {
     }
 
     @Override
+    public Variable decodeVariable(EncodedValue encodedValue) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public FieldInfo decodeFieldInfo(EncodedValue encodedValue) {
         throw new UnsupportedOperationException(); // not implemented here, need type context
     }

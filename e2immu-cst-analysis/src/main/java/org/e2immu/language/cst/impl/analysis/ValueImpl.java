@@ -8,6 +8,8 @@ import org.e2immu.language.cst.api.info.Info;
 import org.e2immu.language.cst.api.info.MethodInfo;
 import org.e2immu.language.cst.api.info.ParameterInfo;
 import org.e2immu.language.cst.api.util.ParSeq;
+import org.e2immu.language.cst.api.variable.FieldReference;
+import org.e2immu.language.cst.api.variable.Variable;
 
 import java.util.*;
 import java.util.function.BiFunction;
@@ -433,6 +435,34 @@ public abstract class ValueImpl implements Value {
                             e -> codec.decodeFieldInfo(e.getKey()),
                             e -> codec.decodeBoolean(e.getValue())));
             return new FieldBooleanMapImpl(decodedMap);
+        });
+    }
+
+    public record VariableBooleanMapImpl(Map<Variable, Boolean> map) implements VariableBooleanMap {
+        public static final VariableBooleanMap EMPTY = new VariableBooleanMapImpl(Map.of());
+
+        @Override
+        public Codec.EncodedValue encode(Codec codec) {
+            Map<Codec.EncodedValue, Codec.EncodedValue> encodedMap = map.entrySet().stream()
+                    .collect(Collectors.toUnmodifiableMap(e -> codec.encodeVariable(e.getKey()),
+                            e -> codec.encodeBoolean(e.getValue())));
+            return codec.encodeMap(encodedMap);
+        }
+
+        @Override
+        public String toString() {
+            return map.entrySet().stream().map(e -> e.getKey() + "=" + e.getValue()).sorted()
+                    .collect(Collectors.joining(", "));
+        }
+    }
+
+    static {
+        decoderMap.put(VariableBooleanMapImpl.class, (codec, encodedValue) -> {
+            Map<Variable, Boolean> decodedMap = codec.decodeMap(encodedValue)
+                    .entrySet().stream().collect(Collectors.toUnmodifiableMap(
+                            e -> codec.decodeVariable(e.getKey()),
+                            e -> codec.decodeBoolean(e.getValue())));
+            return new VariableBooleanMapImpl(decodedMap);
         });
     }
 

@@ -3,6 +3,7 @@ package org.e2immu.language.cst.api.analysis;
 import org.e2immu.language.cst.api.element.Element;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.info.*;
+import org.e2immu.language.cst.api.variable.FieldReference;
 import org.e2immu.language.cst.api.variable.Variable;
 
 import java.util.List;
@@ -17,6 +18,8 @@ support for reading and writing the property-value pairs in many elements.
 public interface Codec {
 
     boolean decodeBoolean(EncodedValue encodedValue);
+
+    Variable decodeVariable(EncodedValue encodedValue);
 
     Expression decodeExpression(EncodedValue value);
 
