@@ -6,6 +6,7 @@ import org.e2immu.language.cst.api.element.CompilationUnit;
 import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.runtime.Runtime;
 import org.e2immu.language.cst.impl.analysis.PropertyImpl;
+import org.e2immu.language.cst.impl.analysis.PropertyProviderImpl;
 import org.e2immu.language.cst.impl.analysis.ValueImpl;
 import org.e2immu.language.cst.impl.runtime.RuntimeImpl;
 import org.junit.jupiter.api.Assertions;
@@ -38,7 +39,8 @@ public class TestCodec {
                 new ValueImpl.CommutableDataImpl("p1", "p2,p3", "p4"));
 
         Codec.DecoderProvider decoderProvider = ValueImpl::decoder;
-        Codec codec = new CodecImpl(decoderProvider, fqn -> runtime.getFullyQualified(fqn, true));
+        Codec codec = new CodecImpl(PropertyProviderImpl::get,
+                decoderProvider, fqn -> runtime.getFullyQualified(fqn, true));
         List<Property> properties = List.of(
                 PropertyImpl.IMMUTABLE_TYPE,
                 PropertyImpl.SHALLOW_ANALYZER,

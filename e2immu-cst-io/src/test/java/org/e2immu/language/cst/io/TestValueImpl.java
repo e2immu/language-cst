@@ -4,6 +4,7 @@ import org.e2immu.language.cst.api.analysis.Codec;
 import org.e2immu.language.cst.api.analysis.Value;
 import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.runtime.Runtime;
+import org.e2immu.language.cst.impl.analysis.PropertyProviderImpl;
 import org.e2immu.language.cst.impl.analysis.ValueImpl;
 import org.e2immu.language.cst.impl.runtime.RuntimeImpl;
 import org.junit.jupiter.api.Test;
@@ -23,8 +24,9 @@ import static org.junit.jupiter.api.Assertions.fail;
 public class TestValueImpl {
     Runtime runtime = new RuntimeImpl();
     Codec.DecoderProvider decoderProvider = ValueImpl::decoder;
+    Codec.PropertyProvider propertyProvider = PropertyProviderImpl::get;
     Codec.TypeProvider typeProvider = fqn -> runtime.getFullyQualified(fqn, true);
-    CodecImpl codec = new CodecImpl(decoderProvider, typeProvider);
+    CodecImpl codec = new CodecImpl(propertyProvider, decoderProvider, typeProvider);
 
     @Test
     public void test() {

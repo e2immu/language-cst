@@ -3,12 +3,8 @@ package org.e2immu.language.cst.impl.analysis;
 import org.e2immu.language.cst.api.analysis.Codec;
 import org.e2immu.language.cst.api.analysis.Value;
 import org.e2immu.language.cst.api.expression.Expression;
-import org.e2immu.language.cst.api.info.FieldInfo;
-import org.e2immu.language.cst.api.info.Info;
-import org.e2immu.language.cst.api.info.MethodInfo;
-import org.e2immu.language.cst.api.info.ParameterInfo;
+import org.e2immu.language.cst.api.info.*;
 import org.e2immu.language.cst.api.util.ParSeq;
-import org.e2immu.language.cst.api.variable.FieldReference;
 import org.e2immu.language.cst.api.variable.Variable;
 
 import java.util.*;
@@ -401,7 +397,7 @@ public abstract class ValueImpl implements Value {
 
         @Override
         public Codec.EncodedValue encode(Codec codec) {
-            return codec.encodeInfo(field, -1);
+            return codec.encodeInfo(field, codec.fieldIndex(field));
         }
     }
 
@@ -416,7 +412,7 @@ public abstract class ValueImpl implements Value {
         @Override
         public Codec.EncodedValue encode(Codec codec) {
             Map<Codec.EncodedValue, Codec.EncodedValue> encodedMap = map.entrySet().stream()
-                    .collect(Collectors.toUnmodifiableMap(e -> codec.encodeInfo(e.getKey()),
+                    .collect(Collectors.toUnmodifiableMap(e -> codec.encodeInfo(e.getKey(), codec.fieldIndex(e.getKey())),
                             e -> codec.encodeBoolean(e.getValue())));
             return codec.encodeMap(encodedMap);
         }
@@ -471,7 +467,8 @@ public abstract class ValueImpl implements Value {
 
         @Override
         public Codec.EncodedValue encode(Codec codec) {
-            Set<Codec.EncodedValue> set = fields.stream().map(codec::encodeInfo).collect(Collectors.toUnmodifiableSet());
+            Set<Codec.EncodedValue> set = fields.stream().map(fi -> codec.encodeInfo(fi, codec.fieldIndex(fi)))
+                    .collect(Collectors.toUnmodifiableSet());
             return codec.encodeSet(set);
         }
     }
@@ -546,7 +543,8 @@ public abstract class ValueImpl implements Value {
         public Codec.EncodedValue encode(Codec codec) {
             Set<Codec.EncodedValue> set = convertToGetSet.stream().map(codec::encodeVariable)
                     .collect(Collectors.toUnmodifiableSet());
-            return codec.encodeList(List.of(codec.encodeSet(set), codec.encodeInfo(methodWithoutParameters)));
+            return codec.encodeList(List.of(codec.encodeSet(set), codec.encodeInfo(methodWithoutParameters,
+                    codec.methodIndex(methodWithoutParameters))));
         }
     }
 
@@ -616,7 +614,19 @@ public abstract class ValueImpl implements Value {
         public Codec.EncodedValue encode(Codec codec) {
             List<Codec.EncodedValue> encodedValues = infoSet.stream()
                     .sorted(Comparator.comparing(Info::fullyQualifiedName))
-                    .map(codec::encodeInfo).toList();
+                    .map(info -> {
+                        int index;
+                        if (info instanceof TypeInfo) index = -1;
+                        else if (info instanceof MethodInfo methodInfo) {
+                            if (methodInfo.isConstructor()) {
+                                index = codec.constructorIndex(methodInfo);
+                            } else {
+                                index = codec.methodIndex(methodInfo);
+                            }
+                        } else if (info instanceof FieldInfo fieldInfo) index = codec.fieldIndex(fieldInfo);
+                        else throw new UnsupportedOperationException();
+                        return codec.encodeInfo(info, index);
+                    }).toList();
             return codec.encodeList(encodedValues);
         }
 

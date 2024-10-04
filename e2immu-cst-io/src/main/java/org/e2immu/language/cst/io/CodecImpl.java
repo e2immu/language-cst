@@ -4,7 +4,6 @@ import org.e2immu.language.cst.api.analysis.Codec;
 import org.e2immu.language.cst.api.analysis.Property;
 import org.e2immu.language.cst.api.analysis.PropertyValueMap;
 import org.e2immu.language.cst.api.analysis.Value;
-import org.e2immu.language.cst.api.element.Element;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.info.*;
 import org.e2immu.language.cst.api.variable.*;
@@ -13,6 +12,7 @@ import org.parsers.json.ast.*;
 
 import java.util.*;
 import java.util.function.BiFunction;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -20,10 +20,22 @@ import java.util.stream.Stream;
 public class CodecImpl implements Codec {
     private final DecoderProvider decoderProvider;
     private final TypeProvider typeProvider;
+    private final PropertyProvider propertyProvider;
 
-    public CodecImpl(DecoderProvider decoderProvider, TypeProvider typeProvider) {
+    public CodecImpl(PropertyProvider propertyProvider, DecoderProvider decoderProvider, TypeProvider typeProvider) {
         this.decoderProvider = decoderProvider;
         this.typeProvider = typeProvider;
+        this.propertyProvider = propertyProvider;
+    }
+
+    @Override
+    public TypeProvider typeProvider() {
+        return typeProvider;
+    }
+
+    @Override
+    public PropertyProvider propertyProvider() {
+        return propertyProvider;
     }
 
     public record D(Node s) implements EncodedValue {
@@ -55,12 +67,55 @@ public class CodecImpl implements Codec {
 
     @Override
     public FieldInfo decodeFieldInfo(EncodedValue encodedValue) {
-        throw new UnsupportedOperationException(); // not implemented here, need type context
+        if (encodedValue instanceof D d && d.s instanceof StringLiteral sl) {
+            String source = sl.getSource();
+            assert 'F' == source.charAt(0);
+            String rest = source.substring(1);
+            return decodeFieldInfo(rest);
+        }
+        throw new UnsupportedOperationException();
     }
+
+    private static final Pattern INDEX_NAME_PATTERN = Pattern.compile("(.+)\\.([\\w$<>]+)\\((\\d+)\\)");
+
+    private FieldInfo decodeFieldInfo(String fqnIndex) {
+        Matcher m = INDEX_NAME_PATTERN.matcher(fqnIndex);
+        if (m.matches()) {
+            int index = Integer.parseInt(m.group(3));
+            FieldInfo fieldInfo = typeProvider.get(m.group(1)).fields().get(index);
+            assert fieldInfo.name().equals(m.group(2));
+            return fieldInfo;
+        } else throw new UnsupportedOperationException();
+    }
+
 
     @Override
     public Info decodeInfo(EncodedValue ev) {
-        throw new UnsupportedOperationException();// TODO
+        if (ev instanceof D d && d.s instanceof StringLiteral sl) {
+            String source = unquote(sl.getSource());
+            char c0 = source.charAt(0);
+            String rest = source.substring(1);
+            return switch (c0) {
+                case 'F' -> decodeFieldInfo(rest);
+                case 'C' -> decodeConstructor(rest);
+                case 'M' -> decodeMethodInfo(rest);
+                case 'T' -> typeProvider.get(rest);
+                case 'P' -> decodeParameterInfo(ev);
+                default -> throw new UnsupportedOperationException("String is " + sl.getSource());
+            };
+        }
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public TypeInfo decodeTypeinfo(EncodedValue ev) {
+        if (ev instanceof D d && d.s instanceof StringLiteral sl) {
+            String source = sl.getSource();
+            assert 'T' == source.charAt(0);
+            String rest = source.substring(1);
+            return typeProvider.get(rest);
+        }
+        throw new UnsupportedOperationException();
     }
 
     @Override
@@ -103,6 +158,30 @@ public class CodecImpl implements Codec {
         return map;
     }
 
+    private MethodInfo decodeConstructor(String fqnNameIndex) {
+        Matcher m = INDEX_NAME_PATTERN.matcher(fqnNameIndex);
+        if (m.matches()) {
+            int index = Integer.parseInt(m.group(3));
+            MethodInfo methodInfo = typeProvider.get(m.group(1)).constructors().get(index);
+            assert methodInfo.isConstructor();
+            return methodInfo;
+        } else {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    private MethodInfo decodeMethodInfo(String fqnNameIndex) {
+        Matcher m = INDEX_NAME_PATTERN.matcher(fqnNameIndex);
+        if (m.matches()) {
+            int index = Integer.parseInt(m.group(3));
+            MethodInfo methodInfo = typeProvider.get(m.group(1)).methods().get(index);
+            assert !methodInfo.isConstructor();
+            assert methodInfo.name().equals(m.group(2));
+            return methodInfo;
+        } else throw new UnsupportedOperationException();
+    }
+
+    // FIXME this method does not work by index
     @Override
     public MethodInfo decodeMethodInfo(EncodedValue ev) {
         if (ev instanceof D d && d.s instanceof StringLiteral sl) {
@@ -123,6 +202,7 @@ public class CodecImpl implements Codec {
         throw new UnsupportedOperationException(); // not implemented here, need type context
     }
 
+    // FIXME not by index
     @Override
     public ParameterInfo decodeParameterInfo(EncodedValue ev) {
         if (ev instanceof D d && d.s instanceof StringLiteral sl) {
@@ -206,10 +286,12 @@ public class CodecImpl implements Codec {
     }
 
     private static final Pattern NUM_PATTERN = Pattern.compile("-?\\.?[0-9]+");
+
     private static String quoteNumber(String s) {
-        if(NUM_PATTERN.matcher(s).matches()) return quote(s);
+        if (NUM_PATTERN.matcher(s).matches()) return quote(s);
         return s;
     }
+
     @Override
     public EncodedValue encodeSet(Set<EncodedValue> set) {
         String e = set.stream().map(ev -> ((E) ev).s).sorted()
@@ -252,7 +334,8 @@ public class CodecImpl implements Codec {
     public Stream<PropertyValue> decode(PropertyValueMap pvm, Stream<EncodedPropertyValue> encodedPropertyValueStream) {
         return encodedPropertyValueStream.map(epv -> {
             String key = epv.key();
-            Property property = pvm.property(key);
+            Property property = propertyProvider.get(key);
+            assert property != null : "Have no property object for key " + key;
             Class<? extends Value> clazz = property.classOfValue();
             BiFunction<Codec, EncodedValue, Value> decoder = decoderProvider.decoder(clazz);
             D d = (D) epv.encodedValue();
@@ -281,18 +364,48 @@ public class CodecImpl implements Codec {
         if (info instanceof TypeInfo typeInfo) {
             return "T" + typeInfo.fullyQualifiedName();
         }
+        assert index >= 0;
         if (info instanceof MethodInfo methodInfo) {
-            if (index < 0) return methodInfo.fullyQualifiedName();
             if (methodInfo.isConstructor()) {
                 return "C" + methodInfo.typeInfo().fullyQualifiedName() + "(" + index + ")";
             }
             return "M" + methodInfo.typeInfo().fullyQualifiedName() + "." + methodInfo.name() + "(" + index + ")";
         }
         if (info instanceof FieldInfo fieldInfo) {
-            return "F" + fieldInfo.fullyQualifiedName() + (index >= 0 ? "(" + index + ")" : "");
+            return "F" + fieldInfo.fullyQualifiedName() + "(" + index + ")";
         }
         if (info instanceof ParameterInfo pi) {
             return "P" + encodeInfoFqn(pi.methodInfo(), index) + ":" + pi.index();
+        }
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public int fieldIndex(FieldInfo fieldInfo) {
+        int i = 0;
+        for (FieldInfo fi : fieldInfo.owner().fields()) {
+            if (fi == fieldInfo) return i;
+            ++i;
+        }
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public int methodIndex(MethodInfo methodInfo) {
+        int i = 0;
+        for (MethodInfo mi : methodInfo.typeInfo().methods()) {
+            if (mi == methodInfo) return i;
+            ++i;
+        }
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public int constructorIndex(MethodInfo methodInfo) {
+        int i = 0;
+        for (MethodInfo mi : methodInfo.typeInfo().constructors()) {
+            if (mi == methodInfo) return i;
+            ++i;
         }
         throw new UnsupportedOperationException();
     }

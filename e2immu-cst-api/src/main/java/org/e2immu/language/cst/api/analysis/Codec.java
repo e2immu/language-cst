@@ -1,9 +1,7 @@
 package org.e2immu.language.cst.api.analysis;
 
-import org.e2immu.language.cst.api.element.Element;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.info.*;
-import org.e2immu.language.cst.api.variable.FieldReference;
 import org.e2immu.language.cst.api.variable.Variable;
 
 import java.util.List;
@@ -27,6 +25,8 @@ public interface Codec {
 
     Info decodeInfo(EncodedValue ev);
 
+    TypeInfo decodeTypeinfo(EncodedValue ev);
+
     int decodeInt(EncodedValue encodedValue);
 
     List<EncodedValue> decodeList(EncodedValue encodedValue);
@@ -45,10 +45,6 @@ public interface Codec {
 
     EncodedValue encodeExpression(Expression expression);
 
-    default EncodedValue encodeInfo(Info info) {
-        return encodeInfo(info, -1);
-    }
-
     EncodedValue encodeInfo(Info info, int index);
 
     EncodedValue encodeInt(int value);
@@ -62,6 +58,12 @@ public interface Codec {
     EncodedValue encodeString(String string);
 
     EncodedValue encodeVariable(Variable variable);
+
+    int fieldIndex(FieldInfo key);
+
+    int methodIndex(MethodInfo methodInfo);
+
+    int constructorIndex(MethodInfo methodInfo);
 
     boolean isList(EncodedValue encodedValue);
 
@@ -83,6 +85,15 @@ public interface Codec {
     interface TypeProvider {
         TypeInfo get(String fqn);
     }
+
+    interface PropertyProvider {
+        Property get(String propertyName);
+    }
+
+    // for extensions
+    TypeProvider typeProvider();
+
+    PropertyProvider propertyProvider();
 
     // Info level
 
