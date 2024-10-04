@@ -13,6 +13,7 @@ import org.parsers.json.ast.*;
 
 import java.util.*;
 import java.util.function.BiFunction;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -198,12 +199,17 @@ public class CodecImpl implements Codec {
     @Override
     public EncodedValue encodeMap(Map<EncodedValue, EncodedValue> map) {
         String encoded = map.entrySet().stream()
-                .map(e -> ((E) e.getKey()).s + ":" + ((E) e.getValue()).s)
+                .map(e -> quoteNumber(((E) e.getKey()).s) + ":" + ((E) e.getValue()).s)
                 .sorted()
                 .collect(Collectors.joining(",", "{", "}"));
         return new E(encoded);
     }
 
+    private static final Pattern NUM_PATTERN = Pattern.compile("-?\\.?[0-9]+");
+    private static String quoteNumber(String s) {
+        if(NUM_PATTERN.matcher(s).matches()) return quote(s);
+        return s;
+    }
     @Override
     public EncodedValue encodeSet(Set<EncodedValue> set) {
         String e = set.stream().map(ev -> ((E) ev).s).sorted()

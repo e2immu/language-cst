@@ -614,7 +614,9 @@ public abstract class ValueImpl implements Value {
 
         @Override
         public Codec.EncodedValue encode(Codec codec) {
-            List<Codec.EncodedValue> encodedValues = infoSet.stream().sorted().map(codec::encodeInfo).toList();
+            List<Codec.EncodedValue> encodedValues = infoSet.stream()
+                    .sorted(Comparator.comparing(Info::fullyQualifiedName))
+                    .map(codec::encodeInfo).toList();
             return codec.encodeList(encodedValues);
         }
 
