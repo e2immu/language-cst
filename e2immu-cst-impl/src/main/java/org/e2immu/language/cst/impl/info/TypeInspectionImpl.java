@@ -299,6 +299,11 @@ public class TypeInspectionImpl extends InspectionImpl implements TypeInspection
         }
 
         @Override
+        public List<MethodInfo> methods() {
+            return methods;
+        }
+
+        @Override
         public Builder computeAccess() {
             Access fromModifiers = accessFromModifiers();
             if (typeInfo.compilationUnitOrEnclosingType().isLeft()) {

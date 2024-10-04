@@ -176,6 +176,12 @@ public interface TypeInfo extends NamedType, Info {
     interface Builder extends Info.Builder<Builder> {
         Builder addPermittedType(TypeInfo typeInfo);
 
+        List<FieldInfo> fields();
+
+        boolean isAbstract();
+
+        List<MethodInfo> methods();
+
         @Fluent
         Builder setEnclosingMethod(MethodInfo methodInfo);
 
