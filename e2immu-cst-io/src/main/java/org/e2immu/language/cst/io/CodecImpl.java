@@ -110,6 +110,12 @@ public class CodecImpl implements Codec {
 
     @Override
     public Variable decodeVariable(Context context, EncodedValue encodedValue) {
+        if (encodedValue instanceof D d && d.s instanceof StringLiteral sl) {
+            String source = unquote(sl.getSource());
+            if ('P' == source.charAt(0)) {
+                return decodeParameterOutOfContext(context, source.substring(1));
+            }
+        }
         throw new UnsupportedOperationException();
     }
 
@@ -170,17 +176,6 @@ public class CodecImpl implements Codec {
             char c0 = source.charAt(0);
             String rest = source.substring(1);
             return decodeInfo(context, c0, rest);
-        }
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public TypeInfo decodeTypeinfo(Context context, EncodedValue ev) {
-        if (ev instanceof D d && d.s instanceof StringLiteral sl) {
-            String source = sl.getSource();
-            assert 'T' == source.charAt(0);
-            String rest = source.substring(1);
-            return typeProvider.get(rest);
         }
         throw new UnsupportedOperationException();
     }
@@ -249,25 +244,43 @@ public class CodecImpl implements Codec {
     }
 
     @Override
-    public MethodInfo decodeMethodInfo(Context context, EncodedValue ev) {
+    public MethodInfo decodeMethodOutOfContext(Context context, EncodedValue ev) {
         if (ev instanceof D d && d.s instanceof StringLiteral sl) {
-            String source = sl.getSource();
+            String source = unquote(sl.getSource());
             assert 'M' == source.charAt(0);
             String rest = source.substring(1);
-            return decodeMethodInfo(context, rest);
+            return decodeMethodOutOfContext(context, rest);
         }
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    public ParameterInfo decodeParameterInfo(Context context, EncodedValue ev) {
-        if (ev instanceof D d && d.s instanceof StringLiteral sl) {
-            String source = sl.getSource();
-            assert 'P' == source.charAt(0);
-            String rest = source.substring(1);
-            return decodeParameterInfo(context, rest);
+    private static final Pattern METHOD_PATTERN = Pattern.compile("(.+)\\.(\\w+)\\((\\d+)\\)");
+
+    private MethodInfo decodeMethodOutOfContext(Context context, String name) {
+        Matcher m = METHOD_PATTERN.matcher(name);
+        if (m.matches()) {
+            String typeFqn = m.group(1);
+            TypeInfo typeInfo = findType(context, typeFqn);
+            int index = Integer.parseInt(m.group(3));
+            MethodInfo methodInfo = typeInfo.methods().get(index);
+            assert methodInfo.name().equals(m.group(2));
+            return methodInfo;
         }
         throw new UnsupportedOperationException();
+    }
+
+    private TypeInfo findType(Context context, String fqn) {
+        TypeInfo typeInfo = context.findType(fqn);
+        if (typeInfo != null) return typeInfo;
+        return typeProvider().get(fqn);
+    }
+
+    private ParameterInfo decodeParameterOutOfContext(Context context, String name) {
+        int colon = name.lastIndexOf(':');
+        String method = name.substring(0, colon);
+        MethodInfo methodInfo = decodeMethodOutOfContext(context, method);
+        int index = Integer.parseInt(name.substring(colon + 1));
+        return methodInfo.parameters().get(index);
     }
 
     private ParameterInfo decodeParameterInfo(Context context, String nameIndex) {
@@ -354,6 +367,13 @@ public class CodecImpl implements Codec {
         return new E(quote(string));
     }
 
+    @Override
+    public EncodedValue encodeMethodOutOfContext(Context context, MethodInfo methodInfo) {
+        String e = "M" + methodInfo.typeInfo().fullyQualifiedName() + "." + methodInfo.name()
+                   + "(" + methodIndex(methodInfo) + ")";
+        return new E(quote(e));
+    }
+
     public static String quote(String s) {
         return "\"" + s.replace("\"", "\\\"") + "\"";
     }
@@ -366,8 +386,9 @@ public class CodecImpl implements Codec {
     @Override
     public EncodedValue encodeVariable(Context context, Variable variable) {
         String type;
-        if (variable instanceof ParameterInfo) {
-            type = "P";
+        if (variable instanceof ParameterInfo pi) {
+            return new E(quote("P" + pi.typeInfo().fullyQualifiedName() + "." + pi.methodInfo().name()
+                               + "(" + methodIndex(pi.methodInfo()) + "):" + pi.index()));
         } else if (variable instanceof FieldReference) {
             type = "F";
         } else if (variable instanceof DependentVariable) {
@@ -384,7 +405,9 @@ public class CodecImpl implements Codec {
     }
 
     @Override
-    public Stream<PropertyValue> decode(Context context, PropertyValueMap pvm, Stream<EncodedPropertyValue> encodedPropertyValueStream) {
+    public Stream<PropertyValue> decode(Context context,
+                                        PropertyValueMap pvm,
+                                        Stream<EncodedPropertyValue> encodedPropertyValueStream) {
         return encodedPropertyValueStream.map(epv -> {
             String key = epv.key();
             Property property = propertyProvider.get(key);
@@ -476,16 +499,6 @@ public class CodecImpl implements Codec {
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    public int subTypeIndex(TypeInfo typeInfo) {
-        int i = 0;
-        for (TypeInfo ti : typeInfo.compilationUnitOrEnclosingType().getRight().subTypes()) {
-            if (ti == typeInfo) return i;
-            ++i;
-        }
-        throw new UnsupportedOperationException();
-    }
-
     public static class ContextImpl implements Context {
         private final Stack<Info> stack = new Stack<>();
 
@@ -521,6 +534,14 @@ public class CodecImpl implements Codec {
         public MethodInfo currentMethod() {
             for (int i = 0; i < stack.size(); i++) {
                 if (peek(i) instanceof MethodInfo mi) return mi;
+            }
+            return null;
+        }
+
+        @Override
+        public TypeInfo findType(String typeFqn) {
+            for (int i = 0; i < stack.size(); i++) {
+                if (peek(i) instanceof TypeInfo ti && typeFqn.equals(ti.fullyQualifiedName())) return ti;
             }
             return null;
         }

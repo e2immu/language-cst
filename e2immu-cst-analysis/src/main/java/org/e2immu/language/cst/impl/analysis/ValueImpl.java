@@ -553,8 +553,7 @@ public abstract class ValueImpl implements Value {
                     .map(v -> codec.encodeVariable(context, v))
                     .collect(Collectors.toUnmodifiableSet());
             return codec.encodeList(context, List.of(codec.encodeSet(context, set),
-                    codec.encodeInfo(context, methodWithoutParameters,
-                            "" + codec.methodIndex(methodWithoutParameters))));
+                    codec.encodeMethodOutOfContext(context, methodWithoutParameters)));
         }
     }
 
@@ -562,9 +561,9 @@ public abstract class ValueImpl implements Value {
         decoderMap.put(GetSetEquivalentImpl.class, (di, encodedValue) -> {
             List<Codec.EncodedValue> list = di.codec().decodeList(di.context(), encodedValue);
             Set<ParameterInfo> set = di.codec().decodeSet(di.context(), list.get(0)).stream()
-                    .map(e -> di.codec().decodeParameterInfo(di.context(), e))
+                    .map(e -> (ParameterInfo) di.codec().decodeVariable(di.context(), e))
                     .collect(Collectors.toUnmodifiableSet());
-            return new GetSetEquivalentImpl(set, di.codec().decodeMethodInfo(di.context(), list.get(1)));
+            return new GetSetEquivalentImpl(set, di.codec().decodeMethodOutOfContext(di.context(), list.get(1)));
         });
     }
 

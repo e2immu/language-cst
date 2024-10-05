@@ -15,6 +15,8 @@ support for reading and writing the property-value pairs in many elements.
  */
 public interface Codec {
     interface Context {
+        TypeInfo findType(String typeFqn);
+
         boolean isEmpty();
 
         Info pop();
@@ -40,17 +42,13 @@ public interface Codec {
 
     Info decodeInfo(Context context, EncodedValue ev);
 
-    TypeInfo decodeTypeinfo(Context context, EncodedValue ev);
-
     int decodeInt(Context context, EncodedValue encodedValue);
 
     List<EncodedValue> decodeList(Context context, EncodedValue encodedValue);
 
     Map<EncodedValue, EncodedValue> decodeMap(Context context, EncodedValue encodedValue);
 
-    MethodInfo decodeMethodInfo(Context context, EncodedValue encodedValue);
-
-    ParameterInfo decodeParameterInfo(Context context, EncodedValue ev);
+    MethodInfo decodeMethodOutOfContext(Context context, EncodedValue encodedValue);
 
     Set<EncodedValue> decodeSet(Context context, EncodedValue encodedValue);
 
@@ -74,13 +72,13 @@ public interface Codec {
 
     EncodedValue encodeVariable(Context context, Variable variable);
 
+    EncodedValue encodeMethodOutOfContext(Context context, MethodInfo methodInfo);
+
     int fieldIndex(FieldInfo key);
 
     int methodIndex(MethodInfo methodInfo);
 
     int constructorIndex(MethodInfo methodInfo);
-
-    int subTypeIndex(TypeInfo typeInfo);
 
     boolean isList(EncodedValue encodedValue);
 
