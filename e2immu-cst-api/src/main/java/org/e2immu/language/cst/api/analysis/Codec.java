@@ -14,50 +14,63 @@ import java.util.stream.Stream;
 support for reading and writing the property-value pairs in many elements.
  */
 public interface Codec {
+    interface Context {
+        boolean isEmpty();
 
-    boolean decodeBoolean(EncodedValue encodedValue);
+        Info pop();
 
-    Variable decodeVariable(EncodedValue encodedValue);
+        Info peek(int stepsBack);
 
-    Expression decodeExpression(EncodedValue value);
+        void push(Info info);
 
-    FieldInfo decodeFieldInfo(EncodedValue encodedValue);
+        TypeInfo currentType();
 
-    Info decodeInfo(EncodedValue ev);
+        MethodInfo currentMethod();
+    }
 
-    TypeInfo decodeTypeinfo(EncodedValue ev);
+    boolean decodeBoolean(Context context, EncodedValue encodedValue);
 
-    int decodeInt(EncodedValue encodedValue);
+    Variable decodeVariable(Context context, EncodedValue encodedValue);
 
-    List<EncodedValue> decodeList(EncodedValue encodedValue);
+    Expression decodeExpression(Context context, EncodedValue value);
 
-    Map<EncodedValue, EncodedValue> decodeMap(EncodedValue encodedValue);
+    FieldInfo decodeFieldInfo(Context context, EncodedValue encodedValue);
 
-    MethodInfo decodeMethodInfo(EncodedValue encodedValue);
+    Info decodeInfo(Context context, EncodedValue ev);
 
-    ParameterInfo decodeParameterInfo(EncodedValue ev);
+    TypeInfo decodeTypeinfo(Context context, EncodedValue ev);
 
-    Set<EncodedValue> decodeSet(EncodedValue encodedValue);
+    int decodeInt(Context context, EncodedValue encodedValue);
 
-    String decodeString(EncodedValue encodedValue);
+    List<EncodedValue> decodeList(Context context, EncodedValue encodedValue);
 
-    EncodedValue encodeBoolean(boolean value);
+    Map<EncodedValue, EncodedValue> decodeMap(Context context, EncodedValue encodedValue);
 
-    EncodedValue encodeExpression(Expression expression);
+    MethodInfo decodeMethodInfo(Context context, EncodedValue encodedValue);
 
-    EncodedValue encodeInfo(Info info, int index);
+    ParameterInfo decodeParameterInfo(Context context, EncodedValue ev);
 
-    EncodedValue encodeInt(int value);
+    Set<EncodedValue> decodeSet(Context context, EncodedValue encodedValue);
 
-    EncodedValue encodeList(List<EncodedValue> encodedValues);
+    String decodeString(Context context, EncodedValue encodedValue);
 
-    EncodedValue encodeMap(Map<EncodedValue, EncodedValue> map);
+    EncodedValue encodeBoolean(Context context, boolean value);
 
-    EncodedValue encodeSet(Set<EncodedValue> set);
+    EncodedValue encodeExpression(Context context, Expression expression);
 
-    EncodedValue encodeString(String string);
+    EncodedValue encodeInfo(Context context, Info info, String index);
 
-    EncodedValue encodeVariable(Variable variable);
+    EncodedValue encodeInt(Context context, int value);
+
+    EncodedValue encodeList(Context context, List<EncodedValue> encodedValues);
+
+    EncodedValue encodeMap(Context context, Map<EncodedValue, EncodedValue> map);
+
+    EncodedValue encodeSet(Context context, Set<EncodedValue> set);
+
+    EncodedValue encodeString(Context context, String string);
+
+    EncodedValue encodeVariable(Context context, Variable variable);
 
     int fieldIndex(FieldInfo key);
 
@@ -65,7 +78,15 @@ public interface Codec {
 
     int constructorIndex(MethodInfo methodInfo);
 
+    int subTypeIndex(TypeInfo typeInfo);
+
     boolean isList(EncodedValue encodedValue);
+
+    interface DI {
+        Codec codec();
+
+        Context context();
+    }
 
     record EncodedPropertyValue(String key, EncodedValue encodedValue) {
     }
@@ -73,13 +94,13 @@ public interface Codec {
     record PropertyValue(Property property, Value value) {
     }
 
-    default EncodedPropertyValue encode(Property property, Value value) {
-        EncodedValue encodedValue = value.encode(this);
+    default EncodedPropertyValue encode(Context context, Property property, Value value) {
+        EncodedValue encodedValue = value.encode(this, context);
         return new EncodedPropertyValue(property.key(), encodedValue);
     }
 
     interface DecoderProvider {
-        BiFunction<Codec, EncodedValue, Value> decoder(Class<? extends Value> clazz);
+        BiFunction<DI, EncodedValue, Value> decoder(Class<? extends Value> clazz);
     }
 
     interface TypeProvider {
@@ -100,8 +121,9 @@ public interface Codec {
     interface EncodedValue {
     }
 
-    Stream<PropertyValue> decode(PropertyValueMap pvm, Stream<EncodedPropertyValue> encodedPropertyValueStream);
+    Stream<PropertyValue> decode(Context context, PropertyValueMap pvm, Stream<EncodedPropertyValue> encodedPropertyValueStream);
 
-    EncodedValue encode(Info info, int index, Stream<EncodedPropertyValue> encodedPropertyValueStream);
+    EncodedValue encode(Context context, Info info, String index, Stream<EncodedPropertyValue> encodedPropertyValueStream,
+                        List<EncodedValue> subs);
 }
 

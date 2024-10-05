@@ -13,9 +13,9 @@ import java.util.stream.Collectors;
 
 public abstract class ValueImpl implements Value {
 
-    private static final Map<Class<? extends Value>, BiFunction<Codec, Codec.EncodedValue, Value>> decoderMap = new HashMap<>();
+    private static final Map<Class<? extends Value>, BiFunction<Codec.DI, Codec.EncodedValue, Value>> decoderMap = new HashMap<>();
 
-    public static BiFunction<Codec, Codec.EncodedValue, Value> decoder(Class<? extends Value> clazz) {
+    public static BiFunction<Codec.DI, Codec.EncodedValue, Value> decoder(Class<? extends Value> clazz) {
         return decoderMap.get(clazz);
     }
 
@@ -65,8 +65,8 @@ public abstract class ValueImpl implements Value {
         }
 
         @Override
-        public Codec.EncodedValue encode(Codec codec) {
-            return codec.encodeInt(value);
+        public Codec.EncodedValue encode(Codec codec, Codec.Context context) {
+            return codec.encodeInt(context, value);
         }
 
         @Override
@@ -89,7 +89,7 @@ public abstract class ValueImpl implements Value {
     }
 
     static {
-        decoderMap.put(BoolImpl.class, (codec, encodedValue) -> BoolImpl.from(codec.decodeInt(encodedValue)));
+        decoderMap.put(BoolImpl.class, (di, encodedValue) -> BoolImpl.from(di.codec().decodeInt(di.context(), encodedValue)));
     }
 
     public record ParameterParSeqImpl(ParSeq<ParameterInfo> parSeq) implements Value.ParameterParSeq {
@@ -106,7 +106,7 @@ public abstract class ValueImpl implements Value {
         });
 
         @Override
-        public Codec.EncodedValue encode(Codec codec) {
+        public Codec.EncodedValue encode(Codec codec, Codec.Context context) {
             throw new UnsupportedOperationException();
         }
     }
@@ -116,9 +116,9 @@ public abstract class ValueImpl implements Value {
         public static final CommutableData BLANK = new ValueImpl.CommutableDataImpl("", "", "");
 
         @Override
-        public Codec.EncodedValue encode(Codec codec) {
-            return codec.encodeList(List.of(codec.encodeString(seq), codec.encodeString(par),
-                    codec.encodeString(multi)));
+        public Codec.EncodedValue encode(Codec codec, Codec.Context context) {
+            return codec.encodeList(context, List.of(codec.encodeString(context, seq), codec.encodeString(context, par),
+                    codec.encodeString(context, multi)));
         }
 
         @Override
@@ -128,10 +128,11 @@ public abstract class ValueImpl implements Value {
     }
 
     static {
-        decoderMap.put(CommutableDataImpl.class, (codec, encodedValue) -> {
-            List<Codec.EncodedValue> list = codec.decodeList(encodedValue);
-            return new CommutableDataImpl(codec.decodeString(list.get(0)), codec.decodeString(list.get(1)),
-                    codec.decodeString(list.get(2)));
+        decoderMap.put(CommutableDataImpl.class, (di, encodedValue) -> {
+            List<Codec.EncodedValue> list = di.codec().decodeList(di.context(), encodedValue);
+            return new CommutableDataImpl(di.codec().decodeString(di.context(), list.get(0)),
+                    di.codec().decodeString(di.context(), list.get(1)),
+                    di.codec().decodeString(di.context(), list.get(2)));
         });
     }
 
@@ -194,8 +195,8 @@ public abstract class ValueImpl implements Value {
         }
 
         @Override
-        public Codec.EncodedValue encode(Codec codec) {
-            return codec.encodeInt(value);
+        public Codec.EncodedValue encode(Codec codec, Codec.Context context) {
+            return codec.encodeInt(context, value);
         }
 
         @Override
@@ -230,7 +231,8 @@ public abstract class ValueImpl implements Value {
     }
 
     static {
-        decoderMap.put(ImmutableImpl.class, (codec, encodedValue) -> ImmutableImpl.from(codec.decodeInt(encodedValue)));
+        decoderMap.put(ImmutableImpl.class, (di, encodedValue) ->
+                ImmutableImpl.from(di.codec().decodeInt(di.context(), encodedValue)));
     }
 
     public static final int INDEX_RETURN_VALUE = -1;
@@ -307,12 +309,12 @@ public abstract class ValueImpl implements Value {
         }
 
         @Override
-        public Codec.EncodedValue encode(Codec codec) {
-            if (linkToParametersReturnValue.isEmpty()) return codec.encodeInt(value);
+        public Codec.EncodedValue encode(Codec codec, Codec.Context context) {
+            if (linkToParametersReturnValue.isEmpty()) return codec.encodeInt(context, value);
             Map<Codec.EncodedValue, Codec.EncodedValue> encodedMap = linkToParametersReturnValue.entrySet().stream()
-                    .collect(Collectors.toUnmodifiableMap(e -> codec.encodeString("" + e.getKey()),
-                            e -> codec.encodeInt(e.getValue())));
-            return codec.encodeList(List.of(codec.encodeInt(value), codec.encodeMap(encodedMap)));
+                    .collect(Collectors.toUnmodifiableMap(e -> codec.encodeString(context, "" + e.getKey()),
+                            e -> codec.encodeInt(context, e.getValue())));
+            return codec.encodeList(context, List.of(codec.encodeInt(context, value), codec.encodeMap(context, encodedMap)));
         }
 
         @Override
@@ -375,46 +377,47 @@ public abstract class ValueImpl implements Value {
         }
     }
 
-    public static Independent decodeIndependentImpl(Codec codec, Codec.EncodedValue encodedValue) {
+    public static Independent decodeIndependentImpl(Codec codec, Codec.Context context, Codec.EncodedValue encodedValue) {
         if (codec.isList(encodedValue)) {
-            List<Codec.EncodedValue> encodedList = codec.decodeList(encodedValue);
-            int value = codec.decodeInt(encodedList.get(0));
-            Map<Codec.EncodedValue, Codec.EncodedValue> encodedMap = codec.decodeMap(encodedList.get(1));
+            List<Codec.EncodedValue> encodedList = codec.decodeList(context, encodedValue);
+            int value = codec.decodeInt(context, encodedList.get(0));
+            Map<Codec.EncodedValue, Codec.EncodedValue> encodedMap = codec.decodeMap(context, encodedList.get(1));
             Map<Integer, Integer> map = encodedMap.entrySet().stream().collect(Collectors.toUnmodifiableMap(
-                    e -> Integer.parseInt(codec.decodeString(e.getKey())),
-                    e -> codec.decodeInt(e.getValue())));
+                    e -> Integer.parseInt(codec.decodeString(context, e.getKey())),
+                    e -> codec.decodeInt(context, e.getValue())));
             return new IndependentImpl(value, map);
         }
-        return IndependentImpl.from(codec.decodeInt(encodedValue));
+        return IndependentImpl.from(codec.decodeInt(context, encodedValue));
     }
 
     static {
-        decoderMap.put(IndependentImpl.class, ValueImpl::decodeIndependentImpl);
+        decoderMap.put(IndependentImpl.class, (di, ev) -> decodeIndependentImpl(di.codec(), di.context(), ev));
     }
 
     public record FieldValueImpl(FieldInfo field) implements FieldValue {
         public static final FieldValue EMPTY = new FieldValueImpl(null);
 
         @Override
-        public Codec.EncodedValue encode(Codec codec) {
-            return codec.encodeInfo(field, codec.fieldIndex(field));
+        public Codec.EncodedValue encode(Codec codec, Codec.Context context) {
+            return codec.encodeInfo(context, field, "" + codec.fieldIndex(field));
         }
     }
 
     static {
-        decoderMap.put(FieldValueImpl.class, (codec, encodedValue)
-                -> new FieldValueImpl(codec.decodeFieldInfo(encodedValue)));
+        decoderMap.put(FieldValueImpl.class, (di, encodedValue)
+                -> new FieldValueImpl(di.codec().decodeFieldInfo(di.context(), encodedValue)));
     }
 
     public record FieldBooleanMapImpl(Map<FieldInfo, Boolean> map) implements FieldBooleanMap {
         public static final FieldBooleanMap EMPTY = new FieldBooleanMapImpl(Map.of());
 
         @Override
-        public Codec.EncodedValue encode(Codec codec) {
+        public Codec.EncodedValue encode(Codec codec, Codec.Context context) {
             Map<Codec.EncodedValue, Codec.EncodedValue> encodedMap = map.entrySet().stream()
-                    .collect(Collectors.toUnmodifiableMap(e -> codec.encodeInfo(e.getKey(), codec.fieldIndex(e.getKey())),
-                            e -> codec.encodeBoolean(e.getValue())));
-            return codec.encodeMap(encodedMap);
+                    .collect(Collectors.toUnmodifiableMap(
+                            e -> codec.encodeInfo(context, e.getKey(), "" + codec.fieldIndex(e.getKey())),
+                            e -> codec.encodeBoolean(context, e.getValue())));
+            return codec.encodeMap(context, encodedMap);
         }
 
         @Override
@@ -425,11 +428,11 @@ public abstract class ValueImpl implements Value {
     }
 
     static {
-        decoderMap.put(FieldBooleanMapImpl.class, (codec, encodedValue) -> {
-            Map<FieldInfo, Boolean> decodedMap = codec.decodeMap(encodedValue)
+        decoderMap.put(FieldBooleanMapImpl.class, (di, encodedValue) -> {
+            Map<FieldInfo, Boolean> decodedMap = di.codec().decodeMap(di.context(), encodedValue)
                     .entrySet().stream().collect(Collectors.toUnmodifiableMap(
-                            e -> codec.decodeFieldInfo(e.getKey()),
-                            e -> codec.decodeBoolean(e.getValue())));
+                            e -> di.codec().decodeFieldInfo(di.context(), e.getKey()),
+                            e -> di.codec().decodeBoolean(di.context(), e.getValue())));
             return new FieldBooleanMapImpl(decodedMap);
         });
     }
@@ -438,11 +441,11 @@ public abstract class ValueImpl implements Value {
         public static final VariableBooleanMap EMPTY = new VariableBooleanMapImpl(Map.of());
 
         @Override
-        public Codec.EncodedValue encode(Codec codec) {
+        public Codec.EncodedValue encode(Codec codec, Codec.Context context) {
             Map<Codec.EncodedValue, Codec.EncodedValue> encodedMap = map.entrySet().stream()
-                    .collect(Collectors.toUnmodifiableMap(e -> codec.encodeVariable(e.getKey()),
-                            e -> codec.encodeBoolean(e.getValue())));
-            return codec.encodeMap(encodedMap);
+                    .collect(Collectors.toUnmodifiableMap(e -> codec.encodeVariable(context, e.getKey()),
+                            e -> codec.encodeBoolean(context, e.getValue())));
+            return codec.encodeMap(context, encodedMap);
         }
 
         @Override
@@ -453,11 +456,11 @@ public abstract class ValueImpl implements Value {
     }
 
     static {
-        decoderMap.put(VariableBooleanMapImpl.class, (codec, encodedValue) -> {
-            Map<Variable, Boolean> decodedMap = codec.decodeMap(encodedValue)
+        decoderMap.put(VariableBooleanMapImpl.class, (di, encodedValue) -> {
+            Map<Variable, Boolean> decodedMap = di.codec().decodeMap(di.context(), encodedValue)
                     .entrySet().stream().collect(Collectors.toUnmodifiableMap(
-                            e -> codec.decodeVariable(e.getKey()),
-                            e -> codec.decodeBoolean(e.getValue())));
+                            e -> di.codec().decodeVariable(di.context(), e.getKey()),
+                            e -> di.codec().decodeBoolean(di.context(), e.getValue())));
             return new VariableBooleanMapImpl(decodedMap);
         });
     }
@@ -466,17 +469,18 @@ public abstract class ValueImpl implements Value {
         public static final AssignedToField EMPTY = new AssignedToFieldImpl(Set.of());
 
         @Override
-        public Codec.EncodedValue encode(Codec codec) {
-            Set<Codec.EncodedValue> set = fields.stream().map(fi -> codec.encodeInfo(fi, codec.fieldIndex(fi)))
-                    .collect(Collectors.toUnmodifiableSet());
-            return codec.encodeSet(set);
+        public Codec.EncodedValue encode(Codec codec, Codec.Context context) {
+            Set<Codec.EncodedValue> set = fields.stream().map(fi -> codec.encodeInfo(context, fi,
+                    "" + codec.fieldIndex(fi))).collect(Collectors.toUnmodifiableSet());
+            return codec.encodeSet(context, set);
         }
     }
 
     static {
-        decoderMap.put(AssignedToFieldImpl.class, (codec, encodedValue) -> {
-            Set<FieldInfo> decodedSet = codec.decodeSet(encodedValue).stream()
-                    .map(codec::decodeFieldInfo).collect(Collectors.toUnmodifiableSet());
+        decoderMap.put(AssignedToFieldImpl.class, (di, encodedValue) -> {
+            Set<FieldInfo> decodedSet = di.codec().decodeSet(di.context(), encodedValue).stream()
+                    .map(e -> di.codec().decodeFieldInfo(di.context(), e))
+                    .collect(Collectors.toUnmodifiableSet());
             return new AssignedToFieldImpl(decodedSet);
         });
     }
@@ -485,20 +489,21 @@ public abstract class ValueImpl implements Value {
         public static final PostConditions EMPTY = new PostConditionsImpl(Map.of());
 
         @Override
-        public Codec.EncodedValue encode(Codec codec) {
+        public Codec.EncodedValue encode(Codec codec, Codec.Context context) {
             Map<Codec.EncodedValue, Codec.EncodedValue> encodedMap = byIndex.entrySet().stream()
-                    .collect(Collectors.toUnmodifiableMap(e -> codec.encodeString(e.getKey()),
-                            e -> codec.encodeExpression(e.getValue())));
-            return codec.encodeMap(encodedMap);
+                    .collect(Collectors.toUnmodifiableMap(
+                            e -> codec.encodeString(context, e.getKey()),
+                            e -> codec.encodeExpression(context, e.getValue())));
+            return codec.encodeMap(context, encodedMap);
         }
     }
 
     static {
-        decoderMap.put(PostConditionsImpl.class, (codec, encodedValue) -> {
-            Map<String, Expression> decodeMap = codec.decodeMap(encodedValue).entrySet().stream()
+        decoderMap.put(PostConditionsImpl.class, (di, encodedValue) -> {
+            Map<String, Expression> decodeMap = di.codec().decodeMap(di.context(), encodedValue).entrySet().stream()
                     .collect(Collectors.toUnmodifiableMap(
-                            e -> codec.decodeString(e.getKey()),
-                            e -> codec.decodeExpression(e.getValue())));
+                            e -> di.codec().decodeString(di.context(), e.getKey()),
+                            e -> di.codec().decodeExpression(di.context(), e.getValue())));
             return new PostConditionsImpl(decodeMap);
         });
     }
@@ -507,30 +512,33 @@ public abstract class ValueImpl implements Value {
         public static final Precondition EMPTY = new PreconditionImpl(null);
 
         @Override
-        public Codec.EncodedValue encode(Codec codec) {
-            return codec.encodeExpression(expression);
+        public Codec.EncodedValue encode(Codec codec, Codec.Context context) {
+            return codec.encodeExpression(context, expression);
         }
     }
 
     static {
-        decoderMap.put(PreconditionImpl.class, (codec, encodedValue) ->
-                new PreconditionImpl(codec.decodeExpression(encodedValue)));
+        decoderMap.put(PreconditionImpl.class, (di, encodedValue) ->
+                new PreconditionImpl(di.codec().decodeExpression(di.context(), encodedValue)));
     }
 
     public record IndicesOfEscapesImpl(Set<String> indices) implements IndicesOfEscapes {
         public static final IndicesOfEscapes EMPTY = new IndicesOfEscapesImpl(Set.of());
 
         @Override
-        public Codec.EncodedValue encode(Codec codec) {
-            Set<Codec.EncodedValue> set = indices.stream().map(codec::encodeString).collect(Collectors.toUnmodifiableSet());
-            return codec.encodeSet(set);
+        public Codec.EncodedValue encode(Codec codec, Codec.Context context) {
+            Set<Codec.EncodedValue> set = indices.stream()
+                    .map(string -> codec.encodeString(context, string))
+                    .collect(Collectors.toUnmodifiableSet());
+            return codec.encodeSet(context, set);
         }
     }
 
     static {
-        decoderMap.put(IndicesOfEscapesImpl.class, (codec, encodedValue) -> {
-            Set<String> indices = codec.decodeSet(encodedValue).stream()
-                    .map(codec::decodeString).collect(Collectors.toUnmodifiableSet());
+        decoderMap.put(IndicesOfEscapesImpl.class, (di, encodedValue) -> {
+            Set<String> indices = di.codec().decodeSet(di.context(), encodedValue).stream()
+                    .map(e -> di.codec().decodeString(di.context(), e))
+                    .collect(Collectors.toUnmodifiableSet());
             return new IndicesOfEscapesImpl(indices);
         });
     }
@@ -540,20 +548,23 @@ public abstract class ValueImpl implements Value {
         public static final GetSetEquivalent EMPTY = new GetSetEquivalentImpl(Set.of(), null);
 
         @Override
-        public Codec.EncodedValue encode(Codec codec) {
-            Set<Codec.EncodedValue> set = convertToGetSet.stream().map(codec::encodeVariable)
+        public Codec.EncodedValue encode(Codec codec, Codec.Context context) {
+            Set<Codec.EncodedValue> set = convertToGetSet.stream()
+                    .map(v -> codec.encodeVariable(context, v))
                     .collect(Collectors.toUnmodifiableSet());
-            return codec.encodeList(List.of(codec.encodeSet(set), codec.encodeInfo(methodWithoutParameters,
-                    codec.methodIndex(methodWithoutParameters))));
+            return codec.encodeList(context, List.of(codec.encodeSet(context, set),
+                    codec.encodeInfo(context, methodWithoutParameters,
+                            "" + codec.methodIndex(methodWithoutParameters))));
         }
     }
 
     static {
-        decoderMap.put(GetSetEquivalentImpl.class, (codec, encodedValue) -> {
-            List<Codec.EncodedValue> list = codec.decodeList(encodedValue);
-            Set<ParameterInfo> set = codec.decodeSet(list.get(0)).stream()
-                    .map(codec::decodeParameterInfo).collect(Collectors.toUnmodifiableSet());
-            return new GetSetEquivalentImpl(set, codec.decodeMethodInfo(list.get(1)));
+        decoderMap.put(GetSetEquivalentImpl.class, (di, encodedValue) -> {
+            List<Codec.EncodedValue> list = di.codec().decodeList(di.context(), encodedValue);
+            Set<ParameterInfo> set = di.codec().decodeSet(di.context(), list.get(0)).stream()
+                    .map(e -> di.codec().decodeParameterInfo(di.context(), e))
+                    .collect(Collectors.toUnmodifiableSet());
+            return new GetSetEquivalentImpl(set, di.codec().decodeMethodInfo(di.context(), list.get(1)));
         });
     }
 
@@ -585,8 +596,8 @@ public abstract class ValueImpl implements Value {
         }
 
         @Override
-        public Codec.EncodedValue encode(Codec codec) {
-            return codec.encodeInt(value);
+        public Codec.EncodedValue encode(Codec codec, Codec.Context context) {
+            return codec.encodeInt(context, value);
         }
 
         @Override
@@ -605,13 +616,14 @@ public abstract class ValueImpl implements Value {
     }
 
     static {
-        decoderMap.put(NotNullImpl.class, (codec, encodedValue) -> NotNullImpl.from(codec.decodeInt(encodedValue)));
+        decoderMap.put(NotNullImpl.class, (di, encodedValue) ->
+                NotNullImpl.from(di.codec().decodeInt(di.context(), encodedValue)));
     }
 
     public record SetOfInfoImpl(Set<? extends Info> infoSet) implements SetOfInfo {
 
         @Override
-        public Codec.EncodedValue encode(Codec codec) {
+        public Codec.EncodedValue encode(Codec codec, Codec.Context context) {
             List<Codec.EncodedValue> encodedValues = infoSet.stream()
                     .sorted(Comparator.comparing(Info::fullyQualifiedName))
                     .map(info -> {
@@ -625,19 +637,20 @@ public abstract class ValueImpl implements Value {
                             }
                         } else if (info instanceof FieldInfo fieldInfo) index = codec.fieldIndex(fieldInfo);
                         else throw new UnsupportedOperationException();
-                        return codec.encodeInfo(info, index);
+                        return codec.encodeInfo(context, info, "" + index);
                     }).toList();
-            return codec.encodeList(encodedValues);
+            return codec.encodeList(context, encodedValues);
         }
 
-        public static SetOfInfo from(Codec codec, Codec.EncodedValue encodedList) {
-            List<Codec.EncodedValue> encodedValues = codec.decodeList(encodedList);
-            Set<Info> set = encodedValues.stream().map(codec::decodeInfo).collect(Collectors.toUnmodifiableSet());
+        public static SetOfInfo from(Codec codec, Codec.Context context, Codec.EncodedValue encodedList) {
+            List<Codec.EncodedValue> encodedValues = codec.decodeList(context, encodedList);
+            Set<Info> set = encodedValues.stream().map(e -> codec.decodeInfo(context, e))
+                    .collect(Collectors.toUnmodifiableSet());
             return new SetOfInfoImpl(set);
         }
     }
 
     static {
-        decoderMap.put(SetOfInfoImpl.class, (SetOfInfoImpl::from));
+        decoderMap.put(SetOfInfoImpl.class, (di, ev) -> SetOfInfoImpl.from(di.codec(), di.context(), ev));
     }
 }

@@ -30,17 +30,18 @@ public class TestValueImpl {
 
     @Test
     public void test() {
+        Codec.Context context = new CodecImpl.ContextImpl();
         ValueImpl.IndependentImpl i = new ValueImpl.IndependentImpl(1, Map.of(0, 0));
         assertEquals("@Independent(hc=true, dependentParameters={0})", i.toString());
-        Codec.EncodedValue ev = i.encode(codec);
+        Codec.EncodedValue ev = i.encode(codec, context);
         assertEquals("[1,{\"0\":0}]", ev.toString());
 
-        Value.Independent i2 = decodeIndependent(codec, ev);
+        Value.Independent i2 = decodeIndependent(codec, context, ev);
         assertTrue(i2.isIndependentHc());
         assertEquals(0, i2.linkToParametersReturnValue().get(0));
     }
 
-    private Value.Independent decodeIndependent(CodecImpl codec, Codec.EncodedValue ev) {
+    private Value.Independent decodeIndependent(CodecImpl codec, Codec.Context context, Codec.EncodedValue ev) {
         JSONParser parser = new JSONParser("{\"a\":" + ev + "}");
         parser.Root();
         Node root = parser.rootNode();
@@ -52,7 +53,7 @@ public class TestValueImpl {
                 if (kvp.get(2) instanceof Array a) {
                     assertEquals(ev.toString(), a.getSource());
                     CodecImpl.D d = new CodecImpl.D(a);
-                    return ValueImpl.decodeIndependentImpl(codec, d);
+                    return ValueImpl.decodeIndependentImpl(codec, context, d);
                 } else fail();
             }
         }
@@ -63,10 +64,11 @@ public class TestValueImpl {
     public void test2() {
         ValueImpl.IndependentImpl i = new ValueImpl.IndependentImpl(1, Map.of(-1, 1, 1, 1));
         assertEquals("@Independent(hc=true, hcReturnValue=true, hcParameters={1})", i.toString());
+        Codec.Context context = new CodecImpl.ContextImpl();
 
-        Codec.EncodedValue ev = i.encode(codec);
+        Codec.EncodedValue ev = i.encode(codec, context);
         assertEquals("[1,{\"-1\":1,\"1\":1}]", ev.toString());
-        Value.Independent i2 = decodeIndependent(codec, ev);
+        Value.Independent i2 = decodeIndependent(codec, context, ev);
         assertTrue(i2.isIndependentHc());
         assertEquals(1, i2.linkToParametersReturnValue().get(1));
         assertEquals(1, i2.linkToParametersReturnValue().get(-1));

@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.Set;
 
 public interface Value extends Comparable<Value> {
-    Codec.EncodedValue encode(Codec codec);
+    Codec.EncodedValue encode(Codec codec, Codec.Context context);
 
     @Override
     default int compareTo(Value o) {
