@@ -122,7 +122,7 @@ public class CodecImpl implements Codec {
     @Override
     public FieldInfo decodeFieldInfo(Context context, EncodedValue encodedValue) {
         if (encodedValue instanceof D d && d.s instanceof StringLiteral sl) {
-            String source = sl.getSource();
+            String source = unquote(sl.getSource());
             assert 'F' == source.charAt(0);
             String rest = source.substring(1);
             return decodeFieldInfo(context, rest);

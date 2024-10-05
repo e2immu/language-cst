@@ -5,10 +5,7 @@ import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.type.TypeNature;
 import org.e2immu.language.cst.api.type.TypeParameter;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
 public class TypeInspectionImpl extends InspectionImpl implements TypeInspection {
@@ -250,9 +247,10 @@ public class TypeInspectionImpl extends InspectionImpl implements TypeInspection
 
         @Override
         public void commit() {
+            List<TypeInfo> sortedSubTypes = subTypes.stream().sorted(Comparator.comparing(TypeInfo::simpleName)).toList();
             TypeInspection ti = new TypeInspectionImpl(this, Set.copyOf(typeModifiers), List.copyOf(methods),
                     List.copyOf(constructors), List.copyOf(fields), parentClass, typeNature, singleAbstractMethod,
-                    List.copyOf(interfacesImplemented), List.copyOf(typeParameters), List.copyOf(subTypes),
+                    List.copyOf(interfacesImplemented), List.copyOf(typeParameters), sortedSubTypes,
                     fieldsAccessedInRestOfPrimaryType, enclosingMethod, List.copyOf(permittedWhenSealed),
                     Set.copyOf(superTypesExcludingJavaLangObject));
             typeInfo.commit(ti);
