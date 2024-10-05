@@ -19,6 +19,8 @@ public interface Codec {
 
         boolean isEmpty();
 
+        boolean methodBeforeType();
+
         Info pop();
 
         Info peek(int stepsBack);

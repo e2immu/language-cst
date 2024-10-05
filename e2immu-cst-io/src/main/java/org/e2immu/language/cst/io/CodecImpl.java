@@ -545,5 +545,15 @@ public class CodecImpl implements Codec {
             }
             return null;
         }
+
+        @Override
+        public boolean methodBeforeType() {
+            for (int i = 0; i < stack.size(); i++) {
+                Info peek = peek(i);
+                if (peek instanceof TypeInfo) return false;
+                if (peek instanceof MethodInfo) return true;
+            }
+            return false;
+        }
     }
 }
