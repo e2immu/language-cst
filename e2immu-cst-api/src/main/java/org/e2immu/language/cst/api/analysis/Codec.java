@@ -36,6 +36,8 @@ public interface Codec {
 
     FieldInfo decodeFieldInfo(Context context, EncodedValue encodedValue);
 
+    Info decodeInfo(Context context, char type, String name);
+
     Info decodeInfo(Context context, EncodedValue ev);
 
     TypeInfo decodeTypeinfo(Context context, EncodedValue ev);

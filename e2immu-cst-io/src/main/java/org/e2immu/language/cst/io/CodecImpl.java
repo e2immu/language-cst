@@ -74,17 +74,22 @@ public class CodecImpl implements Codec {
                         ((E) sub0).write(writer, tab + 1, true);
                     }
                 } else {
-                    writer.write(", \"subs\":[");
+                    StringWriter sw = new StringWriter();
                     boolean first = true;
-
+                    boolean wrote = false;
                     for (EncodedValue sub : subs) {
                         if (sub != null) {
                             if (first) first = false;
-                            else writer.write(",");
-                            ((E) sub).write(writer, tab + 1, true);
+                            else sw.append(",");
+                            ((E) sub).write(sw, tab + 1, true);
+                            wrote = true;
                         }
                     }
-                    writer.write("]");
+                    if (wrote) {
+                        writer.write(", \"subs\":[");
+                        writer.write(sw.toString());
+                        writer.write("]");
+                    }
                 }
             }
             if (surround) writer.write("}");
@@ -135,10 +140,27 @@ public class CodecImpl implements Codec {
         Matcher m = NAME_INDEX_PATTERN.matcher(nameIndex);
         if (m.matches()) {
             int index = Integer.parseInt(m.group(2));
-            TypeInfo subType = context.currentType().subTypes().get(index);
+            TypeInfo typeInfo = context.currentType();
+            assert typeInfo != null;
+            TypeInfo subType = typeInfo.subTypes().get(index);
             assert subType.simpleName().equals(m.group(1));
             return subType;
-        } else throw new UnsupportedOperationException();
+        } else {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    @Override
+    public Info decodeInfo(Context context, char type, String name) {
+        return switch (type) {
+            case 'F' -> decodeFieldInfo(context, name);
+            case 'C' -> decodeConstructor(context, name);
+            case 'M' -> decodeMethodInfo(context, name);
+            case 'T' -> typeProvider.get(name);
+            case 'S' -> decodeSubType(context, name);
+            case 'P' -> decodeParameterInfo(context, name);
+            default -> throw new UnsupportedOperationException();
+        };
     }
 
     @Override
@@ -147,15 +169,7 @@ public class CodecImpl implements Codec {
             String source = unquote(sl.getSource());
             char c0 = source.charAt(0);
             String rest = source.substring(1);
-            return switch (c0) {
-                case 'F' -> decodeFieldInfo(context, rest);
-                case 'C' -> decodeConstructor(context, rest);
-                case 'M' -> decodeMethodInfo(context, rest);
-                case 'T' -> typeProvider.get(rest);
-                case 'S' -> decodeSubType(context, rest);
-                case 'P' -> decodeParameterInfo(context, rest);
-                default -> throw new UnsupportedOperationException("String is " + sl.getSource());
-            };
+            return decodeInfo(context, c0, rest);
         }
         throw new UnsupportedOperationException();
     }
@@ -223,13 +237,13 @@ public class CodecImpl implements Codec {
         }
     }
 
-    private MethodInfo decodeMethodInfo(Context context, String fqnNameIndex) {
-        Matcher m = NAME_INDEX_PATTERN.matcher(fqnNameIndex);
+    private MethodInfo decodeMethodInfo(Context context, String nameIndex) {
+        Matcher m = NAME_INDEX_PATTERN.matcher(nameIndex);
         if (m.matches()) {
-            int index = Integer.parseInt(m.group(3));
+            int index = Integer.parseInt(m.group(2));
             MethodInfo methodInfo = context.currentType().methods().get(index);
             assert !methodInfo.isConstructor();
-            assert methodInfo.name().equals(m.group(2));
+            assert methodInfo.name().equals(m.group(1));
             return methodInfo;
         } else throw new UnsupportedOperationException();
     }
@@ -412,7 +426,7 @@ public class CodecImpl implements Codec {
                 assert context.currentMethod() != null;
                 return "A" + typeInfo.enclosingMethod() + "(" + index + ")";
             }
-            return "S" + typeInfo.simpleName();
+            return "S" + typeInfo.simpleName() + "(" + index + ")";
         }
         assert index != null && !index.isBlank();
         if (info instanceof MethodInfo methodInfo) {
