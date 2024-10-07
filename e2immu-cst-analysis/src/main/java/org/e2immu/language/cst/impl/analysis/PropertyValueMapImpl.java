@@ -5,6 +5,7 @@ import org.e2immu.language.cst.api.analysis.PropertyValueMap;
 import org.e2immu.language.cst.api.analysis.Value;
 import org.e2immu.support.SetOnceMap;
 
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 public class PropertyValueMapImpl implements PropertyValueMap {
@@ -31,6 +32,13 @@ public class PropertyValueMapImpl implements PropertyValueMap {
     @Override
     public <V extends Value> V getOrNull(Property property, Class<? extends V> clazz) {
         return (V) map.getOrDefaultNull(property);
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <V extends Value> V getOrCreate(Property property, Supplier<V> createDefaultValue) {
+        V v = (V) map.getOrDefaultNull(property);
+        return v == null ? createDefaultValue.get() : v;
     }
 
     @Override

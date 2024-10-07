@@ -183,7 +183,7 @@ public class CodecImpl implements Codec {
     @Override
     public int decodeInt(Context context, EncodedValue encodedValue) {
         if (encodedValue instanceof D d && d.s instanceof Literal l) {
-            return Integer.parseInt(l.getSource());
+            return Integer.parseInt(potentiallyUnquote(l.getSource()));
         } else throw new UnsupportedOperationException();
     }
 
@@ -376,6 +376,11 @@ public class CodecImpl implements Codec {
 
     public static String quote(String s) {
         return "\"" + s.replace("\"", "\\\"") + "\"";
+    }
+
+    public static String potentiallyUnquote(String s) {
+        if (!s.isEmpty() && s.charAt(0) == '"') return unquote(s);
+        return s;
     }
 
     public static String unquote(String s) {

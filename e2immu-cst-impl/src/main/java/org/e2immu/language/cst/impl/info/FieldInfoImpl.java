@@ -29,9 +29,6 @@ import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-import static org.e2immu.language.cst.impl.info.InspectionImpl.AccessEnum.PRIVATE;
-import static org.e2immu.language.cst.impl.info.InspectionImpl.AccessEnum.PUBLIC;
-
 public class FieldInfoImpl extends InfoImpl implements FieldInfo {
 
     private final String name;

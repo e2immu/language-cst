@@ -1,16 +1,13 @@
 package org.e2immu.language.cst.impl.analysis;
 
 import org.e2immu.annotation.Modified;
-import org.e2immu.language.cst.api.analysis.Property;
 import org.e2immu.language.cst.api.element.ImportStatement;
 import org.e2immu.language.cst.api.expression.AnnotationExpression;
 import org.e2immu.language.cst.api.info.*;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.runtime.Runtime;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class DecoratorImpl implements Qualification.Decorator {
 

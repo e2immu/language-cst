@@ -18,10 +18,7 @@ import org.e2immu.language.cst.api.variable.DescendMode;
 import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.language.cst.impl.analysis.PropertyImpl;
 import org.e2immu.language.cst.impl.analysis.ValueImpl;
-import org.e2immu.language.cst.impl.element.ElementImpl;
 import org.e2immu.language.cst.impl.translate.TranslationMapImpl;
-import org.e2immu.language.cst.impl.type.TypeParameterImpl;
-import org.e2immu.support.Either;
 import org.e2immu.support.EventuallyFinal;
 
 import java.util.*;

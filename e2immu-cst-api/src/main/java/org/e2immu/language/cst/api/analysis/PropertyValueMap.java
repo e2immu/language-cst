@@ -1,5 +1,6 @@
 package org.e2immu.language.cst.api.analysis;
 
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 public interface PropertyValueMap {
@@ -13,6 +14,8 @@ public interface PropertyValueMap {
     <V extends Value> V getOrDefault(Property property, V defaultValue);
 
     <V extends Value> V getOrNull(Property property, Class<? extends V> clazz);
+
+    <V extends Value> V getOrCreate(Property property, Supplier<V> createDefaultValue);
 
     boolean haveAnalyzedValueFor(Property property);
 
