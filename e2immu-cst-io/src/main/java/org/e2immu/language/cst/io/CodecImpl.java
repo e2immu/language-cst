@@ -287,9 +287,7 @@ public class CodecImpl implements Codec {
         Matcher m = NAME_INDEX_PATTERN.matcher(nameIndex);
         if (m.matches()) {
             int index = Integer.parseInt(m.group(2));
-            ParameterInfo parameterInfo = context.currentMethod().parameters().get(index);
-            assert parameterInfo.name().equals(m.group(1));
-            return parameterInfo;
+            return context.currentMethod().parameters().get(index);
         } else throw new UnsupportedOperationException();
     }
 

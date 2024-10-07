@@ -38,7 +38,10 @@ public class PropertyValueMapImpl implements PropertyValueMap {
     @Override
     public <V extends Value> V getOrCreate(Property property, Supplier<V> createDefaultValue) {
         V v = (V) map.getOrDefaultNull(property);
-        return v == null ? createDefaultValue.get() : v;
+        if (v != null) return v;
+        V vv = createDefaultValue.get();
+        map.put(property, vv);
+        return vv;
     }
 
     @Override

@@ -66,6 +66,7 @@ public abstract class ValueImpl implements Value {
 
         @Override
         public Codec.EncodedValue encode(Codec codec, Codec.Context context) {
+            if (value == 0) return null; // no need to encode 0
             return codec.encodeInt(context, value);
         }
 
@@ -196,6 +197,7 @@ public abstract class ValueImpl implements Value {
 
         @Override
         public Codec.EncodedValue encode(Codec codec, Codec.Context context) {
+            if (value <= 0) return null;
             return codec.encodeInt(context, value);
         }
 
@@ -310,7 +312,10 @@ public abstract class ValueImpl implements Value {
 
         @Override
         public Codec.EncodedValue encode(Codec codec, Codec.Context context) {
-            if (linkToParametersReturnValue.isEmpty()) return codec.encodeInt(context, value);
+            if (linkToParametersReturnValue.isEmpty()) {
+                if (value == 0) return null;
+                return codec.encodeInt(context, value);
+            }
             Map<Codec.EncodedValue, Codec.EncodedValue> encodedMap = linkToParametersReturnValue.entrySet().stream()
                     .collect(Collectors.toUnmodifiableMap(e -> codec.encodeString(context, "" + e.getKey()),
                             e -> codec.encodeInt(context, e.getValue())));
@@ -596,6 +601,7 @@ public abstract class ValueImpl implements Value {
 
         @Override
         public Codec.EncodedValue encode(Codec codec, Codec.Context context) {
+            if (value <= 0) return null;
             return codec.encodeInt(context, value);
         }
 
