@@ -7,6 +7,7 @@ import org.e2immu.language.cst.api.info.ParameterInfo;
 import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.runtime.Predefined;
 import org.e2immu.language.cst.api.type.ParameterizedType;
+import org.e2immu.language.cst.impl.element.SourceImpl;
 import org.e2immu.language.cst.impl.expression.AnnotationExpressionImpl;
 import org.e2immu.language.cst.impl.element.CompilationUnitImpl;
 import org.e2immu.language.cst.impl.info.InspectionImpl;
@@ -214,30 +215,33 @@ public class PredefinedImpl implements Predefined {
         Set<TypeInfo> primitives = Set.of(booleanTypeInfo, byteTypeInfo, doubleTypeInfo, floatTypeInfo,
                 longTypeInfo, shortTypeInfo, voidTypeInfo, intTypeInfo, charTypeInfo);
         for (TypeInfo ti : primitives) {
-            TypeInfo.Builder builder = ti.builder();
-            ti.builder().setAccess(InspectionImpl.AccessEnum.PUBLIC);
-            builder.setTypeNature(TypeNatureEnum.PRIMITIVE);
-            builder.commit();
+            ti.builder()
+                    .setAccess(InspectionImpl.AccessEnum.PUBLIC)
+                    .setTypeNature(TypeNatureEnum.PRIMITIVE)
+                    .setSource(SourceImpl.forCompiledClass(JAVA_PRIMITIVE))
+                    .commit();
             primitiveByName.put(ti.simpleName(), ti);
         }
         List<TypeInfo> objects = new ArrayList<>();
         for (TypeInfo ti : List.of(stringTypeInfo, objectTypeInfo, classTypeInfo, functionalInterface)) {
-            ti.builder().setAccess(InspectionImpl.AccessEnum.PUBLIC);
-            ti.builder().setTypeNature(TypeNatureEnum.CLASS);
+            ti.builder().setAccess(InspectionImpl.AccessEnum.PUBLIC)
+                    .setTypeNature(TypeNatureEnum.CLASS)
+                    .setSource(SourceImpl.forCompiledClass(JAVA_LANG));
             if (ti != objectTypeInfo) {
                 ti.builder().setParentClass(objectParameterizedType);
             }
             objects.add(ti);
         }
         for (TypeInfo ti : List.of(functionalInterface)) {
-            ti.builder().setAccess(InspectionImpl.AccessEnum.PUBLIC);
-            ti.builder().setTypeNature(TypeNatureEnum.ANNOTATION);
+            ti.builder().setAccess(InspectionImpl.AccessEnum.PUBLIC)
+                    .setTypeNature(TypeNatureEnum.ANNOTATION);
         }
         Set<TypeInfo> boxed = Set.of(boxedBooleanTypeInfo, boxedByteTypeInfo, boxedDoubleTypeInfo, boxedFloatTypeInfo,
                 boxedLongTypeInfo, boxedShortTypeInfo, boxedVoidTypeInfo, integerTypeInfo, characterTypeInfo);
         for (TypeInfo ti : boxed) {
-            ti.builder().setAccess(InspectionImpl.AccessEnum.PUBLIC);
-            ti.builder().setTypeNature(TypeNatureEnum.CLASS)
+            ti.builder().setAccess(InspectionImpl.AccessEnum.PUBLIC)
+                    .setSource(SourceImpl.forCompiledClass(JAVA_LANG))
+                    .setTypeNature(TypeNatureEnum.CLASS)
                     .setParentClass(objectParameterizedType);
             objects.add(ti);
         }

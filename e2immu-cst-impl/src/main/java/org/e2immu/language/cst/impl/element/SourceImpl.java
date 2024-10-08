@@ -1,5 +1,6 @@
 package org.e2immu.language.cst.impl.element;
 
+import org.e2immu.language.cst.api.element.CompilationUnit;
 import org.e2immu.language.cst.api.element.Element;
 import org.e2immu.language.cst.api.element.Source;
 
@@ -24,6 +25,15 @@ public class SourceImpl implements Source {
         this.beginPos = (short) beginPos;
         this.endLine = (short) endLine;
         this.endPos = (short) endPos;
+    }
+
+    public static Source forCompiledClass(CompilationUnit compilationUnit) {
+        return new SourceImpl(compilationUnit, null, -1, -1, -1, -1);
+    }
+
+    @Override
+    public boolean isCompiledClass() {
+        return beginLine == -1;
     }
 
     @Override

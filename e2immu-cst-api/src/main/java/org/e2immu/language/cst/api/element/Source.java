@@ -18,6 +18,8 @@ public interface Source extends Comparable<Source> {
     // for statements only
     String index();
 
+    boolean isCompiledClass();
+
     // computations: override if you need to use these frequently
 
     default Info info() {

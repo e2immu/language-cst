@@ -1007,7 +1007,7 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
 
     @Override
     public Source newCompiledClassSource(CompilationUnit compilationUnit) {
-        return new SourceImpl(compilationUnit, "", 0, 0, 0, 0);
+        return SourceImpl.forCompiledClass(compilationUnit);
     }
 
     @Override
