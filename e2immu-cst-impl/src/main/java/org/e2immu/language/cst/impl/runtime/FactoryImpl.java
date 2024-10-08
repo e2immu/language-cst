@@ -12,6 +12,8 @@ import org.e2immu.language.cst.api.runtime.Factory;
 import org.e2immu.language.cst.api.statement.*;
 import org.e2immu.language.cst.api.statement.SwitchEntry;
 import org.e2immu.language.cst.api.translate.TranslationMap;
+import org.e2immu.language.cst.impl.analysis.PropertyImpl;
+import org.e2immu.language.cst.impl.analysis.ValueImpl;
 import org.e2immu.language.cst.impl.element.*;
 import org.e2immu.language.cst.impl.expression.*;
 import org.e2immu.language.cst.impl.expression.util.PrecedenceEnum;
@@ -1008,6 +1010,13 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     @Override
     public Source newCompiledClassSource(CompilationUnit compilationUnit) {
         return SourceImpl.forCompiledClass(compilationUnit);
+    }
+
+    @Override
+    public void setGetSetField(MethodInfo getSetMethod, FieldInfo fieldInfo) {
+        if (!getSetMethod.analysis().haveAnalyzedValueFor(PropertyImpl.GET_SET_FIELD)) {
+            getSetMethod.analysis().set(PropertyImpl.GET_SET_FIELD, new ValueImpl.FieldValueImpl(fieldInfo));
+        }
     }
 
     @Override

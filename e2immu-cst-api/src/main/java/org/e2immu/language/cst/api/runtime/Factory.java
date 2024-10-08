@@ -384,6 +384,8 @@ public interface Factory {
 
     Qualification qualificationSimpleNames();
 
+    void setGetSetField(MethodInfo getSetMethod, FieldInfo fieldInfo);
+
     Split splitNever();
 
     OutputElement symbolColon();
