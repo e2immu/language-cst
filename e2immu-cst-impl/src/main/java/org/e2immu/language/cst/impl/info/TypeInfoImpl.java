@@ -642,7 +642,7 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
         }
         if (change) {
             TypeInfo.Builder builder = typeInfo.builder();
-            newTypeParameters.forEach(builder::addTypeParameter);
+            newTypeParameters.forEach(builder::addOrSetTypeParameter);
             newConstructors.forEach(builder::addConstructor);
             newMethods.forEach(builder::addMethod);
             newSubTypes.forEach(builder::addSubType);

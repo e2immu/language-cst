@@ -234,8 +234,12 @@ public class TypeInspectionImpl extends InspectionImpl implements TypeInspection
         }
 
         @Override
-        public TypeInfo.Builder addTypeParameter(TypeParameter typeParameter) {
-            typeParameters.add(typeParameter);
+        public TypeInfo.Builder addOrSetTypeParameter(TypeParameter typeParameter) {
+            if (typeParameters.size() <= typeParameter.getIndex()) {
+                typeParameters.add(typeParameter);
+            } else {
+                typeParameters.set(typeParameter.getIndex(), typeParameter);
+            }
             return this;
         }
 

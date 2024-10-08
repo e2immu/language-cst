@@ -210,7 +210,7 @@ public interface TypeInfo extends NamedType, Info {
         Builder addInterfaceImplemented(ParameterizedType interfaceImplemented);
 
         @Fluent
-        Builder addTypeParameter(TypeParameter typeParameter);
+        Builder addOrSetTypeParameter(TypeParameter typeParameter);
 
         @Fluent
         Builder setSingleAbstractMethod(MethodInfo singleAbstractMethod);
