@@ -1,12 +1,10 @@
 package org.e2immu.language.cst.impl.analysis;
 
-import org.e2immu.language.cst.api.analysis.Codec;
 import org.e2immu.language.cst.api.analysis.Property;
 
 import java.util.*;
 
 import static org.e2immu.language.cst.impl.analysis.PropertyImpl.*;
-import static org.e2immu.language.cst.impl.analysis.PropertyImpl.MODIFIED_FI_COMPONENTS_PARAMETER;
 
 public class PropertyProviderImpl {
 
@@ -55,7 +53,8 @@ public class PropertyProviderImpl {
                 PRECONDITION_METHOD,
                 SHALLOW_ANALYZER,
                 STATIC_SIDE_EFFECTS_METHOD,
-                MODIFIED_FI_COMPONENTS_PARAMETER
+                MODIFIED_FI_COMPONENTS_PARAMETER,
+                MODIFIED_COMPONENTS_PARAMETER
         );
         properties.forEach(p -> propertyMap.put(p.key(), p));
     }

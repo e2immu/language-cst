@@ -13,6 +13,8 @@ public interface FieldReference extends Variable {
      */
     Expression scope();
 
+    boolean scopeIsRecursively(Variable variable);
+
     /**
      * @return not-null when the <code>scope()</code> expression is a variable
      */

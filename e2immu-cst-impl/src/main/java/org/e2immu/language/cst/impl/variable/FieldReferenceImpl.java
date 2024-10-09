@@ -164,7 +164,7 @@ public class FieldReferenceImpl extends VariableImpl implements FieldReference {
     public Stream<TypeReference> typesReferenced() {
         if (scope != null) {
             Stream<TypeReference> nonDefault = isDefaultScope ? Stream.of()
-                    : Stream.of(new ElementImpl.TypeReference( fieldInfo.owner(), true));
+                    : Stream.of(new ElementImpl.TypeReference(fieldInfo.owner(), true));
             return Stream.concat(nonDefault, Stream.concat(scope.typesReferenced(), parameterizedType().typesReferenced()));
         }
         return parameterizedType().typesReferenced();
@@ -189,6 +189,15 @@ public class FieldReferenceImpl extends VariableImpl implements FieldReference {
     public boolean scopeIsRecursivelyThis() {
         if (scopeIsThis()) return true;
         if (scopeVariable instanceof FieldReference fr) return fr.scopeIsRecursivelyThis();
+        return false;
+    }
+
+    @Override
+    public boolean scopeIsRecursively(Variable variable) {
+        if (variable.equals(scopeVariable)) return true;
+        if (scope instanceof VariableExpression ve && ve.variable() instanceof FieldReference fr) {
+            return fr.scopeIsRecursively(variable);
+        }
         return false;
     }
 
