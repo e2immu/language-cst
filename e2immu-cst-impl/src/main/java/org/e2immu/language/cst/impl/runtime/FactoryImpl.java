@@ -295,6 +295,12 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
+    public DependentVariable newDependentVariable(Variable arrayVariable, ParameterizedType parameterizedType, Variable indexVariable) {
+        return new DependentVariableImpl(newVariableExpression(arrayVariable), arrayVariable,
+                newVariableExpression(indexVariable), indexVariable, parameterizedType);
+    }
+
+    @Override
     public Expression newMultiExpressions(List<Expression> expressions) {
         return new CommaExpressionImpl(List.of(), null, expressions);
     }

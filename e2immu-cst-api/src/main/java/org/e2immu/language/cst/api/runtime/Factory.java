@@ -177,6 +177,9 @@ public interface Factory {
 
     DependentVariable newDependentVariable(Expression array, Expression index);
 
+    // Direct access, useful for synthetic constructs. Preferably use other method.
+    DependentVariable newDependentVariable(Variable arrayVariable, ParameterizedType parameterizedType, Variable indexVariable);
+
     DoStatement.Builder newDoBuilder();
 
     DoubleConstant newDouble(double d);
