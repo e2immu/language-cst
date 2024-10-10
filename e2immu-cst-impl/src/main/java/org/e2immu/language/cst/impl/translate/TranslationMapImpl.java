@@ -7,11 +7,13 @@ import org.e2immu.language.cst.api.info.MethodInfo;
 import org.e2immu.language.cst.api.statement.Statement;
 import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.type.ParameterizedType;
+import org.e2immu.language.cst.api.variable.DependentVariable;
 import org.e2immu.language.cst.api.variable.FieldReference;
 import org.e2immu.language.cst.api.variable.LocalVariable;
 import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.language.cst.impl.expression.VariableExpressionImpl;
 import org.e2immu.language.cst.impl.type.ParameterizedTypeImpl;
+import org.e2immu.language.cst.impl.variable.DependentVariableImpl;
 import org.e2immu.language.cst.impl.variable.FieldReferenceImpl;
 
 import java.util.*;
@@ -291,6 +293,13 @@ public class TranslationMapImpl implements TranslationMap {
             Expression te = lv.assignmentExpression().translate(this);
             if (te != lv.assignmentExpression()) {
                 return lv.withAssignmentExpression(te);
+            }
+        }
+        if(variable instanceof DependentVariable dv) {
+            Expression tArray = dv.arrayExpression().translate(this);
+            Expression tIndex = dv.indexExpression().translate(this);
+            if(tArray != dv.arrayExpression() || tIndex != dv.indexExpression()) {
+                return DependentVariableImpl.create(tArray, tIndex);
             }
         }
         return variable;

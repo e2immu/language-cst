@@ -26,4 +26,7 @@ public interface Variable extends Comparable<Variable>, Element, OneVariable {
     default boolean isStatic() {
         return false;
     }
+
+    default boolean scopeIsRecursively(Variable variable) { return false; }
+
 }

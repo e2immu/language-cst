@@ -195,8 +195,8 @@ public class FieldReferenceImpl extends VariableImpl implements FieldReference {
     @Override
     public boolean scopeIsRecursively(Variable variable) {
         if (variable.equals(scopeVariable)) return true;
-        if (scope instanceof VariableExpression ve && ve.variable() instanceof FieldReference fr) {
-            return fr.scopeIsRecursively(variable);
+        if (scope instanceof VariableExpression ve) {
+            return ve.variable().scopeIsRecursively(variable);
         }
         return false;
     }

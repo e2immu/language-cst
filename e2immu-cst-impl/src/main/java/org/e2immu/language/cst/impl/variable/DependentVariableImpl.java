@@ -147,4 +147,10 @@ public class DependentVariableImpl extends VariableImpl implements DependentVari
     public Expression indexExpression() {
         return indexExpression;
     }
+
+    @Override
+    public boolean scopeIsRecursively(Variable variable) {
+        if (variable.equals(arrayVariable)) return true;
+        return arrayVariable.scopeIsRecursively(variable);
+    }
 }
