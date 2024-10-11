@@ -1019,9 +1019,10 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
-    public void setGetSetField(MethodInfo getSetMethod, FieldInfo fieldInfo) {
+    public void setGetSetField(MethodInfo getSetMethod, FieldInfo fieldInfo, boolean setter, int parameterIndexOfIndex) {
         if (!getSetMethod.analysis().haveAnalyzedValueFor(PropertyImpl.GET_SET_FIELD)) {
-            getSetMethod.analysis().set(PropertyImpl.GET_SET_FIELD, new ValueImpl.FieldValueImpl(fieldInfo));
+            getSetMethod.analysis().set(PropertyImpl.GET_SET_FIELD,
+                    new ValueImpl.GetSetValueImpl(fieldInfo, setter, parameterIndexOfIndex));
         }
     }
 

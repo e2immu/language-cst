@@ -5,8 +5,8 @@ import org.e2immu.language.cst.api.info.FieldInfo;
 import org.e2immu.language.cst.api.info.Info;
 import org.e2immu.language.cst.api.info.MethodInfo;
 import org.e2immu.language.cst.api.info.ParameterInfo;
+import org.e2immu.language.cst.api.runtime.Runtime;
 import org.e2immu.language.cst.api.util.ParSeq;
-import org.e2immu.language.cst.api.variable.FieldReference;
 import org.e2immu.language.cst.api.variable.Variable;
 
 import java.util.Map;
@@ -107,6 +107,16 @@ public interface Value extends Comparable<Value> {
 
     // meant for the "GetSetField" property
     interface FieldValue extends Value {
+        Variable createVariable(Runtime runtime, Expression object, Expression indexOrNull);
+
+        boolean setter();
+
+        int parameterIndexOfIndex();
+
+        default boolean hasIndex() {
+            return parameterIndexOfIndex() >= 0;
+        }
+
         FieldInfo field();
     }
 

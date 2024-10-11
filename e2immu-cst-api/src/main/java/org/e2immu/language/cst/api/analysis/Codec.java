@@ -15,7 +15,7 @@ support for reading and writing the property-value pairs in many elements.
  */
 public interface Codec {
     interface Context {
-        TypeInfo findType(String typeFqn);
+        TypeInfo findType(Codec.TypeProvider typeProvider, String typeFqn);
 
         boolean isEmpty();
 

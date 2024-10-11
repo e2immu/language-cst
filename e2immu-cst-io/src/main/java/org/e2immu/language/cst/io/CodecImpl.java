@@ -260,19 +260,13 @@ public class CodecImpl implements Codec {
         Matcher m = METHOD_PATTERN.matcher(name);
         if (m.matches()) {
             String typeFqn = m.group(1);
-            TypeInfo typeInfo = findType(context, typeFqn);
+            TypeInfo typeInfo =context.findType(typeProvider, typeFqn);
             int index = Integer.parseInt(m.group(3));
             MethodInfo methodInfo = typeInfo.methods().get(index);
             assert methodInfo.name().equals(m.group(2));
             return methodInfo;
         }
         throw new UnsupportedOperationException();
-    }
-
-    private TypeInfo findType(Context context, String fqn) {
-        TypeInfo typeInfo = context.findType(fqn);
-        if (typeInfo != null) return typeInfo;
-        return typeProvider().get(fqn);
     }
 
     private ParameterInfo decodeParameterOutOfContext(Context context, String name) {
@@ -542,11 +536,11 @@ public class CodecImpl implements Codec {
         }
 
         @Override
-        public TypeInfo findType(String typeFqn) {
+        public TypeInfo findType(Codec.TypeProvider typeProvider, String typeFqn) {
             for (int i = 0; i < stack.size(); i++) {
                 if (peek(i) instanceof TypeInfo ti && typeFqn.equals(ti.fullyQualifiedName())) return ti;
             }
-            return null;
+            return typeProvider.get(typeFqn);
         }
 
         @Override

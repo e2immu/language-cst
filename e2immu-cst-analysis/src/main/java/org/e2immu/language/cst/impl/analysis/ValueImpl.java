@@ -4,7 +4,9 @@ import org.e2immu.language.cst.api.analysis.Codec;
 import org.e2immu.language.cst.api.analysis.Value;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.info.*;
+import org.e2immu.language.cst.api.runtime.Runtime;
 import org.e2immu.language.cst.api.util.ParSeq;
+import org.e2immu.language.cst.api.variable.FieldReference;
 import org.e2immu.language.cst.api.variable.Variable;
 
 import java.util.*;
@@ -399,18 +401,43 @@ public abstract class ValueImpl implements Value {
         decoderMap.put(IndependentImpl.class, (di, ev) -> decodeIndependentImpl(di.codec(), di.context(), ev));
     }
 
-    public record FieldValueImpl(FieldInfo field) implements FieldValue {
-        public static final FieldValue EMPTY = new FieldValueImpl(null);
+    public record GetSetValueImpl(FieldInfo field, boolean setter, int parameterIndexOfIndex) implements FieldValue {
+        public static final FieldValue EMPTY = new GetSetValueImpl(null, false, -1);
 
         @Override
         public Codec.EncodedValue encode(Codec codec, Codec.Context context) {
-            return codec.encodeInfo(context, field, "" + codec.fieldIndex(field));
+            List<Codec.EncodedValue> list = new ArrayList<>();
+            list.add(codec.encodeInfo(context, field, "" + codec.fieldIndex(field)));
+            list.add(codec.encodeBoolean(context, setter));
+            if (parameterIndexOfIndex >= 0) {
+                list.add(codec.encodeInt(context, parameterIndexOfIndex));
+            }
+            return codec.encodeList(context, list);
+        }
+
+        @Override
+        public Variable createVariable(Runtime runtime, Expression object, Expression indexOrNull) {
+            assert object != null;
+            FieldReference fieldReference = runtime.newFieldReference(field, object, field.type());
+            if (indexOrNull == null) {
+                // straight: objects
+                return fieldReference;
+            }
+            // indexing: objects[i]
+            return runtime.newDependentVariable(runtime.newVariableExpression(fieldReference), indexOrNull);
         }
     }
 
     static {
-        decoderMap.put(FieldValueImpl.class, (di, encodedValue)
-                -> new FieldValueImpl(di.codec().decodeFieldInfo(di.context(), encodedValue)));
+        decoderMap.put(GetSetValueImpl.class, (di, encodedValue) ->  {
+            Codec codec = di.codec();
+            Codec.Context context = di.context();
+            List<Codec.EncodedValue> list = codec.decodeList(context, encodedValue);
+            FieldInfo field = codec.decodeFieldInfo(context, list.get(0));
+            boolean setter = codec.decodeBoolean(context, list.get(1));
+            int index = list.size() == 2 ? -1 : codec.decodeInt(context, list.get(2));
+            return new GetSetValueImpl(field, setter, index);
+        });
     }
 
     public record FieldBooleanMapImpl(Map<FieldInfo, Boolean> map) implements FieldBooleanMap {
