@@ -389,6 +389,8 @@ public interface Factory {
 
     void setGetSetField(MethodInfo getSetMethod, FieldInfo fieldInfo, boolean setter, int parameterIndexOfIndex);
 
+    void setModificationComponent(MethodInfo methodInfo, FieldInfo component);
+
     Split splitNever();
 
     OutputElement symbolColon();

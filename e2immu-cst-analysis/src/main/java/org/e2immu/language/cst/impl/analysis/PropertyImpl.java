@@ -15,6 +15,8 @@ public class PropertyImpl implements Property {
 
     // method
     public static final Property MODIFIED_METHOD = new PropertyImpl("modifiedMethod");
+    public static final Property MODIFIED_COMPONENTS_METHOD = new PropertyImpl("modifiedComponentsMethod",
+            ValueImpl.VariableBooleanMapImpl.EMPTY);
     public static final Property FLUENT_METHOD = new PropertyImpl("fluentMethod");
     public static final Property IDENTITY_METHOD = new PropertyImpl("identityMethod");
     public static final Property NOT_NULL_METHOD = new PropertyImpl("notNullMethod", ValueImpl.NotNullImpl.NULLABLE);

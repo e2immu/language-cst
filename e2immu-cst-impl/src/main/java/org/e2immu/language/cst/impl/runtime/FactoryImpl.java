@@ -29,6 +29,7 @@ import org.e2immu.language.cst.api.variable.*;
 import org.e2immu.support.Either;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collector;
 
 public class FactoryImpl extends PredefinedImpl implements Factory {
@@ -1023,6 +1024,15 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
         if (!getSetMethod.analysis().haveAnalyzedValueFor(PropertyImpl.GET_SET_FIELD)) {
             getSetMethod.analysis().set(PropertyImpl.GET_SET_FIELD,
                     new ValueImpl.GetSetValueImpl(fieldInfo, setter, parameterIndexOfIndex));
+        }
+    }
+
+    @Override
+    public void setModificationComponent(MethodInfo methodInfo, FieldInfo component) {
+        if (!methodInfo.analysis().haveAnalyzedValueFor(PropertyImpl.MODIFIED_COMPONENTS_METHOD)) {
+            FieldReference fr = newFieldReference(component);
+            ValueImpl.VariableBooleanMapImpl value = new ValueImpl.VariableBooleanMapImpl(Map.of(fr, true));
+            methodInfo.analysis().set(PropertyImpl.MODIFIED_COMPONENTS_METHOD, value);
         }
     }
 
