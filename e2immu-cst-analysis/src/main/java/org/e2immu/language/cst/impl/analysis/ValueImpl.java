@@ -176,7 +176,7 @@ public abstract class ValueImpl implements Value {
 
         @Override
         public boolean isMutable() {
-            return value == 0;
+            return value == 0 || value == 1;
         }
 
         @Override

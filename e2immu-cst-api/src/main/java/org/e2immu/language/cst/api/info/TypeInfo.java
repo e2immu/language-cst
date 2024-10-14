@@ -77,8 +77,9 @@ public interface TypeInfo extends NamedType, Info {
     List<ParameterizedType> interfacesImplemented();
 
     default List<MethodInfo> methods() {
-        return methodStream(null).toList();
+        return methodStream().toList();
     }
+    Stream<MethodInfo> recursiveMethodStream();
 
     boolean isPrimitiveExcludingVoid();
 
@@ -127,15 +128,7 @@ public interface TypeInfo extends NamedType, Info {
 
     boolean isBoxedFloat();
 
-    interface Methods {
-
-    }
-
-    default Stream<MethodInfo> methodStream() {
-        return methodStream(null);
-    }
-
-    Stream<MethodInfo> methodStream(Methods methods);
+    Stream<MethodInfo> methodStream();
 
     List<MethodInfo> constructors();
 

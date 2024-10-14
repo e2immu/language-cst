@@ -176,8 +176,15 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     }
 
     @Override
-    public Stream<MethodInfo> methodStream(Methods methods) {
-        return inspection.get().methodStream(methods);
+    public Stream<MethodInfo> methodStream() {
+        return inspection.get().methodStream();
+    }
+
+    @Override
+    public Stream<MethodInfo> recursiveMethodStream() {
+        Stream<MethodInfo> mine = methodStream();
+        Stream<MethodInfo> descend = subTypes().stream().flatMap(TypeInfo::recursiveMethodStream);
+        return Stream.concat(mine, descend);
     }
 
     @Override

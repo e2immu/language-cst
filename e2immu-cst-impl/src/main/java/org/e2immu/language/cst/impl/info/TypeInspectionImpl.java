@@ -77,7 +77,7 @@ public class TypeInspectionImpl extends InspectionImpl implements TypeInspection
     }
 
     @Override
-    public Stream<MethodInfo> methodStream(TypeInfo.Methods methods) {
+    public Stream<MethodInfo> methodStream() {
         return this.methods.stream();
     }
 
@@ -261,8 +261,8 @@ public class TypeInspectionImpl extends InspectionImpl implements TypeInspection
         }
 
         @Override
-        public Stream<MethodInfo> methodStream(TypeInfo.Methods methods) {
-            return this.methods.stream(); // FIXME
+        public Stream<MethodInfo> methodStream() {
+            return this.methods.stream();
         }
 
         @Override

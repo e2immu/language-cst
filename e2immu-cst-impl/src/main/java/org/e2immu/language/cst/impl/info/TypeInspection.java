@@ -22,26 +22,7 @@ public interface TypeInspection extends Inspection {
 
     boolean isAbstract();
 
-    enum MethodsEnum implements TypeInfo.Methods {
-
-        THIS_TYPE_ONLY(false, false, null),
-        THIS_TYPE_ONLY_EXCLUDE_FIELD_SAM(false, false, null),
-        THIS_TYPE_ONLY_EXCLUDE_FIELD_ARTIFICIAL_SAM(false, false, null),
-        INCLUDE_SUBTYPES(true, false, THIS_TYPE_ONLY),
-        INCLUDE_SUPERTYPES(false, true, THIS_TYPE_ONLY);
-
-        MethodsEnum(boolean recurseIntoSubTypes, boolean recurseIntoSuperTypes, TypeInfo.Methods nonRecursiveVariant) {
-            this.recurseIntoSubTypes = recurseIntoSubTypes;
-            this.recurseIntoSuperTypes = recurseIntoSuperTypes;
-            this.nonRecursiveVariant = nonRecursiveVariant;
-        }
-
-        final boolean recurseIntoSubTypes;
-        final boolean recurseIntoSuperTypes;
-        final TypeInfo.Methods nonRecursiveVariant;
-    }
-
-    Stream<MethodInfo> methodStream(TypeInfo.Methods methods);
+    Stream<MethodInfo> methodStream();
 
     List<MethodInfo> constructors();
 
