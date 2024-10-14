@@ -123,7 +123,7 @@ public class TypeParameterImpl implements TypeParameter {
     }
 
     @Override
-    public ParameterizedType asParameterizedType(Predefined runtime) {
+    public ParameterizedType asParameterizedType() {
         // NOTE: we do not add the type bounds
         return new ParameterizedTypeImpl(this, 0);
     }

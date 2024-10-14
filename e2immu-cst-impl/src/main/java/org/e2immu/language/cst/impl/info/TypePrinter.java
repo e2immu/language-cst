@@ -178,10 +178,10 @@ public record TypePrinter(TypeInfo typeInfo) {
     }
 
     private static void addThisToQualification(TypeInfo typeInfo, QualificationImpl insideType) {
-        insideType.addThis(new ThisImpl(typeInfo));
+        insideType.addThis(new ThisImpl(typeInfo.asSimpleParameterizedType()));
         ParameterizedType parentClass = typeInfo.parentClass();
         if (parentClass != null && !parentClass.isJavaLangObject()) {
-            insideType.addThis(new ThisImpl(parentClass.typeInfo(), null, true));
+            insideType.addThis(new ThisImpl(parentClass.typeInfo().asSimpleParameterizedType(), null, true));
         }
     }
 

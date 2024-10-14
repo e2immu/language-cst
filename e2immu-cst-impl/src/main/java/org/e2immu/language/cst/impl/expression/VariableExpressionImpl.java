@@ -233,7 +233,7 @@ public class VariableExpressionImpl extends ExpressionImpl implements VariableEx
                 }
                 if (translatedType != thisVarPt && !translatedType.typeInfo().equals(thisVar.typeInfo()) ||
                     !Objects.equals(thisVar.explicitlyWriteType(), tExplicitly)) {
-                    This newThisVar = new ThisImpl(translatedType.typeInfo(), tExplicitly, thisVar.writeSuper());
+                    This newThisVar = new ThisImpl(translatedType, tExplicitly, thisVar.writeSuper());
                     return new VariableExpressionImpl(source(), comments(), newThisVar, suffix);
                 }
             }

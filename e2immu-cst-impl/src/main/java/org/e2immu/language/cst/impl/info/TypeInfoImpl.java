@@ -8,6 +8,7 @@ import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.runtime.Predefined;
 import org.e2immu.language.cst.api.translate.TranslationMap;
+import org.e2immu.language.cst.api.type.NamedType;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.type.TypeNature;
 import org.e2immu.language.cst.api.type.TypeParameter;
@@ -226,9 +227,9 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     }
 
     @Override
-    public ParameterizedType asParameterizedType(Predefined runtime) {
+    public ParameterizedType asParameterizedType() {
         List<ParameterizedType> typeParameters = typeParameters()
-                .stream().map(tp -> tp.asParameterizedType(runtime))
+                .stream().map(NamedType::asParameterizedType)
                 .collect(Collectors.toList());
         return new ParameterizedTypeImpl(this, typeParameters);
     }

@@ -120,7 +120,7 @@ public class ComputeMethodOverridesImpl implements ComputeMethodOverrides {
         Map<NamedType, ParameterizedType> translationMapOfSuperType = new HashMap<>();
         if (!superType.parameters().isEmpty()) {
             assert superType.typeInfo() != null;
-            ParameterizedType formalType = superType.typeInfo().asParameterizedType(runtime);
+            ParameterizedType formalType = superType.typeInfo().asParameterizedType();
             int index = 0;
             for (ParameterizedType parameter : formalType.parameters()) {
                 ParameterizedType concreteParameter = superType.parameters().get(index);

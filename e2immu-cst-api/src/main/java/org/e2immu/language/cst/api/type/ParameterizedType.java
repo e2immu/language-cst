@@ -27,9 +27,9 @@ public interface ParameterizedType {
      */
     TypeInfo bestTypeInfo();
 
-    ParameterizedType concreteDirectSuperType(Predefined runtime, ParameterizedType interfaceImplemented);
+    ParameterizedType concreteDirectSuperType(ParameterizedType interfaceImplemented);
 
-    ParameterizedType concreteSuperType(Predefined runtime, ParameterizedType superType);
+    ParameterizedType concreteSuperType(ParameterizedType superType);
 
     ParameterizedType copyWithArrays(int arrays);
 
@@ -70,7 +70,7 @@ public interface ParameterizedType {
     HashMap<K, V> implements Map<K, V>
     Given Map<K, V>, go from abstract to concrete (HM:K to Map:K, HM:V to Map:V)
     */
-    Map<NamedType, ParameterizedType> forwardTypeParameterMap(Predefined runtime);
+    Map<NamedType, ParameterizedType> forwardTypeParameterMap();
 
     /*
        Given a concrete type (List<String>) make a map from the type's abstract parameters to its concrete ones (E -> String)
@@ -79,7 +79,7 @@ public interface ParameterizedType {
        With visited, the method returns K=Integer, V=Map<Integer,String> when presented with Map<Integer,Map<Integer,String>>,
        without visited, it would recurse and return K=Integer, V=String
        */
-    Map<NamedType, ParameterizedType> initialTypeParameterMap(Predefined runtime);
+    Map<NamedType, ParameterizedType> initialTypeParameterMap();
 
     // simple checks
 

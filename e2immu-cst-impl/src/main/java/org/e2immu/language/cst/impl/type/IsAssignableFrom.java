@@ -300,14 +300,14 @@ public record IsAssignableFrom(Predefined runtime,
     private int hierarchy(ParameterizedType target, ParameterizedType from, Mode mode) {
         TypeInfo other = from.typeInfo();
         for (ParameterizedType interfaceImplemented : other.interfacesImplemented()) {
-            ParameterizedType concreteType = from.concreteDirectSuperType(runtime, interfaceImplemented);
+            ParameterizedType concreteType = from.concreteDirectSuperType(interfaceImplemented);
             int scoreInterface = new IsAssignableFrom(runtime, target, concreteType)
                     .execute(true, mode);
             if (scoreInterface != NOT_ASSIGNABLE) return IN_HIERARCHY + scoreInterface;
         }
         ParameterizedType parentClass = other.parentClass();
         if (parentClass != null && !parentClass.isJavaLangObject()) {
-            ParameterizedType concreteType = from.concreteDirectSuperType(runtime, parentClass);
+            ParameterizedType concreteType = from.concreteDirectSuperType(parentClass);
             int scoreParent = new IsAssignableFrom(runtime, target, concreteType)
                     .execute(true, mode);
             if (scoreParent != NOT_ASSIGNABLE) return IN_HIERARCHY + scoreParent;

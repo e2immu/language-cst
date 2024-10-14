@@ -5,6 +5,7 @@ import org.e2immu.language.cst.api.element.Visitor;
 import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
+import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.variable.DescendMode;
 import org.e2immu.language.cst.api.variable.This;
 import org.e2immu.language.cst.api.variable.Variable;
@@ -22,15 +23,15 @@ public class ThisImpl extends VariableImpl implements This {
     private final TypeInfo explicitlyWriteType;
     private final String fullyQualifiedName;
 
-    public ThisImpl(TypeInfo typeInfo) {
-        this(typeInfo, null, false);
+    public ThisImpl(ParameterizedType parameterizedType) {
+        this(parameterizedType, null, false);
     }
 
-    public ThisImpl(TypeInfo typeInfo, TypeInfo explicitlyWriteType, boolean writeSuper) {
-        super(typeInfo.asSimpleParameterizedType());
+    public ThisImpl(ParameterizedType parameterizedType, TypeInfo explicitlyWriteType, boolean writeSuper) {
+        super(parameterizedType);
         this.writeSuper = writeSuper;
         this.explicitlyWriteType = explicitlyWriteType;
-        this.fullyQualifiedName = typeInfo.fullyQualifiedName() + ".this";
+        this.fullyQualifiedName = parameterizedType.typeInfo().fullyQualifiedName() + ".this";
     }
 
     @Override

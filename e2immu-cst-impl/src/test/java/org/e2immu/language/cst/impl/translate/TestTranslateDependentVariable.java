@@ -17,14 +17,14 @@ public class TestTranslateDependentVariable {
     public void test() {
         TypeInfo ti = r.newTypeInfo(r.stringTypeInfo(), "X");
         FieldInfo fi = r.newFieldInfo("array", false, r.intParameterizedType().copyWithArrays(1), ti);
-        LocalVariable x = r.newLocalVariable("x", ti.asParameterizedType(r));
+        LocalVariable x = r.newLocalVariable("x", ti.asParameterizedType());
         FieldReference fr = r.newFieldReference(fi, r.newVariableExpression(x), fi.type());
         assertEquals("x.array", fr.toString());
         LocalVariable i = r.newLocalVariable("i", r.intParameterizedType());
         DependentVariable dv = r.newDependentVariable(r.newVariableExpression(fr), r.newVariableExpression(i));
         assertEquals("x.array[i]", dv.toString());
 
-        This thisVar = r.newThis(ti);
+        This thisVar = r.newThis(ti.asParameterizedType());
         TranslationMap tm = r.newTranslationMapBuilder()
                 .put(x, thisVar) // variable
                 .put(r.newVariableExpression(i), r.intOne()) // expression

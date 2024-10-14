@@ -297,11 +297,11 @@ public interface Factory {
 
     OutputElement newText(String text);
 
-    default This newThis(TypeInfo typeInfo) {
-        return newThis(typeInfo, null, false);
+    default This newThis(ParameterizedType parameterizedType) {
+        return newThis(parameterizedType, null, false);
     }
 
-    This newThis(TypeInfo typeInfo, TypeInfo explicitlyWriteType, boolean writeSuper);
+    This newThis(ParameterizedType parameterizedType, TypeInfo explicitlyWriteType, boolean writeSuper);
 
     ThrowStatement.Builder newThrowBuilder();
 

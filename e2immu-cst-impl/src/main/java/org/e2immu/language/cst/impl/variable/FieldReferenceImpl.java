@@ -11,6 +11,9 @@ import org.e2immu.language.cst.api.info.FieldInfo;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.output.element.TypeName;
+import org.e2immu.language.cst.api.runtime.Factory;
+import org.e2immu.language.cst.api.runtime.Predefined;
+import org.e2immu.language.cst.api.runtime.Runtime;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.variable.DescendMode;
 import org.e2immu.language.cst.api.variable.FieldReference;
@@ -59,7 +62,7 @@ public class FieldReferenceImpl extends VariableImpl implements FieldReference {
             isDefaultScope = scope instanceof TypeExpression te && fieldInfo.owner() == te.parameterizedType().typeInfo();
             this.scopeVariable = null;
         } else if (scope == null) {
-            scopeVariable = new ThisImpl(fieldInfo.owner());
+            scopeVariable = new ThisImpl(fieldInfo.owner().asParameterizedType());
             this.scope = new VariableExpressionImpl(scopeVariable);
             isDefaultScope = true;
         } else {

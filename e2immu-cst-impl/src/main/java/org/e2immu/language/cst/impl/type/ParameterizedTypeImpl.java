@@ -13,11 +13,6 @@ import org.e2immu.language.cst.impl.output.QualificationImpl;
 import org.e2immu.language.cst.api.type.*;
 
 import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -342,7 +337,7 @@ public class ParameterizedTypeImpl implements ParameterizedType {
     }
 
     @Override
-    public ParameterizedType concreteSuperType(Predefined runtime, ParameterizedType superType) {
+    public ParameterizedType concreteSuperType(ParameterizedType superType) {
         TypeInfo bestType = bestTypeInfo();
         if (bestType == superType.typeInfo()) {
             // if we start with Iterable<String>, and we're aiming for Iterable<E>, then
@@ -352,35 +347,35 @@ public class ParameterizedTypeImpl implements ParameterizedType {
         ParameterizedType parentClass = bestType.parentClass();
         if (parentClass != null && !parentClass.isJavaLangObject()) {
             if (parentClass.typeInfo() == superType.typeInfo()) {
-                return concreteDirectSuperType(runtime, parentClass);
+                return concreteDirectSuperType(parentClass);
             }
             /* do a recursion, but accept that we may return null
             we must call concreteSuperType on a concrete version of the parentClass
             */
-            ParameterizedType res = parentClass.concreteSuperType(runtime, superType);
+            ParameterizedType res = parentClass.concreteSuperType(superType);
             if (res != null) {
-                return concreteDirectSuperType(runtime, res);
+                return concreteDirectSuperType(res);
             }
         }
         for (ParameterizedType interfaceType : bestType.interfacesImplemented()) {
             if (interfaceType.typeInfo() == superType.typeInfo()) {
-                return concreteDirectSuperType(runtime, interfaceType);
+                return concreteDirectSuperType(interfaceType);
             }
             // similar to parent
-            ParameterizedType res = interfaceType.concreteSuperType(runtime, superType);
+            ParameterizedType res = interfaceType.concreteSuperType(superType);
             if (res != null) {
-                return concreteDirectSuperType(runtime, res);
+                return concreteDirectSuperType(res);
             }
         }
         return null;
     }
 
     @Override
-    public ParameterizedType concreteDirectSuperType(Predefined runtime, ParameterizedType parentType) {
+    public ParameterizedType concreteDirectSuperType(ParameterizedType parentType) {
         if (parentType.parameters().isEmpty()) return parentType;
 
-        Map<NamedType, ParameterizedType> map = initialTypeParameterMap(runtime);
-        ParameterizedType formalType = parentType.typeInfo().asParameterizedType(runtime);
+        Map<NamedType, ParameterizedType> map = initialTypeParameterMap();
+        ParameterizedType formalType = parentType.typeInfo().asParameterizedType();
         List<ParameterizedType> newParameters = new ArrayList<>(formalType.parameters().size());
         int i = 0;
         for (ParameterizedType param : formalType.parameters()) {
@@ -400,17 +395,17 @@ public class ParameterizedTypeImpl implements ParameterizedType {
     }
 
     @Override
-    public Map<NamedType, ParameterizedType> initialTypeParameterMap(Predefined runtime) {
+    public Map<NamedType, ParameterizedType> initialTypeParameterMap() {
         if (!isType()) return Map.of();
         if (parameters.isEmpty()) return Map.of();
-        return initialTypeParameterMap(runtime, new HashSet<>());
+        return initialTypeParameterMap(new HashSet<>());
     }
 
-    private Map<NamedType, ParameterizedType> initialTypeParameterMap(Predefined runtime, Set<TypeInfo> visited) {
+    private Map<NamedType, ParameterizedType> initialTypeParameterMap(Set<TypeInfo> visited) {
         if (!isType()) return Map.of();
         visited.add(typeInfo);
         if (parameters.isEmpty()) return Map.of();
-        ParameterizedType originalType = typeInfo.asParameterizedType(runtime);
+        ParameterizedType originalType = typeInfo.asParameterizedType();
         int i = 0;
         // linkedHashMap to maintain an order for testing
         Map<NamedType, ParameterizedType> map = new LinkedHashMap<>();
@@ -436,7 +431,7 @@ public class ParameterizedTypeImpl implements ParameterizedType {
             } else throw new UnsupportedOperationException();
             if (recursive != null && recursive.isType() && !visited.contains(recursive.typeInfo())) {
                 Map<NamedType, ParameterizedType> recursiveMap = ((ParameterizedTypeImpl) recursive)
-                        .initialTypeParameterMap(runtime, visited);
+                        .initialTypeParameterMap(visited);
                 map.putAll(recursiveMap);
             }
             i++;
@@ -507,10 +502,10 @@ public class ParameterizedTypeImpl implements ParameterizedType {
     Given Map<K, V>, go from abstract to concrete (HM:K to Map:K, HM:V to Map:V)
     */
     @Override
-    public Map<NamedType, ParameterizedType> forwardTypeParameterMap(Predefined runtime) {
+    public Map<NamedType, ParameterizedType> forwardTypeParameterMap() {
         if (!isType()) return Map.of();
         if (parameters.isEmpty()) return Map.of();
-        ParameterizedType originalType = typeInfo.asParameterizedType(runtime); // Map:K, Map:V
+        ParameterizedType originalType = typeInfo.asParameterizedType(); // Map:K, Map:V
         assert originalType.parameters().size() == parameters.size();
         int i = 0;
         // linkedHashMap to maintain an order for testing

@@ -31,11 +31,11 @@ public class CommonType {
 
         if ((isPrimitive || isBoxed) && pt2 == ParameterizedTypeImpl.NULL_CONSTANT) {
             if (isBoxed) return pt1;
-            return runtime.boxed(bestType).asParameterizedType(runtime);
+            return runtime.boxed(bestType).asParameterizedType();
         }
         if ((pt2IsPrimitive || pt2IsBoxed) && pt1 == ParameterizedTypeImpl.NULL_CONSTANT) {
             if (pt2IsBoxed) return pt2;
-            return runtime.boxed(pt2BestType).asParameterizedType(runtime);
+            return runtime.boxed(pt2BestType).asParameterizedType();
         }
         if (isPrimitive || pt2IsPrimitive) {
             /* one is boxed, the pt2 is not. The result must be boxed (see e.g.
@@ -44,7 +44,7 @@ public class CommonType {
             if (isPrimitive && pt2IsBoxed) {
                 TypeInfo pt2Unboxed = runtime.unboxed(pt2BestType);
                 ParameterizedType pt2UnboxedPt = pt2Unboxed.asSimpleParameterizedType();
-                if (pt1.equals(pt2UnboxedPt)) return runtime.boxed(bestType).asParameterizedType(runtime);
+                if (pt1.equals(pt2UnboxedPt)) return runtime.boxed(bestType).asParameterizedType();
                 if (runtime.isAssignableFromTo(pt1, pt2UnboxedPt, true) >= 0 ||
                     runtime.isAssignableFromTo(pt2UnboxedPt, pt1, true) >= 0) {
                     return runtime.boxed(runtime.widestType(pt1, pt2UnboxedPt).typeInfo()).asSimpleParameterizedType();
@@ -91,10 +91,10 @@ public class CommonType {
         if (commonSuperType.equals(pt2BestType)) {
             return pt2;
         }
-        ParameterizedType result = commonSuperType.asParameterizedType(runtime);
+        ParameterizedType result = commonSuperType.asParameterizedType();
         if (!commonSuperType.typeParameters().isEmpty()) {
-            ParameterizedType concrete = pt1.concreteSuperType(runtime, result);
-            ParameterizedType concretept2 = pt2.concreteSuperType(runtime, result);
+            ParameterizedType concrete = pt1.concreteSuperType(result);
+            ParameterizedType concretept2 = pt2.concreteSuperType(result);
             List<ParameterizedType> updatedParameters = new ArrayList<>(commonSuperType.typeParameters().size());
             int i = 0;
             for (ParameterizedType parameter : concrete.parameters()) {
