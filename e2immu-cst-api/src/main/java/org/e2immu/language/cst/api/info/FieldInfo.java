@@ -13,6 +13,15 @@ public interface FieldInfo extends Info {
 
     boolean hasBeenInspected();
 
+    default int indexInType() {
+        int count = 0;
+        for (FieldInfo f : owner().fields()) {
+            if (f == this) return count;
+            ++count;
+        }
+        throw new UnsupportedOperationException();
+    }
+
     String name();
 
     TypeInfo owner();
