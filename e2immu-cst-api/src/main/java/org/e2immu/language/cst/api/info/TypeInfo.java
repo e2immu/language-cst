@@ -169,6 +169,8 @@ public interface TypeInfo extends NamedType, Info {
     interface Builder extends Info.Builder<Builder> {
         Builder addPermittedType(TypeInfo typeInfo);
 
+        List<MethodInfo> constructors();
+
         List<FieldInfo> fields();
 
         boolean isAbstract();
