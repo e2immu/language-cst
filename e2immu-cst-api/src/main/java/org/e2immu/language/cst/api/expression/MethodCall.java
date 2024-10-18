@@ -21,6 +21,8 @@ public interface MethodCall extends Expression, OneVariable {
 
     ParameterizedType concreteReturnType();
 
+    MethodCall withObject(Expression object);
+
     // make a copy, with different parameters
     MethodCall withParameterExpressions(List<Expression> parameterExpressions);
 

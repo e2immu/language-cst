@@ -11,9 +11,6 @@ import org.e2immu.language.cst.api.info.FieldInfo;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.output.element.TypeName;
-import org.e2immu.language.cst.api.runtime.Factory;
-import org.e2immu.language.cst.api.runtime.Predefined;
-import org.e2immu.language.cst.api.runtime.Runtime;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.variable.DescendMode;
 import org.e2immu.language.cst.api.variable.FieldReference;
@@ -73,19 +70,12 @@ public class FieldReferenceImpl extends VariableImpl implements FieldReference {
             } else {
                 // the scope is not a variable, we must introduce a new scope variable
                 isDefaultScope = false;
-                scopeVariable = overrideScopeVariable != null ? overrideScopeVariable : newScopeVariable(scope);
+                scopeVariable = overrideScopeVariable;
             }
         }
-        this.fullyQualifiedName = computeFqn();
-        assert (scopeVariable == null) == fieldInfo.isStatic();
+        this.fullyQualifiedName = computeFqn(scope);
         assert !(scopeIsRecursivelyThis() && fieldInfo.isStatic());
         // know that: assert this.scope != null;
-    }
-
-    protected Variable newScopeVariable(Expression scope) {
-        int unique = Math.abs(scope.hashCode());
-        String name = "scope" + unique;
-        return new LocalVariableImpl(name, scope.parameterizedType(), scope);
     }
 
     @Override
@@ -103,11 +93,18 @@ public class FieldReferenceImpl extends VariableImpl implements FieldReference {
         return fieldInfo.isStatic();
     }
 
-    private String computeFqn() {
+    private String computeFqn(Expression scope) {
         if (isStatic() || scopeIsThis()) {
             return fieldInfo.fullyQualifiedName();
         }
-        return fieldInfo.fullyQualifiedName() + "#" + scopeVariable.fullyQualifiedName();
+        String scopeFqn;
+        if (scopeVariable != null) {
+            scopeFqn = scopeVariable.fullyQualifiedName();
+        } else {
+            int unique = Math.abs(scope.hashCode());
+            scopeFqn = "scope" + unique;
+        }
+        return fieldInfo.fullyQualifiedName() + "#" + scopeFqn;
     }
 
     @Override
