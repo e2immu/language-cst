@@ -323,4 +323,9 @@ public class FieldInfoImpl extends InfoImpl implements FieldInfo {
         fi.inspection.setVariable(new FieldInspectionImpl.Builder(fi, inspection.get()));
         return fi;
     }
+
+    @Override
+    public boolean isModified() {
+        return analysis().getOrDefault(PropertyImpl.MODIFIED_FIELD, ValueImpl.BoolImpl.FALSE).isTrue();
+    }
 }

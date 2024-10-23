@@ -22,6 +22,8 @@ public interface FieldInfo extends Info {
         throw new UnsupportedOperationException();
     }
 
+    boolean isModified();
+
     String name();
 
     TypeInfo owner();
