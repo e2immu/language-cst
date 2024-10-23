@@ -95,6 +95,21 @@ public abstract class ValueImpl implements Value {
         decoderMap.put(BoolImpl.class, (di, encodedValue) -> BoolImpl.from(di.codec().decodeInt(di.context(), encodedValue)));
     }
 
+    public record MessageImpl(String message) implements Value.Message {
+        public static final Message EMPTY = new MessageImpl("");
+
+        @Override
+        public Codec.EncodedValue encode(Codec codec, Codec.Context context) {
+            if (message.isEmpty()) return null;
+            return codec.encodeString(context, message);
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return message.isEmpty();
+        }
+    }
+
     public record ParameterParSeqImpl(ParSeq<ParameterInfo> parSeq) implements Value.ParameterParSeq {
         public static ParameterParSeqImpl EMPTY = new ValueImpl.ParameterParSeqImpl(new ParSeq<>() {
             @Override
@@ -167,6 +182,11 @@ public abstract class ValueImpl implements Value {
         @Override
         public boolean isAtLeastImmutableHC() {
             return value >= 2;
+        }
+
+        @Override
+        public boolean isImmutableHC() {
+            return value == 2;
         }
 
         @Override
@@ -429,7 +449,7 @@ public abstract class ValueImpl implements Value {
     }
 
     static {
-        decoderMap.put(GetSetValueImpl.class, (di, encodedValue) ->  {
+        decoderMap.put(GetSetValueImpl.class, (di, encodedValue) -> {
             Codec codec = di.codec();
             Codec.Context context = di.context();
             List<Codec.EncodedValue> list = codec.decodeList(context, encodedValue);

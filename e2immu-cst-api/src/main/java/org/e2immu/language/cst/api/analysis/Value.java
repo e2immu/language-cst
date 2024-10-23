@@ -38,10 +38,19 @@ public interface Value extends Comparable<Value> {
         Bool or(Bool bool);
     }
 
+
+    interface Message extends Value {
+        String message();
+
+        boolean isEmpty();
+    }
+
     interface Immutable extends Value {
         boolean isAtLeastImmutableHC();
 
         boolean isImmutable();
+
+        boolean isImmutableHC();
 
         boolean isMutable();
 
