@@ -1,5 +1,6 @@
 package org.e2immu.language.cst.impl.info;
 
+import org.e2immu.language.cst.api.element.Comment;
 import org.e2immu.language.cst.api.expression.AnnotationExpression;
 import org.e2immu.language.cst.api.info.*;
 import org.e2immu.language.cst.api.output.OutputBuilder;
@@ -35,6 +36,13 @@ public record MethodPrinter(TypeInfo typeInfo, MethodInfo methodInfo) {
             return result;
         }
         OutputBuilder builder = new OutputBuilderImpl();
+        Stream<Comment> commentStream;
+        if (qualification.decorator() != null) {
+            commentStream = Stream.concat(methodInfo.comments().stream(), qualification.decorator().comments(methodInfo).stream());
+        } else {
+            commentStream = methodInfo.comments().stream();
+        }
+        commentStream.forEach(c -> builder.add(c.print(qualification)));
         for (AnnotationExpression annotation : methodInfo.annotations()) {
             builder.add(annotation.print(qualification));
             builder.add(SpaceEnum.ONE);

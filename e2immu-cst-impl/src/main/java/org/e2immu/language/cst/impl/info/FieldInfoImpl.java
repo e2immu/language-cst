@@ -49,6 +49,11 @@ public class FieldInfoImpl extends InfoImpl implements FieldInfo {
     }
 
     @Override
+    public String info() {
+        return "field";
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof FieldInfoImpl fieldInfo)) return false;
@@ -185,8 +190,14 @@ public class FieldInfoImpl extends InfoImpl implements FieldInfo {
         if (!asParameter) {
             outputBuilder.add(SymbolEnum.SEMICOLON);
         }
-
-        return Stream.concat(annotationStream, Stream.of(outputBuilder))
+        Stream<Comment> commentStream;
+        if (qualification.decorator() != null) {
+            commentStream = Stream.concat(comments().stream(), qualification.decorator().comments(this).stream());
+        } else {
+            commentStream = comments().stream();
+        }
+        Stream<OutputBuilder> commentOBStream = commentStream.map(c -> c.print(qualification));
+        return Stream.concat(Stream.concat(commentOBStream, annotationStream), Stream.of(outputBuilder))
                 .collect(OutputBuilderImpl.joining(SpaceEnum.ONE_REQUIRED_EASY_SPLIT,
                         GuideImpl.generatorForAnnotationList()));
     }

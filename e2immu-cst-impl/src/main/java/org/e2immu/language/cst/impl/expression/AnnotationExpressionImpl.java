@@ -57,8 +57,8 @@ public class AnnotationExpressionImpl extends ExpressionImpl implements Annotati
 
     @Override
     public OutputBuilder print(Qualification qualification) {
-        OutputBuilder outputBuilder = new OutputBuilderImpl().add(SymbolEnum.AT)
-                .add(TypeNameImpl.typeName(typeInfo, qualification.qualifierRequired(typeInfo)));
+        OutputBuilder outputBuilder = new OutputBuilderImpl().add(TypeNameImpl.typeName(typeInfo,
+                qualification.qualifierRequired(typeInfo), true));
         if (!keyValuePairs.isEmpty()) {
             outputBuilder.add(SymbolEnum.LEFT_PARENTHESIS)
                     .add(keyValuePairs.stream()

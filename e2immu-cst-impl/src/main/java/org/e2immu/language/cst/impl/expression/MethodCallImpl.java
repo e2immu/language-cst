@@ -250,7 +250,7 @@ public class MethodCallImpl extends ExpressionImpl implements MethodCall {
                  */
                 assert methodInfo.isStatic();
                 TypeInfo typeInfo = typeExpression.parameterizedType().typeInfo();
-                TypeName typeName = TypeNameImpl.typeName(typeInfo, qualification.qualifierRequired(typeInfo));
+                TypeName typeName = TypeNameImpl.typeName(typeInfo, qualification.qualifierRequired(typeInfo), false);
                 outputBuilder.add(new QualifiedNameImpl(methodInfo.name(), typeName,
                         qualification.qualifierRequired(methodInfo) ? QualifiedNameImpl.Required.YES : QualifiedNameImpl.Required.NO_METHOD));
                 if (guideGenerator != null) start = true;
@@ -261,7 +261,7 @@ public class MethodCallImpl extends ExpressionImpl implements MethodCall {
                                                 + methodInfo.fullyQualifiedName() + "; this "
                                                 + thisVar.typeInfo().fullyQualifiedName();
                 TypeName typeName = TypeNameImpl.typeName(thisVar.typeInfo(),
-                        qualification.qualifierRequired(thisVar.typeInfo()));
+                        qualification.qualifierRequired(thisVar.typeInfo()), false);
                 ThisName thisName = new ThisNameImpl(thisVar.writeSuper(), typeName,
                         qualification.qualifierRequired(thisVar));
                 boolean qualifierRequired = qualification.qualifierRequired(methodInfo);

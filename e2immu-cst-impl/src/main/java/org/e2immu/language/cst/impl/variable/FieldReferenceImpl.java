@@ -131,7 +131,8 @@ public class FieldReferenceImpl extends VariableImpl implements FieldReference {
     @Override
     public OutputBuilder print(Qualification qualification) {
         if (scope instanceof VariableExpression ve && ve.variable() instanceof This thisVar) {
-            TypeName typeName = TypeNameImpl.typeName(thisVar.typeInfo(), qualification.qualifierRequired(thisVar.typeInfo()));
+            TypeName typeName = TypeNameImpl.typeName(thisVar.typeInfo(),
+                    qualification.qualifierRequired(thisVar.typeInfo()), false);
             ThisNameImpl thisName = new ThisNameImpl(thisVar.writeSuper(),
                     typeName,
                     qualification.qualifierRequired(thisVar));
@@ -142,7 +143,8 @@ public class FieldReferenceImpl extends VariableImpl implements FieldReference {
             return new OutputBuilderImpl().add(new QualifiedNameImpl(simpleName(), null, QualifiedNameImpl.Required.NEVER));
         }
         if (isStatic()) {
-            TypeName typeName = TypeNameImpl.typeName(fieldInfo.typeInfo(), qualification.qualifierRequired(fieldInfo.typeInfo()));
+            TypeName typeName = TypeNameImpl.typeName(fieldInfo.typeInfo(),
+                    qualification.qualifierRequired(fieldInfo.typeInfo()), false);
             QualifiedNameImpl.Required required = qualification.qualifierRequired(this)
                     ? QualifiedNameImpl.Required.YES : QualifiedNameImpl.Required.NO_FIELD;
             return new OutputBuilderImpl().add(new QualifiedNameImpl(fieldInfo.name(), typeName, required));

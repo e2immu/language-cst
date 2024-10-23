@@ -36,4 +36,8 @@ public class MultiLineComment implements Comment {
                         gg));
         return new OutputBuilderImpl().add(joinedText);
     }
+
+    public String comment() {
+        return comment;
+    }
 }

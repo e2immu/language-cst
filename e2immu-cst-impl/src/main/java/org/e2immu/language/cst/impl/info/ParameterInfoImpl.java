@@ -52,6 +52,11 @@ public class ParameterInfoImpl implements ParameterInfo {
     }
 
     @Override
+    public String info() {
+        return "parameter";
+    }
+
+    @Override
     public TypeInfo typeInfo() {
         return methodInfo.typeInfo();
     }

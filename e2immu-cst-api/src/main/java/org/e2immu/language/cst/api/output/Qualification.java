@@ -1,5 +1,6 @@
 package org.e2immu.language.cst.api.output;
 
+import org.e2immu.language.cst.api.element.Comment;
 import org.e2immu.language.cst.api.element.ImportStatement;
 import org.e2immu.language.cst.api.expression.AnnotationExpression;
 import org.e2immu.language.cst.api.info.Info;
@@ -25,6 +26,8 @@ public interface Qualification {
     TypeNameRequired typeNameRequired();
 
     interface Decorator {
+        List<Comment> comments(Info info);
+
         List<AnnotationExpression> annotations(Info info);
 
         List<ImportStatement> importStatements();

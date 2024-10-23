@@ -118,6 +118,9 @@ public record TypePrinter(TypeInfo typeInfo) {
         if (typeInfo().comments() != null) {
             typeInfo.comments().forEach(c -> packageAndImports.add(c.print(qualification)));
         }
+        if (qualification.decorator() != null) {
+            qualification.decorator().comments(typeInfo).forEach(c -> packageAndImports.add(c.print(qualification)));
+        }
         if (qualification.decorator() != null && typeInfo.isPrimaryType()) {
             qualification.decorator().importStatements().forEach(is -> packageAndImports.add(is.print(qualification)));
         }

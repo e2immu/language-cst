@@ -5,6 +5,9 @@ import org.e2immu.language.cst.api.element.CompilationUnit;
 import org.e2immu.language.cst.api.element.Element;
 
 public interface Info extends Element {
+
+    String info();
+
     Access access();
 
     CompilationUnit compilationUnit();

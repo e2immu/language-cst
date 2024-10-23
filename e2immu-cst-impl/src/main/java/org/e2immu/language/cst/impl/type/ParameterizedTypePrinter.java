@@ -83,7 +83,7 @@ public class ParameterizedTypePrinter {
         } else if (parameterizedType.typeInfo() != null) {
             if (parameterizedType.parameters().isEmpty()) {
                 outputBuilder.add(TypeNameImpl.typeName(parameterizedType.typeInfo(),
-                        qualification.qualifierRequired(parameterizedType.typeInfo())));
+                        qualification.qualifierRequired(parameterizedType.typeInfo()), false));
                 if (diamond.isYes()) {
                     outputBuilder.add(SymbolEnum.DIAMOND);
                 }
@@ -160,7 +160,7 @@ public class ParameterizedTypePrinter {
         if (forceSimple) {
             outputBuilder.add(new TextImpl(typeInfo.simpleName()));
         } else {
-            outputBuilder.add(TypeNameImpl.typeName(typeInfo, qualification.qualifierRequired(typeInfo)));
+            outputBuilder.add(TypeNameImpl.typeName(typeInfo, qualification.qualifierRequired(typeInfo), false));
         }
         if (!typeParameters.isEmpty() && diamond != DiamondEnum.NO) {
             outputBuilder.add(SymbolEnum.LEFT_ANGLE_BRACKET);

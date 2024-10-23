@@ -80,7 +80,7 @@ public class ThisImpl extends VariableImpl implements This {
     @Override
     public OutputBuilder print(Qualification qualification) {
         return new OutputBuilderImpl().add(new ThisNameImpl(writeSuper,
-                TypeNameImpl.typeName(typeInfo(), qualification.qualifierRequired(typeInfo())),
+                TypeNameImpl.typeName(typeInfo(), qualification.qualifierRequired(typeInfo()), false),
                 qualification.qualifierRequired(this)));
     }
 

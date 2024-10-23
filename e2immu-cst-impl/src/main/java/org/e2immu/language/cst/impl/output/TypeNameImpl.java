@@ -23,7 +23,8 @@ import org.e2immu.util.internal.util.StringUtil;
 public record TypeNameImpl(String simpleName,
                            String fullyQualifiedName,
                            String fromPrimaryTypeDownwards,
-                           TypeNameRequired required) implements TypeName {
+                           TypeNameRequired required,
+                           boolean annotation) implements TypeName {
 
     public enum Required implements TypeNameRequired {
         DOLLARIZED_FQN, // com.foo.Bar$Bar2
@@ -34,7 +35,7 @@ public record TypeNameImpl(String simpleName,
 
     // for tests
     public TypeNameImpl(String simpleName) {
-        this(simpleName, simpleName, simpleName, Required.SIMPLE);
+        this(simpleName, simpleName, simpleName, Required.SIMPLE, false);
     }
 
     public TypeNameImpl {
@@ -44,16 +45,17 @@ public record TypeNameImpl(String simpleName,
         assert required != null;
     }
 
-    public static TypeName typeName(TypeInfo typeInfo, TypeNameRequired requiresQualifier) {
+    public static TypeName typeName(TypeInfo typeInfo, TypeNameRequired requiresQualifier, boolean annotation) {
         String simpleName = typeInfo.simpleName();
         String fqn = typeInfo.doesNotRequirePackage() ? simpleName : typeInfo.fullyQualifiedName();
         return new TypeNameImpl(simpleName, fqn, typeInfo.isPrimaryType() ? simpleName : typeInfo.fromPrimaryTypeDownwards(),
-                requiresQualifier);
+                requiresQualifier, annotation);
     }
 
     @Override
     public String minimal() {
-        return switch ((Required) required) {
+        String addAnnotation = annotation ? "@" : "";
+        return addAnnotation + switch ((Required) required) {
             case SIMPLE -> simpleName;
             case FQN -> fullyQualifiedName;
             case QUALIFIED_FROM_PRIMARY_TYPE -> fromPrimaryTypeDownwards;

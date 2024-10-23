@@ -64,6 +64,11 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
         }
     }
 
+    @Override
+    public String info() {
+        return "method";
+    }
+
     private final TypeInfo typeInfo; // back reference, only @ContextClass after...
     private final String name;
     private final MethodInfo.MethodType methodType;
