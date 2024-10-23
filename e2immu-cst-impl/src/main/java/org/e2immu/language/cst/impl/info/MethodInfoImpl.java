@@ -244,6 +244,11 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
     }
 
     @Override
+    public String simpleName() {
+        return name;
+    }
+
+    @Override
     public String fullyQualifiedName() {
         return inspection.get().fullyQualifiedName();
     }

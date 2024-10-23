@@ -12,6 +12,8 @@ public interface Info extends Element {
 
     CompilationUnit compilationUnit();
 
+    String simpleName();
+
     String fullyQualifiedName();
 
     boolean isSynthetic();
