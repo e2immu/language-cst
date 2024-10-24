@@ -20,6 +20,8 @@ public interface Info extends Element {
 
     TypeInfo typeInfo();
 
+    boolean hasBeenAnalyzed();
+
     interface Builder<B extends Builder<?>> extends Element.Builder<B> {
         @Fluent
         B setAccess(Access access);

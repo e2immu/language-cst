@@ -62,6 +62,11 @@ public class ParameterInfoImpl implements ParameterInfo {
     }
 
     @Override
+    public boolean hasBeenAnalyzed() {
+        return methodInfo.hasBeenAnalyzed();
+    }
+
+    @Override
     public Access access() {
         throw new UnsupportedOperationException();
     }

@@ -438,12 +438,6 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
     }
 
     @Override
-    public boolean hasBeenAnalyzed() {
-        // TODO should add computational analyzer too, later
-        return analysis().getOrDefault(PropertyImpl.SHALLOW_ANALYZER, ValueImpl.BoolImpl.FALSE).isTrue();
-    }
-
-    @Override
     public MethodType methodType() {
         return methodType;
     }

@@ -6,7 +6,9 @@ import org.e2immu.language.cst.api.element.Element;
 import org.e2immu.language.cst.api.element.Source;
 import org.e2immu.language.cst.api.info.Info;
 import org.e2immu.language.cst.api.variable.Variable;
+import org.e2immu.language.cst.impl.analysis.PropertyImpl;
 import org.e2immu.language.cst.impl.analysis.PropertyValueMapImpl;
+import org.e2immu.language.cst.impl.analysis.ValueImpl;
 import org.e2immu.language.cst.impl.variable.DescendModeEnum;
 import org.e2immu.support.SetOnce;
 
@@ -30,5 +32,11 @@ public abstract class InfoImpl implements Info {
     @Override
     public PropertyValueMap analysis() {
         return propertyValueMap;
+    }
+
+    @Override
+    public boolean hasBeenAnalyzed() {
+        // TODO should add computational analyzer too, later
+        return analysis().getOrDefault(PropertyImpl.SHALLOW_ANALYZER, ValueImpl.BoolImpl.FALSE).isTrue();
     }
 }

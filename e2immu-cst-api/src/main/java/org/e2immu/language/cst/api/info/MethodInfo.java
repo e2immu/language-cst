@@ -28,8 +28,6 @@ public interface MethodInfo extends Info {
 
     boolean explicitlyEmptyMethod();
 
-    boolean hasBeenAnalyzed();
-
     boolean isConstructor();
 
     boolean isFinal();
