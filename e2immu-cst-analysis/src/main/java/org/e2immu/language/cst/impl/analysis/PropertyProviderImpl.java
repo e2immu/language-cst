@@ -52,6 +52,8 @@ public class PropertyProviderImpl {
                 POST_CONDITIONS_METHOD,
                 PRECONDITION_METHOD,
                 SHALLOW_ANALYZER,
+                ANNOTATED_API,
+                ANALYZER_ERROR,
                 STATIC_SIDE_EFFECTS_METHOD,
                 MODIFIED_FI_COMPONENTS_PARAMETER,
                 MODIFIED_COMPONENTS_PARAMETER

@@ -79,6 +79,7 @@ public class PropertyImpl implements Property {
 
     // any element
     public static final Property SHALLOW_ANALYZER = new PropertyImpl("shallowAnalyzer");
+    public static final Property ANNOTATED_API = new PropertyImpl("annotatedApi");
     public static final Property ANALYZER_ERROR = new PropertyImpl("analyzerError", ValueImpl.MessageImpl.EMPTY);
 
 
