@@ -3,6 +3,8 @@ package org.e2immu.language.cst.api.info;
 import org.e2immu.annotation.Fluent;
 import org.e2immu.language.cst.api.element.CompilationUnit;
 import org.e2immu.language.cst.api.expression.Expression;
+import org.e2immu.language.cst.api.output.OutputBuilder;
+import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 
@@ -55,6 +57,8 @@ public interface FieldInfo extends Info {
     default CompilationUnit compilationUnit() {
         return owner().compilationUnit();
     }
+
+    OutputBuilder print(Qualification qualification, boolean asParameter);
 
     Builder builder();
 

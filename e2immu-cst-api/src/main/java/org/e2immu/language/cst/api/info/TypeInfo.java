@@ -158,6 +158,8 @@ public interface TypeInfo extends NamedType, Info {
 
     boolean isPublic();
 
+    boolean isPubliclyAccessible();
+
     void setOnDemandInspection(Consumer<TypeInfo> inspector);
 
     boolean haveOnDemandInspection();

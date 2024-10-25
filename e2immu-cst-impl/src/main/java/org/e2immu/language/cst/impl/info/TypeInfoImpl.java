@@ -431,6 +431,14 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     }
 
     @Override
+    public boolean isPubliclyAccessible() {
+        if (!isPublic()) return false;
+        if (compilationUnitOrEnclosingType.isRight())
+            return compilationUnitOrEnclosingType.getRight().isPubliclyAccessible();
+        return true;
+    }
+
+    @Override
     public void setOnDemandInspection(Consumer<TypeInfo> inspector) {
         assert inspection.isVariable();
         inspection.setOnDemand(() -> inspector.accept(this));

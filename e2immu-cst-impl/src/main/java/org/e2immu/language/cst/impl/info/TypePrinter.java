@@ -175,7 +175,7 @@ public record TypePrinter(TypeInfo typeInfo) {
     private static OutputBuilder outputNonStaticFieldsAsParameters(Qualification qualification, List<FieldInfo> fields) {
         return fields.stream()
                 .filter(fieldInfo -> !fieldInfo.isStatic())
-                .map(fieldInfo -> fieldInfo.print(qualification))
+                .map(fieldInfo -> fieldInfo.print(qualification, true))
                 .collect(OutputBuilderImpl.joining(SymbolEnum.COMMA, SymbolEnum.LEFT_PARENTHESIS, SymbolEnum.RIGHT_PARENTHESIS,
                         GuideImpl.generatorForParameterDeclaration()));
     }

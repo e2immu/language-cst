@@ -171,6 +171,7 @@ public class FieldInfoImpl extends InfoImpl implements FieldInfo {
         return print(qualification, false);
     }
 
+    @Override
     public OutputBuilder print(Qualification qualification, boolean asParameter) {
         Stream<OutputBuilder> annotationStream = Stream.concat(annotations().stream(),
                         qualification.decorator() == null ? Stream.of()
