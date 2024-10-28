@@ -168,6 +168,7 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
 
     @Override
     public VariableExpression newVariableExpression(Variable variable) {
+        assert variable != null;
         return new VariableExpressionImpl(variable);
     }
 
@@ -299,6 +300,12 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     public DependentVariable newDependentVariable(Variable arrayVariable, ParameterizedType parameterizedType, Variable indexVariable) {
         return new DependentVariableImpl(newVariableExpression(arrayVariable), arrayVariable,
                 newVariableExpression(indexVariable), indexVariable, parameterizedType);
+    }
+
+    @Override
+    public DependentVariable newDependentVariable(Variable arrayVariable, ParameterizedType parameterizedType, Expression indexExpression) {
+        return new DependentVariableImpl(newVariableExpression(arrayVariable), arrayVariable,
+                indexExpression, indexExpression instanceof VariableExpression ve ? ve.variable() : null, parameterizedType);
     }
 
     @Override

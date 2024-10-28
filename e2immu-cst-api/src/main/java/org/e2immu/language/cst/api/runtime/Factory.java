@@ -248,6 +248,10 @@ public interface Factory {
 
     MethodReference.Builder newMethodReferenceBuilder();
 
+    DependentVariable newDependentVariable(Variable arrayVariable,
+                                           ParameterizedType parameterizedType,
+                                           Expression indexExpression);
+
     Expression newMultiExpressions(List<Expression> newExpressions);
 
     Comment newMultilineComment(String comment);

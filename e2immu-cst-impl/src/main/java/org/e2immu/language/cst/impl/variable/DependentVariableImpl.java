@@ -14,6 +14,7 @@ import org.e2immu.language.cst.api.variable.DependentVariable;
 import org.e2immu.language.cst.api.variable.DescendMode;
 import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.language.cst.impl.output.OutputBuilderImpl;
+import org.e2immu.language.cst.impl.output.QualificationImpl;
 import org.e2immu.language.cst.impl.output.SymbolEnum;
 
 import java.util.Objects;
@@ -69,9 +70,13 @@ public class DependentVariableImpl extends VariableImpl implements DependentVari
         this.arrayExpression = arrayExpression;
         this.arrayVariable = arrayVariable;
         this.indexVariable = indexVariable;
-        String indexFqn = indexVariable == null ? indexExpression.print(null).toString() : indexVariable.fullyQualifiedName();
+        String indexFqn = indexVariable == null
+                ? indexExpression.print(QualificationImpl.FULLY_QUALIFIED_NAMES).toString()
+                : indexVariable.fullyQualifiedName();
         fullyQualifiedName = arrayVariable.fullyQualifiedName() + "[" + indexFqn + "]";
-        String indexSimple = indexVariable == null ? indexExpression.print(null).toString() : indexVariable.simpleName();
+        String indexSimple = indexVariable == null
+                ? indexExpression.print(QualificationImpl.FULLY_QUALIFIED_NAMES).toString()
+                : indexVariable.simpleName();
         simpleName = arrayVariable.simpleName() + "[" + indexSimple + "]";
     }
 
