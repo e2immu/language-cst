@@ -505,6 +505,11 @@ public abstract class ValueImpl implements Value {
             return map.entrySet().stream().map(e -> e.getKey() + "=" + e.getValue()).sorted()
                     .collect(Collectors.joining(", "));
         }
+
+        @Override
+        public boolean isEmpty() {
+            return map.isEmpty();
+        }
     }
 
     static {

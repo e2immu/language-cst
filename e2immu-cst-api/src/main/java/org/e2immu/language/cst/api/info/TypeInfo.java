@@ -253,6 +253,10 @@ public interface TypeInfo extends NamedType, Info {
         return Stream.concat(constructors().stream(), methodStream());
     }
 
+    default  Iterable<MethodInfo> constructorsAndMethods() {
+        return () -> constructorAndMethodStream().iterator();
+    }
+
     boolean isExtensible();
 
     MethodInfo enclosingMethod();

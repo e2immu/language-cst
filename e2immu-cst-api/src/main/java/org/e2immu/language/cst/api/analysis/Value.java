@@ -134,6 +134,8 @@ public interface Value extends Comparable<Value> {
     }
 
     interface VariableBooleanMap extends Value {
+        boolean isEmpty();
+
         Map<Variable, Boolean> map();
     }
 
