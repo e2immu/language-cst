@@ -118,8 +118,8 @@ public class DependentVariableImpl extends VariableImpl implements DependentVari
 
     @Override
     public Stream<Variable> variables(DescendMode descendMode) {
-        Stream<Variable> s1 = arrayExpression.variables(descendMode);
-        Stream<Variable> s2 = indexExpression.variables(descendMode);
+        Stream<Variable> s1 = Stream.concat(Stream.ofNullable(arrayVariable), arrayExpression.variables(descendMode));
+        Stream<Variable> s2 = Stream.concat(Stream.ofNullable(indexVariable), indexExpression.variables(descendMode));
         return Stream.concat(Stream.of(this), Stream.concat(s1, s2));
     }
 
