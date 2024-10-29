@@ -80,9 +80,8 @@ public class TestCodec {
                             epvs.add(new Codec.EncodedPropertyValue(key, new CodecImpl.D(kvp2.get(2))));
                         }
                     }
-                    List<Codec.PropertyValue> pvs = codec.decode(context, typeInfo2.analysis(), epvs.stream()).toList();
-                    assertEquals(3, pvs.size());
-                    pvs.forEach(pv -> typeInfo2.analysis().set(pv.property(), pv.value()));
+                    codec.decode(context, typeInfo2.analysis(), epvs.stream());
+                    assertEquals(3, typeInfo2.analysis().propertyValueStream().count());
                 } else fail();
             } else fail();
         } else fail();
