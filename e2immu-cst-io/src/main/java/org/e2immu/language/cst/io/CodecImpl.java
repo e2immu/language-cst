@@ -260,7 +260,7 @@ public class CodecImpl implements Codec {
         Matcher m = METHOD_PATTERN.matcher(name);
         if (m.matches()) {
             String typeFqn = m.group(1);
-            TypeInfo typeInfo =context.findType(typeProvider, typeFqn);
+            TypeInfo typeInfo = context.findType(typeProvider, typeFqn);
             int index = Integer.parseInt(m.group(3));
             MethodInfo methodInfo = typeInfo.methods().get(index);
             assert methodInfo.name().equals(m.group(2));
@@ -402,10 +402,10 @@ public class CodecImpl implements Codec {
     }
 
     @Override
-    public Stream<PropertyValue> decode(Context context,
-                                        PropertyValueMap pvm,
-                                        Stream<EncodedPropertyValue> encodedPropertyValueStream) {
-        return encodedPropertyValueStream.map(epv -> {
+    public void decode(Context context,
+                       PropertyValueMap pvm,
+                       Stream<EncodedPropertyValue> encodedPropertyValueStream) {
+        encodedPropertyValueStream.map(epv -> {
             String key = epv.key();
             Property property = propertyProvider.get(key);
             assert property != null : "Have no property object for key " + key;
@@ -414,7 +414,7 @@ public class CodecImpl implements Codec {
             D d = (D) epv.encodedValue();
             Value value = decoder.apply(new DII(this, context), d);
             return new PropertyValue(property, value);
-        });
+        }).forEach(pv -> pvm.set(pv.property(), pv.value()));
     }
 
     @Override

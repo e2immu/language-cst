@@ -1,5 +1,6 @@
 package org.e2immu.language.cst.api.analysis;
 
+import org.e2immu.annotation.Modified;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.info.*;
 import org.e2immu.language.cst.api.variable.Variable;
@@ -123,7 +124,10 @@ public interface Codec {
     interface EncodedValue {
     }
 
-    Stream<PropertyValue> decode(Context context, PropertyValueMap pvm, Stream<EncodedPropertyValue> encodedPropertyValueStream);
+    /*
+    the reason we write directly is that HCS follows HCT in the same list, and needs its value (see decoder of HCS)
+     */
+    void decode(Context context, @Modified PropertyValueMap pvm, Stream<EncodedPropertyValue> encodedPropertyValueStream);
 
     EncodedValue encode(Context context, Info info, String index, Stream<EncodedPropertyValue> encodedPropertyValueStream,
                         List<EncodedValue> subs);
