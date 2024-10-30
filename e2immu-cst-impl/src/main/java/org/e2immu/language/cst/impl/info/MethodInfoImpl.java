@@ -30,6 +30,7 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
 
     public enum MethodTypeEnum implements MethodType {
         CONSTRUCTOR(true), COMPACT_CONSTRUCTOR(true), SYNTHETIC_CONSTRUCTOR(true),
+        SYNTHETIC_ARRAY_CONSTRUCTOR(true),
         STATIC_BLOCK(false), DEFAULT_METHOD(false), STATIC_METHOD(false),
         ABSTRACT_METHOD(false), METHOD(false);
         final boolean constructor;
@@ -268,7 +269,7 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
     }
 
     public boolean isSyntheticConstructor() {
-        return methodType == MethodTypeEnum.SYNTHETIC_CONSTRUCTOR;
+        return methodType == MethodTypeEnum.SYNTHETIC_CONSTRUCTOR || methodType == MethodTypeEnum.SYNTHETIC_ARRAY_CONSTRUCTOR;
     }
 
     public boolean isStaticBlock() {
@@ -562,5 +563,10 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
     public MethodInfo withMethodBody(Block newBody) {
         TranslationMap tm = new TranslationMapImpl.Builder().put(methodBody(), newBody).build();
         return translate(tm).get(0);
+    }
+
+    @Override
+    public boolean isSyntheticArrayConstructor() {
+        return methodType == MethodTypeEnum.SYNTHETIC_ARRAY_CONSTRUCTOR;
     }
 }

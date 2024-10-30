@@ -22,6 +22,8 @@ public interface MethodInfo extends Info {
 
     boolean isFactoryMethod();
 
+    boolean isSyntheticArrayConstructor();
+
     Set<MethodModifier> methodModifiers();
 
     boolean noReturnValue();

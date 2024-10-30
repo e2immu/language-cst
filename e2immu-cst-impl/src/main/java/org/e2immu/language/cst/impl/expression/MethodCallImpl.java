@@ -212,6 +212,7 @@ public class MethodCallImpl extends ExpressionImpl implements MethodCall {
             object.visit(visitor);
             parameterExpressions.forEach(e -> e.visit(visitor));
         }
+        visitor.afterExpression(this);
     }
 
     @Override

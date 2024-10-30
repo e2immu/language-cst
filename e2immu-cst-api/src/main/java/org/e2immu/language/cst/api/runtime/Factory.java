@@ -258,6 +258,8 @@ public interface Factory {
 
     Or.Builder newOrBuilder();
 
+    MethodInfo.MethodType methodTypeSyntheticArrayConstructor();
+
     OutputBuilder newOutputBuilder();
 
     ParameterizedType newParameterizedType(TypeInfo typeInfo, List<ParameterizedType> newParameters);

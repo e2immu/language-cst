@@ -81,17 +81,17 @@ public class EnclosedExpressionImpl extends ExpressionImpl implements EnclosedEx
 
     @Override
     public void visit(Predicate<Element> predicate) {
-        if (predicate.test(inner)) {
+        if (predicate.test(this)) {
             inner.visit(predicate);
         }
     }
 
     @Override
     public void visit(Visitor visitor) {
-        if (visitor.beforeExpression(inner)) {
+        if (visitor.beforeExpression(this)) {
             inner.visit(visitor);
         }
-        visitor.afterExpression(inner);
+        visitor.afterExpression(this);
     }
 
     @Override

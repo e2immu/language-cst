@@ -890,14 +890,20 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
 
     @Override
     public MethodInfo newArrayCreationConstructor(ParameterizedType type) {
-        MethodInfo mi = newMethod(type.typeInfo(), "<init>", methodTypeSyntheticConstructor());
+        MethodInfo mi = newMethod(type.typeInfo(), "<init>", methodTypeSyntheticArrayConstructor());
         mi.builder().setReturnType(type).addMethodModifier(methodModifierPublic()).computeAccess();
         for (int i = 0; i < type.arrays(); i++) {
             mi.builder().addParameter("dim" + i, intParameterizedType());
         }
+        mi.builder().setMethodBody(emptyBlock());
         mi.builder().commitParameters();
         mi.builder().commit();
         return mi;
+    }
+
+    @Override
+    public MethodInfo.MethodType methodTypeSyntheticArrayConstructor() {
+        return MethodInfoImpl.MethodTypeEnum.SYNTHETIC_ARRAY_CONSTRUCTOR;
     }
 
     @Override
