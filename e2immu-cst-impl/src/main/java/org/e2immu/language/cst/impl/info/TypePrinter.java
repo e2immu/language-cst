@@ -129,7 +129,7 @@ public record TypePrinter(TypeInfo typeInfo) {
                         GuideImpl.generatorForAnnotationList())));
     }
 
-    private static List<TypeModifier> minimalModifiers(TypeInfo typeInfo) {
+    public static List<TypeModifier> minimalModifiers(TypeInfo typeInfo) {
         Set<TypeModifier> modifiers = typeInfo.typeModifiers();
         List<TypeModifier> list = new ArrayList<>();
 
