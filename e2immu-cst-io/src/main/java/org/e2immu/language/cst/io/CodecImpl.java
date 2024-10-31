@@ -7,6 +7,7 @@ import org.e2immu.language.cst.api.analysis.Value;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.info.*;
 import org.e2immu.language.cst.api.runtime.Runtime;
+import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.variable.*;
 import org.e2immu.language.cst.impl.analysis.PropertyImpl;
 import org.parsers.json.Node;
@@ -109,7 +110,7 @@ public class CodecImpl implements Codec {
 
     @Override
     public Expression decodeExpression(Context context, EncodedValue value) {
-        throw new UnsupportedOperationException(); // not implemented here, need parser and context
+        return new ExpressionCodec(runtime, this, context).decodeExpression(value);
     }
 
     @Override
@@ -117,12 +118,11 @@ public class CodecImpl implements Codec {
         if (encodedValue instanceof D d && d.s instanceof StringLiteral sl) {
             String source = unquote(sl.getSource());
             char variableType = source.charAt(0);
-            if ('P' == variableType) {
-                return decodeParameterOutOfContext(context, source.substring(1));
-            }
-            if ('F' == variableType) {
-                return decodeFieldReference(context, source.substring(1));
-            }
+            return switch (variableType) {
+                case 'P' -> decodeParameterOutOfContext(context, source.substring(1));
+                case 'F' -> decodeFieldReference(context, source.substring(1));
+                default -> throw new UnsupportedOperationException();
+            };
         }
         throw new UnsupportedOperationException();
     }
@@ -330,7 +330,7 @@ public class CodecImpl implements Codec {
 
     @Override
     public EncodedValue encodeExpression(Context context, Expression expression) {
-        return new E(quote(expression.toString()));
+        return new ExpressionCodec(runtime, this, context).encodeExpression(expression);
     }
 
     @Override
@@ -518,6 +518,20 @@ public class CodecImpl implements Codec {
             ++i;
         }
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public EncodedValue encodeType(Context context, ParameterizedType type) {
+        if (type == null) return encodeString(context, "-");
+        return encodeString(context, type.fullyQualifiedName());
+    }
+
+    // TODO should we use the encoder in byte code parser?
+    @Override
+    public ParameterizedType decodeType(Context context, EncodedValue encodedValue) {
+        String fqn = decodeString(context, encodedValue);
+        if ("-".equals(fqn)) return null;
+        throw new UnsupportedOperationException("TODO: " + fqn);
     }
 
     public static class ContextImpl implements Context {

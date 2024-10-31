@@ -3,6 +3,7 @@ package org.e2immu.language.cst.api.analysis;
 import org.e2immu.annotation.Modified;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.info.*;
+import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.variable.Variable;
 
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.stream.Stream;
 support for reading and writing the property-value pairs in many elements.
  */
 public interface Codec {
+
     interface Context {
         TypeInfo findType(Codec.TypeProvider typeProvider, String typeFqn);
 
@@ -76,6 +78,10 @@ public interface Codec {
     EncodedValue encodeVariable(Context context, Variable variable);
 
     EncodedValue encodeMethodOutOfContext(Context context, MethodInfo methodInfo);
+
+    ParameterizedType decodeType(Context context, EncodedValue encodedValue);
+
+    EncodedValue encodeType(Context context, ParameterizedType type);
 
     int fieldIndex(FieldInfo key);
 

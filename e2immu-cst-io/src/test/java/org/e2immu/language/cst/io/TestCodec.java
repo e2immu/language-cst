@@ -3,8 +3,13 @@ package org.e2immu.language.cst.io;
 import org.e2immu.language.cst.api.analysis.Codec;
 import org.e2immu.language.cst.api.analysis.Property;
 import org.e2immu.language.cst.api.element.CompilationUnit;
+import org.e2immu.language.cst.api.expression.EnclosedExpression;
+import org.e2immu.language.cst.api.expression.VariableExpression;
+import org.e2immu.language.cst.api.info.FieldInfo;
 import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.runtime.Runtime;
+import org.e2immu.language.cst.api.variable.FieldReference;
+import org.e2immu.language.cst.api.variable.LocalVariable;
 import org.e2immu.language.cst.impl.analysis.PropertyImpl;
 import org.e2immu.language.cst.impl.analysis.PropertyProviderImpl;
 import org.e2immu.language.cst.impl.analysis.ValueImpl;
@@ -88,5 +93,25 @@ public class TestCodec {
 
         Assertions.assertEquals("p2,p3", typeInfo2.analysis().getOrDefault(PropertyImpl.COMMUTABLE_METHODS,
                 ValueImpl.CommutableDataImpl.NONE).par());
+    }
+
+    @Test
+    public void test2() {
+        Codec.DecoderProvider decoderProvider = ValueImpl::decoder;
+        Codec codec = new CodecImpl(runtime, PropertyProviderImpl::get,
+                decoderProvider, fqn -> runtime.getFullyQualified(fqn, true));
+        CompilationUnit cu = runtime.newCompilationUnitBuilder().setPackageName("a.b").build();
+        TypeInfo typeInfo = runtime.newTypeInfo(cu, "C");
+        FieldInfo f = runtime.newFieldInfo("f", false, runtime.intParameterizedType(), typeInfo);
+        FieldReference fr = runtime.newFieldReference(f);
+        VariableExpression ve = runtime.newVariableExpression(fr);
+        Codec.Context context = new CodecImpl.ContextImpl();
+
+        CodecImpl.E encodedVe = (CodecImpl.E) codec.encodeExpression(context, ve);
+        assertEquals("variableExpression, \"sub\":{\"Fa.b.C.f\"}", encodedVe.toString());
+
+        EnclosedExpression ee = runtime.newEnclosedExpressionBuilder().setExpression(ve).build();
+        CodecImpl.E encodedEe = (CodecImpl.E) codec.encodeExpression(context, ee);
+        assertEquals("enclosedExpression, \"sub\":{variableExpression, \"sub\":{\"Fa.b.C.f\"}}", encodedEe.toString());
     }
 }
