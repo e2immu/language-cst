@@ -200,6 +200,11 @@ public abstract class ValueImpl implements Value {
         }
 
         @Override
+        public boolean isFinalFields() {
+            return value == 1;
+        }
+
+        @Override
         public Immutable max(Immutable other) {
             if (other == null) return this;
             assert this != NO_VALUE && other != NO_VALUE;

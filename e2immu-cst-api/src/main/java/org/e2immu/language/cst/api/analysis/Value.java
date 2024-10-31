@@ -48,6 +48,8 @@ public interface Value extends Comparable<Value> {
     interface Immutable extends Value {
         boolean isAtLeastImmutableHC();
 
+        boolean isFinalFields();
+
         boolean isImmutable();
 
         boolean isImmutableHC();
