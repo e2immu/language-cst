@@ -56,6 +56,7 @@ public class PropertyProviderImpl {
                 ANALYZER_ERROR,
                 STATIC_SIDE_EFFECTS_METHOD,
                 MODIFIED_FI_COMPONENTS_PARAMETER,
+                MODIFIED_COMPONENTS_METHOD,
                 MODIFIED_COMPONENTS_PARAMETER
         );
         properties.forEach(p -> propertyMap.put(p.key(), p));

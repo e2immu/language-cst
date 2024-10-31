@@ -6,7 +6,9 @@ import org.e2immu.language.cst.api.analysis.PropertyValueMap;
 import org.e2immu.language.cst.api.analysis.Value;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.info.*;
+import org.e2immu.language.cst.api.runtime.Runtime;
 import org.e2immu.language.cst.api.variable.*;
+import org.e2immu.language.cst.impl.analysis.PropertyImpl;
 import org.parsers.json.Node;
 import org.parsers.json.ast.*;
 
@@ -24,11 +26,13 @@ public class CodecImpl implements Codec {
     private final DecoderProvider decoderProvider;
     private final TypeProvider typeProvider;
     private final PropertyProvider propertyProvider;
+    private final Runtime runtime;
 
-    public CodecImpl(PropertyProvider propertyProvider, DecoderProvider decoderProvider, TypeProvider typeProvider) {
+    public CodecImpl(Runtime runtime, PropertyProvider propertyProvider, DecoderProvider decoderProvider, TypeProvider typeProvider) {
         this.decoderProvider = decoderProvider;
         this.typeProvider = typeProvider;
         this.propertyProvider = propertyProvider;
+        this.runtime = runtime;
     }
 
     @Override
@@ -112,11 +116,26 @@ public class CodecImpl implements Codec {
     public Variable decodeVariable(Context context, EncodedValue encodedValue) {
         if (encodedValue instanceof D d && d.s instanceof StringLiteral sl) {
             String source = unquote(sl.getSource());
-            if ('P' == source.charAt(0)) {
+            char variableType = source.charAt(0);
+            if ('P' == variableType) {
                 return decodeParameterOutOfContext(context, source.substring(1));
+            }
+            if ('F' == variableType) {
+                return decodeFieldReference(context, source.substring(1));
             }
         }
         throw new UnsupportedOperationException();
+    }
+
+    private FieldReference decodeFieldReference(Context context, String fqn) {
+        assert !fqn.contains("#") : "TODO not yet implemented";
+
+        int lastDot = fqn.lastIndexOf('.');
+        String typeFqn = fqn.substring(0, lastDot);
+        TypeInfo typeInfo = context.findType(typeProvider, typeFqn);
+        String fieldName = fqn.substring(lastDot + 1);
+        FieldInfo fieldInfo = typeInfo.getFieldByName(fieldName, true);
+        return runtime.newFieldReference(fieldInfo);
     }
 
     @Override
@@ -414,7 +433,12 @@ public class CodecImpl implements Codec {
             D d = (D) epv.encodedValue();
             Value value = decoder.apply(new DII(this, context), d);
             return new PropertyValue(property, value);
-        }).forEach(pv -> pvm.set(pv.property(), pv.value()));
+        }).forEach(pv -> {
+            // the GET_SET_FIELD property can already be set (by GetSetUtil) at byte-code loading
+            if (!pv.property().equals(PropertyImpl.GET_SET_FIELD) || !pvm.haveAnalyzedValueFor(PropertyImpl.GET_SET_FIELD)) {
+                pvm.set(pv.property(), pv.value());
+            }
+        });
     }
 
     @Override

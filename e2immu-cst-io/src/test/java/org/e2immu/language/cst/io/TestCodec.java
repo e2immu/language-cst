@@ -39,7 +39,7 @@ public class TestCodec {
                 new ValueImpl.CommutableDataImpl("p1", "p2,p3", "p4"));
 
         Codec.DecoderProvider decoderProvider = ValueImpl::decoder;
-        Codec codec = new CodecImpl(PropertyProviderImpl::get,
+        Codec codec = new CodecImpl(runtime, PropertyProviderImpl::get,
                 decoderProvider, fqn -> runtime.getFullyQualified(fqn, true));
         List<Property> properties = List.of(
                 PropertyImpl.IMMUTABLE_TYPE,

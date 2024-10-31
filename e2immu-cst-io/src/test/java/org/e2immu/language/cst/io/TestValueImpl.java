@@ -26,7 +26,7 @@ public class TestValueImpl {
     Codec.DecoderProvider decoderProvider = ValueImpl::decoder;
     Codec.PropertyProvider propertyProvider = PropertyProviderImpl::get;
     Codec.TypeProvider typeProvider = fqn -> runtime.getFullyQualified(fqn, true);
-    CodecImpl codec = new CodecImpl(propertyProvider, decoderProvider, typeProvider);
+    CodecImpl codec = new CodecImpl(runtime, propertyProvider, decoderProvider, typeProvider);
 
     @Test
     public void test() {
