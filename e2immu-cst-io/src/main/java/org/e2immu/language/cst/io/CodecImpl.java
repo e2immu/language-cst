@@ -7,7 +7,10 @@ import org.e2immu.language.cst.api.analysis.Value;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.info.*;
 import org.e2immu.language.cst.api.runtime.Runtime;
+import org.e2immu.language.cst.api.type.NamedType;
 import org.e2immu.language.cst.api.type.ParameterizedType;
+import org.e2immu.language.cst.api.type.TypeParameter;
+import org.e2immu.language.cst.api.type.Wildcard;
 import org.e2immu.language.cst.api.variable.*;
 import org.e2immu.language.cst.impl.analysis.PropertyImpl;
 import org.parsers.json.Node;
@@ -523,16 +526,129 @@ public class CodecImpl implements Codec {
     @Override
     public EncodedValue encodeType(Context context, ParameterizedType type) {
         if (type == null) return encodeString(context, "-");
-        return encodeString(context, type.fullyQualifiedName());
+        String s0;
+        if (type.typeInfo() != null) {
+            s0 = "T" + encodeString(context, type.fullyQualifiedName());
+        } else if (type.typeParameter() != null) {
+            s0 = (type.typeParameter().isMethodTypeParameter() ? "M" : "P") + type.typeParameter().getIndex();
+        } else {
+            s0 = type.isUnboundWildcard() ? "?" : "X";
+        }
+        EncodedValue e0 = encodeString(context, s0);
+        EncodedValue e1 = type.isTypeParameter() ? encodeOwnerOfTypeParameter(context, type.typeParameter()) : null;
+        if (type.arrays() == 0 && type.parameters().isEmpty() && e1 == null) {
+            return e0;
+        }
+        EncodedValue e2 = encodeInt(context, type.arrays());
+        Stream<EncodedValue> s3 = type.parameters().stream().map(p -> encodeType(context, p));
+        EncodedValue e4 = encodeWildcard(context, type.wildcard());
+        return encodeList(context, Stream.concat(Stream.concat(Stream.concat(
+                Stream.concat(Stream.of(e0), Stream.ofNullable(e1)), Stream.of(e2)), s3), Stream.ofNullable(e4)).toList());
     }
 
-    // TODO should we use the encoder in byte code parser?
+    private EncodedValue encodeOwnerOfTypeParameter(Context context, TypeParameter typeParameter) {
+        if (typeParameter.isMethodTypeParameter()) {
+            MethodInfo methodInfo = typeParameter.getOwner().getRight();
+            if (methodInfo.equals(context.currentMethod())) return null;
+            return encodeInfo(context, methodInfo, "" + methodIndex(methodInfo));
+        }
+        TypeInfo typeInfo = typeParameter.getOwner().getLeft();
+        if (typeInfo.equals(context.currentType())) return null;
+        return encodeInfo(context, typeInfo, null);
+    }
+
+    private EncodedValue encodeWildcard(Context context, Wildcard wildcard) {
+        if (wildcard == null || wildcard.isUnbound()) return null;
+        String s;
+        if (wildcard.isExtends()) s = "E";
+        else if (wildcard.isSuper()) s = "S";
+        else throw new UnsupportedOperationException();
+        return encodeString(context, s);
+    }
+
     @Override
     public ParameterizedType decodeType(Context context, EncodedValue encodedValue) {
-        String fqn = decodeString(context, encodedValue);
-        if ("-".equals(fqn)) return null;
-        throw new UnsupportedOperationException("TODO: " + fqn);
+        if (encodedValue instanceof D d && d.s instanceof StringLiteral sl) {
+            return decodeSimpleType(context, sl);
+        }
+        List<EncodedValue> list = decodeList(context, encodedValue);
+
+        // list index 0: named type
+        int i = 1;
+        NamedType nt;
+        if (list.get(0) instanceof D d0 && d0.s instanceof StringLiteral sl) {
+            String fqn = unquote(sl.getSource());
+            char first = fqn.charAt(0);
+            if ('T' == first) {
+                nt = context.findType(typeProvider, fqn.substring(1));
+            } else {
+                int index = Integer.parseInt(fqn.substring(1));
+                boolean ownerNotInContext = !(list.get(i) instanceof D d1 && d1.s instanceof NumberLiteral);
+                if ('M' == first) {
+                    MethodInfo owner = ownerNotInContext ? (MethodInfo) decodeInfo(context, list.get(i)) : context.currentMethod();
+                    nt = owner.typeParameters().get(index);
+                } else if ('P' == first) {
+                    TypeInfo owner = ownerNotInContext ? (TypeInfo) decodeInfo(context, list.get(i)) : context.currentType();
+                    nt = owner.typeParameters().get(index);
+                } else throw new UnsupportedOperationException();
+                if (ownerNotInContext) {
+                    ++i;
+                }
+            }
+        } else throw new UnsupportedOperationException();
+
+        // list index 2: arrays
+        int arrays;
+        if (list.get(i) instanceof D d2 && d2.s instanceof NumberLiteral nl) {
+            arrays = Integer.parseInt(nl.getSource());
+        } else throw new UnsupportedOperationException();
+
+        // list index 3: type parameters
+        ++i;
+        List<ParameterizedType> parameters = decodeList(context, list.get(i)).stream().map(ev -> decodeType(context, ev)).toList();
+
+        // list index 4, optional: wildcard
+        Wildcard wildCard;
+        ++i;
+        if (list.size() <= i) {
+            wildCard = null;
+        } else if (list.get(i) instanceof D d3 && d3.s instanceof StringLiteral sl2) {
+            String s = unquote(sl2.getSource());
+            wildCard = "E".equals(s) ? runtime.wildcardExtends() : runtime.wildcardSuper();
+        } else throw new UnsupportedOperationException();
+
+        // create
+        if (nt instanceof TypeInfo ti) {
+            return runtime.newParameterizedType(ti, arrays, wildCard, parameters);
+        }
+        if (nt instanceof TypeParameter tp) {
+            return runtime.newParameterizedType(tp, arrays, wildCard);
+        }
+        throw new UnsupportedOperationException();
     }
+
+    private ParameterizedType decodeSimpleType(Context context, StringLiteral sl) {
+        String fqn = unquote(sl.getSource());
+        char first = fqn.charAt(0);
+        return switch (first) {
+            case '-' -> null;
+            case 'X' -> runtime.parameterizedTypeNullConstant();
+            case '?' -> runtime.parameterizedTypeWildcard();
+            case 'T' -> context.findType(typeProvider, fqn.substring(1)).asSimpleParameterizedType();
+            case 'M' -> {
+                // method type parameter in current context
+                int index = Integer.parseInt(fqn.substring(1));
+                yield context.currentMethod().typeParameters().get(index).asParameterizedType();
+            }
+            case 'P' -> {
+                // type parameter in current context
+                int index = Integer.parseInt(fqn.substring(1));
+                yield context.currentType().typeParameters().get(index).asParameterizedType();
+            }
+            default -> throw new UnsupportedOperationException("TODO: " + fqn);
+        };
+    }
+
 
     public static class ContextImpl implements Context {
         private final Stack<Info> stack = new Stack<>();

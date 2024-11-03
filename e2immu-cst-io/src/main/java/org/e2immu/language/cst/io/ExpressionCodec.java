@@ -33,6 +33,9 @@ public class ExpressionCodec {
     }
 
     public Codec.EncodedValue encodeExpression(Expression e) {
+        if (e == null) {
+            return new CodecImpl.E("-");
+        }
         ECodec eCodec = map.get(e.name());
         assert eCodec != null;
         return eCodec.encode(e);
@@ -40,6 +43,7 @@ public class ExpressionCodec {
 
     public Expression decodeExpression(Codec.EncodedValue encodedValue) {
         if (encodedValue instanceof CodecImpl.E e) {
+            if ("-".equals(e.s())) return null;
             ECodec eCodec = map.get(e.s());
             return eCodec.decode(encodedValue);
         } else throw new UnsupportedOperationException();
