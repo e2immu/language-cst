@@ -17,35 +17,24 @@ support for reading and writing the property-value pairs in many elements.
  */
 public interface Codec {
 
-    interface Context {
-        TypeInfo findType(Codec.TypeProvider typeProvider, String typeFqn);
+    int constructorIndex(MethodInfo methodInfo);
 
-        boolean isEmpty();
-
-        boolean methodBeforeType();
-
-        Info pop();
-
-        Info peek(int stepsBack);
-
-        void push(Info info);
-
-        TypeInfo currentType();
-
-        MethodInfo currentMethod();
-    }
+    /*
+    the reason we write directly is that HCS follows HCT in the same list, and needs its value (see decoder of HCS)
+     */
+    void decode(Context context, @Modified PropertyValueMap pvm, Stream<EncodedPropertyValue> encodedPropertyValueStream);
 
     boolean decodeBoolean(Context context, EncodedValue encodedValue);
 
-    Variable decodeVariable(Context context, EncodedValue encodedValue);
-
     Expression decodeExpression(Context context, EncodedValue value);
 
-    FieldInfo decodeFieldInfo(Context context, EncodedValue encodedValue);
+    FieldInfo decodeFieldInfo(TypeInfo typeInfo, EncodedValue ev);
 
-    Info decodeInfo(Context context, char type, String name);
+    Info decodeInfoInContext(Context context, EncodedValue ev);
 
-    Info decodeInfo(Context context, EncodedValue ev);
+    Info decodeInfoInContext(Context context, char type, String name);
+
+    Info decodeInfoOutOfContext(Context context, EncodedValue ev);
 
     int decodeInt(Context context, EncodedValue encodedValue);
 
@@ -53,17 +42,29 @@ public interface Codec {
 
     Map<EncodedValue, EncodedValue> decodeMap(Context context, EncodedValue encodedValue);
 
-    MethodInfo decodeMethodOutOfContext(Context context, EncodedValue encodedValue);
-
     Set<EncodedValue> decodeSet(Context context, EncodedValue encodedValue);
 
     String decodeString(Context context, EncodedValue encodedValue);
+
+    ParameterizedType decodeType(Context context, EncodedValue encodedValue);
+
+    Variable decodeVariable(Context context, EncodedValue encodedValue);
+
+    default EncodedPropertyValue encode(Context context, Property property, Value value) {
+        EncodedValue encodedValue = value.encode(this, context);
+        return new EncodedPropertyValue(property.key(), encodedValue);
+    }
+
+    EncodedValue encode(Context context, Info info, String index, Stream<EncodedPropertyValue> encodedPropertyValueStream,
+                        List<EncodedValue> subs);
 
     EncodedValue encodeBoolean(Context context, boolean value);
 
     EncodedValue encodeExpression(Context context, Expression expression);
 
-    EncodedValue encodeInfo(Context context, Info info, String index);
+    EncodedValue encodeInfoInContext(Context context, Info info, String index);
+
+    EncodedValue encodeInfoOutOfContext(Context context, Info info);
 
     EncodedValue encodeInt(Context context, int value);
 
@@ -75,37 +76,45 @@ public interface Codec {
 
     EncodedValue encodeString(Context context, String string);
 
-    EncodedValue encodeVariable(Context context, Variable variable);
-
-    EncodedValue encodeMethodOutOfContext(Context context, MethodInfo methodInfo);
-
-    ParameterizedType decodeType(Context context, EncodedValue encodedValue);
-
     EncodedValue encodeType(Context context, ParameterizedType type);
+
+    EncodedValue encodeVariable(Context context, Variable variable);
 
     int fieldIndex(FieldInfo key);
 
+    boolean isList(EncodedValue encodedValue);
+
     int methodIndex(MethodInfo methodInfo);
 
-    int constructorIndex(MethodInfo methodInfo);
+    PropertyProvider propertyProvider();
 
-    boolean isList(EncodedValue encodedValue);
+    int subTypeIndex(TypeInfo subType);
+
+    // for extensions
+    TypeProvider typeProvider();
+
+    interface Context {
+        MethodInfo currentMethod();
+
+        TypeInfo currentType();
+
+        TypeInfo findType(Codec.TypeProvider typeProvider, String typeFqn);
+
+        boolean isEmpty();
+
+        boolean methodBeforeType();
+
+        Info peek(int stepsBack);
+
+        Info pop();
+
+        void push(Info info);
+    }
 
     interface DI {
         Codec codec();
 
         Context context();
-    }
-
-    record EncodedPropertyValue(String key, EncodedValue encodedValue) {
-    }
-
-    record PropertyValue(Property property, Value value) {
-    }
-
-    default EncodedPropertyValue encode(Context context, Property property, Value value) {
-        EncodedValue encodedValue = value.encode(this, context);
-        return new EncodedPropertyValue(property.key(), encodedValue);
     }
 
     interface DecoderProvider {
@@ -120,22 +129,15 @@ public interface Codec {
         Property get(String propertyName);
     }
 
-    // for extensions
-    TypeProvider typeProvider();
-
-    PropertyProvider propertyProvider();
-
     // Info level
 
     interface EncodedValue {
     }
 
-    /*
-    the reason we write directly is that HCS follows HCT in the same list, and needs its value (see decoder of HCS)
-     */
-    void decode(Context context, @Modified PropertyValueMap pvm, Stream<EncodedPropertyValue> encodedPropertyValueStream);
+    record EncodedPropertyValue(String key, EncodedValue encodedValue) {
+    }
 
-    EncodedValue encode(Context context, Info info, String index, Stream<EncodedPropertyValue> encodedPropertyValueStream,
-                        List<EncodedValue> subs);
+    record PropertyValue(Property property, Value value) {
+    }
 }
 

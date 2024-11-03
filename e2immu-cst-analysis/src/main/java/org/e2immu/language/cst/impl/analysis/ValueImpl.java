@@ -432,7 +432,7 @@ public abstract class ValueImpl implements Value {
         @Override
         public Codec.EncodedValue encode(Codec codec, Codec.Context context) {
             List<Codec.EncodedValue> list = new ArrayList<>();
-            list.add(codec.encodeInfo(context, field, "" + codec.fieldIndex(field)));
+            list.add(codec.encodeInfoInContext(context, field, "" + codec.fieldIndex(field)));
             list.add(codec.encodeBoolean(context, setter));
             if (parameterIndexOfIndex >= 0) {
                 list.add(codec.encodeInt(context, parameterIndexOfIndex));
@@ -458,7 +458,7 @@ public abstract class ValueImpl implements Value {
             Codec codec = di.codec();
             Codec.Context context = di.context();
             List<Codec.EncodedValue> list = codec.decodeList(context, encodedValue);
-            FieldInfo field = codec.decodeFieldInfo(context, list.get(0));
+            FieldInfo field = codec.decodeFieldInfo(context.currentType(), list.get(0));
             boolean setter = codec.decodeBoolean(context, list.get(1));
             int index = list.size() == 2 ? -1 : codec.decodeInt(context, list.get(2));
             return new GetSetValueImpl(field, setter, index);
@@ -472,7 +472,7 @@ public abstract class ValueImpl implements Value {
         public Codec.EncodedValue encode(Codec codec, Codec.Context context) {
             Map<Codec.EncodedValue, Codec.EncodedValue> encodedMap = map.entrySet().stream()
                     .collect(Collectors.toUnmodifiableMap(
-                            e -> codec.encodeInfo(context, e.getKey(), "" + codec.fieldIndex(e.getKey())),
+                            e -> codec.encodeInfoInContext(context, e.getKey(), "" + codec.fieldIndex(e.getKey())),
                             e -> codec.encodeBoolean(context, e.getValue())));
             return codec.encodeMap(context, encodedMap);
         }
@@ -488,7 +488,7 @@ public abstract class ValueImpl implements Value {
         decoderMap.put(FieldBooleanMapImpl.class, (di, encodedValue) -> {
             Map<FieldInfo, Boolean> decodedMap = di.codec().decodeMap(di.context(), encodedValue)
                     .entrySet().stream().collect(Collectors.toUnmodifiableMap(
-                            e -> di.codec().decodeFieldInfo(di.context(), e.getKey()),
+                            e -> di.codec().decodeFieldInfo(di.context().currentType(), e.getKey()),
                             e -> di.codec().decodeBoolean(di.context(), e.getValue())));
             return new FieldBooleanMapImpl(decodedMap);
         });
@@ -532,7 +532,7 @@ public abstract class ValueImpl implements Value {
 
         @Override
         public Codec.EncodedValue encode(Codec codec, Codec.Context context) {
-            Set<Codec.EncodedValue> set = fields.stream().map(fi -> codec.encodeInfo(context, fi,
+            Set<Codec.EncodedValue> set = fields.stream().map(fi -> codec.encodeInfoInContext(context, fi,
                     "" + codec.fieldIndex(fi))).collect(Collectors.toUnmodifiableSet());
             return codec.encodeSet(context, set);
         }
@@ -541,7 +541,7 @@ public abstract class ValueImpl implements Value {
     static {
         decoderMap.put(AssignedToFieldImpl.class, (di, encodedValue) -> {
             Set<FieldInfo> decodedSet = di.codec().decodeSet(di.context(), encodedValue).stream()
-                    .map(e -> di.codec().decodeFieldInfo(di.context(), e))
+                    .map(e -> di.codec().decodeFieldInfo(di.context().currentType(), e))
                     .collect(Collectors.toUnmodifiableSet());
             return new AssignedToFieldImpl(decodedSet);
         });
@@ -615,7 +615,7 @@ public abstract class ValueImpl implements Value {
                     .map(v -> codec.encodeVariable(context, v))
                     .collect(Collectors.toUnmodifiableSet());
             return codec.encodeList(context, List.of(codec.encodeSet(context, set),
-                    codec.encodeMethodOutOfContext(context, methodWithoutParameters)));
+                    codec.encodeInfoOutOfContext(context, methodWithoutParameters)));
         }
     }
 
@@ -625,7 +625,7 @@ public abstract class ValueImpl implements Value {
             Set<ParameterInfo> set = di.codec().decodeSet(di.context(), list.get(0)).stream()
                     .map(e -> (ParameterInfo) di.codec().decodeVariable(di.context(), e))
                     .collect(Collectors.toUnmodifiableSet());
-            return new GetSetEquivalentImpl(set, di.codec().decodeMethodOutOfContext(di.context(), list.get(1)));
+            return new GetSetEquivalentImpl(set, (MethodInfo) di.codec().decodeInfoOutOfContext(di.context(), list.get(1)));
         });
     }
 
@@ -699,14 +699,14 @@ public abstract class ValueImpl implements Value {
                             }
                         } else if (info instanceof FieldInfo fieldInfo) index = codec.fieldIndex(fieldInfo);
                         else throw new UnsupportedOperationException();
-                        return codec.encodeInfo(context, info, "" + index);
+                        return codec.encodeInfoInContext(context, info, "" + index);
                     }).toList();
             return codec.encodeList(context, encodedValues);
         }
 
         public static SetOfInfo from(Codec codec, Codec.Context context, Codec.EncodedValue encodedList) {
             List<Codec.EncodedValue> encodedValues = codec.decodeList(context, encodedList);
-            Set<Info> set = encodedValues.stream().map(e -> codec.decodeInfo(context, e))
+            Set<Info> set = encodedValues.stream().map(e -> codec.decodeInfoOutOfContext(context, e))
                     .collect(Collectors.toUnmodifiableSet());
             return new SetOfInfoImpl(set);
         }
