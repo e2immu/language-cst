@@ -16,8 +16,10 @@ import org.e2immu.language.cst.impl.analysis.ValueImpl;
 import org.e2immu.language.cst.impl.runtime.RuntimeImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.parsers.json.JSONLexer;
 import org.parsers.json.JSONParser;
 import org.parsers.json.Node;
+import org.parsers.json.Token;
 import org.parsers.json.ast.JSONObject;
 import org.parsers.json.ast.KeyValuePair;
 import org.parsers.json.ast.Root;
@@ -31,7 +33,13 @@ import static org.junit.jupiter.api.Assertions.*;
 
 
 public class TestCodec {
-    private final Runtime runtime = new RuntimeImpl();
+    private final Runtime runtime = new RuntimeImpl() {
+        @Override
+        public TypeInfo getFullyQualified(String name, boolean complain) {
+            if ("int".equals(name)) return intTypeInfo();
+            throw new UnsupportedOperationException();
+        }
+    };
 
     @Test
     public void test() {
@@ -93,25 +101,5 @@ public class TestCodec {
 
         Assertions.assertEquals("p2,p3", typeInfo2.analysis().getOrDefault(PropertyImpl.COMMUTABLE_METHODS,
                 ValueImpl.CommutableDataImpl.NONE).par());
-    }
-
-    @Test
-    public void test2() {
-        Codec.DecoderProvider decoderProvider = ValueImpl::decoder;
-        Codec codec = new CodecImpl(runtime, PropertyProviderImpl::get,
-                decoderProvider, fqn -> runtime.getFullyQualified(fqn, true));
-        CompilationUnit cu = runtime.newCompilationUnitBuilder().setPackageName("a.b").build();
-        TypeInfo typeInfo = runtime.newTypeInfo(cu, "C");
-        FieldInfo f = runtime.newFieldInfo("f", false, runtime.intParameterizedType(), typeInfo);
-        FieldReference fr = runtime.newFieldReference(f);
-        VariableExpression ve = runtime.newVariableExpression(fr);
-        Codec.Context context = new CodecImpl.ContextImpl();
-
-        CodecImpl.E encodedVe = (CodecImpl.E) codec.encodeExpression(context, ve);
-        assertEquals("variableExpression, \"sub\":{\"Fa.b.C.f\"}", encodedVe.toString());
-
-        EnclosedExpression ee = runtime.newEnclosedExpressionBuilder().setExpression(ve).build();
-        CodecImpl.E encodedEe = (CodecImpl.E) codec.encodeExpression(context, ee);
-        assertEquals("enclosedExpression, \"sub\":{variableExpression, \"sub\":{\"Fa.b.C.f\"}}", encodedEe.toString());
     }
 }

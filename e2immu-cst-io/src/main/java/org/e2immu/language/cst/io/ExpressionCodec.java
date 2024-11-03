@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 public class ExpressionCodec {
     private final Codec codec;
@@ -27,26 +28,27 @@ public class ExpressionCodec {
     }
 
     private interface ECodec {
-        Codec.EncodedValue encode(Expression e);
+        List<Codec.EncodedValue> encode(Expression e);
 
-        Expression decode(Codec.EncodedValue encodedValue);
+        Expression decode(List<Codec.EncodedValue> list);
     }
 
     public Codec.EncodedValue encodeExpression(Expression e) {
         if (e == null) {
-            return new CodecImpl.E("-");
+            return codec.encodeList(context, List.of());
         }
         ECodec eCodec = map.get(e.name());
         assert eCodec != null;
-        return eCodec.encode(e);
+        List<Codec.EncodedValue> list = eCodec.encode(e);
+        Codec.EncodedValue e0 = codec.encodeString(context, e.name());
+        return codec.encodeList(context, Stream.concat(Stream.of(e0), list.stream()).toList());
     }
 
     public Expression decodeExpression(Codec.EncodedValue encodedValue) {
-        if (encodedValue instanceof CodecImpl.E e) {
-            if ("-".equals(e.s())) return null;
-            ECodec eCodec = map.get(e.s());
-            return eCodec.decode(encodedValue);
-        } else throw new UnsupportedOperationException();
+        List<Codec.EncodedValue> list = codec.decodeList(context, encodedValue);
+        String name = codec.decodeString(context, list.get(0));
+        ECodec eCodec = map.get(name);
+        return eCodec.decode(list);
     }
 
     private Codec.EncodedValue encode(String name, Expression... expressions) {
@@ -57,35 +59,28 @@ public class ExpressionCodec {
     class VariableExpressionCodec implements ECodec {
 
         @Override
-        public Codec.EncodedValue encode(Expression e) {
-            return new CodecImpl.E(VariableExpression.NAME,
-                    List.of(codec.encodeVariable(context, ((VariableExpression) e).variable())));
+        public List<Codec.EncodedValue> encode(Expression e) {
+            return List.of(codec.encodeVariable(context, ((VariableExpression) e).variable()));
         }
 
         @Override
-        public Expression decode(Codec.EncodedValue encodedValue) {
-            if (encodedValue instanceof CodecImpl.E e) {
-                assert VariableExpression.NAME.equals(e.s());
-                Variable variable = codec.decodeVariable(context, e.subs().get(0));
-                return runtime.newVariableExpression(variable);
-            } else throw new UnsupportedOperationException();
+        public Expression decode(List<Codec.EncodedValue> list) {
+            Variable variable = codec.decodeVariable(context, list.get(1));
+            return runtime.newVariableExpression(variable);
         }
     }
 
     class EnclosedExpressionCodec implements ECodec {
 
         @Override
-        public Codec.EncodedValue encode(Expression enclosedExpression) {
-            return ExpressionCodec.this.encode(enclosedExpression.name(), ((EnclosedExpression) enclosedExpression).inner());
+        public List<Codec.EncodedValue> encode(Expression enclosedExpression) {
+            return List.of(encodeExpression(((EnclosedExpression) enclosedExpression).inner()));
         }
 
         @Override
-        public Expression decode(Codec.EncodedValue encodedValue) {
-            if (encodedValue instanceof CodecImpl.E e) {
-                assert EnclosedExpression.NAME.equals(e.s());
-                Expression inner = decodeExpression(e.subs().get(0));
-                return runtime.newEnclosedExpressionBuilder().setExpression(inner).build();
-            } else throw new UnsupportedOperationException();
+        public Expression decode(List<Codec.EncodedValue> list) {
+            Expression inner = decodeExpression(list.get(1));
+            return runtime.newEnclosedExpressionBuilder().setExpression(inner).build();
         }
     }
 }

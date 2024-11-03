@@ -118,27 +118,28 @@ public class CodecImpl implements Codec {
 
     @Override
     public Variable decodeVariable(Context context, EncodedValue encodedValue) {
-        if (encodedValue instanceof D d && d.s instanceof StringLiteral sl) {
-            String source = unquote(sl.getSource());
-            char variableType = source.charAt(0);
-            return switch (variableType) {
-                case 'P' -> decodeParameterOutOfContext(context, source.substring(1));
-                case 'F' -> decodeFieldReference(context, source.substring(1));
-                default -> throw new UnsupportedOperationException();
-            };
-        }
-        throw new UnsupportedOperationException();
-    }
-
-    private FieldReference decodeFieldReference(Context context, String fqn) {
-        assert !fqn.contains("#") : "TODO not yet implemented";
-
-        int lastDot = fqn.lastIndexOf('.');
-        String typeFqn = fqn.substring(0, lastDot);
-        TypeInfo typeInfo = context.findType(typeProvider, typeFqn);
-        String fieldName = fqn.substring(lastDot + 1);
-        FieldInfo fieldInfo = typeInfo.getFieldByName(fieldName, true);
-        return runtime.newFieldReference(fieldInfo);
+        List<EncodedValue> list = decodeList(context, encodedValue);
+        String s = decodeString(context, list.get(0));
+        return switch (s) {
+            case "F" -> {
+                FieldInfo fieldInfo = (FieldInfo) decodeInfo(context, list.get(1));
+                if (list.size() == 2) {
+                    yield runtime.newFieldReference(fieldInfo);
+                }
+                Expression scope = decodeExpression(context, list.get(2));
+                yield runtime.newFieldReference(fieldInfo, scope, fieldInfo.type());
+            }
+            case "T" -> {
+                TypeInfo typeInfo = (TypeInfo) decodeInfo(context, list.get(1));
+                yield runtime.newThis(typeInfo.asParameterizedType());
+            }
+            case "L" -> {
+                String name = decodeString(context, list.get(1));
+                ParameterizedType type = decodeType(context, list.get(2));
+                yield runtime.newLocalVariable(name, type);
+            }
+            default -> throw new UnsupportedOperationException();
+        };
     }
 
     @Override
@@ -404,20 +405,26 @@ public class CodecImpl implements Codec {
 
     @Override
     public EncodedValue encodeVariable(Context context, Variable variable) {
-        String type;
         if (variable instanceof ParameterInfo pi) {
-            return new E(quote("P" + pi.typeInfo().fullyQualifiedName() + "." + pi.methodInfo().name()
-                               + "(" + methodIndex(pi.methodInfo()) + "):" + pi.index()));
-        } else if (variable instanceof FieldReference) {
-            type = "F";
-        } else if (variable instanceof DependentVariable) {
-            type = "D";
-        } else if (variable instanceof LocalVariable) {
-            type = "L";
-        } else if (variable instanceof This) {
-            type = "T";
-        } else throw new UnsupportedOperationException();
-        return new E(quote(type + variable.fullyQualifiedName()));
+            throw new UnsupportedOperationException("TODO");
+        }
+        if (variable instanceof FieldReference fr) {
+            EncodedValue f = encodeString(context, "F");
+            EncodedValue encodedFieldInfo = encodeInfo(context, fr.fieldInfo(), "" + fieldIndex(fr.fieldInfo()));
+            if (fr.isDefaultScope()) {
+                return encodeList(context, List.of(f, encodedFieldInfo));
+            }
+            return encodeList(context, List.of(f, encodedFieldInfo, encodeExpression(context, fr.scope())));
+        }
+        if (variable instanceof This thisVar) {
+            return encodeList(context, List.of(encodeString(context, "T"),
+                    encodeInfo(context, thisVar.typeInfo(), null)));
+        }
+        if (variable instanceof LocalVariable lv) {
+            return encodeList(context, List.of(encodeString(context, "L"), encodeString(context, lv.simpleName()),
+                    encodeType(context, lv.parameterizedType())));
+        }
+        throw new UnsupportedOperationException();
     }
 
     public record DII(Codec codec, Context context) implements DI {
@@ -528,7 +535,7 @@ public class CodecImpl implements Codec {
         if (type == null) return encodeString(context, "-");
         String s0;
         if (type.typeInfo() != null) {
-            s0 = "T" + encodeString(context, type.fullyQualifiedName());
+            s0 = "T" + type.typeInfo().fullyQualifiedName();
         } else if (type.typeParameter() != null) {
             s0 = (type.typeParameter().isMethodTypeParameter() ? "M" : "P") + type.typeParameter().getIndex();
         } else {
@@ -536,14 +543,15 @@ public class CodecImpl implements Codec {
         }
         EncodedValue e0 = encodeString(context, s0);
         EncodedValue e1 = type.isTypeParameter() ? encodeOwnerOfTypeParameter(context, type.typeParameter()) : null;
-        if (type.arrays() == 0 && type.parameters().isEmpty() && e1 == null) {
+        if (type.arrays() == 0 && type.parameters().isEmpty()
+            && e1 == null && (type.wildcard() == null || type.wildcard().isUnbound())) {
             return e0;
         }
         EncodedValue e2 = encodeInt(context, type.arrays());
-        Stream<EncodedValue> s3 = type.parameters().stream().map(p -> encodeType(context, p));
+        EncodedValue e3 = encodeList(context, type.parameters().stream().map(p -> encodeType(context, p)).toList());
         EncodedValue e4 = encodeWildcard(context, type.wildcard());
         return encodeList(context, Stream.concat(Stream.concat(Stream.concat(
-                Stream.concat(Stream.of(e0), Stream.ofNullable(e1)), Stream.of(e2)), s3), Stream.ofNullable(e4)).toList());
+                Stream.concat(Stream.of(e0), Stream.ofNullable(e1)), Stream.of(e2)), Stream.of(e3)), Stream.ofNullable(e4)).toList());
     }
 
     private EncodedValue encodeOwnerOfTypeParameter(Context context, TypeParameter typeParameter) {
