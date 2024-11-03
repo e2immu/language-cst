@@ -706,7 +706,7 @@ public abstract class ValueImpl implements Value {
 
         public static SetOfInfo from(Codec codec, Codec.Context context, Codec.EncodedValue encodedList) {
             List<Codec.EncodedValue> encodedValues = codec.decodeList(context, encodedList);
-            Set<Info> set = encodedValues.stream().map(e -> codec.decodeInfoOutOfContext(context, e))
+            Set<Info> set = encodedValues.stream().map(e -> codec.decodeInfoInContext(context, e))
                     .collect(Collectors.toUnmodifiableSet());
             return new SetOfInfoImpl(set);
         }

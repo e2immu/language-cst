@@ -5,6 +5,7 @@ import org.e2immu.language.cst.api.analysis.Property;
 import org.e2immu.language.cst.api.analysis.PropertyValueMap;
 import org.e2immu.language.cst.api.analysis.Value;
 import org.e2immu.language.cst.api.expression.Expression;
+import org.e2immu.language.cst.api.expression.VariableExpression;
 import org.e2immu.language.cst.api.info.*;
 import org.e2immu.language.cst.api.runtime.Runtime;
 import org.e2immu.language.cst.api.type.NamedType;
@@ -389,6 +390,10 @@ public class CodecImpl implements Codec {
             case "D" -> {
                 Expression a = decodeExpression(context, list.get(1));
                 Expression i = decodeExpression(context, list.get(2));
+                if(a instanceof VariableExpression ve) {
+                    // to allow for this[xxx] in StaticValues
+                    yield runtime.newDependentVariable(ve.variable(), ve.parameterizedType(), i);
+                }
                 yield runtime.newDependentVariable(a, i);
             }
             default -> {

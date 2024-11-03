@@ -8,7 +8,6 @@ import org.e2immu.language.cst.api.type.Diamond;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.variable.Variable;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +50,7 @@ public class ExpressionCodec {
 
     public Expression decodeExpression(Codec.EncodedValue encodedValue) {
         List<Codec.EncodedValue> list = codec.decodeList(context, encodedValue);
+        if (list.isEmpty()) return null;
         String name = codec.decodeString(context, list.get(0));
         ECodec eCodec = map.get(name);
         return eCodec.decode(list);

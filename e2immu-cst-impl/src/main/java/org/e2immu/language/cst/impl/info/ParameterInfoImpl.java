@@ -202,7 +202,7 @@ public class ParameterInfoImpl implements ParameterInfo {
 
     @Override
     public boolean isModified() {
-        return analysis.getOrDefault(PropertyImpl.MODIFIED_PARAMETER, ValueImpl.BoolImpl.TRUE).isTrue();
+        return analysis.getOrDefault(PropertyImpl.MODIFIED_PARAMETER, ValueImpl.BoolImpl.FALSE).isTrue();
     }
 
     @Override
