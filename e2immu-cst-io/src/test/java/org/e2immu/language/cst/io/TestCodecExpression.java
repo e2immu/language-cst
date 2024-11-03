@@ -30,7 +30,7 @@ public class TestCodecExpression extends CommonTest {
     public void test1() {
         context.push(typeInfo);
 
-        String encoded = "[\"F\",\"Ff(0)\"]";
+        String encoded = "[\"F\",[\"Ta.b.C\",\"Ff(0)\"]]";
         FieldReference fr = runtime.newFieldReference(f);
         assertEquals(encoded, codec.encodeVariable(context, fr).toString());
         CodecImpl.D d = makeD(encoded);
@@ -47,7 +47,7 @@ public class TestCodecExpression extends CommonTest {
         FieldReference fr = runtime.newFieldReference(f, ee, f.type());
         assertEquals("(lv).f", fr.toString());
 
-        String encoded = "[\"F\",\"Ff(0)\",[\"enclosedExpression\",[\"variableExpression\",[\"L\",\"lv\",\"Ta.b.C\"]]]]";
+        String encoded = "[\"F\",[\"Ta.b.C\",\"Ff(0)\"],[\"enclosedExpression\",[\"variableExpression\",[\"L\",\"lv\",\"Ta.b.C\"]]]]";
         assertEquals(encoded, codec.encodeVariable(context, fr).toString());
         CodecImpl.D d = makeD(encoded);
         assertEquals(fr, codec.decodeVariable(context, d));

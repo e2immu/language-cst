@@ -502,7 +502,7 @@ public abstract class ValueImpl implements Value {
             Map<Codec.EncodedValue, Codec.EncodedValue> encodedMap = map.entrySet().stream()
                     .collect(Collectors.toUnmodifiableMap(e -> codec.encodeVariable(context, e.getKey()),
                             e -> codec.encodeBoolean(context, e.getValue())));
-            return codec.encodeMap(context, encodedMap);
+            return codec.encodeMapAsList(context, encodedMap);
         }
 
         @Override
@@ -519,7 +519,7 @@ public abstract class ValueImpl implements Value {
 
     static {
         decoderMap.put(VariableBooleanMapImpl.class, (di, encodedValue) -> {
-            Map<Variable, Boolean> decodedMap = di.codec().decodeMap(di.context(), encodedValue)
+            Map<Variable, Boolean> decodedMap = di.codec().decodeMapAsList(di.context(), encodedValue)
                     .entrySet().stream().collect(Collectors.toUnmodifiableMap(
                             e -> di.codec().decodeVariable(di.context(), e.getKey()),
                             e -> di.codec().decodeBoolean(di.context(), e.getValue())));

@@ -119,7 +119,7 @@ public class CodecImpl implements Codec {
     @Override
     public FieldInfo decodeFieldInfo(TypeInfo typeInfo, EncodedValue ev) {
         String s = decodeString(null, ev);
-        return decodeFieldInfo(typeInfo, s);
+        return decodeFieldInfo(typeInfo, s.substring(1));
     }
 
     private FieldInfo decodeFieldInfo(TypeInfo typeInfo, String nameIndex) {
@@ -130,6 +130,18 @@ public class CodecImpl implements Codec {
             assert fieldInfo.name().equals(m.group(1));
             return fieldInfo;
         } else throw new UnsupportedOperationException();
+    }
+
+    private Info decodeInfo(Info current, char type, String name) {
+        return switch (type) {
+            case 'F' -> decodeFieldInfo((TypeInfo) current, name);
+            case 'C' -> decodeConstructor((TypeInfo) current, name);
+            case 'M' -> decodeMethodInfo((TypeInfo) current, name);
+            case 'T' -> typeProvider.get(name);
+            case 'S' -> decodeSubType((TypeInfo) current, name);
+            case 'P' -> decodeParameterInfo((MethodInfo) current, name);
+            default -> throw new UnsupportedOperationException();
+        };
     }
 
     @Override
@@ -152,18 +164,6 @@ public class CodecImpl implements Codec {
             case 'T' -> typeProvider.get(name);
             case 'S' -> decodeSubType(context.currentType(), name);
             case 'P' -> decodeParameterInfo(context.currentMethod(), name);
-            default -> throw new UnsupportedOperationException();
-        };
-    }
-
-    private Info decodeInfo(Info current, char type, String name) {
-        return switch (type) {
-            case 'F' -> decodeFieldInfo((TypeInfo) current, name);
-            case 'C' -> decodeConstructor((TypeInfo) current, name);
-            case 'M' -> decodeMethodInfo((TypeInfo) current, name);
-            case 'T' -> typeProvider.get(name);
-            case 'S' -> decodeSubType((TypeInfo) current, name);
-            case 'P' -> decodeParameterInfo((MethodInfo) current, name);
             default -> throw new UnsupportedOperationException();
         };
     }
@@ -213,6 +213,20 @@ public class CodecImpl implements Codec {
         return map;
     }
 
+    @Override
+    public Map<EncodedValue, EncodedValue> decodeMapAsList(Context context, EncodedValue encodedValue) {
+        Map<EncodedValue, EncodedValue> map = new LinkedHashMap<>();
+        List<EncodedValue> list = decodeList(context, encodedValue);
+        Iterator<EncodedValue> it = list.iterator();
+        while (it.hasNext()) {
+            EncodedValue key = it.next();
+            if (!it.hasNext()) throw new UnsupportedOperationException();
+            EncodedValue value = it.next();
+            map.put(key, value);
+        }
+        return map;
+    }
+
     private MethodInfo decodeMethodInfo(TypeInfo typeInfo, String nameIndex) {
         Matcher m = NAME_INDEX_PATTERN.matcher(nameIndex);
         if (m.matches()) {
@@ -245,9 +259,9 @@ public class CodecImpl implements Codec {
 
     private ParameterizedType decodeSimpleType(Context context, StringLiteral sl) {
         String fqn = unquote(sl.getSource());
+        if (fqn.isEmpty()) return null;
         char first = fqn.charAt(0);
         return switch (first) {
-            case '-' -> null;
             case 'X' -> runtime.parameterizedTypeNullConstant();
             case '?' -> runtime.parameterizedTypeWildcard();
             case 'T' -> context.findType(typeProvider, fqn.substring(1)).asSimpleParameterizedType();
@@ -269,7 +283,9 @@ public class CodecImpl implements Codec {
     public String decodeString(Context context, EncodedValue encodedValue) {
         if (encodedValue instanceof D d && d.s instanceof StringLiteral l) {
             return unquote(l.getSource());
-        } else throw new UnsupportedOperationException();
+        } else {
+            throw new UnsupportedOperationException();
+        }
     }
 
     private TypeInfo decodeSubType(TypeInfo typeInfo, String nameIndex) {
@@ -349,10 +365,12 @@ public class CodecImpl implements Codec {
     @Override
     public Variable decodeVariable(Context context, EncodedValue encodedValue) {
         List<EncodedValue> list = decodeList(context, encodedValue);
+        assert !list.isEmpty();
         String s = decodeString(context, list.get(0));
         return switch (s) {
+            case "P" -> (ParameterInfo) this.decodeInfoOutOfContext(context, list.get(1));
             case "F" -> {
-                FieldInfo fieldInfo = (FieldInfo) this.decodeInfoInContext(context, list.get(1));
+                FieldInfo fieldInfo = (FieldInfo) this.decodeInfoOutOfContext(context, list.get(1));
                 if (list.size() == 2) {
                     yield runtime.newFieldReference(fieldInfo);
                 }
@@ -360,7 +378,7 @@ public class CodecImpl implements Codec {
                 yield runtime.newFieldReference(fieldInfo, scope, fieldInfo.type());
             }
             case "T" -> {
-                TypeInfo typeInfo = (TypeInfo) this.decodeInfoInContext(context, list.get(1));
+                TypeInfo typeInfo = (TypeInfo) this.decodeInfoOutOfContext(context, list.get(1));
                 yield runtime.newThis(typeInfo.asParameterizedType());
             }
             case "L" -> {
@@ -368,7 +386,14 @@ public class CodecImpl implements Codec {
                 ParameterizedType type = decodeType(context, list.get(2));
                 yield runtime.newLocalVariable(name, type);
             }
-            default -> throw new UnsupportedOperationException();
+            case "D" -> {
+                Expression a = decodeExpression(context, list.get(1));
+                Expression i = decodeExpression(context, list.get(2));
+                yield runtime.newDependentVariable(a, i);
+            }
+            default -> {
+                throw new UnsupportedOperationException();
+            }
         };
     }
 
@@ -495,6 +520,20 @@ public class CodecImpl implements Codec {
         return new E(encoded);
     }
 
+    private record R(EncodedValue key, EncodedValue value) implements Comparable<R> {
+        @Override
+        public int compareTo(R o) {
+            return ((E) key).s.compareTo(((E) o.key).s);
+        }
+    }
+
+    @Override
+    public EncodedValue encodeMapAsList(Context context, Map<EncodedValue, EncodedValue> map) {
+        List<EncodedValue> list = map.entrySet().stream().map(e -> new R(e.getKey(), e.getValue()))
+                .sorted().flatMap(r -> Stream.of(r.key, r.value)).toList();
+        return encodeList(context, list);
+    }
+
     private EncodedValue encodeOwnerOfTypeParameter(Context context, TypeParameter typeParameter) {
         if (typeParameter.isMethodTypeParameter()) {
             MethodInfo methodInfo = typeParameter.getOwner().getRight();
@@ -520,7 +559,7 @@ public class CodecImpl implements Codec {
 
     @Override
     public EncodedValue encodeType(Context context, ParameterizedType type) {
-        if (type == null) return encodeString(context, "-");
+        if (type == null) return encodeString(context, "");
         String s0;
         if (type.typeInfo() != null) {
             s0 = "T" + type.typeInfo().fullyQualifiedName();
@@ -545,7 +584,7 @@ public class CodecImpl implements Codec {
     @Override
     public EncodedValue encodeVariable(Context context, Variable variable) {
         if (variable instanceof ParameterInfo pi) {
-            throw new UnsupportedOperationException("TODO");
+            return encodeList(context, List.of(encodeString(context, "P"), encodeInfoOutOfContext(context, pi)));
         }
         if (variable instanceof FieldReference fr) {
             EncodedValue f = encodeString(context, "F");
@@ -562,6 +601,10 @@ public class CodecImpl implements Codec {
         if (variable instanceof LocalVariable lv) {
             return encodeList(context, List.of(encodeString(context, "L"), encodeString(context, lv.simpleName()),
                     encodeType(context, lv.parameterizedType())));
+        }
+        if(variable instanceof DependentVariable dv) {
+            return encodeList(context, List.of(encodeString(context, "D"),
+                    encodeExpression(context, dv.arrayExpression()), encodeExpression(context, dv.indexExpression())));
         }
         throw new UnsupportedOperationException();
     }
