@@ -4,17 +4,16 @@ import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.expression.MethodCall;
 import org.e2immu.language.cst.api.expression.VariableExpression;
 import org.e2immu.language.cst.api.info.MethodInfo;
+import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.statement.Statement;
 import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.type.ParameterizedType;
-import org.e2immu.language.cst.api.variable.DependentVariable;
-import org.e2immu.language.cst.api.variable.FieldReference;
-import org.e2immu.language.cst.api.variable.LocalVariable;
-import org.e2immu.language.cst.api.variable.Variable;
+import org.e2immu.language.cst.api.variable.*;
 import org.e2immu.language.cst.impl.expression.VariableExpressionImpl;
 import org.e2immu.language.cst.impl.type.ParameterizedTypeImpl;
 import org.e2immu.language.cst.impl.variable.DependentVariableImpl;
 import org.e2immu.language.cst.impl.variable.FieldReferenceImpl;
+import org.e2immu.language.cst.impl.variable.ThisImpl;
 
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -295,11 +294,19 @@ public class TranslationMapImpl implements TranslationMap {
                 return lv.withAssignmentExpression(te);
             }
         }
-        if(variable instanceof DependentVariable dv) {
+        if (variable instanceof DependentVariable dv) {
             Expression tArray = dv.arrayExpression().translate(this);
             Expression tIndex = dv.indexExpression().translate(this);
-            if(tArray != dv.arrayExpression() || tIndex != dv.indexExpression()) {
+            if (tArray != dv.arrayExpression() || tIndex != dv.indexExpression()) {
                 return DependentVariableImpl.create(tArray, tIndex);
+            }
+        }
+        if (variable instanceof This thisVar) {
+            ParameterizedType tType = translateType(thisVar.parameterizedType());
+            TypeInfo tExplicitly = thisVar.explicitlyWriteType() == null ? null :
+                    translateType(thisVar.explicitlyWriteType().asParameterizedType()).typeInfo();
+            if (tType != thisVar.parameterizedType() || tExplicitly != thisVar.explicitlyWriteType()) {
+                return new ThisImpl(tType, tExplicitly, thisVar.writeSuper());
             }
         }
         return variable;

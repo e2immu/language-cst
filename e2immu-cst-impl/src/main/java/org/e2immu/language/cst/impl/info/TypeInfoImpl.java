@@ -603,7 +603,9 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
         ParameterizedType simpleParameterizedType = asSimpleParameterizedType();
         boolean change = !analysis().isEmpty() && translationMapIn.isClearAnalysis();
 
-        TranslationMap.Builder tmb = new TranslationMapImpl.Builder().setDelegate(translationMapIn);
+        TranslationMap.Builder tmb = new TranslationMapImpl.Builder()
+                .setRecurseIntoScopeVariables(translationMapIn.recurseIntoScopeVariables())
+                .setDelegate(translationMapIn);
 
         List<TypeParameter> newTypeParameters = new ArrayList<>();
         for (TypeParameter tp : typeParameters()) {
