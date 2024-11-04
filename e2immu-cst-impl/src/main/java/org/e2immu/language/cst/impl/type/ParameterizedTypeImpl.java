@@ -674,4 +674,12 @@ public class ParameterizedTypeImpl implements ParameterizedType {
         }
         return this;
     }
+
+    @Override
+    public boolean isJavaUtilList() {
+        TypeInfo bestType = bestTypeInfo();
+        return bestType != null
+               && ("java.util.List".equals(bestType.fullyQualifiedName()) || bestType.superTypesExcludingJavaLangObject().stream()
+                .anyMatch(ti -> "java.util.List".equals(ti.fullyQualifiedName())));
+    }
 }

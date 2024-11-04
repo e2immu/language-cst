@@ -45,6 +45,8 @@ public interface ParameterizedType {
 
     String detailedString();
 
+    boolean isJavaUtilList();
+
     // Qualification: SimpleNames, vararg: false, Diamond: ShowAll
     String simpleString();
 

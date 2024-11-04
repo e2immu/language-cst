@@ -43,7 +43,13 @@ public class DependentVariableImpl extends VariableImpl implements DependentVari
     public static DependentVariable create(Expression array, Expression index) {
         Variable av = makeVariable(array, ARRAY_VARIABLE);
         Variable iv = makeVariable(index, INDEX_VARIABLE);
-        ParameterizedType pt = array.parameterizedType().copyWithOneFewerArrays();
+        ParameterizedType pt;
+        if (array.parameterizedType().arrays() > 0) {
+            pt = array.parameterizedType().copyWithOneFewerArrays();
+        } else {
+            assert array.parameterizedType().isJavaUtilList();
+            pt = array.parameterizedType();
+        }
         return new DependentVariableImpl(array, Objects.requireNonNull(av), index, iv, pt);
     }
 
