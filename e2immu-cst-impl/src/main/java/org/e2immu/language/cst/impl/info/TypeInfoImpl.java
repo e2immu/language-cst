@@ -621,7 +621,7 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
         for (FieldInfo fieldInfo : fields()) {
             FieldInfo newField = fieldInfo.withOwnerVariableBuilder(typeInfo);
             newFields.add(newField);
-            tmb.put(new FieldReferenceImpl(fieldInfo), new FieldReferenceImpl(newField));
+            tmb.put(fieldInfo, newField);
         }
         TranslationMap translationMap = tmb.build();
 

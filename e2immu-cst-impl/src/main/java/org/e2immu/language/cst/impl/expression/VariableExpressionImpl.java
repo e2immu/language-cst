@@ -7,6 +7,7 @@ import org.e2immu.language.cst.api.element.Visitor;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.expression.Precedence;
 import org.e2immu.language.cst.api.expression.VariableExpression;
+import org.e2immu.language.cst.api.info.FieldInfo;
 import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
@@ -185,25 +186,23 @@ public class VariableExpressionImpl extends ExpressionImpl implements VariableEx
         }
         Variable translated3 = translationMap.translateVariable(variable);
         if (translated3 != variable) {
+            if (variable instanceof LocalVariable from && from.assignmentExpression() != null
+                && translated3 instanceof LocalVariable to && to.assignmentExpression() == null) {
+                Expression te = from.assignmentExpression().translate(translationMap);
+                return new VariableExpressionImpl(to.withAssignmentExpression(te));
+            }
             return new VariableExpressionImpl(translated3);
         }
+
         if (translationMap.recurseIntoScopeVariables()) {
             if (variable instanceof FieldReference fr) {
                 Expression translated = fr.scope().translate(translationMap);
-                if (translated != fr.scope()) {
-                    FieldReference newFr = new FieldReferenceImpl(fr.fieldInfo(), translated, null,
+                FieldInfo newField = translationMap.translateFieldInfo(fr.fieldInfo());
+                if (translated != fr.scope() || newField != fr.fieldInfo()) {
+                    FieldReference newFr = new FieldReferenceImpl(newField, translated, null,
                             fr.parameterizedType());
-                    //  if (translated.isDelayed()) {
-                    //      int statementTime = translated instanceof DelayedVariableExpression dve ? dve.statementTime : 0;
-                    //     return DelayedVariableExpression.forField(newFr, statementTime, translated.causesOfDelay());
-                    //  }
                     return new VariableExpressionImpl(source(), comments(), newFr, suffix);
                 }
-                // if (!translated.equals(scopeValue)) {
-                // change the scopeValue to the translated one (see e.g. Basics_21.copy(),
-                // which translates using RemoveSuffixesTranslationMap)
-                //    return new VariableExpression(identifier, fr, suffix, translated, null);
-                //}
             } else if (variable instanceof DependentVariable dv) {
                 Expression translatedScope = dv.arrayExpression().translate(translationMap);
                 Expression translatedIndex = dv.indexExpression().translate(translationMap);
@@ -215,9 +214,6 @@ public class VariableExpressionImpl extends ExpressionImpl implements VariableEx
                             DependentVariableImpl.INDEX_VARIABLE);
                     DependentVariable newDv = new DependentVariableImpl(translatedScope,
                             arrayVariable, translatedIndex, indexVariable, dv.parameterizedType());
-                    //  if (newDv.causesOfDelay().isDelayed()) {
-                    //      return DelayedVariableExpression.forDependentVariable(newDv, newDv.causesOfDelay());
-                    //  }
                     return new VariableExpressionImpl(source(), comments(), newDv, suffix);
                 }
             } else if (variable instanceof This thisVar) {
@@ -231,8 +227,7 @@ public class VariableExpressionImpl extends ExpressionImpl implements VariableEx
                     ParameterizedType tExplicitlyPt = translationMap.translateType(explicitlyPt);
                     tExplicitly = tExplicitlyPt.typeInfo();
                 }
-                if (translatedType != thisVarPt && !translatedType.typeInfo().equals(thisVar.typeInfo()) ||
-                    !Objects.equals(thisVar.explicitlyWriteType(), tExplicitly)) {
+                if (translatedType != thisVarPt || !Objects.equals(thisVar.explicitlyWriteType(), tExplicitly)) {
                     This newThisVar = new ThisImpl(translatedType, tExplicitly, thisVar.writeSuper());
                     return new VariableExpressionImpl(source(), comments(), newThisVar, suffix);
                 }

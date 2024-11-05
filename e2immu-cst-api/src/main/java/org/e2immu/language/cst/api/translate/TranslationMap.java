@@ -21,6 +21,11 @@ import java.util.stream.Collector;
 public interface TranslationMap {
 
     @NotNull
+    default FieldInfo translateFieldInfo(FieldInfo fieldInfo) {
+        return fieldInfo;
+    }
+
+    @NotNull
     default Expression translateExpression(Expression expression) {
         return expression;
     }
@@ -110,11 +115,17 @@ public interface TranslationMap {
         return Map.of();
     }
 
-    default boolean isClearAnalysis() { return true; }
+    default boolean isClearAnalysis() {
+        return true;
+    }
+
+    default Map<FieldInfo, FieldInfo> fieldInfoMap() {
+        return Map.of();
+    }
 
     /*
-    used by CM
-     */
+        used by CM
+         */
     default boolean translateAgain() {
         return false;
     }
@@ -272,6 +283,8 @@ public interface TranslationMap {
         Builder put(Statement template, List<Statement> statements);
 
         Builder put(Expression template, Expression actual);
+
+        Builder put(FieldInfo template, FieldInfo actual);
 
         Builder addVariableExpression(Variable variable, Expression actual);
 

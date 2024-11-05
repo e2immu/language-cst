@@ -3,6 +3,7 @@ package org.e2immu.language.cst.impl.translate;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.expression.MethodCall;
 import org.e2immu.language.cst.api.expression.VariableExpression;
+import org.e2immu.language.cst.api.info.FieldInfo;
 import org.e2immu.language.cst.api.info.MethodInfo;
 import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.statement.Statement;
@@ -16,13 +17,7 @@ import org.e2immu.language.cst.impl.variable.FieldReferenceImpl;
 import org.e2immu.language.cst.impl.variable.ThisImpl;
 
 import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.function.BinaryOperator;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class TranslationMapImpl implements TranslationMap {
 
@@ -33,6 +28,7 @@ public class TranslationMapImpl implements TranslationMap {
     private final Map<ParameterizedType, ParameterizedType> types;
     private final Map<LocalVariable, LocalVariable> localVariables;
     private final Map<? extends Variable, ? extends Expression> variableExpressions;
+    private final Map<FieldInfo, FieldInfo> fieldInfoMap;
     private final boolean expandDelayedWrappedExpressions;
     private final boolean recurseIntoScopeVariables;
     private final boolean yieldIntoReturn;
@@ -47,6 +43,7 @@ public class TranslationMapImpl implements TranslationMap {
                                Map<? extends Variable, ? extends Variable> variables,
                                Map<MethodInfo, List<MethodInfo>> methods,
                                Map<ParameterizedType, ParameterizedType> types,
+                               Map<FieldInfo, FieldInfo> fieldInfoMap,
                                ModificationTimesHandler modificationTimesHandler,
                                boolean expandDelayedWrappedExpressions,
                                boolean recurseIntoScopeVariables,
@@ -60,6 +57,7 @@ public class TranslationMapImpl implements TranslationMap {
         this.statements = statements;
         this.methods = methods;
         this.types = types;//checkForCycles(types);
+        this.fieldInfoMap = fieldInfoMap;
         this.yieldIntoReturn = yieldIntoReturn;
         localVariables = variables.entrySet().stream()
                 .filter(e -> e.getKey() instanceof LocalVariable && e.getValue() instanceof LocalVariable)
@@ -80,6 +78,7 @@ public class TranslationMapImpl implements TranslationMap {
         private final Map<MethodInfo, List<MethodInfo>> methods = new HashMap<>();
         private final Map<Statement, List<Statement>> statements = new HashMap<>();
         private final Map<ParameterizedType, ParameterizedType> types = new HashMap<>();
+        private final Map<FieldInfo, FieldInfo> fieldInfoMap = new HashMap<>();
         private ModificationTimesHandler modificationTimesHandler;
         private boolean expandDelayedWrappedExpressions;
         private boolean recurseIntoScopeVariables;
@@ -100,6 +99,7 @@ public class TranslationMapImpl implements TranslationMap {
             methods.putAll(other.methods());
             statements.putAll(other.statements());
             types.putAll(other.types());
+            fieldInfoMap.putAll(other.fieldInfoMap());
             expandDelayedWrappedExpressions = other.expandDelayedWrappedExpressions();
             recurseIntoScopeVariables = other.recurseIntoScopeVariables();
             yieldIntoReturn = other.translateYieldIntoReturn();
@@ -110,7 +110,7 @@ public class TranslationMapImpl implements TranslationMap {
         @Override
         public TranslationMap build() {
             return new TranslationMapImpl(statements, expressions, variableExpressions, variables, methods, types,
-                    modificationTimesHandler,
+                    Map.copyOf(fieldInfoMap), modificationTimesHandler,
                     expandDelayedWrappedExpressions, recurseIntoScopeVariables, yieldIntoReturn, translateAgain,
                     clearAnalysis, delegate);
         }
@@ -130,6 +130,11 @@ public class TranslationMapImpl implements TranslationMap {
         @Override
         public Builder setRecurseIntoScopeVariables(boolean recurseIntoScopeVariables) {
             this.recurseIntoScopeVariables = recurseIntoScopeVariables;
+            return this;
+        }
+
+        public Builder put(FieldInfo template, FieldInfo actual) {
+            fieldInfoMap.put(template, actual);
             return this;
         }
 
@@ -234,6 +239,11 @@ public class TranslationMapImpl implements TranslationMap {
     }
 
     @Override
+    public FieldInfo translateFieldInfo(FieldInfo fieldInfo) {
+        return fieldInfoMap.getOrDefault(fieldInfo, fieldInfo);
+    }
+
+    @Override
     public boolean translateYieldIntoReturn() {
         return yieldIntoReturn;
     }
@@ -250,8 +260,8 @@ public class TranslationMapImpl implements TranslationMap {
 
     private TranslationMap withoutDelegate() {
         return new TranslationMapImpl(statements, expressions, variableExpressions, variables, methods, types,
-                modificationTimesHandler, expandDelayedWrappedExpressions, recurseIntoScopeVariables, yieldIntoReturn,
-                translateAgain, clearAnalysis, null);
+                fieldInfoMap, modificationTimesHandler, expandDelayedWrappedExpressions, recurseIntoScopeVariables,
+                yieldIntoReturn, translateAgain, clearAnalysis, null);
     }
 
     @Override
@@ -266,51 +276,10 @@ public class TranslationMapImpl implements TranslationMap {
     @Override
     public Variable translateVariable(Variable variable) {
         Variable v = delegate == null ? variable : delegate.translateVariable(variable);
-        return internalTranslateVariable(v);
+        Variable vv = variables.get(v);
+        return vv != null ? vv : variable;
     }
 
-    private Variable internalTranslateVariable(Variable variable) {
-        Variable v = variables.get(variable);
-        if (v != null) {
-            // if variable -> v, and variable has an assignment expression, but v does not, then we copy variable's,
-            // after translation
-            if (variable instanceof LocalVariable from && from.assignmentExpression() != null
-                && v instanceof LocalVariable to && to.assignmentExpression() == null) {
-                Expression te = from.assignmentExpression().translate(this);
-                return to.withAssignmentExpression(te);
-            }
-            return v;
-        }
-        if (variable instanceof FieldReference fr && fr.scopeVariable() != null) {
-            Variable scopeTranslated = translateVariable(fr.scopeVariable());
-            if (scopeTranslated != fr.scopeVariable()) {
-                Expression e = new VariableExpressionImpl(fr.source(), fr.comments(), scopeTranslated, null);
-                return new FieldReferenceImpl(fr.fieldInfo(), e, scopeTranslated, fr.fieldInfo().type());
-            }
-        }
-        if (variable instanceof LocalVariable lv && lv.assignmentExpression() != null) {
-            Expression te = lv.assignmentExpression().translate(this);
-            if (te != lv.assignmentExpression()) {
-                return lv.withAssignmentExpression(te);
-            }
-        }
-        if (variable instanceof DependentVariable dv) {
-            Expression tArray = dv.arrayExpression().translate(this);
-            Expression tIndex = dv.indexExpression().translate(this);
-            if (tArray != dv.arrayExpression() || tIndex != dv.indexExpression()) {
-                return DependentVariableImpl.create(tArray, tIndex);
-            }
-        }
-        if (variable instanceof This thisVar) {
-            ParameterizedType tType = translateType(thisVar.parameterizedType());
-            TypeInfo tExplicitly = thisVar.explicitlyWriteType() == null ? null :
-                    translateType(thisVar.explicitlyWriteType().asParameterizedType()).typeInfo();
-            if (tType != thisVar.parameterizedType() || tExplicitly != thisVar.explicitlyWriteType()) {
-                return new ThisImpl(tType, tExplicitly, thisVar.writeSuper());
-            }
-        }
-        return variable;
-    }
 
     @Override
     public Expression translateVariableExpressionNullIfNotTranslated(Variable variable) {
@@ -397,6 +366,11 @@ public class TranslationMapImpl implements TranslationMap {
     @Override
     public Map<? extends Statement, List<Statement>> statements() {
         return statements;
+    }
+
+    @Override
+    public Map<FieldInfo, FieldInfo> fieldInfoMap() {
+        return fieldInfoMap;
     }
 
     @Override
