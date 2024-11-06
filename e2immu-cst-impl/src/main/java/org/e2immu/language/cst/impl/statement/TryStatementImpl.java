@@ -198,9 +198,10 @@ public class TryStatementImpl extends StatementImpl implements TryStatement {
             List<ParameterizedType> list = exceptionTypes.stream()
                     .map(translationMap::translateType).collect(translationMap.toList(exceptionTypes));
             Block tBlock = (Block) block.translate(translationMap).get(0);
-            if (list != exceptionTypes || tBlock != block) {
+            if (list != exceptionTypes || tBlock != block || translationMap.isClearAnalysis()) {
                 CatchClause cc = new CatchClauseImpl(comments, source, annotations, list, isFinal, catchVariable, tBlock);
                 if (!translationMap.isClearAnalysis()) cc.analysis().setAll(analysis());
+                return cc;
             }
             return this;
         }
