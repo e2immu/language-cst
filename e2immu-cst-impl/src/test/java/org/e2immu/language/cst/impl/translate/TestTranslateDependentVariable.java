@@ -1,5 +1,7 @@
 package org.e2immu.language.cst.impl.translate;
 
+import org.e2immu.language.cst.api.expression.Expression;
+import org.e2immu.language.cst.api.expression.VariableExpression;
 import org.e2immu.language.cst.api.info.FieldInfo;
 import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.runtime.Runtime;
@@ -26,10 +28,14 @@ public class TestTranslateDependentVariable {
 
         This thisVar = r.newThis(ti.asParameterizedType());
         TranslationMap tm = r.newTranslationMapBuilder()
+                .setRecurseIntoScopeVariables(true)
                 .put(x, thisVar) // variable
                 .put(r.newVariableExpression(i), r.intOne()) // expression
                 .build();
         Variable variable = tm.translateVariable(dv);
-        assertEquals("this.array[1]", variable.toString());
+        // !!! x.array[i] is not present in the map; we must go via VariableExpression
+        assertEquals("x.array[i]", variable.toString());
+        Expression translated = r.newVariableExpression(variable).translate(tm);
+        assertEquals("this.array[1]", ((VariableExpression) translated).variable().toString());
     }
 }
