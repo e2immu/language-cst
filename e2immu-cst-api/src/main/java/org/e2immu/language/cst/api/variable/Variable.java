@@ -9,6 +9,7 @@ import org.e2immu.language.cst.api.type.ParameterizedType;
  * It is important that we can sort variables, as part of the sorting system of Expressions.
  */
 public interface Variable extends Comparable<Variable>, Element, OneVariable {
+
     @NotNull
     String fullyQualifiedName();
 
@@ -20,13 +21,21 @@ public interface Variable extends Comparable<Variable>, Element, OneVariable {
 
     @Override
     default int compareTo(Variable o) {
-       return fullyQualifiedName().compareTo(o.fullyQualifiedName());
+        return fullyQualifiedName().compareTo(o.fullyQualifiedName());
     }
 
     default boolean isStatic() {
         return false;
     }
 
-    default boolean scopeIsRecursively(Variable variable) { return false; }
+    default boolean scopeIsRecursively(Variable variable) {
+        return false;
+    }
+
+    default FieldReference fieldReferenceScope() {
+        if (this instanceof FieldReference fr) return fr;
+        if (this instanceof DependentVariable dv) return dv.arrayVariable().fieldReferenceScope();
+        return null;
+    }
 
 }

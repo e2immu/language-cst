@@ -67,6 +67,8 @@ public interface Factory {
 
     FieldModifier fieldModifierVolatile();
 
+    Variable getterVariable(MethodCall methodCall);
+
     IntConstant intMinusOne();
 
     IntConstant intOne();

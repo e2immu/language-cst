@@ -1,5 +1,6 @@
 package org.e2immu.language.cst.impl.runtime;
 
+import org.e2immu.language.cst.api.analysis.Value;
 import org.e2immu.language.cst.api.element.*;
 import org.e2immu.language.cst.api.expression.*;
 import org.e2immu.language.cst.api.info.*;
@@ -1096,6 +1097,24 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     @Override
     public BitwiseNegation newBitwiseNegation(Expression value) {
         return new BitwiseNegationImpl(bitWiseNotOperatorInt(), PrecedenceEnum.UNARY, value);
+    }
+
+    /* return the field rather than the getter*/
+    @Override
+    public Variable getterVariable(MethodCall methodCall) {
+        Value.FieldValue getSetField = methodCall.methodInfo().getSetField();
+        if (getSetField.field() == null) {
+            return null;
+        }
+        ParameterizedType concreteType = methodCall.concreteReturnType();
+        if (methodCall.parameterExpressions().isEmpty()) {
+            return newFieldReference(getSetField.field(), methodCall.object(), concreteType);
+        }
+        ParameterizedType concreteArrayType = concreteType.copyWithArrays(concreteType.arrays() + 1);
+        FieldReference fr = newFieldReference(getSetField.field(), methodCall.object(), concreteArrayType);
+        Expression index = methodCall.parameterExpressions().get(0);
+        assert index.parameterizedType().isMathematicallyInteger();
+        return newDependentVariable(fr, concreteType, index);
     }
 }
 
