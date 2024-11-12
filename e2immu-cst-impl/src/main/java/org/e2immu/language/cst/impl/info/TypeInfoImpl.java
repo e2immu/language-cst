@@ -605,6 +605,7 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
 
         TranslationMap.Builder tmb = new TranslationMapImpl.Builder()
                 .setRecurseIntoScopeVariables(translationMapIn.recurseIntoScopeVariables())
+                .setClearAnalysis(translationMapIn.isClearAnalysis())
                 .setDelegate(translationMapIn);
 
         List<TypeParameter> newTypeParameters = new ArrayList<>();
