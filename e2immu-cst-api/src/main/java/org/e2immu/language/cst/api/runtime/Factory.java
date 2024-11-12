@@ -399,6 +399,9 @@ public interface Factory {
 
     void setModificationComponent(MethodInfo methodInfo, FieldInfo component);
 
+    /* return the field rather than the getter*/
+    Variable setterVariable(MethodCall methodCall);
+
     Split splitNever();
 
     OutputElement symbolColon();

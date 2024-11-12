@@ -1099,7 +1099,7 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
         return new BitwiseNegationImpl(bitWiseNotOperatorInt(), PrecedenceEnum.UNARY, value);
     }
 
-    /* return the field rather than the getter*/
+    /* given a getter call, create the corresponding (indexed) variable */
     @Override
     public Variable getterVariable(MethodCall methodCall) {
         Value.FieldValue getSetField = methodCall.methodInfo().getSetField();
@@ -1110,6 +1110,28 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
         if (methodCall.parameterExpressions().isEmpty()) {
             return newFieldReference(getSetField.field(), methodCall.object(), concreteType);
         }
+        ParameterizedType concreteArrayType = concreteType.copyWithArrays(concreteType.arrays() + 1);
+        FieldReference fr = newFieldReference(getSetField.field(), methodCall.object(), concreteArrayType);
+        Expression index = methodCall.parameterExpressions().get(0);
+        assert index.parameterizedType().isMathematicallyInteger();
+        return newDependentVariable(fr, concreteType, index);
+    }
+
+    /* given a setter call, create the target variable
+     *  obj.setX(v) -> o.x
+     *  obj.setX(i, v) -> o.x[i]
+     */
+    @Override
+    public Variable setterVariable(MethodCall methodCall) {
+        Value.FieldValue getSetField = methodCall.methodInfo().getSetField();
+        if (getSetField.field() == null) {
+            return null;
+        }
+        if (methodCall.parameterExpressions().size() == 1) {
+            ParameterizedType concreteType = methodCall.parameterExpressions().get(0).parameterizedType();
+            return newFieldReference(getSetField.field(), methodCall.object(), concreteType);
+        }
+        ParameterizedType concreteType = methodCall.parameterExpressions().get(1).parameterizedType();
         ParameterizedType concreteArrayType = concreteType.copyWithArrays(concreteType.arrays() + 1);
         FieldReference fr = newFieldReference(getSetField.field(), methodCall.object(), concreteArrayType);
         Expression index = methodCall.parameterExpressions().get(0);
