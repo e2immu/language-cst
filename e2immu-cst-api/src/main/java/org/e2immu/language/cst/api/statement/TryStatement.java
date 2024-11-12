@@ -2,17 +2,11 @@ package org.e2immu.language.cst.api.statement;
 
 import org.e2immu.annotation.Fluent;
 import org.e2immu.language.cst.api.element.Element;
-import org.e2immu.language.cst.api.element.Visitor;
-import org.e2immu.language.cst.api.expression.AnnotationExpression;
 import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.type.ParameterizedType;
-import org.e2immu.language.cst.api.variable.DescendMode;
 import org.e2immu.language.cst.api.variable.LocalVariable;
-import org.e2immu.language.cst.api.variable.Variable;
 
 import java.util.List;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 public interface TryStatement extends Statement {
 

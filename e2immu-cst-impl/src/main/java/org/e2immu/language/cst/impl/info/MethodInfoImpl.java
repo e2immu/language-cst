@@ -487,10 +487,15 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
         ParameterizedType tReturnType = translationMap.translateType(returnType());
         boolean change = tReturnType != returnType() || !analysis().isEmpty() && translationMap.isClearAnalysis();
 
-        List<Statement> tBody = methodBody().translate(translationMap);
         ParameterizedType ownerPt = typeInfo.asSimpleParameterizedType();
         boolean ownerChange = translationMap.translateType(ownerPt) != ownerPt;
-        change |= tBody.size() != 1 || tBody.get(0) != methodBody() || ownerChange;
+        change |= ownerChange;
+
+        if (!change) {
+            // first test; we'll have to re-do
+            List<Statement> tBody = methodBody().translate(translationMap);
+            change = tBody.size() != 1 || tBody.get(0) != methodBody();
+        }
 
         List<ParameterizedType> exceptionTypeList = exceptionTypes();
         List<ParameterizedType> newExceptionTypes = exceptionTypeList
@@ -510,7 +515,7 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
         if (change) {
             MethodInfo methodInfo = copyAllButBodyParametersReturnTypeAnnotationsExceptionTypes(translationMap);
             MethodInfo.Builder builder = methodInfo.builder();
-            builder.setMethodBody((Block) tBody.get(0));
+
 
             for (ParameterInfo dvc : directVariableChanges) {
                 ParameterInfo original = parameters().get(dvc.index());
@@ -523,6 +528,23 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
                 }
             }
             builder.commitParameters();
+
+            TranslationMap tmWithParameters;
+            if (parameters().isEmpty()) {
+                tmWithParameters = translationMap;
+            } else {
+                TranslationMap.Builder b = new TranslationMapImpl.Builder()
+                        .setClearAnalysis(translationMap.isClearAnalysis())
+                        .setRecurseIntoScopeVariables(translationMap.recurseIntoScopeVariables())
+                        .setDelegate(translationMap);
+                for (ParameterInfo pi : builder.parameters()) {
+                    b.put(parameters().get(pi.index()), pi);
+                }
+                tmWithParameters = b.build();
+            }
+            List<Statement> tBody = methodBody().translate(tmWithParameters);
+
+            builder.setMethodBody((Block) tBody.get(0));
 
             newExceptionTypes.forEach(builder::addExceptionType);
             builder.setReturnType(tReturnType);

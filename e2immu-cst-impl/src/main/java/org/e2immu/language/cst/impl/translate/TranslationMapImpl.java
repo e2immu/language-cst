@@ -298,7 +298,7 @@ public class TranslationMapImpl implements TranslationMap {
     @Override
     public List<MethodInfo> translateMethod(MethodInfo methodInfo) {
         if (delegate != null) {
-            List<MethodInfo> list = delegate.translateMethod(methodInfo);
+            List<MethodInfo> list = methodInfo.translate(delegate);
             TranslationMap withoutDelegate = withoutDelegate();
             return list.stream().flatMap(mi -> mi.translate(withoutDelegate).stream()).toList();
         }

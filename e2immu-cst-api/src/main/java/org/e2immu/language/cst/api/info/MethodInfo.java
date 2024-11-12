@@ -220,6 +220,8 @@ public interface MethodInfo extends Info {
         // used for translations
         @Fluent
         Builder addParameter(ParameterInfo parameterInfo);
+
+        List<ParameterInfo> parameters();
     }
 
     default boolean isVarargs() {

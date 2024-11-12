@@ -1,5 +1,6 @@
 package org.e2immu.language.cst.impl.statement;
 
+import org.e2immu.language.cst.api.analysis.PropertyValueMap;
 import org.e2immu.language.cst.api.element.Comment;
 import org.e2immu.language.cst.api.element.Element;
 import org.e2immu.language.cst.api.element.Source;
@@ -16,6 +17,7 @@ import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.variable.DescendMode;
 import org.e2immu.language.cst.api.variable.LocalVariable;
 import org.e2immu.language.cst.api.variable.Variable;
+import org.e2immu.language.cst.impl.analysis.PropertyValueMapImpl;
 import org.e2immu.language.cst.impl.element.ElementImpl;
 import org.e2immu.language.cst.impl.output.*;
 import org.e2immu.language.cst.impl.type.DiamondEnum;
@@ -71,6 +73,7 @@ public class TryStatementImpl extends StatementImpl implements TryStatement {
         private final Source source;
         private final List<Comment> comments;
         private final List<AnnotationExpression> annotations;
+        private final PropertyValueMap propertyValueMap = new PropertyValueMapImpl();
 
         public CatchClauseImpl(List<Comment> comments,
                                Source source,
@@ -204,6 +207,11 @@ public class TryStatementImpl extends StatementImpl implements TryStatement {
                 return cc;
             }
             return this;
+        }
+
+        @Override
+        public PropertyValueMap analysis() {
+            return propertyValueMap;
         }
     }
 
