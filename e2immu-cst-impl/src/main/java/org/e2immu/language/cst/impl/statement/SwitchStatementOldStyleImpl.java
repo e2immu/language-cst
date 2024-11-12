@@ -19,7 +19,6 @@ import org.e2immu.language.cst.impl.output.*;
 
 import java.util.*;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class SwitchStatementOldStyleImpl extends StatementImpl implements SwitchStatementOldStyle {
@@ -38,6 +37,11 @@ public class SwitchStatementOldStyleImpl extends StatementImpl implements Switch
 
     @Override
     public Statement withBlocks(List<Block> tSubBlocks) {
+        throw new UnsupportedOperationException("Use withBlocks(tSubBlocks, switchLabels)");
+    }
+
+    @Override
+    public Statement withBlocks(List<Block> tSubBlocks, List<SwitchLabel> switchLabels) {
         return new SwitchStatementOldStyleImpl(comments(), source(), annotations(), label(), selector,
                 tSubBlocks.get(0), switchLabels);
     }
@@ -103,6 +107,11 @@ public class SwitchStatementOldStyleImpl extends StatementImpl implements Switch
             Expression tWhen = whenExpression.translate(translationMap);
             if (tLiteral == literal && tPatternVariable == patternVariable && tWhen == whenExpression) return this;
             return new SwitchLabelImpl(tLiteral, startFromPosition, tPatternVariable, tWhen);
+        }
+
+        @Override
+        public SwitchLabel withStartPosition(int newStartPosition) {
+            return new SwitchLabelImpl(literal, newStartPosition, patternVariable, whenExpression);
         }
     }
 

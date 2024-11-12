@@ -36,7 +36,11 @@ public interface SwitchStatementOldStyle extends Statement {
         OutputBuilder print(Qualification qualification);
 
         SwitchLabel translate(TranslationMap translationMap);
+
+        SwitchLabel withStartPosition(int newStartPosition);
     }
+
+    Statement withBlocks(List<Block> tSubBlocks, List<SwitchLabel> switchLabels);
 
     List<SwitchLabel> switchLabels();
 
