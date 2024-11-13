@@ -194,45 +194,45 @@ public class VariableExpressionImpl extends ExpressionImpl implements VariableEx
             return new VariableExpressionImpl(translated3);
         }
 
-        if (translationMap.recurseIntoScopeVariables()) {
-            if (variable instanceof FieldReference fr) {
-                Expression translated = fr.scope().translate(translationMap);
-                FieldInfo newField = translationMap.translateFieldInfo(fr.fieldInfo());
-                if (translated != fr.scope() || newField != fr.fieldInfo()) {
-                    FieldReference newFr = new FieldReferenceImpl(newField, translated, null,
-                            fr.parameterizedType());
-                    return new VariableExpressionImpl(source(), comments(), newFr, suffix);
-                }
-            } else if (variable instanceof DependentVariable dv) {
-                Expression translatedScope = dv.arrayExpression().translate(translationMap);
-                Expression translatedIndex = dv.indexExpression().translate(translationMap);
-                if (translatedScope != dv.arrayExpression() || translatedIndex != dv.indexExpression()) {
-                    Variable arrayVariable = DependentVariableImpl.makeVariable(translatedScope,
-                            DependentVariableImpl.ARRAY_VARIABLE);
-                    assert arrayVariable != null;
-                    Variable indexVariable = DependentVariableImpl.makeVariable(translatedIndex,
-                            DependentVariableImpl.INDEX_VARIABLE);
-                    DependentVariable newDv = new DependentVariableImpl(translatedScope,
-                            arrayVariable, translatedIndex, indexVariable, dv.parameterizedType());
-                    return new VariableExpressionImpl(source(), comments(), newDv, suffix);
-                }
-            } else if (variable instanceof This thisVar) {
-                ParameterizedType thisVarPt = thisVar.parameterizedType();
-                ParameterizedType translatedType = translationMap.translateType(thisVarPt);
-                TypeInfo tExplicitly;
-                if (thisVar.explicitlyWriteType() == null) {
-                    tExplicitly = null;
-                } else {
-                    ParameterizedType explicitlyPt = thisVar.explicitlyWriteType().asSimpleParameterizedType();
-                    ParameterizedType tExplicitlyPt = translationMap.translateType(explicitlyPt);
-                    tExplicitly = tExplicitlyPt.typeInfo();
-                }
-                if (translatedType != thisVarPt || !Objects.equals(thisVar.explicitlyWriteType(), tExplicitly)) {
-                    This newThisVar = new ThisImpl(translatedType, tExplicitly, thisVar.writeSuper());
-                    return new VariableExpressionImpl(source(), comments(), newThisVar, suffix);
-                }
+
+        if (variable instanceof FieldReference fr) {
+            Expression translated = fr.scope().translate(translationMap);
+            FieldInfo newField = translationMap.translateFieldInfo(fr.fieldInfo());
+            if (translated != fr.scope() || newField != fr.fieldInfo()) {
+                FieldReference newFr = new FieldReferenceImpl(newField, translated, null,
+                        fr.parameterizedType());
+                return new VariableExpressionImpl(source(), comments(), newFr, suffix);
+            }
+        } else if (variable instanceof DependentVariable dv) {
+            Expression translatedScope = dv.arrayExpression().translate(translationMap);
+            Expression translatedIndex = dv.indexExpression().translate(translationMap);
+            if (translatedScope != dv.arrayExpression() || translatedIndex != dv.indexExpression()) {
+                Variable arrayVariable = DependentVariableImpl.makeVariable(translatedScope,
+                        DependentVariableImpl.ARRAY_VARIABLE);
+                assert arrayVariable != null;
+                Variable indexVariable = DependentVariableImpl.makeVariable(translatedIndex,
+                        DependentVariableImpl.INDEX_VARIABLE);
+                DependentVariable newDv = new DependentVariableImpl(translatedScope,
+                        arrayVariable, translatedIndex, indexVariable, dv.parameterizedType());
+                return new VariableExpressionImpl(source(), comments(), newDv, suffix);
+            }
+        } else if (variable instanceof This thisVar) {
+            ParameterizedType thisVarPt = thisVar.parameterizedType();
+            ParameterizedType translatedType = translationMap.translateType(thisVarPt);
+            TypeInfo tExplicitly;
+            if (thisVar.explicitlyWriteType() == null) {
+                tExplicitly = null;
+            } else {
+                ParameterizedType explicitlyPt = thisVar.explicitlyWriteType().asSimpleParameterizedType();
+                ParameterizedType tExplicitlyPt = translationMap.translateType(explicitlyPt);
+                tExplicitly = tExplicitlyPt.typeInfo();
+            }
+            if (translatedType != thisVarPt || !Objects.equals(thisVar.explicitlyWriteType(), tExplicitly)) {
+                This newThisVar = new ThisImpl(translatedType, tExplicitly, thisVar.writeSuper());
+                return new VariableExpressionImpl(source(), comments(), newThisVar, suffix);
             }
         }
+
         return this;
     }
 

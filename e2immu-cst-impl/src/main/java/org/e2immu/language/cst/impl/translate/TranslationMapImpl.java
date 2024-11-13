@@ -5,16 +5,11 @@ import org.e2immu.language.cst.api.expression.MethodCall;
 import org.e2immu.language.cst.api.expression.VariableExpression;
 import org.e2immu.language.cst.api.info.FieldInfo;
 import org.e2immu.language.cst.api.info.MethodInfo;
-import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.statement.Statement;
 import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.variable.*;
-import org.e2immu.language.cst.impl.expression.VariableExpressionImpl;
 import org.e2immu.language.cst.impl.type.ParameterizedTypeImpl;
-import org.e2immu.language.cst.impl.variable.DependentVariableImpl;
-import org.e2immu.language.cst.impl.variable.FieldReferenceImpl;
-import org.e2immu.language.cst.impl.variable.ThisImpl;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -30,7 +25,6 @@ public class TranslationMapImpl implements TranslationMap {
     private final Map<? extends Variable, ? extends Expression> variableExpressions;
     private final Map<FieldInfo, FieldInfo> fieldInfoMap;
     private final boolean expandDelayedWrappedExpressions;
-    private final boolean recurseIntoScopeVariables;
     private final boolean yieldIntoReturn;
     private final boolean translateAgain;
     private final boolean clearAnalysis;
@@ -46,7 +40,6 @@ public class TranslationMapImpl implements TranslationMap {
                                Map<FieldInfo, FieldInfo> fieldInfoMap,
                                ModificationTimesHandler modificationTimesHandler,
                                boolean expandDelayedWrappedExpressions,
-                               boolean recurseIntoScopeVariables,
                                boolean yieldIntoReturn,
                                boolean translateAgain,
                                boolean clearAnalysis,
@@ -63,7 +56,6 @@ public class TranslationMapImpl implements TranslationMap {
                 .filter(e -> e.getKey() instanceof LocalVariable && e.getValue() instanceof LocalVariable)
                 .collect(Collectors.toMap(e -> ((LocalVariable) e.getKey()), e -> ((LocalVariable) e.getValue())));
         this.expandDelayedWrappedExpressions = expandDelayedWrappedExpressions;
-        this.recurseIntoScopeVariables = recurseIntoScopeVariables;
         this.translateAgain = translateAgain;
         this.modificationTimesHandler = modificationTimesHandler;
         this.clearAnalysis = clearAnalysis;
@@ -81,7 +73,7 @@ public class TranslationMapImpl implements TranslationMap {
         private final Map<FieldInfo, FieldInfo> fieldInfoMap = new HashMap<>();
         private ModificationTimesHandler modificationTimesHandler;
         private boolean expandDelayedWrappedExpressions;
-        private boolean recurseIntoScopeVariables;
+        private boolean doNotRecurseIntoScopeVariables;
         private boolean yieldIntoReturn;
         private boolean translateAgain;
         private boolean clearAnalysis;
@@ -101,7 +93,6 @@ public class TranslationMapImpl implements TranslationMap {
             types.putAll(other.types());
             fieldInfoMap.putAll(other.fieldInfoMap());
             expandDelayedWrappedExpressions = other.expandDelayedWrappedExpressions();
-            recurseIntoScopeVariables = other.recurseIntoScopeVariables();
             yieldIntoReturn = other.translateYieldIntoReturn();
             translateAgain = other.translateAgain();
             delegate = other.delegate();
@@ -111,8 +102,7 @@ public class TranslationMapImpl implements TranslationMap {
         public TranslationMap build() {
             return new TranslationMapImpl(statements, expressions, variableExpressions, variables, methods, types,
                     Map.copyOf(fieldInfoMap), modificationTimesHandler,
-                    expandDelayedWrappedExpressions, recurseIntoScopeVariables, yieldIntoReturn, translateAgain,
-                    clearAnalysis, delegate);
+                    expandDelayedWrappedExpressions, yieldIntoReturn, translateAgain, clearAnalysis, delegate);
         }
 
         @Override
@@ -124,12 +114,6 @@ public class TranslationMapImpl implements TranslationMap {
         @Override
         public Builder setTranslateAgain(boolean translateAgain) {
             this.translateAgain = translateAgain;
-            return this;
-        }
-
-        @Override
-        public Builder setRecurseIntoScopeVariables(boolean recurseIntoScopeVariables) {
-            this.recurseIntoScopeVariables = recurseIntoScopeVariables;
             return this;
         }
 
@@ -253,14 +237,9 @@ public class TranslationMapImpl implements TranslationMap {
         return !variables.isEmpty();
     }
 
-    @Override
-    public boolean recurseIntoScopeVariables() {
-        return recurseIntoScopeVariables;
-    }
-
     private TranslationMap withoutDelegate() {
         return new TranslationMapImpl(statements, expressions, variableExpressions, variables, methods, types,
-                fieldInfoMap, modificationTimesHandler, expandDelayedWrappedExpressions, recurseIntoScopeVariables,
+                fieldInfoMap, modificationTimesHandler, expandDelayedWrappedExpressions,
                 yieldIntoReturn, translateAgain, clearAnalysis, null);
     }
 

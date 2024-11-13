@@ -535,7 +535,6 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
             } else {
                 TranslationMap.Builder b = new TranslationMapImpl.Builder()
                         .setClearAnalysis(translationMap.isClearAnalysis())
-                        .setRecurseIntoScopeVariables(translationMap.recurseIntoScopeVariables())
                         .setDelegate(translationMap);
                 for (ParameterInfo pi : builder.parameters()) {
                     b.put(parameters().get(pi.index()), pi);

@@ -28,7 +28,6 @@ public class TestTranslateDependentVariable {
 
         This thisVar = r.newThis(ti.asParameterizedType());
         TranslationMap tm = r.newTranslationMapBuilder()
-                .setRecurseIntoScopeVariables(true)
                 .put(x, thisVar) // variable
                 .put(r.newVariableExpression(i), r.intOne()) // expression
                 .build();

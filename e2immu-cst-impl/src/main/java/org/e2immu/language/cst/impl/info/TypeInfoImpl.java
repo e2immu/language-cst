@@ -6,7 +6,6 @@ import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.info.*;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
-import org.e2immu.language.cst.api.runtime.Predefined;
 import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.type.NamedType;
 import org.e2immu.language.cst.api.type.ParameterizedType;
@@ -18,7 +17,6 @@ import org.e2immu.language.cst.impl.analysis.PropertyImpl;
 import org.e2immu.language.cst.impl.analysis.ValueImpl;
 import org.e2immu.language.cst.impl.translate.TranslationMapImpl;
 import org.e2immu.language.cst.impl.type.ParameterizedTypeImpl;
-import org.e2immu.language.cst.impl.variable.FieldReferenceImpl;
 import org.e2immu.support.Either;
 import org.e2immu.support.EventuallyFinalOnDemand;
 
@@ -604,7 +602,6 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
         boolean change = !analysis().isEmpty() && translationMapIn.isClearAnalysis();
 
         TranslationMap.Builder tmb = new TranslationMapImpl.Builder()
-                .setRecurseIntoScopeVariables(translationMapIn.recurseIntoScopeVariables())
                 .setClearAnalysis(translationMapIn.isClearAnalysis())
                 .setDelegate(translationMapIn);
 

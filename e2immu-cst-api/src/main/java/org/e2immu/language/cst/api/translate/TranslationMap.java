@@ -76,13 +76,6 @@ public interface TranslationMap {
         return false;
     }
 
-    /*
-     unlike in merge, in the case of ExplicitConstructorInvocation, we cannot predict which fields need their scope translating
-     */
-    default boolean recurseIntoScopeVariables() {
-        return false;
-    }
-
     default boolean expandDelayedWrappedExpressions() {
         return false;
     }
@@ -273,8 +266,6 @@ public interface TranslationMap {
 
         @Fluent
         Builder setTranslateAgain(boolean translateAgain);
-
-        Builder setRecurseIntoScopeVariables(boolean recurseIntoScopeVariables);
 
         Builder put(Statement template, Statement actual);
 
