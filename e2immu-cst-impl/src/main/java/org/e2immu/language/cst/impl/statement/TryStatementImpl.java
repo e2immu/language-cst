@@ -183,7 +183,9 @@ public class TryStatementImpl extends StatementImpl implements TryStatement {
 
         @Override
         public void visit(Predicate<Element> predicate) {
-            block.visit(predicate);
+            if(predicate.test(this)) {
+                block.visit(predicate);
+            }
         }
 
         @Override
