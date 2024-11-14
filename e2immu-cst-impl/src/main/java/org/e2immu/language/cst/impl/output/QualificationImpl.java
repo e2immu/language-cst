@@ -65,9 +65,11 @@ public class QualificationImpl implements Qualification {
 
     @Override
     public TypeNameRequired qualifierRequired(TypeInfo typeInfo) {
-        if (typeNameRequired != null) return typeNameRequired;
         assert top.typesNotImported != null; // to keep IntelliJ happy
-        return top.typesNotImported.getOrDefault(typeInfo, TypeNameImpl.Required.SIMPLE);
+        TypeNameImpl.Required r = top.typesNotImported.get(typeInfo);
+        if (r != null) return r;
+        if (typeNameRequired != null) return typeNameRequired;
+        return TypeNameImpl.Required.SIMPLE;
     }
 
     @Override
