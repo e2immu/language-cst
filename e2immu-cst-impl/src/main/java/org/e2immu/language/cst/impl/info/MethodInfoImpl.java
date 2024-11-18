@@ -493,7 +493,9 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
 
         if (!change) {
             // first test; we'll have to re-do
+            translationMap.startOfTestTranslation();
             List<Statement> tBody = methodBody().translate(translationMap);
+            translationMap.endOfTestTranslation();
             change = tBody.size() != 1 || tBody.get(0) != methodBody();
         }
 

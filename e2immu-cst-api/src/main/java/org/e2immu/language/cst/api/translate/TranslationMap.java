@@ -20,6 +20,17 @@ import java.util.stream.Collector;
 
 public interface TranslationMap {
 
+    /*
+    The method body is translated 2x during the translation of a whole method, see MethodInfoImpl.translate(..).
+    The result of the first iteration is discarded except for the knowledge whether translation is needed or not.
+    The following two methods mark such a "test" translation.
+     */
+    default void endOfTestTranslation() {
+    }
+
+    default void startOfTestTranslation() {
+    }
+
     @NotNull
     default FieldInfo translateFieldInfo(FieldInfo fieldInfo) {
         return fieldInfo;
