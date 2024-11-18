@@ -120,6 +120,11 @@ public interface Value extends Comparable<Value> {
     interface FieldValue extends Value {
         Variable createVariable(Runtime runtime, Expression object, Expression indexOrNull);
 
+        default int parameterIndexOfValue() {
+            int i = parameterIndexOfIndex();
+            return i < 0 ? 0 : 1 - i;
+        }
+
         boolean setter();
 
         int parameterIndexOfIndex();

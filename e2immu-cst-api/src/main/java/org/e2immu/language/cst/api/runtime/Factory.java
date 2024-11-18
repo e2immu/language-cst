@@ -167,6 +167,8 @@ public interface Factory {
 
     CompilationUnit.Builder newCompilationUnitBuilder();
 
+    Precedence precedenceOfBinaryOperator(MethodInfo op);
+
     Source newCompiledClassSource(CompilationUnit compilationUnit);
 
     MethodInfo newConstructor(TypeInfo owner);

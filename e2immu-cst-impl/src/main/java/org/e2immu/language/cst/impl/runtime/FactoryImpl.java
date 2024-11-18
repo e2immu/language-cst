@@ -29,6 +29,7 @@ import org.e2immu.language.cst.api.type.*;
 import org.e2immu.language.cst.api.variable.*;
 import org.e2immu.support.Either;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collector;
@@ -38,11 +39,40 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     private final IntConstant zero;
     private final IntConstant one;
     private final IntConstant minusOne;
+    private final Map<MethodInfo, Precedence> precedenceMap = new HashMap<>();
 
     public FactoryImpl() {
         zero = new IntConstantImpl(this, 0);
         one = new IntConstantImpl(this, 1);
         minusOne = new IntConstantImpl(this, -1);
+
+        precedenceMap.put(plusOperatorInt(), PrecedenceEnum.ADDITIVE);
+        precedenceMap.put(minusOperatorInt(), PrecedenceEnum.ADDITIVE);
+        precedenceMap.put(plusOperatorString(), PrecedenceEnum.ADDITIVE);
+
+        precedenceMap.put(multiplyOperatorInt(), PrecedenceEnum.MULTIPLICATIVE);
+        precedenceMap.put(divideOperatorInt(), PrecedenceEnum.MULTIPLICATIVE);
+        precedenceMap.put(remainderOperatorInt(), PrecedenceEnum.MULTIPLICATIVE);
+        precedenceMap.put(andOperatorInt(), PrecedenceEnum.AND);
+        precedenceMap.put(orOperatorInt(), PrecedenceEnum.OR);
+        precedenceMap.put(xorOperatorInt(), PrecedenceEnum.XOR);
+        precedenceMap.put(leftShiftOperatorInt(), PrecedenceEnum.SHIFT);
+        precedenceMap.put(signedRightShiftOperatorInt(), PrecedenceEnum.SHIFT);
+        precedenceMap.put(unsignedRightShiftOperatorInt(), PrecedenceEnum.SHIFT);
+
+        precedenceMap.put(lessEqualsOperatorInt(), PrecedenceEnum.RELATIONAL);
+        precedenceMap.put(lessOperatorInt(), PrecedenceEnum.RELATIONAL);
+        precedenceMap.put(greaterEqualsOperatorInt(), PrecedenceEnum.RELATIONAL);
+        precedenceMap.put(greaterOperatorInt(), PrecedenceEnum.RELATIONAL);
+
+        precedenceMap.put(equalsOperatorInt(), PrecedenceEnum.EQUALITY);
+        precedenceMap.put(notEqualsOperatorInt(), PrecedenceEnum.EQUALITY);
+        precedenceMap.put(equalsOperatorObject(), PrecedenceEnum.EQUALITY);
+        precedenceMap.put(notEqualsOperatorObject(), PrecedenceEnum.EQUALITY);
+
+        precedenceMap.put(andOperatorBool(), PrecedenceEnum.LOGICAL_AND);
+        precedenceMap.put(orOperatorBool(), PrecedenceEnum.LOGICAL_OR);
+        precedenceMap.put(xorOperatorBool(), PrecedenceEnum.XOR);
     }
 
     @Override
@@ -1029,6 +1059,13 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
+    public Precedence precedenceOfBinaryOperator(MethodInfo op) {
+        Precedence precedence = precedenceMap.get(op);
+        assert precedence != null;
+        return precedence;
+    }
+
+    @Override
     public Source newCompiledClassSource(CompilationUnit compilationUnit) {
         return SourceImpl.forCompiledClass(compilationUnit);
     }
@@ -1103,7 +1140,7 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     @Override
     public Variable getterVariable(MethodCall methodCall) {
         Value.FieldValue getSetField = methodCall.methodInfo().getSetField();
-        if (getSetField.field() == null) {
+        if (getSetField.field() == null || getSetField.setter()) {
             return null;
         }
         ParameterizedType concreteType = methodCall.concreteReturnType();
@@ -1124,7 +1161,7 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     @Override
     public Variable setterVariable(MethodCall methodCall) {
         Value.FieldValue getSetField = methodCall.methodInfo().getSetField();
-        if (getSetField.field() == null) {
+        if (getSetField.field() == null || !getSetField.setter()) {
             return null;
         }
         if (methodCall.parameterExpressions().size() == 1) {
