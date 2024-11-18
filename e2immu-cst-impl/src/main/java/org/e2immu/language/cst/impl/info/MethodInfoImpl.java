@@ -493,9 +493,9 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
 
         if (!change) {
             // first test; we'll have to re-do
-            translationMap.startOfTestTranslation();
+            translationMap.methodTranslationInfo(this, true, true);
             List<Statement> tBody = methodBody().translate(translationMap);
-            translationMap.endOfTestTranslation();
+            translationMap.methodTranslationInfo(this, false, true);
             change = tBody.size() != 1 || tBody.get(0) != methodBody();
         }
 
@@ -543,7 +543,9 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
                 }
                 tmWithParameters = b.build();
             }
+            translationMap.methodTranslationInfo(this, true, false);
             List<Statement> tBody = methodBody().translate(tmWithParameters);
+            translationMap.methodTranslationInfo(this, false, false);
 
             builder.setMethodBody((Block) tBody.get(0));
 

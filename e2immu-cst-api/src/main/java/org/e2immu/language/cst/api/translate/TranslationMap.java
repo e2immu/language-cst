@@ -25,10 +25,7 @@ public interface TranslationMap {
     The result of the first iteration is discarded except for the knowledge whether translation is needed or not.
     The following two methods mark such a "test" translation.
      */
-    default void endOfTestTranslation() {
-    }
-
-    default void startOfTestTranslation() {
+    default void methodTranslationInfo(MethodInfo methodInfo, boolean startEnd, boolean test) {
     }
 
     @NotNull
