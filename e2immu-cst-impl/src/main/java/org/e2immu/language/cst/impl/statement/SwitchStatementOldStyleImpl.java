@@ -266,7 +266,7 @@ public class SwitchStatementOldStyleImpl extends StatementImpl implements Switch
         if (tBlock != block || tSelector != selector || translatedLabels != switchLabels
             || !analysis().isEmpty() && translationMap.isClearAnalysis()) {
             SwitchStatementOldStyleImpl ssos = new SwitchStatementOldStyleImpl(comments(), source(), annotations(),
-                    label(), tSelector, ensureBlock(block.translate(translationMap)), translatedLabels);
+                    label(), tSelector, (Block) tBlock, translatedLabels);
             if (!translationMap.isClearAnalysis()) ssos.analysis().setAll(analysis());
             return List.of(ssos);
         }
