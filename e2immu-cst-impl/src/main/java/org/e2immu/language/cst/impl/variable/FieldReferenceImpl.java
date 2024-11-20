@@ -212,4 +212,9 @@ public class FieldReferenceImpl extends VariableImpl implements FieldReference {
     public boolean scopeIsThis() {
         return scopeVariable instanceof This;
     }
+
+    @Override
+    public Stream<Variable> variableStreamDescendIntoScope() {
+        return Stream.concat(Stream.of(this), scopeVariable.variableStreamDescendIntoScope());
+    }
 }

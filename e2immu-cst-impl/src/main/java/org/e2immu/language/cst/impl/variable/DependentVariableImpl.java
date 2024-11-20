@@ -165,4 +165,9 @@ public class DependentVariableImpl extends VariableImpl implements DependentVari
         if (variable.equals(arrayVariable)) return true;
         return arrayVariable.scopeIsRecursively(variable);
     }
+
+    @Override
+    public Stream<Variable> variableStreamDescendIntoScope() {
+        return Stream.concat(Stream.of(this), arrayVariable.variableStreamDescendIntoScope());
+    }
 }

@@ -5,6 +5,8 @@ import org.e2immu.language.cst.api.element.Element;
 import org.e2immu.language.cst.api.expression.util.OneVariable;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 
+import java.util.stream.Stream;
+
 /**
  * It is important that we can sort variables, as part of the sorting system of Expressions.
  */
@@ -38,4 +40,5 @@ public interface Variable extends Comparable<Variable>, Element, OneVariable {
         return null;
     }
 
+   default  Stream<Variable> variableStreamDescendIntoScope() { return Stream.of(this); }
 }

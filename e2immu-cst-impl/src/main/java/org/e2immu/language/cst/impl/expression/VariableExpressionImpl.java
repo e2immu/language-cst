@@ -189,6 +189,10 @@ public class VariableExpressionImpl extends ExpressionImpl implements VariableEx
             if (variable instanceof LocalVariable from && from.assignmentExpression() != null
                 && translated3 instanceof LocalVariable to && to.assignmentExpression() == null) {
                 Expression te = from.assignmentExpression().translate(translationMap);
+                if (te.variableStreamDescend().anyMatch(to::equals)) {
+                    // this goes in conjunction with the assertion
+                    return new VariableExpressionImpl(from.withAssignmentExpression(null));
+                }
                 return new VariableExpressionImpl(to.withAssignmentExpression(te));
             }
             return new VariableExpressionImpl(translated3);
