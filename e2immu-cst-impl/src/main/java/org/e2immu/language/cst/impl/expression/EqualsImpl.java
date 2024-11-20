@@ -26,6 +26,11 @@ public class EqualsImpl extends BinaryOperatorImpl implements Equals {
     }
 
     @Override
+    public Expression withSource(Source source) {
+        return new EqualsImpl(comments(), source, operator, precedence, lhs, rhs, parameterizedType);
+    }
+
+    @Override
     public Expression translate(TranslationMap translationMap) {
         Expression translated = translationMap.translateExpression(this);
         if (translated != this) return translated;

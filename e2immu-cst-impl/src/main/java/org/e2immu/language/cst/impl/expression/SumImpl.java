@@ -1,13 +1,14 @@
 package org.e2immu.language.cst.impl.expression;
 
-import org.e2immu.language.cst.api.expression.Expression;
-import org.e2immu.language.cst.api.expression.Negation;
-import org.e2immu.language.cst.api.expression.Numeric;
-import org.e2immu.language.cst.api.expression.Sum;
+import org.e2immu.language.cst.api.element.Comment;
+import org.e2immu.language.cst.api.element.Source;
+import org.e2immu.language.cst.api.expression.*;
+import org.e2immu.language.cst.api.info.MethodInfo;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.runtime.Runtime;
 import org.e2immu.language.cst.api.translate.TranslationMap;
+import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.impl.expression.util.ExpressionComparator;
 import org.e2immu.language.cst.impl.output.OutputBuilderImpl;
 import org.e2immu.language.cst.impl.output.SymbolEnum;
@@ -16,15 +17,22 @@ import java.util.List;
 
 
 public class SumImpl extends BinaryOperatorImpl implements Sum {
-    // for translation
-    private final Runtime runtime;
 
     public SumImpl(Runtime runtime, Expression lhs, Expression rhs) {
         super(List.of(), null, runtime.plusOperatorInt(), runtime.precedenceAdditive(), lhs, rhs,
                 runtime.widestTypeUnbox(lhs.parameterizedType(), rhs.parameterizedType()));
-        this.runtime = runtime;
         assert lhs.isNumeric() : "Have " + lhs + ", " + lhs.parameterizedType(); // and definitely not StringConstant!
         assert rhs.isNumeric() : "Have " + rhs + ", " + rhs.parameterizedType();
+    }
+
+    public SumImpl(List<Comment> comments, Source source, MethodInfo operator, Precedence precedence,
+                   Expression lhs, Expression rhs, ParameterizedType parameterizedType) {
+        super(comments, source, operator, precedence, lhs, rhs, parameterizedType);
+    }
+
+    @Override
+    public Expression withSource(Source source) {
+        return new SumImpl(comments(), source, operator, precedence, lhs, rhs, parameterizedType);
     }
 
     @Override
@@ -92,7 +100,7 @@ public class SumImpl extends BinaryOperatorImpl implements Sum {
         Expression tl = lhs.translate(translationMap);
         Expression tr = rhs.translate(translationMap);
         if (tl == lhs && tr == rhs) return this;
-        return new SumImpl(runtime, tl, tr);
+        return new SumImpl(comments(), source(), operator, precedence, tl, tr, parameterizedType);
     }
 
     @Override

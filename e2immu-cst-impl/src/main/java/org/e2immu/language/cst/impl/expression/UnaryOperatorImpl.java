@@ -1,7 +1,9 @@
 package org.e2immu.language.cst.impl.expression;
 
 import org.e2immu.annotation.NotNull;
+import org.e2immu.language.cst.api.element.Comment;
 import org.e2immu.language.cst.api.element.Element;
+import org.e2immu.language.cst.api.element.Source;
 import org.e2immu.language.cst.api.element.Visitor;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.expression.Precedence;
@@ -17,6 +19,7 @@ import org.e2immu.language.cst.impl.expression.util.ExpressionComparator;
 import org.e2immu.language.cst.impl.output.OutputBuilderImpl;
 import org.e2immu.language.cst.impl.output.SymbolEnum;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -27,10 +30,19 @@ public class UnaryOperatorImpl extends ExpressionImpl implements UnaryOperator {
     public final MethodInfo operator;
 
     public UnaryOperatorImpl(@NotNull MethodInfo operator, @NotNull Expression expression, Precedence precedence) {
-        super(1+expression.complexity());
+        this(List.of(), null, operator, expression, precedence);
+    }
+
+    public UnaryOperatorImpl(List<Comment> comments, Source source, @NotNull MethodInfo operator, @NotNull Expression expression, Precedence precedence) {
+        super(comments, source, 1 + expression.complexity());
         this.expression = Objects.requireNonNull(expression);
         this.precedence = precedence;
         this.operator = Objects.requireNonNull(operator);
+    }
+
+    @Override
+    public Expression withSource(Source source) {
+        return new UnaryOperatorImpl(comments(), source, operator, expression, precedence);
     }
 
     @Override
@@ -124,6 +136,6 @@ public class UnaryOperatorImpl extends ExpressionImpl implements UnaryOperator {
 
         Expression translatedExpression = expression.translate(translationMap);
         if (translatedExpression == expression) return this;
-        return new UnaryOperatorImpl(operator, translatedExpression, precedence);
+        return new UnaryOperatorImpl(comments(), source(), operator, translatedExpression, precedence);
     }
 }

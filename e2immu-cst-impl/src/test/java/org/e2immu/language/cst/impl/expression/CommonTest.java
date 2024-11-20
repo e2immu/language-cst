@@ -38,4 +38,12 @@ public abstract class CommonTest {
     protected InstanceOf newInstanceOf(Expression e, ParameterizedType testType) {
         return r.newInstanceOfBuilder().setExpression(e).setTestType(testType).build();
     }
+
+    protected Expression multiply(Expression lhs, Expression rhs) {
+        return r.newBinaryOperatorBuilder()
+                .setLhs(lhs).setRhs(rhs).setOperator(r.multiplyOperatorInt())
+                .setPrecedence(r.precedenceOfBinaryOperator(r.multiplyOperatorInt()))
+                .setParameterizedType(r.widestType(lhs.parameterizedType(), rhs.parameterizedType()))
+                .build();
+    }
 }

@@ -1,6 +1,8 @@
 package org.e2immu.language.cst.impl.expression;
 
+import org.e2immu.language.cst.api.element.Comment;
 import org.e2immu.language.cst.api.element.Element;
+import org.e2immu.language.cst.api.element.Source;
 import org.e2immu.language.cst.api.element.Visitor;
 import org.e2immu.language.cst.api.expression.ConstantExpression;
 import org.e2immu.language.cst.api.expression.Expression;
@@ -10,13 +12,14 @@ import org.e2immu.language.cst.api.variable.DescendMode;
 import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.language.cst.impl.expression.util.PrecedenceEnum;
 
+import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 public abstract class ConstantExpressionImpl<T> extends ExpressionImpl implements ConstantExpression<T> {
 
-    protected ConstantExpressionImpl(int complexity) {
-        super(complexity);
+    protected ConstantExpressionImpl(List<Comment> comments, Source source, int complexity) {
+        super(comments, source, complexity);
     }
 
     @Override

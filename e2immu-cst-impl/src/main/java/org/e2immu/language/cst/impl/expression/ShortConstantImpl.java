@@ -1,5 +1,7 @@
 package org.e2immu.language.cst.impl.expression;
 
+import org.e2immu.language.cst.api.element.Comment;
+import org.e2immu.language.cst.api.element.Source;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.expression.Numeric;
 import org.e2immu.language.cst.api.expression.ShortConstant;
@@ -11,19 +13,26 @@ import org.e2immu.language.cst.impl.expression.util.ExpressionComparator;
 import org.e2immu.language.cst.impl.output.OutputBuilderImpl;
 import org.e2immu.language.cst.impl.output.TextImpl;
 
+import java.util.List;
+
 public class ShortConstantImpl extends ConstantExpressionImpl<Short> implements Numeric, ShortConstant {
 
     private final short value;
     private final ParameterizedType parameterizedType;
 
     public ShortConstantImpl(Predefined predefined, short value) {
-        this(predefined.shortParameterizedType(), value);
+        this(List.of(), null, predefined.shortParameterizedType(), value);
     }
 
-    protected ShortConstantImpl(ParameterizedType parameterizedType, short value) {
-        super(value < -1 || value > 1 ? 2 : 1);
+    public ShortConstantImpl(List<Comment> comments, Source source, ParameterizedType parameterizedType, short value) {
+        super(comments, source, value < -1 || value > 1 ? 2 : 1);
         this.parameterizedType = parameterizedType;
         this.value = value;
+    }
+
+    @Override
+    public Expression withSource(Source source) {
+        return new ShortConstantImpl(comments(), source, parameterizedType, value);
     }
 
     @Override
@@ -76,11 +85,11 @@ public class ShortConstantImpl extends ConstantExpressionImpl<Short> implements 
 
     @Override
     public Expression negate() {
-        return new ShortConstantImpl(parameterizedType, (short) -value);
+        return new ShortConstantImpl(comments(), source(), parameterizedType, (short) -value);
     }
 
     @Override
     public Expression bitwiseNegation() {
-        return new ShortConstantImpl(parameterizedType, (short) ~value);
+        return new ShortConstantImpl(comments(), source(), parameterizedType, (short) ~value);
     }
 }

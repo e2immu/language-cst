@@ -43,6 +43,11 @@ public class InlineConditionalImpl extends ExpressionImpl implements InlineCondi
         this.commonType = commonType;
     }
 
+    @Override
+    public Expression withSource(Source source) {
+        return new InlineConditionalImpl(comments(), source, condition, ifTrue, ifFalse, commonType);
+    }
+
     public static final class Builder extends ElementImpl.Builder<InlineConditional.Builder> implements InlineConditional.Builder {
         private Expression condition;
         private Expression ifTrue;

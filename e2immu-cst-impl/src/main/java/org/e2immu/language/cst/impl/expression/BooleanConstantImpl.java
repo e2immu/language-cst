@@ -1,5 +1,7 @@
 package org.e2immu.language.cst.impl.expression;
 
+import org.e2immu.language.cst.api.element.Comment;
+import org.e2immu.language.cst.api.element.Source;
 import org.e2immu.language.cst.api.expression.BooleanConstant;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.output.OutputBuilder;
@@ -10,18 +12,25 @@ import org.e2immu.language.cst.impl.expression.util.ExpressionComparator;
 import org.e2immu.language.cst.impl.output.OutputBuilderImpl;
 import org.e2immu.language.cst.impl.output.TextImpl;
 
+import java.util.List;
+
 public class BooleanConstantImpl extends ConstantExpressionImpl<Boolean> implements BooleanConstant {
     private final ParameterizedType booleanPt;
     private final boolean constant;
 
     public BooleanConstantImpl(Predefined predefined, boolean constant) {
-        this(predefined.booleanParameterizedType(), constant);
+        this(List.of(), null, predefined.booleanParameterizedType(), constant);
     }
 
-    protected BooleanConstantImpl(ParameterizedType booleanPt, boolean constant) {
-        super(1);
+    public BooleanConstantImpl(List<Comment> comments, Source source, ParameterizedType booleanPt, boolean constant) {
+        super(comments, source, 1);
         this.booleanPt = booleanPt;
         this.constant = constant;
+    }
+
+    @Override
+    public Expression withSource(Source source) {
+        return new BooleanConstantImpl(comments(), source, booleanPt, constant);
     }
 
     @Override
@@ -63,6 +72,6 @@ public class BooleanConstantImpl extends ConstantExpressionImpl<Boolean> impleme
     }
 
     public BooleanConstant negate() {
-        return new BooleanConstantImpl(booleanPt, !constant);
+        return new BooleanConstantImpl(comments(), source(), booleanPt, !constant);
     }
 }

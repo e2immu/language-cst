@@ -5,27 +5,28 @@ import org.e2immu.language.cst.api.element.Source;
 import org.e2immu.language.cst.api.expression.Divide;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.expression.Precedence;
+import org.e2immu.language.cst.api.expression.Remainder;
 import org.e2immu.language.cst.api.info.MethodInfo;
 import org.e2immu.language.cst.api.runtime.Runtime;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 
 import java.util.List;
 
-public class DivideImpl extends BinaryOperatorImpl implements Divide {
+public class RemainderImpl extends BinaryOperatorImpl implements Remainder {
 
-    public DivideImpl(List<Comment> comments, Source source, MethodInfo operator, Precedence precedence,
-                      Expression lhs, Expression rhs, ParameterizedType parameterizedType) {
+    public RemainderImpl(List<Comment> comments, Source source, MethodInfo operator, Precedence precedence,
+                         Expression lhs, Expression rhs, ParameterizedType parameterizedType) {
         super(comments, source, operator, precedence, lhs, rhs, parameterizedType);
     }
 
-    public DivideImpl(Runtime runtime, Expression lhs, Expression rhs) {
-        super(List.of(), null, runtime.divideOperatorInt(), runtime.precedenceMultiplicative(), lhs,
+    public RemainderImpl(Runtime runtime, Expression lhs, Expression rhs) {
+        super(List.of(), null, runtime.remainderOperatorInt(), runtime.precedenceMultiplicative(), lhs,
                 rhs, runtime.widestTypeUnbox(lhs.parameterizedType(), rhs.parameterizedType()));
     }
 
     @Override
     public Expression withSource(Source source) {
-        return new DivideImpl(comments(), source, operator, precedence, lhs, rhs, parameterizedType);
+        return new RemainderImpl(comments(), source, operator, precedence, lhs, rhs, parameterizedType);
     }
 
     @Override

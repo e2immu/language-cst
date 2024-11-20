@@ -27,6 +27,7 @@ public class EvalImpl implements Eval {
     private final EvalBinaryOperator evalBinaryOperator;
     private final EvalInstanceOf evalInstanceOf;
     private final EvalUnaryOperator evalUnaryOperator;
+    private final EvalRemainder evalRemainder;
 
     public EvalImpl(Runtime runtime) {
         evalProduct = new EvalProduct(runtime);
@@ -41,6 +42,7 @@ public class EvalImpl implements Eval {
         evalBinaryOperator = new EvalBinaryOperator(runtime);
         evalInstanceOf = new EvalInstanceOf(runtime);
         evalUnaryOperator = new EvalUnaryOperator(runtime);
+        evalRemainder = new EvalRemainder(runtime);
     }
 
     @Override
@@ -85,7 +87,7 @@ public class EvalImpl implements Eval {
 
     @Override
     public Expression remainder(Expression lhs, Expression rhs) {
-        throw new UnsupportedOperationException();
+        return evalRemainder.remainder(lhs, rhs);
     }
 
     @Override

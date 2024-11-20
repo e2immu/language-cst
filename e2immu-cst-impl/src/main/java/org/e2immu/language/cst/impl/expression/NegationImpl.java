@@ -1,5 +1,7 @@
 package org.e2immu.language.cst.impl.expression;
 
+import org.e2immu.language.cst.api.element.Comment;
+import org.e2immu.language.cst.api.element.Source;
 import org.e2immu.language.cst.api.expression.Equals;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.expression.Negation;
@@ -11,10 +13,21 @@ import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.impl.output.OutputBuilderImpl;
 import org.e2immu.language.cst.impl.output.SymbolEnum;
 
+import java.util.List;
+
 public class NegationImpl extends UnaryOperatorImpl implements Negation {
 
     public NegationImpl(MethodInfo operator, Precedence precedence, Expression expression) {
-        super(operator, expression, precedence);
+        super(List.of(), null, operator, expression, precedence);
+    }
+
+    public NegationImpl(List<Comment> comments, Source source, MethodInfo operator, Precedence precedence, Expression expression) {
+        super(comments, source, operator, expression, precedence);
+    }
+
+    @Override
+    public Expression withSource(Source source) {
+        return new NegationImpl(comments(), source, operator, precedence, expression);
     }
 
     @Override
@@ -38,7 +51,7 @@ public class NegationImpl extends UnaryOperatorImpl implements Negation {
         if (translatedExpression instanceof Negation negation) {
             return negation.expression(); // double negation gets cancelled
         }
-        return new NegationImpl(operator, precedence, translatedExpression);
+        return new NegationImpl(comments(), source(), operator, precedence, translatedExpression);
     }
 
     @Override

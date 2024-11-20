@@ -1,6 +1,7 @@
 package org.e2immu.language.cst.impl.expression;
 
 import org.e2immu.language.cst.api.element.Element;
+import org.e2immu.language.cst.api.element.Source;
 import org.e2immu.language.cst.api.element.Visitor;
 import org.e2immu.language.cst.api.expression.EmptyExpression;
 import org.e2immu.language.cst.api.expression.Expression;
@@ -35,6 +36,11 @@ public class EmptyExpressionImpl extends ExpressionImpl implements EmptyExpressi
         super(1);
         this.msg = msg;
         parameterizedType = predefined.voidParameterizedType();
+    }
+
+    @Override
+    public Expression withSource(Source source) {
+        throw new UnsupportedOperationException();
     }
 
     @Override

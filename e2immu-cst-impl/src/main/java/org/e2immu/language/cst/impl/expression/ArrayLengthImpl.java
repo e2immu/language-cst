@@ -36,6 +36,11 @@ public class ArrayLengthImpl extends ExpressionImpl implements ArrayLength {
         this.intPt = intPt;
     }
 
+    @Override
+    public Expression withSource(Source source) {
+        return new ArrayLengthImpl(comments(), source, intPt, scope);
+    }
+
     public static class Builder extends ElementImpl.Builder<ArrayLength.Builder> implements ArrayLength.Builder {
         private Expression expression;
         private final ParameterizedType intParameterizedType;

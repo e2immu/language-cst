@@ -1,5 +1,7 @@
 package org.e2immu.language.cst.impl.expression;
 
+import org.e2immu.language.cst.api.element.Comment;
+import org.e2immu.language.cst.api.element.Source;
 import org.e2immu.language.cst.api.expression.DoubleConstant;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.expression.FloatConstant;
@@ -13,19 +15,26 @@ import org.e2immu.language.cst.impl.output.OutputBuilderImpl;
 import org.e2immu.language.cst.impl.output.TextImpl;
 import org.e2immu.util.internal.util.IntUtil;
 
+import java.util.List;
+
 public class DoubleConstantImpl extends ConstantExpressionImpl<Double> implements Numeric, DoubleConstant {
 
     private final double value;
     private final ParameterizedType parameterizedType;
 
     public DoubleConstantImpl(Predefined predefined, double value) {
-        this(predefined.doubleParameterizedType(), value);
+        this(List.of(), null, predefined.doubleParameterizedType(), value);
     }
 
-    protected DoubleConstantImpl(ParameterizedType parameterizedType, double value) {
-        super(0 == value ? 1 : 2);
+    public DoubleConstantImpl(List<Comment> comments, Source source, ParameterizedType parameterizedType, double value) {
+        super(comments, source, 0 == value ? 1 : 2);
         this.parameterizedType = parameterizedType;
         this.value = value;
+    }
+
+    @Override
+    public Expression withSource(Source source) {
+        return new DoubleConstantImpl(comments(), source, parameterizedType, value);
     }
 
     @Override
@@ -78,7 +87,7 @@ public class DoubleConstantImpl extends ConstantExpressionImpl<Double> implement
 
     @Override
     public Expression negate() {
-        return new DoubleConstantImpl(parameterizedType, -value);
+        return new DoubleConstantImpl(comments(), source(), parameterizedType, -value);
     }
 
     @Override

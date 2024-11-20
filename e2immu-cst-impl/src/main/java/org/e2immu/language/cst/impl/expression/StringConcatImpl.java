@@ -24,4 +24,9 @@ public class StringConcatImpl extends BinaryOperatorImpl implements StringConcat
         super(List.of(), null, predefined.plusOperatorString(), PrecedenceEnum.ADDITIVE, lhs,
                 rhs, predefined.stringParameterizedType());
     }
+
+    @Override
+    public Expression withSource(Source source) {
+        return new StringConcatImpl(comments(), source, operator, precedence, lhs, rhs, parameterizedType);
+    }
 }

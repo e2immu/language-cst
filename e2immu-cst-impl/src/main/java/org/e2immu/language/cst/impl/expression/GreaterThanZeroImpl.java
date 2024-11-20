@@ -1,6 +1,8 @@
 package org.e2immu.language.cst.impl.expression;
 
+import org.e2immu.language.cst.api.element.Comment;
 import org.e2immu.language.cst.api.element.Element;
+import org.e2immu.language.cst.api.element.Source;
 import org.e2immu.language.cst.api.element.Visitor;
 import org.e2immu.language.cst.api.expression.*;
 import org.e2immu.language.cst.api.output.OutputBuilder;
@@ -20,6 +22,7 @@ import org.e2immu.language.cst.impl.output.SymbolEnum;
 import org.e2immu.language.cst.impl.output.TextImpl;
 import org.e2immu.util.internal.util.IntUtil;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -30,10 +33,19 @@ public class GreaterThanZeroImpl extends ExpressionImpl implements GreaterThanZe
     private final ParameterizedType booleanPt;
 
     public GreaterThanZeroImpl(ParameterizedType booleanPt, Expression expression, boolean allowEquals) {
-        super(1 + expression.complexity());
+        this(List.of(), null, booleanPt, expression, allowEquals);
+    }
+
+    public GreaterThanZeroImpl(List<Comment> comments, Source source, ParameterizedType booleanPt, Expression expression, boolean allowEquals) {
+        super(comments, source, 1 + expression.complexity());
         this.expression = expression;
         this.allowEquals = allowEquals;
         this.booleanPt = booleanPt;
+    }
+
+    @Override
+    public Expression withSource(Source source) {
+        return new GreaterThanZeroImpl(comments(), source, booleanPt, expression, allowEquals);
     }
 
     @Override
@@ -74,7 +86,7 @@ public class GreaterThanZeroImpl extends ExpressionImpl implements GreaterThanZe
                 if (v instanceof Negation ne) {
                     x = ne.expression();
                     lessThan = true;
-                    if (IntUtil.isMathematicalInteger(d)) {
+                    if (IntUtil.isMathematicalInteger(d) && ne.parameterizedType().isMathematicallyInteger()) {
                         assert !allowEquals : "By convention, we store x < 4 rather than x <= 3";
                         b = d - 1;
                     } else {
@@ -141,7 +153,7 @@ public class GreaterThanZeroImpl extends ExpressionImpl implements GreaterThanZe
 
         Expression translatedExpression = expression.translate(translationMap);
         if (translatedExpression == expression) return this;
-        return new GreaterThanZeroImpl(booleanPt, translatedExpression, allowEquals);
+        return new GreaterThanZeroImpl(comments(), source(), booleanPt, translatedExpression, allowEquals);
     }
 
     @Override

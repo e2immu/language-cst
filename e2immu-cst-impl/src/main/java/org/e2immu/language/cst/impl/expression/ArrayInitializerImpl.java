@@ -1,6 +1,8 @@
 package org.e2immu.language.cst.impl.expression;
 
+import org.e2immu.language.cst.api.element.Comment;
 import org.e2immu.language.cst.api.element.Element;
+import org.e2immu.language.cst.api.element.Source;
 import org.e2immu.language.cst.api.element.Visitor;
 import org.e2immu.language.cst.api.expression.ArrayInitializer;
 import org.e2immu.language.cst.api.expression.Expression;
@@ -29,9 +31,18 @@ public class ArrayInitializerImpl extends ExpressionImpl implements ArrayInitial
     private final List<Expression> expressions;
 
     public ArrayInitializerImpl(List<Expression> expressions, ParameterizedType commonType) {
-        super(expressions.stream().mapToInt(Expression::complexity).sum() + 1);
+        this(List.of(), null, expressions, commonType);
+    }
+
+    public ArrayInitializerImpl(List<Comment> comments, Source source, List<Expression> expressions, ParameterizedType commonType) {
+        super(comments, source, expressions.stream().mapToInt(Expression::complexity).sum() + 1);
         this.commonType = commonType;
         this.expressions = expressions;
+    }
+
+    @Override
+    public Expression withSource(Source source) {
+        return new ArrayInitializerImpl(comments(), source, expressions, commonType);
     }
 
     @Override
@@ -123,6 +134,6 @@ public class ArrayInitializerImpl extends ExpressionImpl implements ArrayInitial
                 .collect(translationMap.toList(expressions));
         ParameterizedType translatedType = translationMap.translateType(commonType);
         if (translatedType == commonType && translatedExpressions == expressions) return this;
-        return new ArrayInitializerImpl(translatedExpressions, translatedType);
+        return new ArrayInitializerImpl(comments(), source(), translatedExpressions, translatedType);
     }
 }

@@ -1,5 +1,7 @@
 package org.e2immu.language.cst.impl.expression;
 
+import org.e2immu.language.cst.api.element.Comment;
+import org.e2immu.language.cst.api.element.Source;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.expression.IntConstant;
 import org.e2immu.language.cst.api.expression.Numeric;
@@ -11,19 +13,26 @@ import org.e2immu.language.cst.impl.expression.util.ExpressionComparator;
 import org.e2immu.language.cst.impl.output.OutputBuilderImpl;
 import org.e2immu.language.cst.impl.output.TextImpl;
 
+import java.util.List;
+
 public class IntConstantImpl extends ConstantExpressionImpl<Integer> implements Numeric, IntConstant {
 
     private final int value;
     private final ParameterizedType parameterizedType;
 
     public IntConstantImpl(Predefined predefined, int value) {
-        this(predefined.intParameterizedType(), value);
+        this(List.of(), null, predefined.intParameterizedType(), value);
     }
 
-    protected IntConstantImpl(ParameterizedType parameterizedType, int value) {
-        super(value < -1 || value > 1 ? 2 : 1);
+    public IntConstantImpl(List<Comment> comments, Source source, ParameterizedType parameterizedType, int value) {
+        super(comments, source, value < -1 || value > 1 ? 2 : 1);
         this.parameterizedType = parameterizedType;
         this.value = value;
+    }
+
+    @Override
+    public Expression withSource(Source source) {
+        return new IntConstantImpl(comments(), source, parameterizedType, value);
     }
 
     @Override
@@ -76,11 +85,11 @@ public class IntConstantImpl extends ConstantExpressionImpl<Integer> implements 
 
     @Override
     public Expression negate() {
-        return new IntConstantImpl(parameterizedType, -value);
+        return new IntConstantImpl(comments(), source(), parameterizedType, -value);
     }
 
     @Override
     public Expression bitwiseNegation() {
-        return new IntConstantImpl(parameterizedType, ~value);
+        return new IntConstantImpl(comments(), source(), parameterizedType, ~value);
     }
 }

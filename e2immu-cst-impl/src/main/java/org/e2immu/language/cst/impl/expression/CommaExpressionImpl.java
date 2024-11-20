@@ -36,6 +36,11 @@ public class CommaExpressionImpl extends ExpressionImpl implements CommaExpressi
         assert !expressions.isEmpty();
     }
 
+    @Override
+    public Expression withSource(Source source) {
+        return new CommaExpressionImpl(comments(), source, expressions);
+    }
+
     public static class Builder extends ElementImpl.Builder<CommaExpression.Builder> implements CommaExpression.Builder {
         private final List<Expression> expressions = new ArrayList<>();
 

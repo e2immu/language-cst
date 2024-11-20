@@ -10,8 +10,6 @@ public interface VariableExpression extends Expression {
 
     Variable variable();
 
-    VariableExpression withSource(Source newSource);
-
     VariableExpression withSuffix(Suffix suffix);
 
     interface Suffix {

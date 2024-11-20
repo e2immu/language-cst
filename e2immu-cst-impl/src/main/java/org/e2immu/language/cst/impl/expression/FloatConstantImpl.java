@@ -1,5 +1,7 @@
 package org.e2immu.language.cst.impl.expression;
 
+import org.e2immu.language.cst.api.element.Comment;
+import org.e2immu.language.cst.api.element.Source;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.expression.FloatConstant;
 import org.e2immu.language.cst.api.expression.IntConstant;
@@ -12,19 +14,26 @@ import org.e2immu.language.cst.impl.expression.util.ExpressionComparator;
 import org.e2immu.language.cst.impl.output.OutputBuilderImpl;
 import org.e2immu.language.cst.impl.output.TextImpl;
 
+import java.util.List;
+
 public class FloatConstantImpl extends ConstantExpressionImpl<Float> implements Numeric, FloatConstant {
 
     private final float value;
     private final ParameterizedType parameterizedType;
 
     public FloatConstantImpl(Predefined predefined, float value) {
-        this(predefined.floatParameterizedType(), value);
+        this(List.of(), null, predefined.floatParameterizedType(), value);
     }
 
-    protected FloatConstantImpl(ParameterizedType parameterizedType, float value) {
-        super(value != 0 ? 2 : 1);
+    public FloatConstantImpl(List<Comment> comments, Source source, ParameterizedType parameterizedType, float value) {
+        super(comments, source, value != 0 ? 2 : 1);
         this.parameterizedType = parameterizedType;
         this.value = value;
+    }
+
+    @Override
+    public Expression withSource(Source source) {
+        return new FloatConstantImpl(comments(), source, parameterizedType, value);
     }
 
     @Override
@@ -77,7 +86,7 @@ public class FloatConstantImpl extends ConstantExpressionImpl<Float> implements 
 
     @Override
     public Expression negate() {
-        return new FloatConstantImpl(parameterizedType, value);
+        return new FloatConstantImpl(comments(), source(), parameterizedType, value);
     }
 
     @Override

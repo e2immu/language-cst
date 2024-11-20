@@ -1,5 +1,7 @@
 package org.e2immu.language.cst.impl.expression;
 
+import org.e2immu.language.cst.api.element.Comment;
+import org.e2immu.language.cst.api.element.Source;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.expression.StringConstant;
 import org.e2immu.language.cst.api.output.OutputBuilder;
@@ -11,6 +13,7 @@ import org.e2immu.language.cst.impl.output.OutputBuilderImpl;
 import org.e2immu.language.cst.impl.output.TextImpl;
 import org.e2immu.util.internal.util.StringUtil;
 
+import java.util.List;
 import java.util.Objects;
 
 public class StringConstantImpl extends ConstantExpressionImpl<String> implements StringConstant {
@@ -18,13 +21,18 @@ public class StringConstantImpl extends ConstantExpressionImpl<String> implement
     private final String constant;
 
     public StringConstantImpl(Predefined predefined, String constant) {
-        this(predefined.stringParameterizedType(), constant);
+        this(List.of(), null, predefined.stringParameterizedType(), constant);
     }
 
-    protected StringConstantImpl(ParameterizedType stringPt, String constant) {
-        super(constant.isEmpty() ? 1 : 2);
+    public StringConstantImpl(List<Comment> comments, Source source, ParameterizedType stringPt, String constant) {
+        super(comments, source, constant.isEmpty() ? 1 : 2);
         this.stringPt = Objects.requireNonNull(stringPt);
         this.constant = Objects.requireNonNull(constant);
+    }
+
+    @Override
+    public Expression withSource(Source source) {
+        return new StringConstantImpl(comments(), source, stringPt, constant);
     }
 
     @Override

@@ -1,6 +1,8 @@
 package org.e2immu.language.cst.impl.expression;
 
+import org.e2immu.language.cst.api.element.Comment;
 import org.e2immu.language.cst.api.element.Element;
+import org.e2immu.language.cst.api.element.Source;
 import org.e2immu.language.cst.api.element.Visitor;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.expression.Precedence;
@@ -18,6 +20,7 @@ import org.e2immu.language.cst.impl.expression.util.InternalCompareToException;
 import org.e2immu.language.cst.impl.expression.util.PrecedenceEnum;
 import org.e2immu.language.cst.impl.output.OutputBuilderImpl;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -27,9 +30,18 @@ public class TypeExpressionImpl extends ExpressionImpl implements TypeExpression
     public final Diamond diamond;
 
     public TypeExpressionImpl(ParameterizedType parameterizedType, Diamond diamond) {
-        super(1);
+        this(List.of(), null, parameterizedType, diamond);
+    }
+
+    public TypeExpressionImpl(List<Comment> comments, Source source, ParameterizedType parameterizedType, Diamond diamond) {
+        super(comments, source, 1);
         this.parameterizedType = Objects.requireNonNull(parameterizedType);
         this.diamond = diamond;
+    }
+
+    @Override
+    public Expression withSource(Source source) {
+        return new TypeExpressionImpl(comments(), source, parameterizedType, diamond);
     }
 
     @Override
@@ -100,6 +112,6 @@ public class TypeExpressionImpl extends ExpressionImpl implements TypeExpression
 
         ParameterizedType translatedType = translationMap.translateType(parameterizedType);
         if (translatedType == parameterizedType) return this;
-        return new TypeExpressionImpl(translatedType, diamond);
+        return new TypeExpressionImpl(comments(), source(), translatedType, diamond);
     }
 }

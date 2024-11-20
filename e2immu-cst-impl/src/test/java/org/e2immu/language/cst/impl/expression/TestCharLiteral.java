@@ -4,6 +4,8 @@ import org.e2immu.language.cst.api.runtime.Predefined;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TestCharLiteral {
@@ -17,6 +19,6 @@ public class TestCharLiteral {
     }
 
     private static String print(char c) {
-        return new CharConstantImpl((ParameterizedType) null, c).toString();
+        return new CharConstantImpl(List.of(), null, null, c).toString();
     }
 }

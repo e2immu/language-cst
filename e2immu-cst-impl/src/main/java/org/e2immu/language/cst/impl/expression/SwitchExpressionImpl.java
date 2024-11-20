@@ -43,6 +43,11 @@ public class SwitchExpressionImpl extends ExpressionImpl implements SwitchExpres
         this.parameterizedType = parameterizedType;
     }
 
+    @Override
+    public Expression withSource(Source source) {
+        return new SwitchExpressionImpl(comments(), source, selector, entries, parameterizedType);
+    }
+
     public static class BuilderImpl extends ElementImpl.Builder<SwitchExpression.Builder>
             implements SwitchExpression.Builder {
         private Expression selector;

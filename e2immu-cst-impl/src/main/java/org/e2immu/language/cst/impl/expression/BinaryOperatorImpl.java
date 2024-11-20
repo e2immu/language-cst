@@ -47,6 +47,11 @@ public class BinaryOperatorImpl extends ExpressionImpl implements BinaryOperator
         this.parameterizedType = Objects.requireNonNull(parameterizedType);
     }
 
+    @Override
+    public Expression withSource(Source source) {
+        return new BinaryOperatorImpl(comments(), source, operator, precedence, lhs, rhs, parameterizedType);
+    }
+
     public static class Builder extends ElementImpl.Builder<BinaryOperator.Builder> implements BinaryOperator.Builder {
         protected MethodInfo operator;
         protected Precedence precedence;

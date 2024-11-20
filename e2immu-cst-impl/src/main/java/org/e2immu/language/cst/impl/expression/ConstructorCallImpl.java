@@ -57,6 +57,12 @@ public class ConstructorCallImpl extends ExpressionImpl implements ConstructorCa
         this.concreteReturnType = Objects.requireNonNull(concreteReturnType);
     }
 
+    @Override
+    public Expression withSource(Source source) {
+        return new ConstructorCallImpl(comments(), source, constructor, concreteReturnType, diamond, object,
+                parameterExpressions, arrayInitializer, anonymousClass);
+    }
+
     public static class Builder extends ElementImpl.Builder<ConstructorCall.Builder> implements ConstructorCall.Builder {
         private MethodInfo constructor;
         private Diamond diamond;

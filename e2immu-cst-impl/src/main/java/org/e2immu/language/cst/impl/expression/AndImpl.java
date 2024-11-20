@@ -50,6 +50,11 @@ public class AndImpl extends ExpressionImpl implements And {
     }
 
     @Override
+    public Expression withSource(Source source) {
+        return new AndImpl(comments(), source, booleanPt, expressions);
+    }
+
+    @Override
     public List<Expression> expressions() {
         return expressions;
     }

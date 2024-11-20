@@ -22,7 +22,6 @@ import org.e2immu.language.cst.impl.type.ParameterizedTypeImpl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class AnnotationExpressionImpl extends ExpressionImpl implements AnnotationExpression {
@@ -33,6 +32,11 @@ public class AnnotationExpressionImpl extends ExpressionImpl implements Annotati
         super(comments, source, 1 + keyValuePairs.stream().mapToInt(kv -> kv.value().complexity()).sum());
         this.typeInfo = typeInfo;
         this.keyValuePairs = keyValuePairs;
+    }
+
+    @Override
+    public Expression withSource(Source source) {
+        return new AnnotationExpressionImpl(comments(), source, typeInfo, keyValuePairs);
     }
 
     @Override

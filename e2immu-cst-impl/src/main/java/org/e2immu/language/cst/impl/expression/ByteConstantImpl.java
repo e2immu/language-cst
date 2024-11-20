@@ -1,5 +1,7 @@
 package org.e2immu.language.cst.impl.expression;
 
+import org.e2immu.language.cst.api.element.Comment;
+import org.e2immu.language.cst.api.element.Source;
 import org.e2immu.language.cst.api.expression.ByteConstant;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.expression.IntConstant;
@@ -12,19 +14,26 @@ import org.e2immu.language.cst.impl.expression.util.ExpressionComparator;
 import org.e2immu.language.cst.impl.output.OutputBuilderImpl;
 import org.e2immu.language.cst.impl.output.TextImpl;
 
+import java.util.List;
+
 public class ByteConstantImpl extends ConstantExpressionImpl<Byte> implements Numeric, ByteConstant {
 
     private final byte value;
     private final ParameterizedType parameterizedType;
 
     public ByteConstantImpl(Predefined predefined, byte value) {
-        this(predefined.byteParameterizedType(), value);
+        this(List.of(), null, predefined.byteParameterizedType(), value);
     }
 
-    protected ByteConstantImpl(ParameterizedType parameterizedType, byte value) {
-        super(value < -1 || value > 1 ? 2 : 1);
+    public ByteConstantImpl(List<Comment> comments, Source source, ParameterizedType parameterizedType, byte value) {
+        super(comments, source, value < -1 || value > 1 ? 2 : 1);
         this.parameterizedType = parameterizedType;
         this.value = value;
+    }
+
+    @Override
+    public Expression withSource(Source source) {
+        return new ByteConstantImpl(comments(), source, parameterizedType, value);
     }
 
     @Override
@@ -77,11 +86,11 @@ public class ByteConstantImpl extends ConstantExpressionImpl<Byte> implements Nu
 
     @Override
     public Expression negate() {
-        return new ByteConstantImpl(parameterizedType, (byte) -value);
+        return new ByteConstantImpl(comments(), source(), parameterizedType, (byte) -value);
     }
 
     @Override
     public Expression bitwiseNegation() {
-        return new ByteConstantImpl(parameterizedType, (byte) ~value);
+        return new ByteConstantImpl(comments(), source(), parameterizedType, (byte) ~value);
     }
 }

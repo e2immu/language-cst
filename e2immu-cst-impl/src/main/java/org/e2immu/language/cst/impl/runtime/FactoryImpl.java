@@ -512,7 +512,7 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
 
     @Override
     public Expression nullConstant() {
-        return new NullConstantImpl(parameterizedTypeNullConstant());
+        return new NullConstantImpl(List.of(), null, parameterizedTypeNullConstant());
     }
 
     @Override
@@ -1091,7 +1091,7 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     public ClassExpression newClassExpression(TypeInfo typeInfo) {
         ParameterizedType pt = newParameterizedType(typeInfo, 0);
         ParameterizedType classPt = newParameterizedType(classTypeInfo(), List.of(pt));
-        return new ClassExpressionImpl(pt, classPt);
+        return new ClassExpressionImpl(List.of(), null, pt, classPt);
     }
 
     @Override

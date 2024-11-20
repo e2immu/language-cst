@@ -53,6 +53,12 @@ public class AssignmentImpl extends ExpressionImpl implements Assignment {
         this.prefixPrimitiveOperator = prefixPrimitiveOperator;
     }
 
+    @Override
+    public Expression withSource(Source source) {
+        return new AssignmentImpl(comments(), source, target, value, assignmentOperator, assignmentOperatorIsPlus,
+                binaryOperator, prefixPrimitiveOperator);
+    }
+
     public static class Builder extends ElementImpl.Builder<Assignment.Builder> implements Assignment.Builder {
         private VariableExpression target;
         private Expression value;

@@ -20,7 +20,6 @@ import org.e2immu.language.cst.impl.element.ElementImpl;
 import org.e2immu.language.cst.impl.expression.util.ExpressionComparator;
 import org.e2immu.language.cst.impl.expression.util.PrecedenceEnum;
 import org.e2immu.language.cst.impl.output.*;
-import org.e2immu.language.cst.impl.output.*;
 
 import java.util.List;
 import java.util.Objects;
@@ -35,7 +34,7 @@ public class MethodCallImpl extends ExpressionImpl implements MethodCall {
     private final ParameterizedType concreteReturnType;
     private final String modificationTimes;
 
-    public MethodCallImpl(Source source, List<Comment> comments,
+    public MethodCallImpl(List<Comment> comments, Source source,
                           Expression object, boolean objectIsImplicit, MethodInfo methodInfo,
                           List<Expression> parameterExpressions, ParameterizedType concreteReturnType,
                           String modificationTimes) {
@@ -49,6 +48,12 @@ public class MethodCallImpl extends ExpressionImpl implements MethodCall {
         this.methodInfo = Objects.requireNonNull(methodInfo);
         this.modificationTimes = Objects.requireNonNull(modificationTimes);
         assert !(object instanceof TypeExpression) || methodInfo.isStatic();
+    }
+
+    @Override
+    public Expression withSource(Source source) {
+        return new MethodCallImpl(comments(), source, object, objectIsImplicit, methodInfo, parameterExpressions,
+                concreteReturnType, modificationTimes);
     }
 
     public static class Builder extends ElementImpl.Builder<MethodCall.Builder> implements MethodCall.Builder {
@@ -78,7 +83,7 @@ public class MethodCallImpl extends ExpressionImpl implements MethodCall {
             assert object != null : "Must set object, even if it is the implicit 'this', of call to "
                                     + methodInfo;
             assert concreteReturnType != null : "Must set the concrete return type of call to " + methodInfo;
-            return new MethodCallImpl(source, comments, object, objectIsImplicit, methodInfo,
+            return new MethodCallImpl(comments, source, object, objectIsImplicit, methodInfo,
                     List.copyOf(parameterExpressions), concreteReturnType, modificationTimes);
         }
 
@@ -168,13 +173,13 @@ public class MethodCallImpl extends ExpressionImpl implements MethodCall {
 
     @Override
     public MethodCall withParameterExpressions(List<Expression> parameterExpressions) {
-        return new MethodCallImpl(source(), comments(), object, objectIsImplicit, methodInfo, parameterExpressions,
+        return new MethodCallImpl(comments(), source(), object, objectIsImplicit, methodInfo, parameterExpressions,
                 concreteReturnType, modificationTimes);
     }
 
     @Override
     public MethodCall withObject(Expression object) {
-        return new MethodCallImpl(source(), comments(), object, objectIsImplicit, methodInfo, parameterExpressions,
+        return new MethodCallImpl(comments(), source(), object, objectIsImplicit, methodInfo, parameterExpressions,
                 concreteReturnType, modificationTimes);
     }
 
@@ -330,7 +335,7 @@ public class MethodCallImpl extends ExpressionImpl implements MethodCall {
             && newModificationTimes.equals(modificationTimes)) {
             return this;
         }
-        MethodCall translatedMc = new MethodCallImpl(source(), comments(), translatedObject, objectIsImplicit,
+        MethodCall translatedMc = new MethodCallImpl(comments(), source(), translatedObject, objectIsImplicit,
                 translatedMethod.get(0), translatedParameters, translatedReturnType, newModificationTimes);
         if (translationMap.translateAgain()) {
             return translatedMc.translate(translationMap);

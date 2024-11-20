@@ -48,6 +48,11 @@ public class InstanceOfImpl extends ExpressionImpl implements InstanceOf {
         this.booleanParameterizedType = booleanParameterizedType;
     }
 
+    @Override
+    public Expression withSource(Source source) {
+        return new InstanceOfImpl(comments(), source, expression, testType, patternVariable, booleanParameterizedType);
+    }
+
     public static class BuilderImpl extends ElementImpl.Builder<InstanceOf.Builder> implements InstanceOf.Builder {
         private final ParameterizedType booleanPt;
 

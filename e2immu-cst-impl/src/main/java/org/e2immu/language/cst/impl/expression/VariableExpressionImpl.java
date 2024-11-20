@@ -35,10 +35,10 @@ public class VariableExpressionImpl extends ExpressionImpl implements VariableEx
     private final Suffix suffix;
 
     public VariableExpressionImpl(Variable variable) {
-        this(null, List.of(), variable, null);
+        this(List.of(), null, variable, null);
     }
 
-    public VariableExpressionImpl(Source source, List<Comment> comments, Variable variable, Suffix suffix) {
+    public VariableExpressionImpl(List<Comment> comments, Source source, Variable variable, Suffix suffix) {
         super(comments, source, variable.complexity());
         this.variable = variable;
         this.suffix = suffix;
@@ -72,7 +72,7 @@ public class VariableExpressionImpl extends ExpressionImpl implements VariableEx
 
         @Override
         public VariableExpression build() {
-            return new VariableExpressionImpl(source, comments, variable, suffix);
+            return new VariableExpressionImpl(comments, source, variable, suffix);
         }
     }
 
@@ -91,7 +91,7 @@ public class VariableExpressionImpl extends ExpressionImpl implements VariableEx
 
     @Override
     public VariableExpression withSuffix(Suffix suffix) {
-        return new VariableExpressionImpl(source(), comments(), variable, suffix);
+        return new VariableExpressionImpl(comments(), source(), variable, suffix);
     }
 
     @Override
@@ -201,7 +201,7 @@ public class VariableExpressionImpl extends ExpressionImpl implements VariableEx
             if (translated != fr.scope() || newField != fr.fieldInfo()) {
                 FieldReference newFr = new FieldReferenceImpl(newField, translated, null,
                         fr.parameterizedType());
-                return new VariableExpressionImpl(source(), comments(), newFr, suffix);
+                return new VariableExpressionImpl(comments(), source(), newFr, suffix);
             }
         } else if (variable instanceof DependentVariable dv) {
             Expression translatedScope = dv.arrayExpression().translate(translationMap);
@@ -214,7 +214,7 @@ public class VariableExpressionImpl extends ExpressionImpl implements VariableEx
                         DependentVariableImpl.INDEX_VARIABLE);
                 DependentVariable newDv = new DependentVariableImpl(translatedScope,
                         arrayVariable, translatedIndex, indexVariable, dv.parameterizedType());
-                return new VariableExpressionImpl(source(), comments(), newDv, suffix);
+                return new VariableExpressionImpl(comments(), source(), newDv, suffix);
             }
         } else if (variable instanceof This thisVar) {
             ParameterizedType thisVarPt = thisVar.parameterizedType();
@@ -229,7 +229,7 @@ public class VariableExpressionImpl extends ExpressionImpl implements VariableEx
             }
             if (translatedType != thisVarPt || !Objects.equals(thisVar.explicitlyWriteType(), tExplicitly)) {
                 This newThisVar = new ThisImpl(translatedType, tExplicitly, thisVar.writeSuper());
-                return new VariableExpressionImpl(source(), comments(), newThisVar, suffix);
+                return new VariableExpressionImpl(comments(), source(), newThisVar, suffix);
             }
         }
 
@@ -243,6 +243,6 @@ public class VariableExpressionImpl extends ExpressionImpl implements VariableEx
 
     @Override
     public VariableExpression withSource(Source newSource) {
-        return new VariableExpressionImpl(newSource, comments(), variable, suffix);
+        return new VariableExpressionImpl(comments(), newSource, variable, suffix);
     }
 }

@@ -41,6 +41,11 @@ public class MethodReferenceImpl extends ExpressionImpl implements MethodReferen
     }
 
     @Override
+    public Expression withSource(Source source) {
+        return new MethodReferenceImpl(comments(), source, parameterizedType, methodInfo, scope);
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof MethodReferenceImpl that)) return false;

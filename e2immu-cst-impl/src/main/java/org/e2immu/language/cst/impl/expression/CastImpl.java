@@ -35,6 +35,11 @@ public class CastImpl extends ExpressionImpl implements Cast {
         this.parameterizedType = parameterizedType;
     }
 
+    @Override
+    public Expression withSource(Source source) {
+        return new CastImpl(comments(), source, parameterizedType, expression);
+    }
+
     public static class Builder extends ElementImpl.Builder<Cast.Builder> implements Cast.Builder {
         private Expression expression;
         private ParameterizedType parameterizedType;

@@ -50,6 +50,11 @@ public class OrImpl extends ExpressionImpl implements Or {
     }
 
     @Override
+    public Expression withSource(Source source) {
+        return new OrImpl(comments(), source, booleanPt, expressions);
+    }
+
+    @Override
     public List<Expression> expressions() {
         return expressions;
     }

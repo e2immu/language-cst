@@ -57,6 +57,11 @@ public class LambdaImpl extends ExpressionImpl implements Lambda {
         this.methodBody = methodBody;
     }
 
+    @Override
+    public Expression withSource(Source source) {
+        return new LambdaImpl(comments(), source, methodInfo, parameters, methodBody, outputVariants);
+    }
+
     public enum OutputVariantImpl implements OutputVariant {
         TYPED, VAR, EMPTY;
 

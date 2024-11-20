@@ -1,6 +1,8 @@
 package org.e2immu.language.cst.impl.expression;
 
+import org.e2immu.language.cst.api.element.Comment;
 import org.e2immu.language.cst.api.element.Element;
+import org.e2immu.language.cst.api.element.Source;
 import org.e2immu.language.cst.api.element.Visitor;
 import org.e2immu.language.cst.api.expression.*;
 import org.e2immu.language.cst.api.output.OutputBuilder;
@@ -19,6 +21,7 @@ import org.e2immu.language.cst.impl.output.OutputBuilderImpl;
 import org.e2immu.language.cst.impl.output.SymbolEnum;
 import org.e2immu.language.cst.impl.type.DiamondEnum;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -27,10 +30,18 @@ public class ClassExpressionImpl extends ConstantExpressionImpl<ParameterizedTyp
     public final ParameterizedType parameterizedType; // String.class -> String
     public final ParameterizedType classType; // String.class -> Class<String>
 
-    public ClassExpressionImpl(ParameterizedType parameterizedType, ParameterizedType classType) {
-        super(1);
+    public ClassExpressionImpl(List<Comment> comments,
+                               Source source,
+                               ParameterizedType parameterizedType,
+                               ParameterizedType classType) {
+        super(comments, source, 1);
         this.parameterizedType = Objects.requireNonNull(parameterizedType);
         this.classType = Objects.requireNonNull(classType);
+    }
+
+    @Override
+    public Expression withSource(Source source) {
+        return new ClassExpressionImpl(comments(), source, parameterizedType, classType);
     }
 
     @Override
@@ -87,7 +98,7 @@ public class ClassExpressionImpl extends ConstantExpressionImpl<ParameterizedTyp
         ParameterizedType translatedType = translationMap.translateType(this.parameterizedType);
         if (this.parameterizedType == translatedType) return this;
         ParameterizedType translatedClassType = translationMap.translateType(classType);
-        return new ClassExpressionImpl(translatedType, translatedClassType);
+        return new ClassExpressionImpl(comments(), source(), translatedType, translatedClassType);
     }
 
     @Override

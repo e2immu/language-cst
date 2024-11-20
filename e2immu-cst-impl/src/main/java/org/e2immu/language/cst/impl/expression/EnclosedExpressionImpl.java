@@ -32,6 +32,11 @@ public class EnclosedExpressionImpl extends ExpressionImpl implements EnclosedEx
     }
 
     @Override
+    public Expression withSource(Source source) {
+        return new EnclosedExpressionImpl(comments(), source, inner);
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;

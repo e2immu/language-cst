@@ -1,5 +1,7 @@
 package org.e2immu.language.cst.impl.expression;
 
+import org.e2immu.language.cst.api.element.Comment;
+import org.e2immu.language.cst.api.element.Source;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.expression.IntConstant;
 import org.e2immu.language.cst.api.expression.LongConstant;
@@ -12,19 +14,26 @@ import org.e2immu.language.cst.impl.expression.util.ExpressionComparator;
 import org.e2immu.language.cst.impl.output.OutputBuilderImpl;
 import org.e2immu.language.cst.impl.output.TextImpl;
 
+import java.util.List;
+
 public class LongConstantImpl extends ConstantExpressionImpl<Long> implements Numeric, LongConstant {
 
     private final long value;
     private final ParameterizedType parameterizedType;
 
     public LongConstantImpl(Predefined predefined, long value) {
-        this(predefined.longParameterizedType(), value);
+        this(List.of(), null, predefined.longParameterizedType(), value);
     }
 
-    protected LongConstantImpl(ParameterizedType parameterizedType, long value) {
-        super(0 == value ? 1 : 2);
+    public LongConstantImpl(List<Comment> comments, Source source, ParameterizedType parameterizedType, long value) {
+        super(comments, source, 0 == value ? 1 : 2);
         this.parameterizedType = parameterizedType;
         this.value = value;
+    }
+
+    @Override
+    public Expression withSource(Source source) {
+        return new LongConstantImpl(comments(), source, parameterizedType, value);
     }
 
     @Override
@@ -42,7 +51,7 @@ public class LongConstantImpl extends ConstantExpressionImpl<Long> implements Nu
 
     @Override
     public OutputBuilder print(Qualification qualification) {
-        return new OutputBuilderImpl().add(new TextImpl(value+"L"));
+        return new OutputBuilderImpl().add(new TextImpl(value + "L"));
     }
 
     @Override
@@ -77,11 +86,11 @@ public class LongConstantImpl extends ConstantExpressionImpl<Long> implements Nu
 
     @Override
     public Expression negate() {
-        return new LongConstantImpl(parameterizedType, -value);
+        return new LongConstantImpl(comments(), source(), parameterizedType, -value);
     }
 
     @Override
     public Expression bitwiseNegation() {
-        return new LongConstantImpl(parameterizedType, ~value);
+        return new LongConstantImpl(comments(), source(), parameterizedType, ~value);
     }
 }
