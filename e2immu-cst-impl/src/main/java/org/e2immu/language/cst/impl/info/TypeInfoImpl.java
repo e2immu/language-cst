@@ -273,7 +273,8 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
                isShort() || isBoxedShort() ||
                isByte() || isBoxedByte() ||
                isFloat() || isBoxedFloat() ||
-               isDouble() || isBoxedDouble();
+               isDouble() || isBoxedDouble() ||
+               isChar() || isCharacter();
     }
 
     @Override
