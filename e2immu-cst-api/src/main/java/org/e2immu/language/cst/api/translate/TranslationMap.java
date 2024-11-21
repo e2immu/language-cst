@@ -194,6 +194,10 @@ public interface TranslationMap {
     }
 
     default <T> Collector<T, Set<T>, Set<T>> toSet(Set<T> original) {
+        return staticToSet(original);
+    }
+
+    static <T> Collector<T, Set<T>, Set<T>> staticToSet(Set<T> original) {
         return new Collector<>() {
             boolean changes;
 
