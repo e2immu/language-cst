@@ -591,6 +591,17 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
     }
 
     @Override
+    public MethodInfo withMethodType(MethodType methodType) {
+        if (methodType == this.methodType) return this;
+        MethodInfoImpl mi = methodType.isConstructor() ? new MethodInfoImpl(typeInfo, methodType)
+                : new MethodInfoImpl(methodType, name, typeInfo);
+        if (inspection.isFinal()) mi.inspection.setFinal(inspection.get());
+        else mi.inspection.setVariable(inspection.get());
+        mi.analysis().setAll(analysis());
+        return mi;
+    }
+
+    @Override
     public boolean isSyntheticArrayConstructor() {
         return methodType == MethodTypeEnum.SYNTHETIC_ARRAY_CONSTRUCTOR;
     }

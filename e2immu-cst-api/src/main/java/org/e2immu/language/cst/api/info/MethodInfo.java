@@ -70,6 +70,8 @@ public interface MethodInfo extends Info {
      */
     MethodInfo withMethodBody(Block newBody);
 
+    MethodInfo withMethodType(MethodType methodType);
+
     interface MethodType {
         boolean isCompactConstructor();
 
