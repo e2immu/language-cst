@@ -235,6 +235,10 @@ public interface TranslationMap {
     }
 
     default <K, V> Collector<Map.Entry<K, V>, Map<K, V>, Map<K, V>> toMap(Map<K, V> original) {
+        return staticToMap(original);
+    }
+
+    static <K, V> Collector<Map.Entry<K, V>, Map<K, V>, Map<K, V>> staticToMap(Map<K, V> original) {
         return new Collector<>() {
             boolean changes;
 
