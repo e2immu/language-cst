@@ -1169,8 +1169,7 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
             return newFieldReference(getSetField.field(), methodCall.object(), concreteType);
         }
         ParameterizedType concreteType = methodCall.parameterExpressions().get(1).parameterizedType();
-        ParameterizedType concreteArrayType = concreteType.copyWithArrays(concreteType.arrays() + 1);
-        FieldReference fr = newFieldReference(getSetField.field(), methodCall.object(), concreteArrayType);
+        FieldReference fr = newFieldReference(getSetField.field(), methodCall.object(), getSetField.field().type());
         Expression index = methodCall.parameterExpressions().get(0);
         assert index.parameterizedType().isMathematicallyInteger();
         return newDependentVariable(fr, concreteType, index);
