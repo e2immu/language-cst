@@ -123,8 +123,8 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
-    public ArrayInitializer newArrayInitializer(List<Expression> expressions, ParameterizedType commonType) {
-        return new ArrayInitializerImpl(expressions, commonType);
+    public ArrayInitializer.Builder newArrayInitializerBuilder() {
+        return new ArrayInitializerImpl.Builder();
     }
 
     @Override

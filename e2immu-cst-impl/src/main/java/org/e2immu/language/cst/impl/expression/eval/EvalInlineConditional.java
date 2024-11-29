@@ -19,6 +19,8 @@ import org.e2immu.language.cst.api.runtime.Runtime;
 import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.language.cst.impl.expression.util.LhsRhs;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 public class EvalInlineConditional {
     private final Runtime runtime;
 
@@ -256,9 +258,20 @@ public class EvalInlineConditional {
         return false;
     }
 
+    private static boolean containsEmpty(Expression expression) {
+        AtomicBoolean found = new AtomicBoolean();
+        expression.visit(e -> {
+            if (e instanceof EmptyExpression) {
+                found.set(true);
+            }
+            return !found.get();
+        });
+        return found.get();
+    }
+
     private static Expression edgeCases(Runtime runtime,
                                         Expression condition, Expression ifTrue, Expression ifFalse) {
-        if (ifTrue.isEmpty() || ifFalse.isEmpty()) {
+        if (containsEmpty(ifTrue) || containsEmpty(ifFalse)) {
             /*
              The inline conditional system is used to construct inline conditionals such as x?<no return value>:false
              in the context of constructing a correct return value (e2immu, but also jfocus).
@@ -288,6 +301,7 @@ public class EvalInlineConditional {
             if (ifFalse.isBoolValueTrue()) {
                 return runtime.or(runtime.negate(condition), ifTrue);
             }
+            // ifTrue must be boolean too...
             return runtime.and(condition, ifTrue);
         }
 

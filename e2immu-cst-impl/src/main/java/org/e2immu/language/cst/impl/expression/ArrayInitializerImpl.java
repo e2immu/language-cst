@@ -13,6 +13,7 @@ import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.variable.DescendMode;
 import org.e2immu.language.cst.api.variable.Variable;
+import org.e2immu.language.cst.impl.element.ElementImpl;
 import org.e2immu.language.cst.impl.expression.util.ExpressionComparator;
 import org.e2immu.language.cst.impl.expression.util.InternalCompareToException;
 import org.e2immu.language.cst.impl.expression.util.PrecedenceEnum;
@@ -38,6 +39,28 @@ public class ArrayInitializerImpl extends ExpressionImpl implements ArrayInitial
         super(comments, source, expressions.stream().mapToInt(Expression::complexity).sum() + 1);
         this.commonType = commonType;
         this.expressions = expressions;
+    }
+
+    public static class Builder extends ElementImpl.Builder<ArrayInitializer.Builder> implements ArrayInitializer.Builder {
+        private List<Expression> expressions;
+        private ParameterizedType commonType;
+
+        @Override
+        public ArrayInitializer.Builder setExpressions(List<Expression> expressions) {
+            this.expressions = expressions;
+            return this;
+        }
+
+        @Override
+        public ArrayInitializer.Builder setCommonType(ParameterizedType commonType) {
+            this.commonType = commonType;
+            return this;
+        }
+
+        @Override
+        public ArrayInitializer build() {
+            return new ArrayInitializerImpl(comments, source, List.copyOf(expressions), commonType);
+        }
     }
 
     @Override

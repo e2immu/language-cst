@@ -131,7 +131,7 @@ public interface Factory {
 
     MethodInfo newArrayCreationConstructor(ParameterizedType returnType);
 
-    ArrayInitializer newArrayInitializer(List<Expression> expressions, ParameterizedType commonType);
+    ArrayInitializer.Builder newArrayInitializerBuilder();
 
     ArrayLength.Builder newArrayLengthBuilder();
 

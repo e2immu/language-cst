@@ -52,6 +52,10 @@ public record Interval(double left, boolean leftIncluded, double right, boolean 
         }
         if (isOpenRight()) {
             assert other.isOpenLeft();
+            if (left > other.right) {
+                // we cannot represent this interval: [a,inf] and [-inf,b], with a > b
+                return null;
+            }
             return new Interval(left, leftIncluded, other.right, other.rightIncluded);
         }
         throw new IllegalStateException();
