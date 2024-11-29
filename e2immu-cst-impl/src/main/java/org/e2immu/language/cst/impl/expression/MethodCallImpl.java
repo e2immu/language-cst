@@ -337,7 +337,7 @@ public class MethodCallImpl extends ExpressionImpl implements MethodCall {
         }
         MethodCall translatedMc = new MethodCallImpl(comments(), source(), translatedObject, objectIsImplicit,
                 translatedMethod.get(0), translatedParameters, translatedReturnType, newModificationTimes);
-        if (translationMap.translateAgain()) {
+        if (translationMap.translateAgain() && !this.equals(translatedMc)) {
             return translatedMc.translate(translationMap);
         }
         return translatedMc;
