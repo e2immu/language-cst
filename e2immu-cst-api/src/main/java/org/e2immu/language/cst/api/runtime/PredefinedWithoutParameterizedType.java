@@ -29,6 +29,8 @@ public interface PredefinedWithoutParameterizedType {
 
     MethodInfo assignPlusOperatorInt();
 
+    MethodInfo assignPlusOperatorString();
+
     MethodInfo assignRemainderOperatorInt();
 
     MethodInfo assignSignedRightShiftOperatorInt();

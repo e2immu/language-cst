@@ -202,6 +202,8 @@ public class PredefinedImpl implements Predefined {
 
     private final MethodInfo plusOperatorString = createOperator(stringTypeInfo, "+", List.of(stringParameterizedType,
             stringParameterizedType), stringParameterizedType);
+    private final MethodInfo assignPlusOperatorString = createOperator(stringTypeInfo, "+=",
+            List.of(stringParameterizedType), stringParameterizedType);
 
     private final MethodInfo equalsOperatorObject = createOperator(objectTypeInfo, "==",
             List.of(objectParameterizedType, objectParameterizedType), booleanParameterizedType);
@@ -420,6 +422,11 @@ public class PredefinedImpl implements Predefined {
     @Override
     public MethodInfo assignPlusOperatorInt() {
         return assignPlusOperatorInt;
+    }
+
+    @Override
+    public MethodInfo assignPlusOperatorString() {
+        return assignPlusOperatorString;
     }
 
     @Override
