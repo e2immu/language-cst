@@ -249,7 +249,7 @@ public class EvalAnd {
                 // not (3 == a) && (4 == a)  (the situation 3 == a && not (3 == a) has been solved as A && not A == False
                 if (ev1.rhs().equals(ev2.rhs()) && !ev1.lhs().equals(ev2.lhs())) {
                     newConcat.remove(newConcat.size() - 1); // full replace
-                    return Action.ADD;
+                    return Action.ADD_CHANGE;
                 }
             }
         }

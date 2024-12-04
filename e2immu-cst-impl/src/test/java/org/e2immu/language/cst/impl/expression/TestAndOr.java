@@ -102,4 +102,14 @@ public class TestAndOr extends CommonTest {
         Expression e = r.and(x2, r.or(x3, nx1));
         assertEquals("\"<\"==s", e.toString());
     }
+
+    @Test
+    public void test4() {
+        Expression nx1 = r.negate(r.equals(r.newChar('!'), x));
+        Expression nx2 = r.negate(r.equals(r.newChar('<'), x));
+        Expression nx3 = r.negate(r.equals(r.newChar('>'), x));
+        Expression x7 = r.equals(r.newChar('a'), x);
+        Expression e = r.and(nx1, nx2, nx3, x7);
+        assertEquals("'a'==x", e.toString());
+    }
 }
