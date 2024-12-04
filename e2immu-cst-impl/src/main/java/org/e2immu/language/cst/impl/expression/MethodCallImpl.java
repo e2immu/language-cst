@@ -39,7 +39,6 @@ public class MethodCallImpl extends ExpressionImpl implements MethodCall {
                           List<Expression> parameterExpressions, ParameterizedType concreteReturnType,
                           String modificationTimes) {
         super(comments, source, object.complexity()
-                                + methodInfo.complexity()
                                 + parameterExpressions.stream().mapToInt(Expression::complexity).sum());
         this.object = Objects.requireNonNull(object);
         this.objectIsImplicit = objectIsImplicit;

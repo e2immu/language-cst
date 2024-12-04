@@ -29,6 +29,8 @@ public abstract class CommonTest {
 
     protected final VariableExpression s = r.newVariableExpression(createVariable("s", r.stringParameterizedType()));
 
+    protected final VariableExpression x = r.newVariableExpression(createVariable("x", r.charParameterizedType()));
+
     protected final VariableExpression dd = r.newVariableExpression(createVariable("dd", r.doubleParameterizedType().ensureBoxed(r)));
 
     protected Variable createVariable(String name, ParameterizedType type) {

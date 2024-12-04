@@ -419,7 +419,7 @@ public class EvalAnd {
                 if (result.size() < or.expressions().size()) {
                     Expression newOr = runtime.or(result);
                     newConcat.set(newConcat.size() - 1, newOr); // full replace
-                    return Action.ADD_CHANGE;
+                    return Action.SKIP;
                 }
             }
         }
