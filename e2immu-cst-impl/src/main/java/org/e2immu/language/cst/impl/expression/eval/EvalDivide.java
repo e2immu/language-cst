@@ -19,7 +19,7 @@ public class EvalDivide {
 
         if (l instanceof Numeric ln && ln.doubleValue() == 0) return l;
         if (r instanceof Numeric rn && rn.doubleValue() == 1) return l;
-        if (l instanceof IntConstant li && r instanceof IntConstant ri)
+        if (l instanceof IntConstant li && r instanceof IntConstant ri && ri.constant() != 0)
             return runtime.newInt(li.constant() / ri.constant());
 
         // any unknown lingering

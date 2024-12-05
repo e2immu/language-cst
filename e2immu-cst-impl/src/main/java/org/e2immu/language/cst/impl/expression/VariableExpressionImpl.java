@@ -197,18 +197,6 @@ public class VariableExpressionImpl extends ExpressionImpl implements VariableEx
             }
             return new VariableExpressionImpl(translated3);
         }
-        if (variable instanceof LocalVariable from && from.assignmentExpression() != null) {
-            // the following assertion is required to avoid infinite translation loops
-            assert from.assignmentExpression().variableStreamDescend().noneMatch(v ->
-                    v instanceof LocalVariable lv && lv.equals(variable) && lv.assignmentExpression() != null);
-            Expression te = from.assignmentExpression().translate(translationMap);
-            if (te.variableStreamDescend().anyMatch(variable::equals)) {
-                // this goes in conjunction with the assertion
-                return new VariableExpressionImpl(from.withAssignmentExpression(null));
-            }
-            return new VariableExpressionImpl(from.withAssignmentExpression(te));
-        }
-
         if (variable instanceof FieldReference fr) {
             Expression translated = fr.scope().translate(translationMap);
             FieldInfo newField = translationMap.translateFieldInfo(fr.fieldInfo());
