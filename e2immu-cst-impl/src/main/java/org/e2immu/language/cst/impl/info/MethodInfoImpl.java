@@ -586,6 +586,7 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
 
     @Override
     public MethodInfo withMethodBody(Block newBody) {
+        if (newBody == methodBody()) return this;
         TranslationMap tm = new TranslationMapImpl.Builder().put(methodBody(), newBody).build();
         return translate(tm).get(0);
     }
