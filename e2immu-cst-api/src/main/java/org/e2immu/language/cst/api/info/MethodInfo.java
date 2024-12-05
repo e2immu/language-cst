@@ -72,6 +72,8 @@ public interface MethodInfo extends Info {
 
     MethodInfo withMethodType(MethodType methodType);
 
+    MethodInfo withSynthetic(boolean synthetic);
+
     interface MethodType {
         boolean isCompactConstructor();
 

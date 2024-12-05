@@ -42,8 +42,22 @@ public class MethodInspectionImpl extends InspectionImpl implements MethodInspec
                                 Block methodBody,
                                 String fullyQualifiedName,
                                 Set<MethodInfo> overrides) {
-        super(inspection.access(), inspection.comments(), inspection.source(), inspection.isSynthetic(),
-                inspection.annotations());
+        this(inspection, inspection.isSynthetic(), returnType, typeParameters, parameters, methodModifiers,
+                exceptionTypes, operatorType, methodBody, fullyQualifiedName, overrides);
+    }
+
+    public MethodInspectionImpl(Inspection inspection,
+                                boolean synthetic,
+                                ParameterizedType returnType,
+                                List<TypeParameter> typeParameters,
+                                List<ParameterInfo> parameters,
+                                Set<MethodModifier> methodModifiers,
+                                List<ParameterizedType> exceptionTypes,
+                                OperatorType operatorType,
+                                Block methodBody,
+                                String fullyQualifiedName,
+                                Set<MethodInfo> overrides) {
+        super(inspection.access(), inspection.comments(), inspection.source(), synthetic, inspection.annotations());
         this.returnType = returnType;
         this.operatorType = operatorType;
         this.parameters = parameters;
@@ -53,6 +67,12 @@ public class MethodInspectionImpl extends InspectionImpl implements MethodInspec
         this.typeParameters = typeParameters;
         this.methodModifiers = methodModifiers;
         this.exceptionTypes = exceptionTypes;
+    }
+
+    @Override
+    public MethodInspection withSynthetic(boolean synthetic) {
+        return new MethodInspectionImpl(this, synthetic, returnType, typeParameters, parameters,
+                methodModifiers, exceptionTypes, operatorType, methodBody, fullyQualifiedName, overrides);
     }
 
     @Override
@@ -117,6 +137,12 @@ public class MethodInspectionImpl extends InspectionImpl implements MethodInspec
             if (methodInfo.isStatic()) {
                 addMethodModifier(MethodModifierEnum.STATIC);
             }
+        }
+
+        @Override
+        public MethodInspection withSynthetic(boolean synthetic) {
+            setSynthetic(synthetic);
+            return this;
         }
 
         @Override

@@ -602,6 +602,19 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
     }
 
     @Override
+    public MethodInfo withSynthetic(boolean synthetic) {
+        if (synthetic == isSynthetic()) return this;
+        if (inspection.isFinal()) {
+            MethodInfoImpl mii = new MethodInfoImpl(methodType, name, typeInfo);
+            mii.inspection.setFinal(inspection.get().withSynthetic(synthetic));
+            mii.analysis().setAll(analysis());
+            return mii;
+        }
+        ((MethodInspectionImpl.Builder) inspection.get()).setSynthetic(synthetic);
+        return this;
+    }
+
+    @Override
     public boolean isSyntheticArrayConstructor() {
         return methodType == MethodTypeEnum.SYNTHETIC_ARRAY_CONSTRUCTOR;
     }

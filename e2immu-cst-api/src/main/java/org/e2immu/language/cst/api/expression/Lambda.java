@@ -40,6 +40,8 @@ public interface Lambda extends Expression {
 
     List<OutputVariant> outputVariants();
 
+    Lambda withMethodInfoAndMethodBody(MethodInfo methodInfo);
+
     interface OutputVariant {
         boolean isEmpty();
 

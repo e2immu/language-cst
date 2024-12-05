@@ -19,6 +19,8 @@ public interface ConstructorCall extends Expression {
 
     ArrayInitializer arrayInitializer();
 
+    ConstructorCall withAnonymousClass(TypeInfo newAnonymous);
+
     ConstructorCall withParameterExpressions(List<Expression> newParameterExpressions);
 
     Diamond diamond();

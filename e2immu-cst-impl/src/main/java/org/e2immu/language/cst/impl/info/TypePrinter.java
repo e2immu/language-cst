@@ -43,19 +43,21 @@ public record TypePrinter(TypeInfo typeInfo) {
         // PACKAGE AND IMPORTS
 
         OutputBuilder packageAndImports = new OutputBuilderImpl();
-        if (typeInfo.isPrimaryType()) {
-            String packageName = typeInfo.packageName();
-            if (!packageName.isEmpty()) {
-                packageAndImports.add(KeywordImpl.PACKAGE).add(SpaceEnum.ONE).add(new TextImpl(packageName))
-                        .add(SymbolEnum.SEMICOLON)
-                        .add(SpaceEnum.NEWLINE);
-            }
-            imports.stream().sorted().forEach(i -> packageAndImports.add(KeywordImpl.IMPORT).add(SpaceEnum.ONE)
-                    .add(new TextImpl(i)).add(SymbolEnum.SEMICOLON).add(SpaceEnum.NEWLINE));
-        }
+
 
         OutputBuilder afterAnnotations = new OutputBuilderImpl();
         if (doTypeDeclaration) {
+            if (typeInfo.isPrimaryType()) {
+                String packageName = typeInfo.packageName();
+                if (!packageName.isEmpty()) {
+                    packageAndImports.add(KeywordImpl.PACKAGE).add(SpaceEnum.ONE).add(new TextImpl(packageName))
+                            .add(SymbolEnum.SEMICOLON)
+                            .add(SpaceEnum.NEWLINE);
+                }
+                imports.stream().sorted().forEach(i -> packageAndImports.add(KeywordImpl.IMPORT).add(SpaceEnum.ONE)
+                        .add(new TextImpl(i)).add(SymbolEnum.SEMICOLON).add(SpaceEnum.NEWLINE));
+            }
+            
             // the class name
             afterAnnotations
                     .add(minimalModifiers(typeInfo).stream().map(mod -> new OutputBuilderImpl().add(mod.keyword()))

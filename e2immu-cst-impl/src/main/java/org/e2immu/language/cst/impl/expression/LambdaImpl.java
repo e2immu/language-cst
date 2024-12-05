@@ -58,6 +58,11 @@ public class LambdaImpl extends ExpressionImpl implements Lambda {
     }
 
     @Override
+    public Lambda withMethodInfoAndMethodBody(MethodInfo methodInfo) {
+        return new LambdaImpl(comments(), source(), methodInfo, parameters, methodInfo.methodBody(), outputVariants);
+    }
+
+    @Override
     public Expression withSource(Source source) {
         return new LambdaImpl(comments(), source, methodInfo, parameters, methodBody, outputVariants);
     }

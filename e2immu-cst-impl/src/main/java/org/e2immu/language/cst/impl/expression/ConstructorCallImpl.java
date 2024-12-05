@@ -285,6 +285,12 @@ public class ConstructorCallImpl extends ExpressionImpl implements ConstructorCa
     }
 
     @Override
+    public ConstructorCall withAnonymousClass(TypeInfo newAnonymous) {
+        return new ConstructorCallImpl(comments(), source(), constructor, concreteReturnType, diamond, object,
+                parameterExpressions, arrayInitializer, newAnonymous);
+    }
+
+    @Override
     public Diamond diamond() {
         return diamond;
     }
