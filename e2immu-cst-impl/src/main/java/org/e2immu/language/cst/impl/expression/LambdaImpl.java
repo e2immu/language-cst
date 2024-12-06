@@ -52,6 +52,7 @@ public class LambdaImpl extends ExpressionImpl implements Lambda {
                        List<OutputVariant> outputVariants) {
         super(comments, source, 1 + methodInfo.complexity());
         this.methodInfo = methodInfo;
+        assert methodInfo.isPublic() : "This method implements a functional interface, so it must be public";
         this.outputVariants = outputVariants;
         this.parameters = parameters;
         this.methodBody = methodBody;
