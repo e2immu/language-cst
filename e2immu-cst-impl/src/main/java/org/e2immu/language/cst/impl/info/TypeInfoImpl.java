@@ -632,7 +632,7 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
         }
         for (FieldInfo fieldInfo : newFields) {
             Expression init = fieldInfo.initializer();
-            Expression tInit = init == null ? null : init.translate(translationMap);
+            Expression tInit = init.translate(translationMap);
             if (init != tInit) {
                 change = true;
                 fieldInfo.builder().setInitializer(tInit);

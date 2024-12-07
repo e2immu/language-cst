@@ -1,10 +1,12 @@
 package org.e2immu.language.cst.impl.info;
 
 
+import org.e2immu.language.cst.api.analysis.PropertyValueMap;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.info.Access;
 import org.e2immu.language.cst.api.info.FieldInfo;
 import org.e2immu.language.cst.api.info.FieldModifier;
+import org.e2immu.language.cst.impl.analysis.PropertyValueMapImpl;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -13,11 +15,13 @@ import java.util.Set;
 public class FieldInspectionImpl extends InspectionImpl implements FieldInspection {
     private final Set<FieldModifier> fieldModifiers;
     private final Expression initializer;
+    private final PropertyValueMap analysisOfInitializer = new PropertyValueMapImpl();
 
     public FieldInspectionImpl(Inspection inspection, Set<FieldModifier> fieldModifiers, Expression initializer) {
         super(inspection.access(), inspection.comments(), inspection.source(), inspection.isSynthetic(),
                 inspection.annotations());
         this.fieldModifiers = fieldModifiers;
+        assert initializer != null; // use empty expression if you want an absence of initializer.
         this.initializer = initializer;
     }
 
@@ -26,6 +30,10 @@ public class FieldInspectionImpl extends InspectionImpl implements FieldInspecti
         return initializer;
     }
 
+    @Override
+    public PropertyValueMap analysisOfInitializer() {
+        return analysisOfInitializer;
+    }
 
     @Override
     public Set<FieldModifier> fieldModifiers() {
@@ -95,6 +103,11 @@ public class FieldInspectionImpl extends InspectionImpl implements FieldInspecti
         @Override
         public boolean hasBeenCommitted() {
             return fieldInfo.hasBeenCommitted();
+        }
+
+        @Override
+        public PropertyValueMap analysisOfInitializer() {
+            throw new UnsupportedOperationException();
         }
     }
 }

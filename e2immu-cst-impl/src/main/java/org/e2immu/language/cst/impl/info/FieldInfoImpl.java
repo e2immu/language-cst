@@ -1,5 +1,6 @@
 package org.e2immu.language.cst.impl.info;
 
+import org.e2immu.language.cst.api.analysis.PropertyValueMap;
 import org.e2immu.language.cst.api.element.Comment;
 import org.e2immu.language.cst.api.element.Element;
 import org.e2immu.language.cst.api.element.Source;
@@ -293,6 +294,11 @@ public class FieldInfoImpl extends InfoImpl implements FieldInfo {
     }
 
     @Override
+    public PropertyValueMap analysisOfInitializer() {
+        return inspection.get().analysisOfInitializer();
+    }
+
+    @Override
     public boolean isSynthetic() {
         return inspection.get().isSynthetic();
     }
@@ -305,7 +311,7 @@ public class FieldInfoImpl extends InfoImpl implements FieldInfo {
     @Override
     public List<FieldInfo> translate(TranslationMap translationMap) {
         Expression init = initializer();
-        Expression tInit = init == null ? null : init.translate(translationMap);
+        Expression tInit = init.translate(translationMap);
         TypeInfo tOwner = translationMap.translateType(owner.asSimpleParameterizedType()).typeInfo();
         ParameterizedType tType = translationMap.translateType(type);
 

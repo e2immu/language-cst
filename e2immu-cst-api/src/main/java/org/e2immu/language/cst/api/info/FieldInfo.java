@@ -1,6 +1,7 @@
 package org.e2immu.language.cst.api.info;
 
 import org.e2immu.annotation.Fluent;
+import org.e2immu.language.cst.api.analysis.PropertyValueMap;
 import org.e2immu.language.cst.api.element.CompilationUnit;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.output.OutputBuilder;
@@ -12,6 +13,8 @@ import java.util.List;
 import java.util.Set;
 
 public interface FieldInfo extends Info {
+
+    PropertyValueMap analysisOfInitializer();
 
     boolean hasBeenInspected();
 
