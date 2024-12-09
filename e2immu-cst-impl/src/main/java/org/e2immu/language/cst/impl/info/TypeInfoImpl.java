@@ -669,8 +669,9 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
             newMethods.forEach(builder::addMethod);
             newSubTypes.forEach(builder::addSubType);
             newFields.forEach(builder::addField);
-            builder.addAnnotations(newAnnotations);
-            builder.commit();
+            builder.addAnnotations(newAnnotations)
+                    .setEnclosingMethod(this.enclosingMethod())
+                    .commit();
             if (!translationMap.isClearAnalysis()) {
                 typeInfo.analysis().setAll(analysis());
             }

@@ -14,9 +14,13 @@ import java.util.List;
 public interface Lambda extends Expression {
     MethodInfo methodInfo();
 
-    Block methodBody();
+    default Block methodBody() {
+        return methodInfo().methodBody();
+    }
 
-    List<ParameterInfo> parameters();
+    default List<ParameterInfo> parameters() {
+        return methodInfo().parameters();
+    }
 
     default TypeInfo abstractFunctionalTypeInfo() {
         return concreteFunctionalType().typeInfo();
