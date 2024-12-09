@@ -180,4 +180,8 @@ public interface Value extends Comparable<Value> {
     interface SetOfInfo extends Value {
         Set<? extends Info> infoSet();
     }
+
+    interface SetOfStrings extends Value {
+        Set<String> set();
+    }
 }

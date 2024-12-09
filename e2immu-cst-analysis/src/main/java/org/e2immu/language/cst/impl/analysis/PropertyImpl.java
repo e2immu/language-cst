@@ -12,6 +12,8 @@ public class PropertyImpl implements Property {
             ValueImpl.IndependentImpl.DEPENDENT);
     public static final Property IMMUTABLE_TYPE_DETERMINED_BY_PARAMETERS
             = new PropertyImpl("immutableTypeDeterminedByParameters");
+    public final static Property LOCAL_VARIABLES_OF_ENCLOSING_METHOD = new PropertyImpl("localVariablesOfEnclosingMethod",
+            ValueImpl.SetOfStringsImpl.EMPTY_SET);
 
     // method
     public static final Property MODIFIED_METHOD = new PropertyImpl("modifiedMethod");

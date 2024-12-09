@@ -682,6 +682,28 @@ public abstract class ValueImpl implements Value {
                 NotNullImpl.from(di.codec().decodeInt(di.context(), encodedValue)));
     }
 
+    public record SetOfStringsImpl(Set<String> set) implements SetOfStrings {
+        public static final SetOfStrings EMPTY_SET = new SetOfStringsImpl(Set.of());
+
+        @Override
+        public Codec.EncodedValue encode(Codec codec, Codec.Context context) {
+            List<Codec.EncodedValue> encodedValues = set.stream().sorted()
+                    .map(s -> codec.encodeString(context, s)).toList();
+            return codec.encodeList(context, encodedValues);
+        }
+
+        public static SetOfStrings from(Codec codec, Codec.Context context, Codec.EncodedValue encodedList) {
+            List<Codec.EncodedValue> encodedValues = codec.decodeList(context, encodedList);
+            Set<String> set = encodedValues.stream().map(e -> codec.decodeString(context, e))
+                    .collect(Collectors.toUnmodifiableSet());
+            return new SetOfStringsImpl(set);
+        }
+    }
+
+    static {
+        decoderMap.put(SetOfStringsImpl.class, (di, ev) -> SetOfStringsImpl.from(di.codec(), di.context(), ev));
+    }
+
     public record SetOfInfoImpl(Set<? extends Info> infoSet) implements SetOfInfo {
 
         @Override
