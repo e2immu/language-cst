@@ -365,11 +365,6 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
-    public Instance newInstanceForTooComplex(ParameterizedType parameterizedType) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public ParameterizedType commonType(ParameterizedType pt1, ParameterizedType pt2) {
         return new CommonType(this).commonType(pt1, pt2);
     }

@@ -226,8 +226,6 @@ public interface Factory {
 
     InlineConditional.Builder newInlineConditionalBuilder();
 
-    Instance newInstanceForTooComplex(ParameterizedType parameterizedType);
-
     InstanceOf.Builder newInstanceOfBuilder();
 
     IntConstant newInt(int i);

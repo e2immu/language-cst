@@ -2,7 +2,6 @@ package org.e2immu.language.cst.api.runtime;
 
 import org.e2immu.language.cst.api.expression.*;
 import org.e2immu.language.cst.api.variable.Variable;
-import org.e2immu.language.cst.api.expression.*;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -83,8 +82,6 @@ public interface Eval {
     }
 
     boolean isNotNull0(Expression expression);
-
-    int limitOnComplexity();
 
     Stream<Expression> expandTerms(Expression expression, boolean negate);
     

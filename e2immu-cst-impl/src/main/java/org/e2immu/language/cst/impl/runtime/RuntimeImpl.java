@@ -8,15 +8,24 @@ import org.e2immu.language.cst.api.runtime.Eval;
 import org.e2immu.language.cst.api.runtime.Runtime;
 import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.language.cst.impl.element.E2ImmuAnnotationsImpl;
+import org.e2immu.language.cst.impl.expression.eval.EvalOptions;
 import org.e2immu.language.cst.impl.info.ComputeMethodOverridesImpl;
 
 import java.util.List;
 import java.util.stream.Stream;
 
 public class RuntimeImpl extends FactoryImpl implements Runtime {
-    private final Eval eval = new EvalImpl(this);
+    private final Eval eval;
     private final E2ImmuAnnotationsImpl e2ImmuAnnotations = new E2ImmuAnnotationsImpl();
     private final LanguageConfiguration lc = new LanguageConfigurationImpl(true);
+
+    public RuntimeImpl() {
+        this(EvalOptions.DEFAULT);
+    }
+
+    public RuntimeImpl(EvalOptions evalOptions) {
+        eval = new EvalImpl(this, evalOptions);
+    }
 
     @Override
     public LanguageConfiguration configuration() {
@@ -125,11 +134,6 @@ public class RuntimeImpl extends FactoryImpl implements Runtime {
     @Override
     public boolean isNotNull0(Expression expression) {
         return eval.isNotNull0(expression);
-    }
-
-    @Override
-    public int limitOnComplexity() {
-        return eval.limitOnComplexity();
     }
 
     @Override

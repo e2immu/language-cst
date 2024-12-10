@@ -29,13 +29,13 @@ public class EvalImpl implements Eval {
     private final EvalUnaryOperator evalUnaryOperator;
     private final EvalRemainder evalRemainder;
 
-    public EvalImpl(Runtime runtime) {
+    public EvalImpl(Runtime runtime, EvalOptions evalOptions) {
         evalProduct = new EvalProduct(runtime);
         evalSum = new EvalSum(runtime);
         evalNegation = new EvalNegation(runtime);
         evalEquals = new EvalEquals(runtime);
-        evalAnd = new EvalAnd(runtime);
-        evalOr = new EvalOr(runtime);
+        evalAnd = new EvalAnd(runtime, evalOptions);
+        evalOr = new EvalOr(runtime, evalOptions);
         evalDivide = new EvalDivide(runtime);
         evalInlineConditional = new EvalInlineConditional(runtime);
         evalInequality = new EvalInequality(runtime);
@@ -144,11 +144,6 @@ public class EvalImpl implements Eval {
     public boolean isNotNull0(Expression expression) {
         // for now, this is the only way we proceed
         return expression.parameterizedType().isPrimitiveExcludingVoid();
-    }
-
-    @Override
-    public int limitOnComplexity() {
-        return ExpressionImpl.SOFT_LIMIT_ON_COMPLEXITY;
     }
 
     @Override

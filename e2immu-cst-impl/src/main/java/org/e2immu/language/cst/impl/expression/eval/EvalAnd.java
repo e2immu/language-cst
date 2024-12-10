@@ -17,15 +17,15 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import static org.e2immu.language.cst.impl.expression.ExpressionCanBeTooComplex.reducedComplexity;
-
 public class EvalAnd {
     private static final Logger LOGGER = LoggerFactory.getLogger(EvalAnd.class);
 
     private final Runtime runtime;
+    private final int maxAndOrComplexity;
 
-    public EvalAnd(Runtime runtime) {
+    public EvalAnd(Runtime runtime, EvalOptions evalOptions) {
         this.runtime = runtime;
+        this.maxAndOrComplexity = evalOptions.maxAndOrComplexity();
     }
 
     private enum Action {
@@ -58,12 +58,11 @@ public class EvalAnd {
 
         // STEP 4: loop
 
-        boolean changes = complexity < runtime.limitOnComplexity();
+        boolean changes = complexity < maxAndOrComplexity;
         if (!changes) {
             LOGGER.debug("Not analysing AND operation, complexity {}", complexity);
-            return reducedComplexity(runtime, values);
+            return runtime.newAndBuilder().addExpressions(concat).build();
         }
-        assert complexity < ExpressionImpl.HARD_LIMIT_ON_COMPLEXITY : "Complexity reached " + complexity;
 
         while (changes) {
             changes = false;
@@ -263,7 +262,7 @@ public class EvalAnd {
         if (actionEqEq != null) return actionEqEq;
 
         Action actionGeEq = analyseGeEq(prev, value);
-        if(actionGeEq != null) return actionGeEq;
+        if (actionGeEq != null) return actionGeEq;
 
         Action actionGeNotEqual = analyseGeNotEq(newConcat, prev, value);
         if (actionGeNotEqual != null) return actionGeNotEqual;
@@ -326,7 +325,7 @@ public class EvalAnd {
         GreaterThanZero ge;
         if (prev != null && (ge = prev.asInstanceOf(GreaterThanZero.class)) != null) {
             Equals ev1;
-            if((ev1 = value.asInstanceOf(Equals.class)) != null) {
+            if ((ev1 = value.asInstanceOf(Equals.class)) != null) {
                 GreaterThanZero.XB xb = ge.extract(runtime);
                 Numeric ev1ln;
                 if ((ev1ln = ev1.lhs().asInstanceOf(Numeric.class)) != null && ev1.rhs().equals(xb.x())) {

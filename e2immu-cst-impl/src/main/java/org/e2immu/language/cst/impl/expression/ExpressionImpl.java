@@ -15,12 +15,6 @@ import org.e2immu.language.cst.impl.output.SymbolEnum;
 import java.util.List;
 
 public abstract class ExpressionImpl extends ElementImpl implements Expression {
-
-    public static final int HARD_LIMIT_ON_COMPLEXITY = 5000;
-    public static final int SOFT_LIMIT_ON_COMPLEXITY = 500;
-    public static final int CONSTRUCTOR_CALL_EXPANSION_LIMIT = 20;
-    public static final int COMPLEXITY_LIMIT_OF_INLINED_METHOD = 1000;
-
     private final int complexity;
     private final Source source;
     private final List<Comment> comments;

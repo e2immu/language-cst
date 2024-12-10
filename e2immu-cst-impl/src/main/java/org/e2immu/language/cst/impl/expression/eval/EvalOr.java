@@ -13,15 +13,21 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.e2immu.language.cst.impl.expression.ExpressionCanBeTooComplex.reducedComplexity;
-
 public class EvalOr {
     private static final Logger LOGGER = LoggerFactory.getLogger(EvalOr.class);
 
     private final Runtime runtime;
+    private final double maxFactorOrExpansion;
+    private final double maxComplexityOrExpansion;
+    private final int maxCombinationsOrExpansion;
+    private final int maxAndOrComplexity;
 
-    public EvalOr(Runtime runtime) {
+    public EvalOr(Runtime runtime, EvalOptions evalOptions) {
         this.runtime = runtime;
+        maxFactorOrExpansion = evalOptions.maxFactorOrExpansion();
+        maxComplexityOrExpansion = evalOptions.maxComplexityOrExpansion();
+        maxCombinationsOrExpansion = evalOptions.maxCombinationsOrExpansion();
+        maxAndOrComplexity = evalOptions.maxAndOrComplexity();
     }
 
     public Expression eval(List<Expression> values) {
@@ -45,12 +51,11 @@ public class EvalOr {
         And firstAnd = null;
 
         int complexity = values.stream().mapToInt(Expression::complexity).sum();
-        boolean changes = complexity < runtime.limitOnComplexity();
+        boolean changes = complexity < maxAndOrComplexity;
         if (!changes) {
             LOGGER.debug("Not analysing OR operation, complexity {}", complexity);
-            return reducedComplexity(runtime, values);
+            return runtime.newOrBuilder().addExpressions(values).build();
         }
-        assert complexity < ExpressionImpl.HARD_LIMIT_ON_COMPLEXITY : "Complexity reached " + complexity;
 
         while (changes) {
             changes = false;
@@ -140,13 +145,17 @@ public class EvalOr {
         }
         ArrayList<Expression> finalValues = concat;
         if (firstAnd != null) {
-            List<Expression> components = firstAnd.expressions().stream()
-                    .map(v -> eval(ListUtil.immutableConcat(finalValues, List.of(v))))
-                    .toList();
-            LOGGER.debug("Found And-clause {}, components for new And are {}", firstAnd, components);
-            int complexityComponents = components.stream().mapToInt(Expression::complexity).sum();
-            if (complexityComponents < runtime.limitOnComplexity()) {
-                return runtime.and(components);
+            int explode = firstAnd.expressions().size() * finalValues.size();
+            if (explode < maxCombinationsOrExpansion) {
+                List<Expression> components = firstAnd.expressions().stream()
+                        .map(v -> eval(ListUtil.immutableConcat(finalValues, List.of(v))))
+                        .toList();
+                LOGGER.debug("Found And-clause {}, components for new And are {}", firstAnd, components);
+                int complexityComponents = components.stream().mapToInt(Expression::complexity).sum();
+                if (complexityComponents < maxComplexityOrExpansion
+                    && complexityComponents < maxFactorOrExpansion * complexity) {
+                    return runtime.and(components);
+                }
             }
         }
         if (finalValues.size() == 1) return finalValues.get(0);
