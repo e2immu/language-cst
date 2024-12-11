@@ -4,6 +4,6 @@ public record EvalOptions(int maxComplexityOrExpansion,
                           double maxFactorOrExpansion,
                           int maxCombinationsOrExpansion,
                           int maxAndOrComplexity) {
-    public static EvalOptions DEFAULT = new EvalOptions(100,
-            2.5d, 50, 100);
+    public static EvalOptions DEFAULT = new EvalOptions(150,
+            2.5d, 50, 150);
 }
