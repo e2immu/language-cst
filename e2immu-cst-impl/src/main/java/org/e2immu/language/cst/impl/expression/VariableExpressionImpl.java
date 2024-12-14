@@ -95,6 +95,11 @@ public class VariableExpressionImpl extends ExpressionImpl implements VariableEx
     }
 
     @Override
+    public VariableExpression withVariable(Variable variable) {
+        return new VariableExpressionImpl(comments(), source(), variable, suffix);
+    }
+
+    @Override
     public ParameterizedType parameterizedType() {
         return variable.parameterizedType();
     }

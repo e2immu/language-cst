@@ -2,7 +2,6 @@ package org.e2immu.language.cst.api.expression;
 
 import org.e2immu.annotation.Fluent;
 import org.e2immu.language.cst.api.element.Element;
-import org.e2immu.language.cst.api.element.Source;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.variable.Variable;
 
@@ -11,6 +10,8 @@ public interface VariableExpression extends Expression {
     Variable variable();
 
     VariableExpression withSuffix(Suffix suffix);
+
+    VariableExpression withVariable(Variable variable);
 
     interface Suffix {
         OutputBuilder print();
