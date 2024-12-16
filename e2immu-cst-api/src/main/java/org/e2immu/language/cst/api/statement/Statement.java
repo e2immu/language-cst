@@ -49,6 +49,8 @@ public interface Statement extends Element {
     interface Builder<B extends Builder<?>> extends Element.Builder<B> {
         @Fluent
         B setLabel(String label);
+
+        Statement build();
     }
 
     List<Statement> translate(TranslationMap translationMap);
