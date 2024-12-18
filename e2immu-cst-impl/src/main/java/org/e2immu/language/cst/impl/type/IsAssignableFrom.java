@@ -40,6 +40,7 @@ public record IsAssignableFrom(Predefined runtime,
     public static final int SAME_UNDERLYING_TYPE = 1;
     private static final int BOXING_TO_PRIMITIVE = 1;
     private static final int BOXING_FROM_PRIMITIVE = 1;
+    public static final int FUNCTIONAL_TYPE_EQUIVALENCE = 3;
     public static final int TYPE_BOUND = 5;
     public static final int IN_HIERARCHY = 10;
     private static final int UNBOUND_WILDCARD = 100;
@@ -279,7 +280,7 @@ public record IsAssignableFrom(Predefined runtime,
         // target void -> fromIsVoid is unimportant, we can assign a function to a consumer
         if (!targetIsVoid && fromIsVoid) return NOT_ASSIGNABLE;
 
-        if (mode == Mode.COVARIANT_ERASURE) return SAME_UNDERLYING_TYPE;
+        if (mode == Mode.COVARIANT_ERASURE) return FUNCTIONAL_TYPE_EQUIVALENCE;
         // now, ensure that all type parameters have equal values
         int i = 0;
         for (ParameterInfo t : targetMi.parameters()) {
