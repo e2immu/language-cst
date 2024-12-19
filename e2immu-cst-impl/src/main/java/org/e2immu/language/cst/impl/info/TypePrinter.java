@@ -247,7 +247,6 @@ public record TypePrinter(TypeInfo typeInfo) {
 
     private static class PerPackage {
         final List<TypeInfo> types = new LinkedList<>();
-        boolean allowStar = true;
     }
 
     private static ResultOfImportComputation imports(String myPackage, TypeInfo typeInfo, Qualification q) {
@@ -268,11 +267,9 @@ public record TypePrinter(TypeInfo typeInfo) {
             String packageName = ti.packageName();
             if (packageName != null && !myPackage.equals(packageName)) {
                 boolean doImport = qualification.addTypeReturnImport(ti);
-                PerPackage perPackage = typesPerPackage.computeIfAbsent(packageName, p -> new PerPackage());
                 if (doImport) {
+                    PerPackage perPackage = typesPerPackage.computeIfAbsent(packageName, p -> new PerPackage());
                     perPackage.types.add(ti);
-                } else {
-                    perPackage.allowStar = false; // because we don't want to play with complicated ordering
                 }
             }
         });
@@ -280,13 +277,9 @@ public record TypePrinter(TypeInfo typeInfo) {
         Set<String> imports = new TreeSet<>();
         for (Map.Entry<String, PerPackage> e : typesPerPackage.entrySet()) {
             PerPackage perPackage = e.getValue();
-            if (perPackage.types.size() >= 4 && perPackage.allowStar) {
-                imports.add(e.getKey() + ".*");
-            } else {
                 for (TypeInfo ti : perPackage.types) {
                     imports.add(ti.fullyQualifiedName());
                 }
-            }
         }
         return new ResultOfImportComputation(imports, qualification);
     }
