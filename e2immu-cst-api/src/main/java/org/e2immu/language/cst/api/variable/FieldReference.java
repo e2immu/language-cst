@@ -23,4 +23,16 @@ public interface FieldReference extends Variable {
     boolean isDefaultScope();
 
     boolean scopeIsThis();
+
+    @Override
+    default FieldReference fieldReferenceScope() {
+        return this;
+    }
+
+    @Override
+    default Variable fieldReferenceBase() {
+        Variable scopeVariable = scopeVariable();
+        if (scopeVariable instanceof FieldReference fr) return fr.fieldReferenceBase();
+        return scopeVariable;
+    }
 }

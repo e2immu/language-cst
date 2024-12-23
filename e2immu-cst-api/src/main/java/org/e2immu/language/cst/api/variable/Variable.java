@@ -35,8 +35,10 @@ public interface Variable extends Comparable<Variable>, Element, OneVariable {
     }
 
     default FieldReference fieldReferenceScope() {
-        if (this instanceof FieldReference fr) return fr;
-        if (this instanceof DependentVariable dv) return dv.arrayVariable().fieldReferenceScope();
+        return null;
+    }
+
+    default Variable fieldReferenceBase() {
         return null;
     }
 
