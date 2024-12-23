@@ -4,6 +4,7 @@ import org.e2immu.language.cst.api.element.CompilationUnit;
 import org.e2immu.language.cst.api.info.MethodInfo;
 import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.runtime.Runtime;
+import org.e2immu.language.cst.impl.info.ImportComputerImpl;
 import org.e2immu.language.cst.impl.info.TypePrinter;
 import org.e2immu.language.cst.impl.runtime.RuntimeImpl;
 import org.junit.jupiter.api.Test;
@@ -32,7 +33,8 @@ public class TestMethod {
                 package com.foo;
                  class Test{public String toString(){}}\
                 """;
-        assertEquals(src, tp.print(runtime.qualificationFullyQualifiedNames(), true).toString());
+        assertEquals(src, tp.print(new ImportComputerImpl(), runtime.qualificationFullyQualifiedNames(),
+                true).toString());
 
         assertTrue(mi.isPublic());
         assertFalse(mi.isPubliclyAccessible());

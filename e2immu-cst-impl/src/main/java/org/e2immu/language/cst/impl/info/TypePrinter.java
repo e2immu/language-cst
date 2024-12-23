@@ -1,6 +1,5 @@
 package org.e2immu.language.cst.impl.info;
 
-import org.e2immu.language.cst.api.element.Element;
 import org.e2immu.language.cst.api.expression.AnnotationExpression;
 import org.e2immu.language.cst.api.expression.ConstructorCall;
 import org.e2immu.language.cst.api.expression.Expression;
@@ -13,18 +12,17 @@ import org.e2immu.language.cst.impl.type.DiamondEnum;
 import org.e2immu.language.cst.impl.variable.ThisImpl;
 
 import java.util.*;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public record TypePrinter(TypeInfo typeInfo) {
 
-    public OutputBuilder print(Qualification qualification, boolean doTypeDeclaration) {
+    public OutputBuilder print(ImportComputer importComputer, Qualification qualification, boolean doTypeDeclaration) {
         Set<String> imports;
         Qualification insideType;
         if (typeInfo.isPrimaryType() && typeInfo.hasBeenInspected()) {
-            ResultOfImportComputation res = imports(typeInfo.packageName(), typeInfo, qualification);
-            imports = res.imports;
-            insideType = res.qualification;
+            ImportComputer.Result res = importComputer.go(typeInfo, qualification);
+            imports = res.imports();
+            insideType = res.qualification();
         } else {
             imports = Set.of();
             insideType = typeInfo.hasBeenInspected() && qualification instanceof QualificationImpl
@@ -57,7 +55,7 @@ public record TypePrinter(TypeInfo typeInfo) {
                 imports.stream().sorted().forEach(i -> packageAndImports.add(KeywordImpl.IMPORT).add(SpaceEnum.ONE)
                         .add(new TextImpl(i)).add(SymbolEnum.SEMICOLON).add(SpaceEnum.NEWLINE));
             }
-            
+
             // the class name
             afterAnnotations
                     .add(minimalModifiers(typeInfo).stream().map(mod -> new OutputBuilderImpl().add(mod.keyword()))
@@ -239,53 +237,5 @@ public record TypePrinter(TypeInfo typeInfo) {
             return Stream.of(outputBuilder);
         }
         return Stream.of();
-    }
-
-
-    record ResultOfImportComputation(Set<String> imports, QualificationImpl qualification) {
-    }
-
-    private static class PerPackage {
-        final List<TypeInfo> types = new LinkedList<>();
-    }
-
-    private static ResultOfImportComputation imports(String myPackage, TypeInfo typeInfo, Qualification q) {
-        Set<TypeInfo> typesReferenced = typeInfo.typesReferenced()
-                .filter(Element.TypeReference::explicit)
-                .map(Element.TypeReference::typeInfo)
-                .map(TypeInfo::primaryType)
-                .filter(TypePrinter::allowInImport)
-                .collect(Collectors.toSet());
-        Map<String, PerPackage> typesPerPackage = new HashMap<>();
-        QualificationImpl qualification;
-        if (q == null) {
-            qualification = new QualificationImpl(false, TypeNameImpl.Required.QUALIFIED_FROM_PRIMARY_TYPE, null);
-        } else {
-            qualification = new QualificationImpl(q.doNotQualifyImplicit(), q.typeNameRequired(), q.decorator());
-        }
-        typesReferenced.forEach(ti -> {
-            String packageName = ti.packageName();
-            if (packageName != null && !myPackage.equals(packageName)) {
-                boolean doImport = qualification.addTypeReturnImport(ti);
-                if (doImport) {
-                    PerPackage perPackage = typesPerPackage.computeIfAbsent(packageName, p -> new PerPackage());
-                    perPackage.types.add(ti);
-                }
-            }
-        });
-        // IMPROVE static fields and methods
-        Set<String> imports = new TreeSet<>();
-        for (Map.Entry<String, PerPackage> e : typesPerPackage.entrySet()) {
-            PerPackage perPackage = e.getValue();
-                for (TypeInfo ti : perPackage.types) {
-                    imports.add(ti.fullyQualifiedName());
-                }
-        }
-        return new ResultOfImportComputation(imports, qualification);
-    }
-
-    private static boolean allowInImport(TypeInfo typeInfo) {
-        return !"java.lang".equals(typeInfo.packageName())
-               && !typeInfo.isPrimitiveExcludingVoid() && !typeInfo.isVoid();
     }
 }
