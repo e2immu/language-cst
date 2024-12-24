@@ -23,13 +23,12 @@ public class EvalInstanceOf {
         VariableExpression ve;
         if ((ve = value.asInstanceOf(VariableExpression.class)) != null) {
             ParameterizedType type = ve.variable().parameterizedType();
-            if (type.isPrimitiveExcludingVoid()) {
-                return runtime.newBoolean(testType.equals(type.ensureBoxed(runtime)));
-            }
-            if (testType.equals(type)) {
+            // trivial cast to same or higher type
+            if (testType.isAssignableFrom(runtime, type)) {
                 return runtime.constantTrue();
             }
-            if (!testType.isAssignableFrom(runtime, type)) {
+            // see TestOperators for examples
+            if (!testType.typeInfo().isInterface() && !type.isAssignableFrom(runtime, testType)) {
                 return runtime.constantFalse();
             }
             // keep as is
