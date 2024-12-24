@@ -71,7 +71,7 @@ public class EnclosedExpressionImpl extends ExpressionImpl implements EnclosedEx
 
     @Override
     public Precedence precedence() {
-        return PrecedenceEnum.TOP;
+        return PrecedenceEnum.ACCESS;
     }
 
     @Override

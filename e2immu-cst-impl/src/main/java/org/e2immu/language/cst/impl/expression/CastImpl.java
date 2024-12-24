@@ -87,7 +87,7 @@ public class CastImpl extends ExpressionImpl implements Cast {
 
     @Override
     public Precedence precedence() {
-        return PrecedenceEnum.UNARY;
+        return PrecedenceEnum.CAST;
     }
 
     @Override

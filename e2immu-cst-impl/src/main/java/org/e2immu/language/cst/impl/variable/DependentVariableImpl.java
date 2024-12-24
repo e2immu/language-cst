@@ -13,6 +13,7 @@ import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.variable.DependentVariable;
 import org.e2immu.language.cst.api.variable.DescendMode;
 import org.e2immu.language.cst.api.variable.Variable;
+import org.e2immu.language.cst.impl.expression.util.PrecedenceEnum;
 import org.e2immu.language.cst.impl.output.OutputBuilderImpl;
 import org.e2immu.language.cst.impl.output.QualificationImpl;
 import org.e2immu.language.cst.impl.output.SymbolEnum;
@@ -115,8 +116,18 @@ public class DependentVariableImpl extends VariableImpl implements DependentVari
 
     @Override
     public OutputBuilder print(Qualification qualification) {
+        OutputBuilder outputInParenthesis;
+        OutputBuilder printedArrayExpression = arrayExpression.print(qualification);
+        if (PrecedenceEnum.ACCESS.greaterThan(arrayExpression.precedence())) {
+            outputInParenthesis = new OutputBuilderImpl()
+                    .add(SymbolEnum.LEFT_PARENTHESIS)
+                    .add(printedArrayExpression)
+                    .add(SymbolEnum.RIGHT_PARENTHESIS);
+        } else {
+            outputInParenthesis = printedArrayExpression;
+        }
         return new OutputBuilderImpl()
-                .add(arrayExpression.print(qualification))
+                .add(outputInParenthesis)
                 .add(SymbolEnum.LEFT_BRACKET)
                 .add(indexExpression.print(qualification))
                 .add(SymbolEnum.RIGHT_BRACKET);

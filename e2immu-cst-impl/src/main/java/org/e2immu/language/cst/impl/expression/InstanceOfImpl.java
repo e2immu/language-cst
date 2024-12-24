@@ -119,7 +119,7 @@ public class InstanceOfImpl extends ExpressionImpl implements InstanceOf {
 
     @Override
     public Precedence precedence() {
-        return PrecedenceEnum.INSTANCE_OF;
+        return PrecedenceEnum.RELATIONAL;
     }
 
     @Override

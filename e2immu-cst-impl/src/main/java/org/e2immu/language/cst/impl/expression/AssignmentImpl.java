@@ -161,6 +161,9 @@ public class AssignmentImpl extends ExpressionImpl implements Assignment {
 
     @Override
     public Precedence precedence() {
+        if (prefixPrimitiveOperator != null) {
+            return prefixPrimitiveOperator ? PrecedenceEnum.ASSIGNMENT : PrecedenceEnum.POST_INCREMENT;
+        }
         return PrecedenceEnum.ASSIGNMENT;
     }
 

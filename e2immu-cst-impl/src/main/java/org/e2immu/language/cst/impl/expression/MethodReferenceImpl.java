@@ -93,7 +93,7 @@ public class MethodReferenceImpl extends ExpressionImpl implements MethodReferen
 
     @Override
     public Precedence precedence() {
-        return PrecedenceEnum.ARRAY_ACCESS;
+        return PrecedenceEnum.ACCESS;
     }
 
     @Override

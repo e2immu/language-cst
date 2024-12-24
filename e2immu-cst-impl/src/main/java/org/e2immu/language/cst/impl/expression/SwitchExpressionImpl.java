@@ -95,7 +95,7 @@ public class SwitchExpressionImpl extends ExpressionImpl implements SwitchExpres
 
     @Override
     public Precedence precedence() {
-        return PrecedenceEnum.TERNARY;
+        return PrecedenceEnum.BOTTOM;
     }
 
     @Override

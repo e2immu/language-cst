@@ -429,7 +429,7 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
 
     @Override
     public Precedence precedenceArrayAccess() {
-        return PrecedenceEnum.ARRAY_ACCESS;
+        return PrecedenceEnum.ACCESS;
     }
 
     @Override

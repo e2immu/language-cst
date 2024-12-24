@@ -19,6 +19,7 @@ import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.language.cst.impl.element.ElementImpl;
 import org.e2immu.language.cst.impl.expression.TypeExpressionImpl;
 import org.e2immu.language.cst.impl.expression.VariableExpressionImpl;
+import org.e2immu.language.cst.impl.expression.util.PrecedenceEnum;
 import org.e2immu.language.cst.impl.output.*;
 import org.e2immu.language.cst.impl.type.DiamondEnum;
 
@@ -150,7 +151,17 @@ public class FieldReferenceImpl extends VariableImpl implements FieldReference {
             return new OutputBuilderImpl().add(new QualifiedNameImpl(fieldInfo.name(), typeName, required));
         }
         // real variable
-        return new OutputBuilderImpl().add(scope.print(qualification)).add(SymbolEnum.DOT)
+        OutputBuilder outputInParenthesis;
+        OutputBuilder printedScope = scope.print(qualification);
+        if (PrecedenceEnum.ACCESS.greaterThan(scope.precedence())) {
+            outputInParenthesis = new OutputBuilderImpl()
+                    .add(SymbolEnum.LEFT_PARENTHESIS)
+                    .add(printedScope)
+                    .add(SymbolEnum.RIGHT_PARENTHESIS);
+        } else {
+            outputInParenthesis = printedScope;
+        }
+        return new OutputBuilderImpl().add(outputInParenthesis).add(SymbolEnum.DOT)
                 .add(new QualifiedNameImpl(simpleName(), null, QualifiedNameImpl.Required.NEVER));
     }
 

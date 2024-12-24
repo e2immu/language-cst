@@ -171,7 +171,7 @@ public class ConstructorCallImpl extends ExpressionImpl implements ConstructorCa
 
     @Override
     public Precedence precedence() {
-        return PrecedenceEnum.UNARY;
+        return PrecedenceEnum.ACCESS;
     }
 
     @Override

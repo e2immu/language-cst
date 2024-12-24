@@ -189,7 +189,7 @@ public class MethodCallImpl extends ExpressionImpl implements MethodCall {
 
     @Override
     public Precedence precedence() {
-        return PrecedenceEnum.ARRAY_ACCESS;
+        return PrecedenceEnum.ACCESS;
     }
 
     @Override
