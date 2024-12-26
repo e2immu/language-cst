@@ -1132,10 +1132,10 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     private ParameterizedType typeOfElements(ParameterizedType pt) {
-        if(pt.arrays()>0) return pt.copyWithFewerArrays(1);
+        if (pt.arrays() > 0) return pt.copyWithFewerArrays(1);
         // we'll need to find the value of the first type parameter of List... non-trivial here
-        if("java.util.List".equals(pt.bestTypeInfo().fullyQualifiedName())) {
-            if(pt.parameters().size() == 1) return pt.parameters().get(0);
+        if ("java.util.List".equals(pt.bestTypeInfo().fullyQualifiedName())) {
+            if (pt.parameters().size() == 1) return pt.parameters().get(0);
             return objectParameterizedType();
         }
         throw new UnsupportedOperationException("Not yet implemented");
@@ -1144,40 +1144,32 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     /* given a getter call, create the corresponding (indexed) variable */
     @Override
     public Variable getterVariable(MethodCall methodCall) {
-        Value.FieldValue getSetField = methodCall.methodInfo().getSetField();
-        if (getSetField.field() == null || getSetField.setter()) {
-            return null;
-        }
-        ParameterizedType concreteType = getSetField.field().type();// methodCall.concreteReturnType();
-        if (methodCall.parameterExpressions().isEmpty()) {
-            return newFieldReference(getSetField.field(), methodCall.object(), concreteType);
-        }
-        ParameterizedType concreteArrayType = typeOfElements(concreteType);
-        FieldReference fr = newFieldReference(getSetField.field(), methodCall.object(), concreteArrayType);
-        Expression index = methodCall.parameterExpressions().get(0);
-        assert index.parameterizedType().isMathematicallyInteger();
-        return newDependentVariable(fr, concreteArrayType, index);
+        return getSetVariable(methodCall, false);
     }
 
     /* given a setter call, create the target variable
      *  obj.setX(v) -> o.x
      *  obj.setX(i, v) -> o.x[i]
      */
+
     @Override
     public Variable setterVariable(MethodCall methodCall) {
+        return getSetVariable(methodCall, true);
+    }
+
+    private Variable getSetVariable(MethodCall methodCall, boolean setter) {
         Value.FieldValue getSetField = methodCall.methodInfo().getSetField();
-        if (getSetField.field() == null || !getSetField.setter()) {
+        if (getSetField.field() == null || getSetField.setter() != setter) {
             return null;
         }
-        ParameterizedType type = getSetField.field().type();
-        if (methodCall.parameterExpressions().size() == 1) {
-            return newFieldReference(getSetField.field(), methodCall.object(), type);
+        ParameterizedType fieldType = getSetField.field().type();
+        if (methodCall.parameterExpressions().size() == (setter ? 1 : 0)) {
+            return newFieldReference(getSetField.field(), methodCall.object(), fieldType);
         }
-        ParameterizedType indexType = typeOfElements(type);
-        FieldReference fr = newFieldReference(getSetField.field(), methodCall.object(), type);
+        FieldReference fr = newFieldReference(getSetField.field(), methodCall.object(), fieldType);
         Expression index = methodCall.parameterExpressions().get(0);
         assert index.parameterizedType().isMathematicallyInteger();
-        return newDependentVariable(fr, indexType, index);
+        return newDependentVariable(newVariableExpression(fr), index);
     }
 }
 
