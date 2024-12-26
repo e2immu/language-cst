@@ -1131,6 +1131,16 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
         return new BitwiseNegationImpl(bitWiseNotOperatorInt(), PrecedenceEnum.UNARY, value);
     }
 
+    private ParameterizedType typeOfElements(ParameterizedType pt) {
+        if(pt.arrays()>0) return pt.copyWithFewerArrays(1);
+        // we'll need to find the value of the first type parameter of List... non-trivial here
+        if("java.util.List".equals(pt.bestTypeInfo().fullyQualifiedName())) {
+            if(pt.parameters().size() == 1) return pt.parameters().get(0);
+            return objectParameterizedType();
+        }
+        throw new UnsupportedOperationException("Not yet implemented");
+    }
+
     /* given a getter call, create the corresponding (indexed) variable */
     @Override
     public Variable getterVariable(MethodCall methodCall) {
@@ -1138,15 +1148,15 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
         if (getSetField.field() == null || getSetField.setter()) {
             return null;
         }
-        ParameterizedType concreteType = methodCall.concreteReturnType();
+        ParameterizedType concreteType = getSetField.field().type();// methodCall.concreteReturnType();
         if (methodCall.parameterExpressions().isEmpty()) {
             return newFieldReference(getSetField.field(), methodCall.object(), concreteType);
         }
-        ParameterizedType concreteArrayType = concreteType.copyWithArrays(concreteType.arrays() + 1);
+        ParameterizedType concreteArrayType = typeOfElements(concreteType);
         FieldReference fr = newFieldReference(getSetField.field(), methodCall.object(), concreteArrayType);
         Expression index = methodCall.parameterExpressions().get(0);
         assert index.parameterizedType().isMathematicallyInteger();
-        return newDependentVariable(fr, concreteType, index);
+        return newDependentVariable(fr, concreteArrayType, index);
     }
 
     /* given a setter call, create the target variable
@@ -1159,15 +1169,15 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
         if (getSetField.field() == null || !getSetField.setter()) {
             return null;
         }
+        ParameterizedType type = getSetField.field().type();
         if (methodCall.parameterExpressions().size() == 1) {
-            ParameterizedType concreteType = methodCall.parameterExpressions().get(0).parameterizedType();
-            return newFieldReference(getSetField.field(), methodCall.object(), concreteType);
+            return newFieldReference(getSetField.field(), methodCall.object(), type);
         }
-        ParameterizedType concreteType = methodCall.parameterExpressions().get(1).parameterizedType();
-        FieldReference fr = newFieldReference(getSetField.field(), methodCall.object(), getSetField.field().type());
+        ParameterizedType indexType = typeOfElements(type);
+        FieldReference fr = newFieldReference(getSetField.field(), methodCall.object(), type);
         Expression index = methodCall.parameterExpressions().get(0);
         assert index.parameterizedType().isMathematicallyInteger();
-        return newDependentVariable(fr, concreteType, index);
+        return newDependentVariable(fr, indexType, index);
     }
 }
 
