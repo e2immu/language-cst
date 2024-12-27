@@ -48,8 +48,9 @@ public class DependentVariableImpl extends VariableImpl implements DependentVari
         if (array.parameterizedType().arrays() > 0) {
             pt = array.parameterizedType().copyWithOneFewerArrays();
         } else {
+            // see TestGetSet
             assert array.parameterizedType().isJavaUtilList()
-                    : "For now, indexing in works in arrays and, strictly, java.lang.List";
+                    : "For now, indexing works in arrays and, strictly, java.lang.List";
             if (array.parameterizedType().parameters().isEmpty()) {
                 ParameterizedType jlo = array.parameterizedType().typeInfo().parentClass();
                 assert jlo.isJavaLangObject() : "List's parent should be JLO, as it is an interface";

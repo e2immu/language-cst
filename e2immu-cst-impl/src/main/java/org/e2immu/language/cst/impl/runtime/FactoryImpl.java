@@ -1162,11 +1162,18 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
         if (getSetField.field() == null || getSetField.setter() != setter) {
             return null;
         }
-        ParameterizedType fieldType = getSetField.field().type();
-        if (methodCall.parameterExpressions().size() == (setter ? 1 : 0)) {
-            return newFieldReference(getSetField.field(), methodCall.object(), fieldType);
+        ParameterizedType concreteType;
+        ParameterizedType getSetFieldType = getSetField.field().type();
+        if (getSetFieldType.typeParameter() != null && getSetFieldType.typeParameter().getOwner().isLeft() && getSetFieldType.typeParameter().getOwner().getLeft().fullyQualifiedName().equals("java.util.List")) {
+            ParameterizedType pt = setter ? methodCall.parameterExpressions().get(methodCall.parameterExpressions().size() - 1).parameterizedType() : methodCall.concreteReturnType();
+            concreteType = pt.copyWithArrays(pt.arrays() + 1);
+        } else {
+            concreteType = getSetFieldType;
         }
-        FieldReference fr = newFieldReference(getSetField.field(), methodCall.object(), fieldType);
+        if (methodCall.parameterExpressions().size() == (setter ? 1 : 0)) {
+            return newFieldReference(getSetField.field(), methodCall.object(), concreteType);
+        }
+        FieldReference fr = newFieldReference(getSetField.field(), methodCall.object(), concreteType);
         Expression index = methodCall.parameterExpressions().get(0);
         assert index.parameterizedType().isMathematicallyInteger();
         return newDependentVariable(newVariableExpression(fr), index);
