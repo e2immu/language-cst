@@ -242,6 +242,31 @@ public class ParameterizedTypeImpl implements ParameterizedType {
     }
 
     @Override
+    public boolean isByte() {
+        return arrays == 0 && typeInfo != null && typeInfo.isByte();
+    }
+
+    @Override
+    public boolean isLong() {
+        return arrays == 0 && typeInfo != null && typeInfo.isLong();
+    }
+
+    @Override
+    public boolean isShort() {
+        return arrays == 0 && typeInfo != null && typeInfo.isShort();
+    }
+
+    @Override
+    public boolean isDouble() {
+        return arrays == 0 && typeInfo != null && typeInfo.isDouble();
+    }
+
+    @Override
+    public Boolean isFloat() {
+        return arrays == 0 && typeInfo != null && typeInfo.isFloat();
+    }
+
+    @Override
     public boolean isJavaLangObject() {
         return arrays == 0 && typeInfo != null && typeInfo.isJavaLangObject();
     }

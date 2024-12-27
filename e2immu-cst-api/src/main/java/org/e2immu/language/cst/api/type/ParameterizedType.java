@@ -45,7 +45,17 @@ public interface ParameterizedType {
 
     String detailedString();
 
+    boolean isByte();
+
+    boolean isDouble();
+
+    Boolean isFloat();
+
     boolean isJavaUtilList();
+
+    boolean isLong();
+
+    boolean isShort();
 
     // Qualification: SimpleNames, vararg: false, Diamond: ShowAll
     String simpleString();
