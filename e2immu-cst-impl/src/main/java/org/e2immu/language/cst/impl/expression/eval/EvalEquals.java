@@ -15,33 +15,30 @@ public class EvalEquals {
     }
 
     public Expression eval(Expression lhs, Expression rhs) {
-        Expression l = runtime.sortAndSimplify(lhs);
-        Expression r = runtime.sortAndSimplify(rhs);
-
-        if (l.equals(r)) return runtime.constantTrue();
+        if (lhs.equals(rhs)) return runtime.constantTrue();
 
         ConstantExpression<?> lc, rc;
-        if ((lc = l.asInstanceOf(ConstantExpression.class)) != null
-            && ((rc = r.asInstanceOf(ConstantExpression.class)) != null
+        if ((lc = lhs.asInstanceOf(ConstantExpression.class)) != null
+            && ((rc = rhs.asInstanceOf(ConstantExpression.class)) != null
                 && !lc.isNullConstant()
                 && !rc.isNullConstant())) {
             return new EvalConstant(runtime).equalsExpression(lc, rc);
         }
 
         InlineConditional inlineLeft;
-        if ((inlineLeft = l.asInstanceOf(InlineConditional.class)) != null) {
-            Expression result = tryToRewriteConstantEqualsInline(r, inlineLeft);
+        if ((inlineLeft = lhs.asInstanceOf(InlineConditional.class)) != null) {
+            Expression result = tryToRewriteConstantEqualsInline(rhs, inlineLeft);
             if (result != null) return result;
         }
         InlineConditional inlineRight;
-        if ((inlineRight = r.asInstanceOf(InlineConditional.class)) != null) {
-            Expression result = tryToRewriteConstantEqualsInline(l, inlineRight);
+        if ((inlineRight = rhs.asInstanceOf(InlineConditional.class)) != null) {
+            Expression result = tryToRewriteConstantEqualsInline(lhs, inlineRight);
             if (result != null) return result;
         }
 
         EvalSum evalSum = new EvalSum(runtime);
-        Expression[] terms = Stream.concat(evalSum.expandTerms(l, false),
-                evalSum.expandTerms(r, true)).toArray(Expression[]::new);
+        Expression[] terms = Stream.concat(evalSum.expandTerms(lhs, false),
+                evalSum.expandTerms(rhs, true)).toArray(Expression[]::new);
         Arrays.sort(terms);
         Expression[] termsOfProducts = evalSum.makeProducts(terms);
 

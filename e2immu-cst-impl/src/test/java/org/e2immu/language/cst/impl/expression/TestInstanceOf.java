@@ -12,11 +12,11 @@ public class TestInstanceOf extends CommonTest {
     public void test() {
         Expression e1 = newInstanceOf(a, r.newParameterizedType(r.boxedBooleanTypeInfo(), 0));
         assertEquals("a instanceof Boolean", e1.toString());
-        assertTrue(r.sortAndSimplify(e1).isBoolValueTrue());
+        assertTrue(r.sortAndSimplify(false, e1).isBoolValueTrue());
 
         Expression e2 = newInstanceOf(a, r.newParameterizedType(r.integerTypeInfo(), 0));
         assertEquals("a instanceof Integer", e2.toString());
-        assertTrue(r.sortAndSimplify(e2).isBoolValueFalse());
+        assertTrue(r.sortAndSimplify(false, e2).isBoolValueFalse());
     }
 
     @Test
@@ -27,7 +27,7 @@ public class TestInstanceOf extends CommonTest {
         // object simply disappears!
         Expression e2 = newInstanceOf(a, r.newParameterizedType(r.objectTypeInfo(), 0));
         assertEquals("a instanceof Object", e2.toString());
-        assertTrue(r.sortAndSimplify(e2).isBoolValueTrue());
+        assertTrue(r.sortAndSimplify(false, e2).isBoolValueTrue());
 
         assertEquals("a instanceof Boolean", r.and(e1, e2).toString());
 

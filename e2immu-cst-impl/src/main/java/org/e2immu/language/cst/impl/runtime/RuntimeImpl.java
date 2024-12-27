@@ -33,8 +33,13 @@ public class RuntimeImpl extends FactoryImpl implements Runtime {
     }
 
     @Override
-    public Expression unaryOperator(UnaryOperator unaryOperator) {
-        return eval.unaryOperator(unaryOperator);
+    public Expression cast(Expression evaluated, Cast cast) {
+        return eval.cast(evaluated, cast);
+    }
+
+    @Override
+    public Expression unaryOperator(Expression evaluated, UnaryOperator unaryOperator) {
+        return eval.unaryOperator(evaluated, unaryOperator);
     }
 
     @Override
@@ -97,8 +102,8 @@ public class RuntimeImpl extends FactoryImpl implements Runtime {
     }
 
     @Override
-    public Expression instanceOf(InstanceOf instanceOf) {
-        return eval.instanceOf(instanceOf);
+    public Expression instanceOf(Expression evaluated, InstanceOf instanceOf) {
+        return eval.instanceOf(evaluated, instanceOf);
     }
 
     @Override
@@ -127,8 +132,8 @@ public class RuntimeImpl extends FactoryImpl implements Runtime {
     }
 
     @Override
-    public Expression binaryOperator(BinaryOperator binaryOperator) {
-        return eval.binaryOperator(binaryOperator);
+    public Expression binaryOperator(Expression lhs, Expression rhs, BinaryOperator binaryOperator) {
+        return eval.binaryOperator(lhs, rhs, binaryOperator);
     }
 
     @Override

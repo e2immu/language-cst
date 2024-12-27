@@ -11,8 +11,7 @@ public class EvalUnaryOperator {
         this.runtime = runtime;
     }
 
-    public Expression eval(UnaryOperator unaryOperator) {
-        Expression value = unaryOperator.expression();
+    public Expression eval(Expression value, UnaryOperator unaryOperator) {
         MethodInfo operator = unaryOperator.operator();
 
         // !!, ~~

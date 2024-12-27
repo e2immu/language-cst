@@ -11,8 +11,7 @@ public class EvalInstanceOf {
         this.runtime = runtime;
     }
 
-    public Expression eval(InstanceOf instanceOf) {
-        Expression value = instanceOf.expression();
+    public Expression eval(Expression value, InstanceOf instanceOf) {
         if (value.isNullConstant()) {
             return runtime.constantFalse();
         }
@@ -20,8 +19,7 @@ public class EvalInstanceOf {
         if (testType.isJavaLangObject()) {
             return runtime.constantTrue();
         }
-        VariableExpression ve;
-        if ((ve = value.asInstanceOf(VariableExpression.class)) != null) {
+        if (value instanceof VariableExpression ve) {
             ParameterizedType type = ve.variable().parameterizedType();
             // trivial cast to same or higher type
             if (testType.isAssignableFrom(runtime, type)) {

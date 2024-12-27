@@ -6,9 +6,23 @@ import org.e2immu.language.cst.api.variable.Variable;
 import java.util.List;
 import java.util.stream.Stream;
 
+/*
+All recursion takes place in sortAndSimplify, when required.
+None of the abstract methods should call sortAndSimplify again.
+ */
 public interface Eval {
 
-    Expression instanceOf(InstanceOf instanceOf);
+    default Expression cast(Cast cast) {
+        return cast(cast.expression(), cast);
+    }
+
+    Expression cast(Expression evaluated, Cast cast);
+
+    default Expression instanceOf(InstanceOf instanceOf) {
+        return instanceOf(instanceOf.expression(), instanceOf);
+    }
+
+    Expression instanceOf(Expression evaluated, InstanceOf instanceOf);
 
     Expression inlineConditional(Expression condition, Expression ifTrue, Expression ifFalse,
                                  Variable myself, boolean modifying);
@@ -37,46 +51,81 @@ public interface Eval {
 
     Expression divide(Expression lhs, Expression rhs);
 
-    Expression binaryOperator(BinaryOperator binaryOperator);
+    default Expression binaryOperator(BinaryOperator binaryOperator) {
+        return binaryOperator(binaryOperator.lhs(), binaryOperator.rhs(), binaryOperator);
+    }
 
-    Expression unaryOperator(UnaryOperator unaryOperator);
+    Expression binaryOperator(Expression evaluatedLhs, Expression evaluatedRhs, BinaryOperator binaryOperator);
 
-    default Expression sortAndSimplify(Expression expression) {
+    default Expression unaryOperator(UnaryOperator unaryOperator) {
+        return unaryOperator(unaryOperator.expression(), unaryOperator);
+    }
+
+    Expression unaryOperator(Expression evaluated, UnaryOperator unaryOperator);
+
+    default Expression sortAndSimplify(boolean recurse, Expression expression) {
         if (expression instanceof Sum sum) {
-            return sum(sum.lhs(), sum.rhs());
+            Expression lhs = recurse ? sortAndSimplify(true, sum.lhs()) : sum.lhs();
+            Expression rhs = recurse ? sortAndSimplify(true, sum.rhs()) : sum.rhs();
+            return sum(lhs, rhs);
         }
         if (expression instanceof Product product) {
-            return product(product.lhs(), product.rhs());
+            Expression lhs = recurse ? sortAndSimplify(true, product.lhs()) : product.lhs();
+            Expression rhs = recurse ? sortAndSimplify(true, product.rhs()) : product.rhs();
+            return product(lhs, rhs);
         }
         if (expression instanceof InlineConditional i) {
-            return inlineConditional(i.condition(), i.ifTrue(), i.ifFalse(), null, true);
+            Expression condition = recurse ? sortAndSimplify(true, i.condition()) : i.condition();
+            Expression ifTrue = recurse ? sortAndSimplify(true, i.ifTrue()) : i.ifTrue();
+            Expression ifFalse = recurse ? sortAndSimplify(true, i.ifFalse()) : i.ifFalse();
+            return inlineConditional(condition, ifTrue, ifFalse, null, true);
         }
         if (expression instanceof Or or) {
-            return or(or.expressions());
+            List<Expression> expressions = recurse
+                    ? or.expressions().stream().map(e -> sortAndSimplify(true, e)).toList()
+                    : or.expressions();
+            return or(expressions);
         }
         if (expression instanceof And and) {
-            return and(and.expressions());
+            List<Expression> expressions = recurse
+                    ? and.expressions().stream().map(e -> sortAndSimplify(true, e)).toList()
+                    : and.expressions();
+            return and(expressions);
         }
         if (expression instanceof GreaterThanZero gt0) {
-            return greaterThanZero(gt0.expression(), gt0.allowEquals());
+            Expression e = recurse ? sortAndSimplify(true, gt0.expression()) : gt0.expression();
+            return greaterThanZero(e, gt0.allowEquals());
         }
         if (expression instanceof Equals equals) {
-            return equals(equals.lhs(), equals.rhs());
+            Expression lhs = recurse ? sortAndSimplify(true, equals.lhs()) : equals.lhs();
+            Expression rhs = recurse ? sortAndSimplify(true, equals.rhs()) : equals.rhs();
+            return equals(lhs, rhs);
         }
         if (expression instanceof Negation negation) {
-            return negate(negation.expression());
+            Expression e = recurse ? sortAndSimplify(true, negation.expression()) : negation.expression();
+            return negate(e);
         }
         if (expression instanceof Divide divide) {
-            return divide(divide.lhs(), divide.rhs());
+            Expression lhs = recurse ? sortAndSimplify(true, divide.lhs()) : divide.lhs();
+            Expression rhs = recurse ? sortAndSimplify(true, divide.rhs()) : divide.rhs();
+            return divide(lhs, rhs);
         }
-        if(expression instanceof BinaryOperator binaryOperator) {
-            return binaryOperator(binaryOperator);
+        if (expression instanceof BinaryOperator binaryOperator) {
+            Expression lhs = recurse ? sortAndSimplify(true, binaryOperator.lhs()) : binaryOperator.lhs();
+            Expression rhs = recurse ? sortAndSimplify(true, binaryOperator.rhs()) : binaryOperator.rhs();
+            return binaryOperator(lhs, rhs, binaryOperator);
         }
-        if(expression instanceof UnaryOperator unaryOperator) {
-            return unaryOperator(unaryOperator);
+        if (expression instanceof UnaryOperator unaryOperator) {
+            Expression e = recurse ? sortAndSimplify(true, unaryOperator.expression()) : unaryOperator.expression();
+            return unaryOperator(e, unaryOperator);
         }
-        if(expression instanceof InstanceOf instanceOf) {
-            return instanceOf(instanceOf);
+        if (expression instanceof InstanceOf instanceOf) {
+            Expression e = recurse ? sortAndSimplify(true, instanceOf.expression()) : instanceOf.expression();
+            return instanceOf(e, instanceOf);
+        }
+        if (expression instanceof Cast cast) {
+            Expression e = recurse ? sortAndSimplify(true, cast.expression()) : cast.expression();
+            return cast(e, cast);
         }
         return expression;
     }
@@ -84,7 +133,7 @@ public interface Eval {
     boolean isNotNull0(Expression expression);
 
     Stream<Expression> expandTerms(Expression expression, boolean negate);
-    
+
     Stream<Expression> expandFactors(Expression expression);
 
     Expression less(Expression lhs, Expression rhs, boolean allowEquals);

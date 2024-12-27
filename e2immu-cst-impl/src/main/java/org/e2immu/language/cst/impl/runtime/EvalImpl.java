@@ -1,9 +1,6 @@
 package org.e2immu.language.cst.impl.runtime;
 
-import org.e2immu.language.cst.api.expression.BinaryOperator;
-import org.e2immu.language.cst.api.expression.Expression;
-import org.e2immu.language.cst.api.expression.InstanceOf;
-import org.e2immu.language.cst.api.expression.UnaryOperator;
+import org.e2immu.language.cst.api.expression.*;
 import org.e2immu.language.cst.api.runtime.Eval;
 import org.e2immu.language.cst.api.runtime.Runtime;
 import org.e2immu.language.cst.api.variable.Variable;
@@ -28,6 +25,7 @@ public class EvalImpl implements Eval {
     private final EvalInstanceOf evalInstanceOf;
     private final EvalUnaryOperator evalUnaryOperator;
     private final EvalRemainder evalRemainder;
+    private final EvalCast evalCast;
 
     public EvalImpl(Runtime runtime, EvalOptions evalOptions) {
         evalProduct = new EvalProduct(runtime);
@@ -43,11 +41,17 @@ public class EvalImpl implements Eval {
         evalInstanceOf = new EvalInstanceOf(runtime);
         evalUnaryOperator = new EvalUnaryOperator(runtime);
         evalRemainder = new EvalRemainder(runtime);
+        evalCast = new EvalCast(runtime);
     }
 
     @Override
-    public Expression instanceOf(InstanceOf instanceOf) {
-        return evalInstanceOf.eval(instanceOf);
+    public Expression cast(Expression evaluated, Cast cast) {
+        return evalCast.eval(evaluated, cast);
+    }
+
+    @Override
+    public Expression instanceOf(Expression evaluated, InstanceOf instanceOf) {
+        return evalInstanceOf.eval(evaluated, instanceOf);
     }
 
     @Override
@@ -61,13 +65,13 @@ public class EvalImpl implements Eval {
     }
 
     @Override
-    public Expression binaryOperator(BinaryOperator binaryOperator) {
-        return evalBinaryOperator.eval(binaryOperator);
+    public Expression binaryOperator(Expression lhs, Expression rhs, BinaryOperator binaryOperator) {
+        return evalBinaryOperator.eval(lhs, rhs, binaryOperator);
     }
 
     @Override
-    public Expression unaryOperator(UnaryOperator unaryOperator) {
-        return evalUnaryOperator.eval(unaryOperator);
+    public Expression unaryOperator(Expression expression, UnaryOperator unaryOperator) {
+        return evalUnaryOperator.eval(expression, unaryOperator);
     }
 
     @Override

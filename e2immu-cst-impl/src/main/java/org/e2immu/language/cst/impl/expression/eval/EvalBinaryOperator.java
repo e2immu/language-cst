@@ -12,10 +12,8 @@ public class EvalBinaryOperator {
         this.runtime = runtime;
     }
 
-    public Expression eval(BinaryOperator operator) {
-        Expression l = runtime.sortAndSimplify(operator.lhs());
-        Expression r = runtime.sortAndSimplify(operator.rhs());
-        Expression evaluated = determineValue(l, r, operator.operator());
+    public Expression eval(Expression lhs, Expression rhs, BinaryOperator operator) {
+        Expression evaluated = determineValue(lhs, rhs, operator.operator());
         return evaluated != null ? evaluated : operator;
     }
 

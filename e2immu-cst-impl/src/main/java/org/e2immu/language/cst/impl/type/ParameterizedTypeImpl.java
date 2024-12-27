@@ -147,7 +147,7 @@ public class ParameterizedTypeImpl implements ParameterizedType {
     @Override
     public ParameterizedType erased() {
         if (arrays == 0 && wildcard == null && parameters.isEmpty()) return this;
-        return new ParameterizedTypeImpl(typeInfo, typeParameter, List.of(), 0, null);
+        return new ParameterizedTypeImpl(typeInfo, typeParameter, List.of(), arrays, null);
     }
 
     @Override
