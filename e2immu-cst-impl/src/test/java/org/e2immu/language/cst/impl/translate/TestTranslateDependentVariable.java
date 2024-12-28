@@ -34,7 +34,7 @@ public class TestTranslateDependentVariable {
         Variable variable = tm.translateVariable(dv);
         // !!! x.array[i] is not present in the map; we must go via VariableExpression
         assertEquals("x.array[i]", variable.toString());
-        Expression translated = r.newVariableExpression(variable).translate(tm);
-        assertEquals("this.array[1]", ((VariableExpression) translated).variable().toString());
+        Variable translated = tm.translateVariableRecursively(variable);
+        assertEquals("this.array[1]", translated.toString());
     }
 }
