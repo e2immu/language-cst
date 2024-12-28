@@ -17,22 +17,24 @@ public class EvalCast {
 
         if (castType.isAssignableFrom(runtime, e.parameterizedType())) return e;
         if (!(e instanceof ConstantExpression<?>)) return cast;
-        Boolean b = redundantIntegerCast(e, castType);
-        if (b != null) return b ? e : cast;
-        Boolean c = redundantDoubleCast(e, castType);
-        if (c != null) return c ? e : cast;
+        Expression ee = redundantIntegerCast(e, castType);
+        if (ee != null) return ee;
+        Expression eee = redundantDoubleCast(e, castType);
+        if (eee != null) return eee;
         return cast;
     }
 
-    public static Boolean redundantDoubleCast(Expression e, ParameterizedType castType) {
+    private Expression redundantDoubleCast(Expression e, ParameterizedType castType) {
         double d;
         if (e instanceof FloatConstant fc) d = fc.doubleValue();
         else if (e instanceof DoubleConstant dc) d = dc.doubleValue();
         else return null;
-        return castType.isFloat() && (float) d == d || castType.isDouble();
+        if (castType.isFloat()) return runtime.newFloat((float) d);
+        if (castType.isDouble()) return runtime.newDouble(d);
+        return null;
     }
 
-    public static Boolean redundantIntegerCast(Expression e, ParameterizedType castType) {
+    private Expression redundantIntegerCast(Expression e, ParameterizedType castType) {
         long l;
         if (e instanceof ByteConstant bc) l = bc.constant();
         else if (e instanceof ShortConstant sc) l = sc.constant();
@@ -43,9 +45,10 @@ public class EvalCast {
         else if (e instanceof FloatConstant fc && IntUtil.isMathematicalInteger(fc.doubleValue()))
             l = (long) fc.doubleValue();
         else return null;
-        return castType.isByte() && l <= Byte.MAX_VALUE && l >= Byte.MIN_VALUE
-               || castType.isShort() && l <= Short.MAX_VALUE && l >= Short.MIN_VALUE
-               || castType.isInt() && l <= Integer.MAX_VALUE && l >= Integer.MIN_VALUE
-               || castType.isLong();
+        if (castType.isByte()) return runtime.newByte((byte) l);
+        if (castType.isShort()) return runtime.newShort((short) l);
+        if (castType.isInt()) return runtime.newInt((int) l);
+        if (castType.isLong()) return runtime.newLong(l);
+        return null;
     }
 }
