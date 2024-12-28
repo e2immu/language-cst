@@ -5,11 +5,15 @@ import org.e2immu.language.cst.api.expression.MethodCall;
 import org.e2immu.language.cst.api.expression.VariableExpression;
 import org.e2immu.language.cst.api.info.FieldInfo;
 import org.e2immu.language.cst.api.info.MethodInfo;
+import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.statement.Statement;
 import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.variable.*;
 import org.e2immu.language.cst.impl.type.ParameterizedTypeImpl;
+import org.e2immu.language.cst.impl.variable.DependentVariableImpl;
+import org.e2immu.language.cst.impl.variable.FieldReferenceImpl;
+import org.e2immu.language.cst.impl.variable.ThisImpl;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -377,5 +381,62 @@ public class TranslationMapImpl implements TranslationMap {
     @Override
     public boolean isClearAnalysis() {
         return clearAnalysis;
+    }
+
+    @Override
+    public Variable translateVariableRecursively(Variable variable) {
+        return translateVariableRecursively(this, variable);
+    }
+
+    // also accessible via runtime
+    public static Variable translateVariableRecursively(TranslationMap tm, Variable variable) {
+        Variable translated = tm.translateVariable(variable);
+        if (translated != variable) {
+            if (variable instanceof LocalVariable from && from.assignmentExpression() != null
+                && translated instanceof LocalVariable to && to.assignmentExpression() == null) {
+                Expression te = from.assignmentExpression().translate(tm);
+                if (te.variableStreamDescend().anyMatch(to::equals)) {
+                    // this goes in conjunction with the assertion
+                    return from.withAssignmentExpression(null);
+                }
+                return to.withAssignmentExpression(te);
+            }
+            return translated;
+        }
+        if (variable instanceof FieldReference fr) {
+            Expression tScope = fr.scope().translate(tm);
+            FieldInfo newField = tm.translateFieldInfo(fr.fieldInfo());
+            if (tScope != fr.scope() || newField != fr.fieldInfo()) {
+                return new FieldReferenceImpl(newField, tScope, null, fr.parameterizedType());
+            }
+        } else if (variable instanceof DependentVariable dv) {
+            Expression translatedScope = dv.arrayExpression().translate(tm);
+            Expression translatedIndex = dv.indexExpression().translate(tm);
+            if (translatedScope != dv.arrayExpression() || translatedIndex != dv.indexExpression()) {
+                Variable arrayVariable = DependentVariableImpl.makeVariable(translatedScope,
+                        DependentVariableImpl.ARRAY_VARIABLE);
+                assert arrayVariable != null;
+                Variable indexVariable = DependentVariableImpl.makeVariable(translatedIndex,
+                        DependentVariableImpl.INDEX_VARIABLE);
+                return new DependentVariableImpl(translatedScope, arrayVariable, translatedIndex, indexVariable,
+                        dv.parameterizedType());
+            }
+        } else if (variable instanceof This thisVar) {
+            ParameterizedType thisVarPt = thisVar.parameterizedType();
+            ParameterizedType translatedType = tm.translateType(thisVarPt);
+            TypeInfo tExplicitly;
+            if (thisVar.explicitlyWriteType() == null) {
+                tExplicitly = null;
+            } else {
+                ParameterizedType explicitlyPt = thisVar.explicitlyWriteType().asSimpleParameterizedType();
+                ParameterizedType tExplicitlyPt = tm.translateType(explicitlyPt);
+                tExplicitly = tExplicitlyPt.typeInfo();
+            }
+            if (translatedType != thisVarPt || !Objects.equals(thisVar.explicitlyWriteType(), tExplicitly)) {
+                return new ThisImpl(translatedType, tExplicitly, thisVar.writeSuper());
+            }
+        }
+
+        return variable;
     }
 }

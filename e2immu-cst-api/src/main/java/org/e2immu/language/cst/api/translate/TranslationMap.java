@@ -7,9 +7,10 @@ import org.e2immu.language.cst.api.expression.MethodCall;
 import org.e2immu.language.cst.api.info.FieldInfo;
 import org.e2immu.language.cst.api.info.MethodInfo;
 import org.e2immu.language.cst.api.info.TypeInfo;
+import org.e2immu.language.cst.api.runtime.Runtime;
 import org.e2immu.language.cst.api.statement.Statement;
 import org.e2immu.language.cst.api.type.ParameterizedType;
-import org.e2immu.language.cst.api.variable.Variable;
+import org.e2immu.language.cst.api.variable.*;
 
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -58,6 +59,19 @@ public interface TranslationMap {
     default Variable translateVariable(Variable variable) {
         return variable;
     }
+
+    /*
+    You must implement this method. If you want the default behavior, use
+
+    @Override
+    public Variable translateVariableRecursively(Variable variable) {
+        return runtime.translateVariableRecursively(this, variable);
+    }
+
+    which calls the code of TranslationMapImpl.translateVariableRecursively()
+     */
+    @NotNull
+    Variable translateVariableRecursively(Variable variable);
 
     @NotNull(content = true)
     default List<Statement> translateStatement(Statement statement) {

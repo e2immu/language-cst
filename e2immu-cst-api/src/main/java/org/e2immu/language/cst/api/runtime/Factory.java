@@ -412,6 +412,8 @@ public interface Factory {
 
     OutputElement symbolRightParenthesis();
 
+    Variable translateVariableRecursively(TranslationMap translationMap, Variable variable);
+
     TypeModifier typeModifierAbstract();
 
     TypeModifier typeModifierFinal();

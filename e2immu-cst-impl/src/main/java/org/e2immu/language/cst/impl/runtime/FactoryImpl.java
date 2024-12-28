@@ -1178,5 +1178,10 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
         assert index.parameterizedType().isMathematicallyInteger();
         return newDependentVariable(newVariableExpression(fr), index);
     }
+
+    @Override
+    public Variable translateVariableRecursively(TranslationMap translationMap, Variable variable) {
+        return TranslationMapImpl.translateVariableRecursively(translationMap, variable);
+    }
 }
 
