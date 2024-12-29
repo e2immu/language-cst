@@ -5,8 +5,7 @@ import org.e2immu.annotation.Nullable;
 import org.e2immu.language.cst.api.element.Element;
 import org.e2immu.language.cst.api.element.Source;
 import org.e2immu.language.cst.api.element.Visitor;
-import org.e2immu.language.cst.api.expression.Expression;
-import org.e2immu.language.cst.api.expression.VariableExpression;
+import org.e2immu.language.cst.api.expression.*;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.type.ParameterizedType;
@@ -38,12 +37,9 @@ public class DependentVariableImpl extends VariableImpl implements DependentVari
     private final String simpleName;
     private final String fullyQualifiedName;
 
-    public static final String ARRAY_VARIABLE = "av-";
-    public static final String INDEX_VARIABLE = "iv-";
-
     public static DependentVariable create(Expression array, Expression index) {
-        Variable av = makeVariable(array, ARRAY_VARIABLE);
-        Variable iv = makeVariable(index, INDEX_VARIABLE);
+        Variable av = extractVariable(array);
+        Variable iv = extractVariable(index);
         ParameterizedType pt;
         if (array.parameterizedType().arrays() > 0) {
             pt = array.parameterizedType().copyWithOneFewerArrays();
@@ -59,21 +55,21 @@ public class DependentVariableImpl extends VariableImpl implements DependentVari
                 pt = array.parameterizedType().parameters().get(0);
             }
         }
-        return new DependentVariableImpl(array, Objects.requireNonNull(av), index, iv, pt);
+        return new DependentVariableImpl(array, av, index, iv, pt);
     }
 
-    public static Variable makeVariable(Expression expression, String variablePrefix) {
-        if (expression.isConstant()) return null;
-        VariableExpression ve;
-        if ((ve = expression.asInstanceOf(VariableExpression.class)) != null) {
+    private static Variable extractVariable(Expression e) {
+        if (e instanceof VariableExpression ve) {
             return ve.variable();
         }
-        Source source = expression.source();
-        assert source != null : "Expression " + expression.getClass() + " has no source";
-        String name = variablePrefix + source.compact();
-        return new LocalVariableImpl(name, expression.parameterizedType(), null);
+        if (e instanceof Cast cast) {
+            return extractVariable(cast.expression());
+        }
+        if (e instanceof EnclosedExpression ee) {
+            return extractVariable(ee.inner());
+        }
+        return null;
     }
-
 
     public DependentVariableImpl(Expression arrayExpression,
                                  Variable arrayVariable,
@@ -85,14 +81,23 @@ public class DependentVariableImpl extends VariableImpl implements DependentVari
         this.arrayExpression = arrayExpression;
         this.arrayVariable = arrayVariable;
         this.indexVariable = indexVariable;
-        String indexFqn = indexVariable == null
-                ? indexExpression.print(QualificationImpl.FULLY_QUALIFIED_NAMES).toString()
-                : indexVariable.fullyQualifiedName();
-        fullyQualifiedName = arrayVariable.fullyQualifiedName() + "[" + indexFqn + "]";
+        String arrayFqn = arrayVariable == null ? expressionId(arrayExpression) : arrayVariable.fullyQualifiedName();
+        String indexFqn = indexVariable == null ? expressionId(indexExpression) : indexVariable.fullyQualifiedName();
+        fullyQualifiedName = arrayFqn + "[" + indexFqn + "]";
+        String arraySimple = arrayVariable == null
+                ? arrayExpression.print(QualificationImpl.FULLY_QUALIFIED_NAMES).toString()
+                : arrayVariable.simpleName();
         String indexSimple = indexVariable == null
                 ? indexExpression.print(QualificationImpl.FULLY_QUALIFIED_NAMES).toString()
                 : indexVariable.simpleName();
-        simpleName = arrayVariable.simpleName() + "[" + indexSimple + "]";
+        simpleName = arraySimple + "[" + indexSimple + "]";
+    }
+
+    private static String expressionId(Expression expression) {
+        if(expression instanceof ConstantExpression<?>) return expression.toString();
+        Source source = expression.source();
+        assert source != null;
+        return "`" + source.beginLine() + "-" + source.beginPos() + "`";
     }
 
     @Override

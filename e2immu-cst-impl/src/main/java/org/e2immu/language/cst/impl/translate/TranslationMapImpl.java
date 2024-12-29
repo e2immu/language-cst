@@ -413,13 +413,7 @@ public class TranslationMapImpl implements TranslationMap {
             Expression translatedScope = dv.arrayExpression().translate(tm);
             Expression translatedIndex = dv.indexExpression().translate(tm);
             if (translatedScope != dv.arrayExpression() || translatedIndex != dv.indexExpression()) {
-                Variable arrayVariable = DependentVariableImpl.makeVariable(translatedScope,
-                        DependentVariableImpl.ARRAY_VARIABLE);
-                assert arrayVariable != null;
-                Variable indexVariable = DependentVariableImpl.makeVariable(translatedIndex,
-                        DependentVariableImpl.INDEX_VARIABLE);
-                return new DependentVariableImpl(translatedScope, arrayVariable, translatedIndex, indexVariable,
-                        dv.parameterizedType());
+                return DependentVariableImpl.create(translatedScope, translatedIndex);
             }
         } else if (variable instanceof This thisVar) {
             ParameterizedType thisVarPt = thisVar.parameterizedType();
