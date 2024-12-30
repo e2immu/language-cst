@@ -312,7 +312,8 @@ public class ParameterizedTypeImpl implements ParameterizedType {
 
     @Override
     public int numericIsAssignableFrom(Predefined runtime, ParameterizedType other) {
-        return new IsAssignableFrom(runtime, this, other).execute(false, IsAssignableFrom.Mode.COVARIANT);
+        return new IsAssignableFrom(runtime, this, other).execute(false, false,
+                IsAssignableFrom.Mode.COVARIANT);
     }
 
     @Override

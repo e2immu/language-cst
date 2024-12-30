@@ -3,6 +3,7 @@ package org.e2immu.language.cst.impl.expression.eval;
 import org.e2immu.language.cst.api.expression.*;
 import org.e2immu.language.cst.api.runtime.Runtime;
 import org.e2immu.language.cst.api.type.ParameterizedType;
+import org.e2immu.language.cst.impl.type.IsAssignableFrom;
 import org.e2immu.util.internal.util.IntUtil;
 
 public class EvalCast {
@@ -14,8 +15,10 @@ public class EvalCast {
 
     public Expression eval(Expression e, Cast cast) {
         ParameterizedType castType = cast.parameterizedType();
-
-        if (castType.isAssignableFrom(runtime, e.parameterizedType())) return e;
+        IsAssignableFrom isAssignableFrom = new IsAssignableFrom(runtime, castType, e.parameterizedType());
+        int score = isAssignableFrom.execute(false, true,
+                IsAssignableFrom.Mode.COVARIANT);
+        if (score >= 0) return e;
         if (!(e instanceof ConstantExpression<?>)) return cast;
         Expression ee = redundantIntegerCast(e, castType);
         if (ee != null) return ee;

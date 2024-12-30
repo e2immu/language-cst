@@ -1035,7 +1035,7 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     @Override
     public int isAssignableFromCovariantErasure(ParameterizedType target, ParameterizedType from) {
         return new IsAssignableFrom(this, target, from)
-                .execute(false, IsAssignableFrom.Mode.COVARIANT_ERASURE);
+                .execute(false, false, IsAssignableFrom.Mode.COVARIANT_ERASURE);
     }
 
     @Override

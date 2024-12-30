@@ -30,7 +30,7 @@ public record IsAssignableFrom(Predefined runtime,
     public static final int NOT_ASSIGNABLE = -1;
 
     public boolean execute() {
-        return execute(false, Mode.COVARIANT) != NOT_ASSIGNABLE;
+        return execute(false, false, Mode.COVARIANT) != NOT_ASSIGNABLE;
     }
 
     private static final IntBinaryOperator REDUCER = (a, b) -> a == NOT_ASSIGNABLE || b == NOT_ASSIGNABLE ? NOT_ASSIGNABLE : a + b;
@@ -55,12 +55,14 @@ public record IsAssignableFrom(Predefined runtime,
     }
 
     /**
-     * @param ignoreArrays do the comparison, ignoring array information
-     * @param mode         the comparison mode
+     * @param ignoreArrays               do the comparison, ignoring array information
+     * @param strictTypeParameterTargets set to true when deciding whether a cast is required in an assignment, or not.
+     *                                   typical value is false, when used for method selection.
+     * @param mode                       the comparison mode
      * @return a numeric "nearness", the lower, the better and the more specific
      */
 
-    public int execute(boolean ignoreArrays, Mode mode) {
+    public int execute(boolean ignoreArrays, boolean strictTypeParameterTargets, Mode mode) {
         if (target == from || target.equals(from) || ignoreArrays && target.equalsIgnoreArrays(from)) return EQUALS;
 
         // NULL
@@ -98,7 +100,7 @@ public record IsAssignableFrom(Predefined runtime,
                 }
                 if (target.arrays() > 0) {
                     // recurse without the arrays; target and from remain the same
-                    return execute(true, Mode.COVARIANT);
+                    return execute(true, strictTypeParameterTargets, Mode.COVARIANT);
                 }
             }
 
@@ -118,10 +120,10 @@ public record IsAssignableFrom(Predefined runtime,
 
             // two different types, so they must be in a hierarchy
             if (target.typeInfo() != from.typeInfo()) {
-                return differentNonNullTypeInfo(mode);
+                return differentNonNullTypeInfo(mode, strictTypeParameterTargets);
             }
             // identical base type, so look at type parameters
-            return sameNoNullTypeInfo(mode);
+            return sameNoNullTypeInfo(mode, strictTypeParameterTargets);
         }
 
         if (target.typeInfo() != null && from.typeParameter() != null) {
@@ -137,19 +139,19 @@ public record IsAssignableFrom(Predefined runtime,
                 return IN_HIERARCHY + pathToJLO;
             }
             return otherTypeBounds.stream().mapToInt(bound -> new IsAssignableFrom(runtime, target, bound)
-                            .execute(true, mode))
+                            .execute(true, strictTypeParameterTargets, mode))
                     .min().orElseThrow();
         }
 
         // I am a type parameter
         if (target.typeParameter() != null) {
-            return targetIsATypeParameter(mode);
+            return targetIsATypeParameter(mode, strictTypeParameterTargets);
         }
         // if wildcard is unbound, I am <?>; anything goes
         return target.wildcard() == null || target.wildcard().isUnbound() ? UNBOUND_WILDCARD : NOT_ASSIGNABLE;
     }
 
-    private int targetIsATypeParameter(Mode mode) {
+    private int targetIsATypeParameter(Mode mode, boolean strictTypeParameterTargets) {
         assert target.typeParameter() != null;
 
         if (target.typeParameter().equals(from.typeParameter()) && target.arrays() != from.arrays()) {
@@ -157,6 +159,9 @@ public record IsAssignableFrom(Predefined runtime,
             return NOT_ASSIGNABLE;
         }
         if (target.arrays() > 0 && from.arrays() < target.arrays()) {
+            if(strictTypeParameterTargets) {
+                return NOT_ASSIGNABLE;
+            }
             return ARRAY_PENALTY * (target.arrays() - from.arrays());
         }
 
@@ -164,6 +169,9 @@ public record IsAssignableFrom(Predefined runtime,
         if (targetTypeBounds.isEmpty()) {
             int arrayDiff = from.arrays() - target.arrays();
             assert arrayDiff >= 0;
+            if (strictTypeParameterTargets) {
+                return NOT_ASSIGNABLE; // only when they are exactly the same, which was tested earlier
+            }
             return TYPE_BOUND + IN_HIERARCHY * arrayDiff;
         }
         if (target.arrays() > 0 && from.arrays() != target.arrays()) {
@@ -173,7 +181,8 @@ public record IsAssignableFrom(Predefined runtime,
         if (from.typeInfo() != null) {
             int best = NOT_ASSIGNABLE;
             for (ParameterizedType typeBound : targetTypeBounds) {
-                int score = new IsAssignableFrom(runtime, typeBound, from).execute(true, mode);
+                int score = new IsAssignableFrom(runtime, typeBound, from).execute(true,
+                        strictTypeParameterTargets, mode);
                 if (score >= 0 && (best == NOT_ASSIGNABLE || best > score)) {
                     best = score;
                 }
@@ -184,7 +193,7 @@ public record IsAssignableFrom(Predefined runtime,
         if (from.typeParameter() != null) {
             List<ParameterizedType> fromTypeBounds = from.typeParameter().typeBounds();
             if (fromTypeBounds.isEmpty()) {
-                return TYPE_BOUND;
+                return strictTypeParameterTargets ? NOT_ASSIGNABLE : TYPE_BOUND;
             }
             if (mode == Mode.INVARIANT && (isSelfReference(from) || isSelfReference(target))) {
                 // see TestAssignableFromGenerics2
@@ -195,7 +204,7 @@ public record IsAssignableFrom(Predefined runtime,
             for (ParameterizedType myBound : targetTypeBounds) {
                 for (ParameterizedType otherBound : fromTypeBounds) {
                     int score = new IsAssignableFrom(runtime, myBound, otherBound)
-                            .execute(true, mode);
+                            .execute(true, strictTypeParameterTargets, mode);
                     if (score >= 0 && (best == NOT_ASSIGNABLE || best > score)) {
                         best = score;
                     }
@@ -215,7 +224,7 @@ public record IsAssignableFrom(Predefined runtime,
         return ti.typeParameters().size() > i && ti.typeParameters().get(i).equals(tp);
     }
 
-    private int sameNoNullTypeInfo(Mode mode) {
+    private int sameNoNullTypeInfo(Mode mode, boolean strictTypeParameterTargets) {
         if (mode == Mode.COVARIANT_ERASURE) return SAME_UNDERLYING_TYPE;
 
         // List<E> <-- List<String>
@@ -229,7 +238,7 @@ public record IsAssignableFrom(Predefined runtime,
         return ListUtil.joinLists(target.parameters(), from.parameters())
                 .mapToInt(p -> {
                     Mode newMode = mode == Mode.INVARIANT ? Mode.INVARIANT : modeFromWildcard(mode, p.k().wildcard());
-                    return new IsAssignableFrom(runtime, p.k(), p.v()).execute(true, newMode);
+                    return new IsAssignableFrom(runtime, p.k(), p.v()).execute(true, strictTypeParameterTargets, newMode);
                 }).reduce(0, REDUCER);
     }
 
@@ -241,10 +250,10 @@ public record IsAssignableFrom(Predefined runtime,
         return mode == Mode.COVARIANT ? Mode.CONTRAVARIANT : Mode.COVARIANT;
     }
 
-    private int differentNonNullTypeInfo(Mode mode) {
+    private int differentNonNullTypeInfo(Mode mode, boolean strictTypeParameterTargets) {
         int i = switch (mode) {
-            case COVARIANT, COVARIANT_ERASURE -> hierarchy(target, from, mode);
-            case CONTRAVARIANT -> hierarchy(from, target, Mode.COVARIANT);
+            case COVARIANT, COVARIANT_ERASURE -> hierarchy(strictTypeParameterTargets, target, from, mode);
+            case CONTRAVARIANT -> hierarchy(strictTypeParameterTargets, from, target, Mode.COVARIANT);
             case INVARIANT -> NOT_ASSIGNABLE;
             case ANY -> throw new UnsupportedOperationException("?");
         };
@@ -298,19 +307,19 @@ public record IsAssignableFrom(Predefined runtime,
         return !"java.util.function".equals(packageName) && !methodInfo.isSynthetic();
     }
 
-    private int hierarchy(ParameterizedType target, ParameterizedType from, Mode mode) {
+    private int hierarchy(boolean strictTypeParameterTargets, ParameterizedType target, ParameterizedType from, Mode mode) {
         TypeInfo other = from.typeInfo();
         for (ParameterizedType interfaceImplemented : other.interfacesImplemented()) {
             ParameterizedType concreteType = from.concreteDirectSuperType(interfaceImplemented);
             int scoreInterface = new IsAssignableFrom(runtime, target, concreteType)
-                    .execute(true, mode);
+                    .execute(true, strictTypeParameterTargets, mode);
             if (scoreInterface != NOT_ASSIGNABLE) return IN_HIERARCHY + scoreInterface;
         }
         ParameterizedType parentClass = other.parentClass();
         if (parentClass != null && !parentClass.isJavaLangObject()) {
             ParameterizedType concreteType = from.concreteDirectSuperType(parentClass);
             int scoreParent = new IsAssignableFrom(runtime, target, concreteType)
-                    .execute(true, mode);
+                    .execute(true, strictTypeParameterTargets, mode);
             if (scoreParent != NOT_ASSIGNABLE) return IN_HIERARCHY + scoreParent;
         }
         return NOT_ASSIGNABLE;
@@ -371,7 +380,7 @@ public record IsAssignableFrom(Predefined runtime,
         }
         // check the hierarchy of boxed: e.g. Number
         ParameterizedType boxedPt = boxed.asSimpleParameterizedType();
-        int h = hierarchy(target, boxedPt, Mode.COVARIANT);
+        int h = hierarchy(false, target, boxedPt, Mode.COVARIANT);
         return h == NOT_ASSIGNABLE ? NOT_ASSIGNABLE : h + BOXING_FROM_PRIMITIVE;
     }
 }
