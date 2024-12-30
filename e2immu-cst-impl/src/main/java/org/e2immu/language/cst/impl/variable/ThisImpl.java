@@ -57,7 +57,7 @@ public class ThisImpl extends VariableImpl implements This {
     @Override
     public String simpleName() {
         String superOrThis = writeSuper ? "super" : "this";
-        if (explicitlyWriteType != null) return explicitlyWriteType.simpleName() + "+" + superOrThis;
+        if (explicitlyWriteType != null) return explicitlyWriteType.simpleName() + "." + superOrThis;
         return superOrThis;
     }
 
