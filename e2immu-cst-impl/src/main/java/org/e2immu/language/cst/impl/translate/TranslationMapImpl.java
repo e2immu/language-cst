@@ -410,10 +410,10 @@ public class TranslationMapImpl implements TranslationMap {
                 return new FieldReferenceImpl(newField, tScope, null, fr.parameterizedType());
             }
         } else if (variable instanceof DependentVariable dv) {
-            Expression translatedScope = dv.arrayExpression().translate(tm);
+            Expression translatedArray = dv.arrayExpression().translate(tm);
             Expression translatedIndex = dv.indexExpression().translate(tm);
-            if (translatedScope != dv.arrayExpression() || translatedIndex != dv.indexExpression()) {
-                return DependentVariableImpl.create(translatedScope, translatedIndex);
+            if (translatedArray != dv.arrayExpression() || translatedIndex != dv.indexExpression()) {
+                return DependentVariableImpl.create(translatedArray, translatedIndex);
             }
         } else if (variable instanceof This thisVar) {
             ParameterizedType thisVarPt = thisVar.parameterizedType();
