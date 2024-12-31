@@ -67,8 +67,6 @@ public interface Factory {
 
     FieldModifier fieldModifierVolatile();
 
-    Variable getterVariable(MethodCall methodCall);
-
     IntConstant intMinusOne();
 
     IntConstant intOne();
@@ -398,9 +396,6 @@ public interface Factory {
     void setGetSetField(MethodInfo getSetMethod, FieldInfo fieldInfo, boolean setter, int parameterIndexOfIndex);
 
     void setModificationComponent(MethodInfo methodInfo, FieldInfo component);
-
-    /* return the field rather than the getter*/
-    Variable setterVariable(MethodCall methodCall);
 
     Split splitNever();
 

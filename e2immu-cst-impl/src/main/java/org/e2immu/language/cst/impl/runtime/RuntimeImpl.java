@@ -1,11 +1,15 @@
 package org.e2immu.language.cst.impl.runtime;
 
+import org.e2immu.language.cst.api.analysis.Value;
 import org.e2immu.language.cst.api.expression.*;
 import org.e2immu.language.cst.api.info.ComputeMethodOverrides;
+import org.e2immu.language.cst.api.info.MethodInfo;
 import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.runtime.LanguageConfiguration;
 import org.e2immu.language.cst.api.runtime.Eval;
 import org.e2immu.language.cst.api.runtime.Runtime;
+import org.e2immu.language.cst.api.type.ParameterizedType;
+import org.e2immu.language.cst.api.variable.FieldReference;
 import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.language.cst.impl.element.E2ImmuAnnotationsImpl;
 import org.e2immu.language.cst.impl.expression.eval.EvalOptions;
@@ -89,6 +93,11 @@ public class RuntimeImpl extends FactoryImpl implements Runtime {
     @Override
     public Expression equals(Expression lhs, Expression rhs) {
         return eval.equals(lhs, rhs);
+    }
+
+    @Override
+    public Expression equalsMethod(MethodCall methodCall, Expression lhs, Expression rhs) {
+        return eval.equalsMethod(methodCall, lhs, rhs);
     }
 
     @Override
@@ -245,4 +254,59 @@ public class RuntimeImpl extends FactoryImpl implements Runtime {
     public ComputeMethodOverrides computeMethodOverrides() {
         return new ComputeMethodOverridesImpl(this);
     }
+
+
+    /* given a getter call, create the corresponding (indexed) variable */
+    @Override
+    public Variable getterVariable(MethodCall methodCall) {
+        return getSetVariable(methodCall, false);
+    }
+
+    /* given a setter call, create the target variable
+     *  obj.setX(v) -> o.x
+     *  obj.setX(i, v) -> o.x[i]
+     */
+
+    @Override
+    public Variable setterVariable(MethodCall methodCall) {
+        return getSetVariable(methodCall, true);
+    }
+
+    private Variable getSetVariable(MethodCall methodCall, boolean setter) {
+        Value.FieldValue getSetField = methodCall.methodInfo().getSetField();
+        if (getSetField.field() == null || getSetField.setter() != setter) {
+            return null;
+        }
+        ParameterizedType concreteType;
+        ParameterizedType getSetFieldType = getSetField.field().type();
+        if (getSetFieldType.typeParameter() != null && getSetFieldType.typeParameter().getOwner().isLeft() && getSetFieldType.typeParameter().getOwner().getLeft().fullyQualifiedName().equals("java.util.List")) {
+            ParameterizedType pt = setter ? methodCall.parameterExpressions().get(methodCall.parameterExpressions().size() - 1).parameterizedType() : methodCall.concreteReturnType();
+            concreteType = pt.copyWithArrays(pt.arrays() + 1);
+        } else {
+            concreteType = getSetFieldType;
+        }
+        if (methodCall.parameterExpressions().size() == (setter ? 1 : 0)) {
+            return newFieldReference(getSetField.field(), methodCall.object(), concreteType);
+        }
+        FieldReference fr = newFieldReference(getSetField.field(), methodCall.object(), concreteType);
+        FieldReference fr2;
+        if (getSetFieldType.arrays() == 0) {
+            ParameterizedType pt;
+            if (getSetFieldType.parameters().isEmpty()) {
+                pt = objectParameterizedType();
+            } else {
+                pt = getSetFieldType.parameters().get(0);
+            }
+            TypeInfo list = getFullyQualified(List.class, true);
+            MethodInfo get = list.findUniqueMethod("get", 1);
+            Value.FieldValue fv = get.getSetField();
+            fr2 = newFieldReference(fv.field(), newVariableExpression(fr), pt.copyWithArrays(pt.arrays() + 1));
+        } else {
+            fr2 = fr;
+        }
+        Expression index = methodCall.parameterExpressions().get(0);
+        assert index.parameterizedType().isMathematicallyInteger();
+        return newDependentVariable(newVariableExpression(fr2), index);
+    }
+
 }

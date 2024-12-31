@@ -1,10 +1,12 @@
 package org.e2immu.language.cst.impl.expression.eval;
 
 import org.e2immu.language.cst.api.expression.*;
+import org.e2immu.language.cst.api.info.MethodInfo;
 import org.e2immu.language.cst.api.runtime.Runtime;
 import org.e2immu.language.cst.impl.expression.EqualsImpl;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Stream;
 
 public class EvalEquals {
@@ -12,6 +14,25 @@ public class EvalEquals {
 
     public EvalEquals(Runtime runtime) {
         this.runtime = runtime;
+    }
+
+    public Expression evalMethod(MethodCall methodCall, Expression lhs, Expression rhs) {
+        if (lhs.equals(rhs)) return runtime.constantTrue();
+        if (lhs == methodCall.object() && rhs == methodCall.parameterExpressions().get(0)) {
+            // don't touch, no change
+            return methodCall;
+        }
+        return runtime.newMethodCallBuilder()
+                .setConcreteReturnType(methodCall.concreteReturnType())
+                .setModificationTimes(methodCall.modificationTimes())
+                .setMethodInfo(methodCall.methodInfo())
+                .setObject(lhs)
+                .setObjectIsImplicit(methodCall.objectIsImplicit())
+                .setParameterExpressions(List.of(rhs))
+                .setSource(methodCall.source())
+                .addAnnotations(methodCall.annotations())
+                .addComments(methodCall.comments())
+                .build();
     }
 
     public Expression eval(Expression lhs, Expression rhs) {

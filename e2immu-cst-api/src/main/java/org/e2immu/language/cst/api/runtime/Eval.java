@@ -37,6 +37,8 @@ public interface Eval {
 
     Expression equals(Expression lhs, Expression rhs);
 
+    Expression equalsMethod(MethodCall methodCall, Expression lhs, Expression rhs);
+
     Expression greater(Expression lhs, Expression rhs, boolean allowEquals);
 
     Expression greaterThanZero(Expression expression, boolean allowEquals);
@@ -95,6 +97,11 @@ public interface Eval {
         if (expression instanceof GreaterThanZero gt0) {
             Expression e = recurse ? sortAndSimplify(true, gt0.expression()) : gt0.expression();
             return greaterThanZero(e, gt0.allowEquals());
+        }
+        if (expression instanceof MethodCall mc && mc.methodInfo().isOverloadOfJLOEquals()) {
+            Expression lhs = recurse ? sortAndSimplify(true, mc.object()) : mc.object();
+            Expression rhs = recurse ? sortAndSimplify(true, mc.parameterExpressions().get(0)) : mc.parameterExpressions().get(0);
+            return equalsMethod(mc, lhs, rhs);
         }
         if (expression instanceof Equals equals) {
             Expression lhs = recurse ? sortAndSimplify(true, equals.lhs()) : equals.lhs();

@@ -40,21 +40,8 @@ public class DependentVariableImpl extends VariableImpl implements DependentVari
     public static DependentVariable create(Expression array, Expression index) {
         Variable av = extractVariable(array);
         Variable iv = extractVariable(index);
-        ParameterizedType pt;
-        if (array.parameterizedType().arrays() > 0) {
-            pt = array.parameterizedType().copyWithOneFewerArrays();
-        } else {
-            // see TestGetSet
-            assert array.parameterizedType().isJavaUtilList()
-                    : "For now, indexing works in arrays and, strictly, java.lang.List";
-            if (array.parameterizedType().parameters().isEmpty()) {
-                ParameterizedType jlo = array.parameterizedType().typeInfo().parentClass();
-                assert jlo.isJavaLangObject() : "List's parent should be JLO, as it is an interface";
-                pt = jlo;
-            } else {
-                pt = array.parameterizedType().parameters().get(0);
-            }
-        }
+        assert array.parameterizedType().arrays() > 0;
+        ParameterizedType pt = array.parameterizedType().copyWithOneFewerArrays();
         return new DependentVariableImpl(array, av, index, iv, pt);
     }
 
@@ -94,7 +81,7 @@ public class DependentVariableImpl extends VariableImpl implements DependentVari
     }
 
     private static String expressionId(Expression expression) {
-        if(expression instanceof ConstantExpression<?>) return expression.toString();
+        if (expression instanceof ConstantExpression<?>) return expression.toString();
         Source source = expression.source();
         assert source != null;
         return "`" + source.beginLine() + "-" + source.beginPos() + "`";

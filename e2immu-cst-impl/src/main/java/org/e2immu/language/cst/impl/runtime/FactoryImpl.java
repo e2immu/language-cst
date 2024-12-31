@@ -1141,44 +1141,6 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
         throw new UnsupportedOperationException("Not yet implemented");
     }
 
-    /* given a getter call, create the corresponding (indexed) variable */
-    @Override
-    public Variable getterVariable(MethodCall methodCall) {
-        return getSetVariable(methodCall, false);
-    }
-
-    /* given a setter call, create the target variable
-     *  obj.setX(v) -> o.x
-     *  obj.setX(i, v) -> o.x[i]
-     */
-
-    @Override
-    public Variable setterVariable(MethodCall methodCall) {
-        return getSetVariable(methodCall, true);
-    }
-
-    private Variable getSetVariable(MethodCall methodCall, boolean setter) {
-        Value.FieldValue getSetField = methodCall.methodInfo().getSetField();
-        if (getSetField.field() == null || getSetField.setter() != setter) {
-            return null;
-        }
-        ParameterizedType concreteType;
-        ParameterizedType getSetFieldType = getSetField.field().type();
-        if (getSetFieldType.typeParameter() != null && getSetFieldType.typeParameter().getOwner().isLeft() && getSetFieldType.typeParameter().getOwner().getLeft().fullyQualifiedName().equals("java.util.List")) {
-            ParameterizedType pt = setter ? methodCall.parameterExpressions().get(methodCall.parameterExpressions().size() - 1).parameterizedType() : methodCall.concreteReturnType();
-            concreteType = pt.copyWithArrays(pt.arrays() + 1);
-        } else {
-            concreteType = getSetFieldType;
-        }
-        if (methodCall.parameterExpressions().size() == (setter ? 1 : 0)) {
-            return newFieldReference(getSetField.field(), methodCall.object(), concreteType);
-        }
-        FieldReference fr = newFieldReference(getSetField.field(), methodCall.object(), concreteType);
-        Expression index = methodCall.parameterExpressions().get(0);
-        assert index.parameterizedType().isMathematicallyInteger();
-        return newDependentVariable(newVariableExpression(fr), index);
-    }
-
     @Override
     public Variable translateVariableRecursively(TranslationMap translationMap, Variable variable) {
         return TranslationMapImpl.translateVariableRecursively(translationMap, variable);

@@ -4,7 +4,6 @@ import org.e2immu.language.cst.api.expression.*;
 import org.e2immu.language.cst.api.runtime.Eval;
 import org.e2immu.language.cst.api.runtime.Runtime;
 import org.e2immu.language.cst.api.variable.Variable;
-import org.e2immu.language.cst.impl.expression.ExpressionImpl;
 import org.e2immu.language.cst.impl.expression.eval.*;
 
 import java.util.Arrays;
@@ -97,6 +96,11 @@ public class EvalImpl implements Eval {
     @Override
     public Expression equals(Expression lhs, Expression rhs) {
         return evalEquals.eval(lhs, rhs);
+    }
+
+    @Override
+    public Expression equalsMethod(MethodCall methodCall, Expression lhs, Expression rhs) {
+        return evalEquals.evalMethod(methodCall, lhs, rhs);
     }
 
     @Override
