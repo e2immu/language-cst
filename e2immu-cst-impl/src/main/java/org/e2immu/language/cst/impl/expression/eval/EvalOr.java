@@ -113,11 +113,38 @@ public class EvalOr {
                         // x>=a || x>=b --> x>=min(a,b)
                         if (!xb0.lessThan() && !xb1.lessThan()) {
                             changes = true;
-                            if (xb0.b() > xb1.b()) {
+                            if (xb0.b() > xb1.b() || !gt0.allowEquals()) {
                                 // replace previous
                                 newConcat.set(newConcat.size() - 1, value);
                             }  // else ignore this one
                             continue;
+                        }
+                    }
+                    Expression notXb1 = runtime.negate(xb1.x());
+                    if (xb0.x().equals(notXb1)) {
+                        if (xb0.b() == xb1.b()) {
+                            if (gt0.allowEquals() || gt1.allowEquals()) {
+                                return runtime.constantTrue();
+                            }
+                            // x < a || x > a ==> x != a
+                            changes = true;
+                            newConcat.set(newConcat.size() - 1,
+                                    runtime.negate(runtime.equals(xb0.x(), runtime.intOrDouble(xb0.b()))));
+                            continue;
+                        }
+                    }
+                    if (xb0.b() == xb1.b() && xb0.x() instanceof Sum s1 && xb1.x() instanceof Sum s2) {
+                        if (s1.lhs().equals(s2.lhs()) && s1.rhs().equals(runtime.negate(s2.rhs()))) {
+                            // l+m >= 0, l-m >= 0 ===> l >= Math.min(-m, m), l >= -Math.abs(m)
+                            // changes = true;
+                            // newConcat.set(newConcat.size() - 1, abs);
+                            //  continue;
+                        }
+                        if (s1.rhs().equals(s2.rhs()) && s1.lhs().equals(runtime.negate(s2.lhs()))) {
+                            // -l+m >= 0, l+m >= 0 ===>  m >= Math.min(-l, l)
+                            // changes = true;
+                            // newConcat.set(newConcat.size() - 1, abs);
+                            // continue;
                         }
                     }
                 }

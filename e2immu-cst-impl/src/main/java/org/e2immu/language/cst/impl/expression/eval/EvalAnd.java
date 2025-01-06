@@ -524,7 +524,7 @@ public class EvalAnd {
                 // !xb1.lessThan: x >= b1 && x <= b2; otherwise: x <= b1 && x >= b2
                 if (xb1b > xb2b) return !xb1lt ? Action.FALSE : Action.ADD;
                 if (xb1b < xb2b) return !xb1lt ? Action.ADD : Action.FALSE;
-                if (IntUtil.isMathematicalInteger(xb1b)) {
+                if (IntUtil.isMathematicalInteger(xb1b) && (ge1.allowEquals() && ge2.allowEquals() == reverse)) {
                     Expression newValue = runtime.equals(runtime.intOrDouble(xb1b), xb1x); // null-checks are irrelevant here
                     newConcat.set(newConcat.size() - 1, newValue);
                     return Action.SKIP;
