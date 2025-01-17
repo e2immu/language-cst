@@ -3,6 +3,7 @@ package org.e2immu.language.cst.api.runtime;
 import org.e2immu.language.cst.api.expression.*;
 import org.e2immu.language.cst.api.variable.Variable;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -11,6 +12,36 @@ All recursion takes place in sortAndSimplify, when required.
 None of the abstract methods should call sortAndSimplify again.
  */
 public interface Eval {
+
+    // computes baseCondition & clause,  meant for when clause is not necessarily more specific than baseCondition
+    Expression combineCondition(Expression baseCondition, Expression clause);
+
+    // base = A&B, condition = A&B&C -> true
+    //             condition = A&D   -> false
+    // this computes base & condition == condition
+    boolean conditionIsMoreSpecificThan(Expression condition, Expression base);
+
+    // computes or(bases) && condition == false
+    boolean conditionIsNotMoreSpecificThanAnyOf(Expression condition, Collection<Expression> bases);
+
+    // given base A&B, conditions for assignments A&B&C, A&B&!D, return A&B&(!C || D)
+    // each of the conditions MUST be more specific than the base condition
+
+    Expression complementOfConditions(List<Expression> conditions, Expression baseCondition);
+
+    boolean isNegationOf(Expression e1, Expression e2);
+
+    // return A&B given condition = A&B&C, clauseToRemove = C
+    // group of methods to deal with boolean expressions
+    Expression removeClausesFromCondition(Expression condition, Expression clauseToRemove);
+
+    // computes expression && !clauseToExclude
+    // return A&B&!C given condition A&B&C, clauseToExclude = C
+    // return false given condition A&B&C, clauseToExclude = D
+    // clauseToExclude does not need to be part of the condition, in which case we return FALSE
+    Expression complementOfClausesInCondition(Expression condition, Expression clauseToExclude);
+
+    // end of methods for boolean expressions
 
     default Expression cast(Cast cast) {
         return cast(cast.expression(), cast);

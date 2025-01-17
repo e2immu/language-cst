@@ -58,11 +58,7 @@ public class EvalAnd {
 
         // STEP 4: loop
 
-        boolean changes = complexity < maxAndOrComplexity;
-        if (!changes) {
-            LOGGER.debug("Not analysing AND operation, complexity {}", complexity);
-            return runtime.newAndBuilder().addExpressions(concat).build();
-        }
+        boolean changes = true;
 
         while (changes) {
             changes = false;
@@ -73,13 +69,32 @@ public class EvalAnd {
 
             // STEP 4b: observations
 
-            for (Expression value : concat) {
-                if (value instanceof BooleanConstant bc && !bc.constant()) {
-                    LOGGER.debug("Return FALSE in And, found FALSE");
-                    return runtime.constantFalse();
+            {
+                Iterator<Expression> it = concat.iterator();
+                Expression prev = null;
+                while (it.hasNext()) {
+                    Expression value = it.next();
+                    if (value instanceof BooleanConstant bc) {
+                        if (bc.constant()) {
+                            it.remove(); // TRUE in and...
+                        } else {
+                            LOGGER.debug("Return FALSE in And, found FALSE");
+                            return runtime.constantFalse();
+                        }
+                    } else if (value.equals(prev)) {
+                        it.remove(); // duplicates can be removed
+                    } else if (prev != null && runtime.isNegationOf(value, prev)) {
+                        return runtime.constantFalse();
+                    }
+                    prev = value;
                 }
             }
-            concat.removeIf(value -> value instanceof BooleanConstant); // TRUE can go
+
+            boolean tooComplex = complexity >= maxAndOrComplexity;
+            if (tooComplex) {
+                LOGGER.warn("Stop analysing AND operation, complexity {}", complexity);
+                break;
+            }
 
             // STEP 4c: reductions
 
@@ -131,17 +146,6 @@ public class EvalAnd {
     }
 
     private Action analyse(int pos, ArrayList<Expression> newConcat, Expression prev, Expression value) {
-        // A && A
-        if (value.equals(prev)) return Action.SKIP;
-
-        // this works because of sorting
-        // A && !A will always sit next to each other
-        Negation negatedValue;
-        if ((negatedValue = value.asInstanceOf(Negation.class)) != null && negatedValue.expression().equals(prev)) {
-            LOGGER.debug("Return FALSE in And, found direct opposite for {}", value);
-            return Action.FALSE;
-        }
-
         // A && A ? B : C --> A && B
         InlineConditional conditionalValue;
         if ((conditionalValue = value.asInstanceOf(InlineConditional.class)) != null
@@ -156,78 +160,6 @@ public class EvalAnd {
             && conditionalValue2.condition().equals(runtime.negate(value))) {
             newConcat.set(newConcat.size() - 1, conditionalValue2.ifFalse());
             return Action.ADD;
-        }
-
-        // A && (!A || ...) ==> we can remove the !A
-        // if we keep doing this, the OrValue empties out, and we are in the situation:
-        // A && !B && (!A || B) ==> each of the components of an OR occur in negative form earlier on
-        // this is the more complicated form of A && !A
-        if (value.isInstanceOf(Or.class)) {
-            List<Expression> remaining = new ArrayList<>(components(value));
-            Iterator<Expression> iterator = remaining.iterator();
-            boolean changed = false;
-            while (iterator.hasNext()) {
-                Expression value1 = iterator.next();
-                Expression negated1 = runtime.negate(value1);
-                boolean found = false;
-                for (int pos2 = 0; pos2 < newConcat.size(); pos2++) {
-                    if (pos2 != pos && negated1.equals(newConcat.get(pos2))) {
-                        found = true;
-                        break;
-                    }
-                }
-                if (found) {
-                    iterator.remove();
-                    changed = true;
-                }
-            }
-            if (changed) {
-                if (remaining.isEmpty()) {
-                    LOGGER.debug("Return FALSE in And, found opposite for {}", value);
-                    return Action.FALSE;
-                }
-                // replace
-                Expression orValue = runtime.or(remaining);
-                LOGGER.debug("Replace {} by {}, found opposite in {}", value, orValue, newConcat);
-                newConcat.add(orValue);
-                return Action.SKIP;
-            }
-        }
-
-        // the more complicated variant of A && A => A
-        // A && (A || xxx) ==> A
-        if (value.isInstanceOf(Or.class)) {
-            List<Expression> components = components(value);
-            for (Expression value1 : components) {
-                for (Expression value2 : newConcat) {
-                    if (value1.equals(value2)) {
-                        LOGGER.debug("Skipping {} in OR, already in other clause of And", value);
-                        return Action.SKIP;
-                    }
-                }
-            }
-        }
-        // A || B &&  A || !B ==> A
-        if (value.isInstanceOf(Or.class) && prev != null && prev.isInstanceOf(Or.class)) {
-            List<Expression> components = components(value);
-            List<Expression> prevComponents = components(prev);
-            List<Expression> equal = new ArrayList<>();
-            boolean ok = true;
-            for (Expression value1 : components) {
-                if (prevComponents.contains(value1)) {
-                    equal.add(value1);
-                } else if (!prevComponents.contains(runtime.negate(value1))) {
-                    // not opposite, e.g. C
-                    ok = false;
-                    break;
-                }
-            }
-            if (ok && !equal.isEmpty()) {
-                Expression orValue = runtime.or(equal);
-                newConcat.set(newConcat.size() - 1, orValue);
-                LOGGER.debug("Skipping {} in OR, simplified to {}", value, orValue);
-                return Action.SKIP;
-            }
         }
 
         // combinations with equality and inequality (GE)
@@ -276,16 +208,89 @@ public class EvalAnd {
 
         // simplification of the OrValue
 
-        Or orValue;
-        if ((orValue = value.asInstanceOf(Or.class)) != null) {
+        if (value instanceof Or orValue) {
             if (orValue.expressions().size() == 1) {
                 newConcat.add(orValue.expressions().get(0));
                 LOGGER.debug("Simplification of OR into single And clause: {}", value);
                 return Action.SKIP;
             }
+
+            // A || B &&  A || !B ==> A
+            if (prev instanceof Or) {
+                List<Expression> components = components(value);
+                List<Expression> prevComponents = components(prev);
+                List<Expression> equal = new ArrayList<>();
+                boolean ok = true;
+                for (Expression value1 : components) {
+                    if (prevComponents.contains(value1)) {
+                        equal.add(value1);
+                    } else if (!prevComponents.contains(runtime.negate(value1))) {
+                        // not opposite, e.g. C
+                        ok = false;
+                        break;
+                    }
+                }
+                if (ok && !equal.isEmpty()) {
+                    Expression newOr = runtime.or(equal);
+                    newConcat.set(newConcat.size() - 1, newOr);
+                    LOGGER.debug("Skipping {} in OR, simplified to {}", value, newOr);
+                    return Action.SKIP;
+                }
+            }
+
+            List<Expression> newOrExpressions = new ArrayList<>(orValue.expressions().size());
+            boolean change = false;
+            for (Expression e : orValue.expressions()) {
+                if (newConcat.stream().anyMatch(e::equals)) {
+                    // A && (B || A) ---> A, the whole OR construct can go
+                    return Action.SKIP;
+                }
+                if (newConcat.stream().anyMatch(f -> runtime.isNegationOf(e, f))) {
+                    // A && (B || !A || C)  --> A && (B || C)
+                    change = true; // skip this clause in the OR
+                } else {
+                    if (e instanceof And and) {
+                        // A && (B || A&&C) --> A && (B || C)
+                        Expression simplifiedAnd = simplifyAnd(newConcat, and);
+                        if (simplifiedAnd != null) {
+                            change = true;
+                            newOrExpressions.add(simplifiedAnd);
+                        } else {
+                            newOrExpressions.add(e);
+                        }
+                    } else {
+                        newOrExpressions.add(e);
+                    }
+                }
+            }
+            if (newOrExpressions.isEmpty()) {
+                return Action.FALSE; // nothing left
+            }
+            if (change) {
+                newConcat.add(runtime.or(newOrExpressions));
+                return Action.SKIP;
+            }
         }
 
         return Action.ADD;
+    }
+
+    // A && (B || A&&C) --> A && (B || C)
+    private Expression simplifyAnd(ArrayList<Expression> newConcat, And and) {
+        boolean change = false;
+        List<Expression> newAnd = new ArrayList<>(and.expressions().size());
+        for (Expression e : and.expressions()) {
+            if (newConcat.stream().anyMatch(e::equals)) {
+                change = true;
+            } else {
+                newAnd.add(e);
+            }
+        }
+        if (change) {
+            if (newAnd.isEmpty()) return runtime.constantTrue();
+            return runtime.and(newAnd);
+        }
+        return null;
     }
 
     private Action analyseEqualsEquals(Expression prev,

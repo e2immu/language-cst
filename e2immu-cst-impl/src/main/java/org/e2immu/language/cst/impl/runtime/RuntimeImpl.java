@@ -15,6 +15,7 @@ import org.e2immu.language.cst.impl.element.E2ImmuAnnotationsImpl;
 import org.e2immu.language.cst.impl.expression.eval.EvalOptions;
 import org.e2immu.language.cst.impl.info.ComputeMethodOverridesImpl;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -34,6 +35,41 @@ public class RuntimeImpl extends FactoryImpl implements Runtime {
     @Override
     public LanguageConfiguration configuration() {
         return lc;
+    }
+
+    @Override
+    public Expression removeClausesFromCondition(Expression condition, Expression clauseToRemove) {
+        return eval.removeClausesFromCondition(condition, clauseToRemove);
+    }
+
+    @Override
+    public Expression complementOfClausesInCondition(Expression condition, Expression clauseToExclude) {
+        return eval.complementOfClausesInCondition(condition, clauseToExclude);
+    }
+
+    @Override
+    public Expression complementOfConditions(List<Expression> conditions, Expression baseCondition) {
+        return eval.complementOfConditions(conditions, baseCondition);
+    }
+
+    @Override
+    public boolean conditionIsMoreSpecificThan(Expression condition, Expression baseCondition) {
+        return eval.conditionIsMoreSpecificThan(condition, baseCondition);
+    }
+
+    @Override
+    public boolean conditionIsNotMoreSpecificThanAnyOf(Expression condition, Collection<Expression> bases) {
+        return conditionIsNotMoreSpecificThanAnyOf(condition, bases);
+    }
+
+    @Override
+    public Expression combineCondition(Expression baseCondition, Expression clause) {
+        return eval.combineCondition(baseCondition, clause);
+    }
+
+    @Override
+    public boolean isNegationOf(Expression e1, Expression e2) {
+        return eval.isNegationOf(e1, e2);
     }
 
     @Override

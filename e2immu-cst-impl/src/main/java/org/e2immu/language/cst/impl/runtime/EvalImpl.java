@@ -7,6 +7,7 @@ import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.language.cst.impl.expression.eval.*;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -25,6 +26,7 @@ public class EvalImpl implements Eval {
     private final EvalUnaryOperator evalUnaryOperator;
     private final EvalRemainder evalRemainder;
     private final EvalCast evalCast;
+    private final EvalBoolean evalBoolean;
 
     public EvalImpl(Runtime runtime, EvalOptions evalOptions) {
         evalProduct = new EvalProduct(runtime);
@@ -41,6 +43,7 @@ public class EvalImpl implements Eval {
         evalUnaryOperator = new EvalUnaryOperator(runtime);
         evalRemainder = new EvalRemainder(runtime);
         evalCast = new EvalCast(runtime);
+        evalBoolean = new EvalBoolean(runtime);
     }
 
     @Override
@@ -162,5 +165,44 @@ public class EvalImpl implements Eval {
     @Override
     public Stream<Expression> expandFactors(Expression expression) {
         return evalProduct.expandFactors(expression);
+    }
+
+    @Override
+    public Expression removeClausesFromCondition(Expression expression, Expression clausesToRemove) {
+        return evalBoolean.removeClauseFromCondition(expression, clausesToRemove);
+    }
+
+    @Override
+    public Expression complementOfClausesInCondition(Expression condition, Expression clausesToExclude) {
+        return evalBoolean.complementOfClausesInCondition(condition, clausesToExclude);
+    }
+
+    @Override
+    public Expression complementOfConditions(List<Expression> conditions, Expression baseCondition) {
+        return evalBoolean.complementOfConditions(baseCondition, conditions);
+    }
+
+    @Override
+    public boolean conditionIsMoreSpecificThan(Expression condition, Expression base) {
+        return evalBoolean.isMoreSpecificThan(base, condition);
+    }
+
+    @Override
+    public Expression combineCondition(Expression baseCondition, Expression clause) {
+        return evalBoolean.combineCondition(baseCondition, clause);
+    }
+
+    @Override
+    public boolean conditionIsNotMoreSpecificThanAnyOf(Expression condition, Collection<Expression> bases) {
+        return evalBoolean.conditionIsNotMoreSpecificThanAnyOf(condition, bases);
+    }
+
+    @Override
+    public boolean isNegationOf(Expression e1, Expression e2) {
+        if(e1.parameterizedType().isBoolean()) {
+            assert e2.parameterizedType().isBoolean();
+            return evalBoolean.isNegationOf(e1, e2);
+        }
+        return e1.equals(evalNegation.eval(e2));
     }
 }
