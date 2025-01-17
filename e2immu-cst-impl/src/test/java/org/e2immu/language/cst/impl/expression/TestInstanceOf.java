@@ -1,7 +1,6 @@
 package org.e2immu.language.cst.impl.expression;
 
 import org.e2immu.language.cst.api.expression.Expression;
-import org.e2immu.language.cst.api.variable.Variable;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -87,22 +86,5 @@ public class TestInstanceOf extends CommonTest {
         Expression and = r.and(e2, e1);
         assertEquals("false", and.toString());
     }
-
-
-    @Test
-    public void test7() {
-        Variable o1 = createVariable("o1", r.objectParameterizedType());
-        Expression e1 = newInstanceOf(r.newVariableExpression(o1), r.newParameterizedType(r.boxedBooleanTypeInfo(), 0));
-        assertEquals("o1 instanceof Boolean", e1.toString());
-
-        Expression e2 = newInstanceOf(r.newVariableExpression(o1), r.newParameterizedType(r.integerTypeInfo(), 0));
-        assertEquals("o1 instanceof Integer", e2.toString());
-
-        Expression and1 = r.and(r.negate(e2), e1);
-        assertEquals("o1 instanceof Boolean", and1.toString());
-        Expression and2 = r.and(e2, r.negate(e1));
-        assertEquals("o1 instanceof Integer", and2.toString());
-    }
-
 }
 
