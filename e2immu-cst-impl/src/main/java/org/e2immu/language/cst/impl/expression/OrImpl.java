@@ -41,12 +41,14 @@ public class OrImpl extends ExpressionImpl implements Or {
         super(1 + expressions.stream().mapToInt(Expression::complexity).sum());
         this.expressions = expressions;
         this.booleanPt = booleanPt;
+        assert expressions.size() > 1;
     }
 
     public OrImpl(List<Comment> comments, Source source, ParameterizedType booleanPt, List<Expression> expressions) {
         super(comments, source, 1 + expressions.stream().mapToInt(Expression::complexity).sum());
         this.expressions = expressions;
         this.booleanPt = booleanPt;
+        assert expressions.size() > 1;
     }
 
     @Override
