@@ -4,7 +4,6 @@ import org.e2immu.language.cst.api.expression.*;
 import org.e2immu.language.cst.api.runtime.Runtime;
 import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.language.cst.impl.expression.AndImpl;
-import org.e2immu.language.cst.impl.expression.ExpressionImpl;
 import org.e2immu.language.cst.impl.expression.SumImpl;
 import org.e2immu.language.cst.impl.expression.util.AndOrSorter;
 import org.e2immu.language.cst.impl.expression.util.InequalitySolver;
@@ -36,14 +35,11 @@ public class EvalAnd {
     public Expression eval(List<Expression> values) {
 
         // STEP 1: check that all values return boolean!
-        int complexity = 0;
         for (Expression v : values) {
             assert !v.isEmpty() : "Unknown value " + v + " in And";
             assert v.parameterizedType() != null : "Null return type for " + v + " in And";
             assert v.parameterizedType().isBooleanOrBoxedBoolean() || v.parameterizedType().isUnboundTypeParameter()
                     : "Non-boolean return type for " + v + " in And: " + v.parameterizedType();
-
-            complexity += v.complexity();
         }
 
         // STEP 2: trivial reductions
@@ -89,7 +85,7 @@ public class EvalAnd {
                     prev = value;
                 }
             }
-
+            int complexity = concat.stream().mapToInt(Expression::complexity).sum();
             boolean tooComplex = complexity >= maxAndOrComplexity;
             if (tooComplex) {
                 LOGGER.warn("Stop analysing AND operation, complexity {}", complexity);

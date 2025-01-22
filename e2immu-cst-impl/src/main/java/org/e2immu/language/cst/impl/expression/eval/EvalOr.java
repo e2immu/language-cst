@@ -2,11 +2,9 @@ package org.e2immu.language.cst.impl.expression.eval;
 
 import org.e2immu.language.cst.api.expression.*;
 import org.e2immu.language.cst.api.runtime.Runtime;
-import org.e2immu.language.cst.impl.expression.ExpressionImpl;
 import org.e2immu.language.cst.impl.expression.OrImpl;
 import org.e2immu.language.cst.impl.expression.util.AndOrSorter;
 import org.e2immu.util.internal.util.IntUtil;
-import org.e2immu.util.internal.util.ListUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,7 +83,7 @@ public class EvalOr {
             int complexity = concat.stream().mapToInt(Expression::complexity).sum();
             boolean tooComplex = complexity >= maxAndOrComplexity;
             if (tooComplex) {
-                LOGGER.debug("Not analysing OR operation, complexity {}", complexity);
+                LOGGER.warn("Not analysing OR operation, complexity {}", complexity);
                 return runtime.newOrBuilder().addExpressions(concat).build();
             }
 
