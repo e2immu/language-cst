@@ -151,7 +151,8 @@ public class EvalOr {
 
 
     private R twoAnds(Expression prev, Expression value, ArrayList<Expression> newConcat) {
-        if (value instanceof And and2 && prev instanceof And and1) {
+        if (value instanceof And and2 && and2.expressions().size() == 2
+            && prev instanceof And and1 && and1.expressions().size() == 2) {
             Expression and10 = and1.expressions().get(0);
             Expression and20 = and2.expressions().get(0);
             Expression and11 = and1.expressions().get(1);
