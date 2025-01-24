@@ -183,8 +183,8 @@ public class EvalImpl implements Eval {
     }
 
     @Override
-    public boolean conditionIsMoreSpecificThan(Expression condition, Expression base) {
-        return evalBoolean.isMoreSpecificThan(base, condition);
+    public boolean conditionIsMoreSpecificThan(Expression lessSpecific, Expression moreSpecific) {
+        return evalBoolean.isMoreSpecificThan(lessSpecific, moreSpecific);
     }
 
     @Override

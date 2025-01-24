@@ -19,7 +19,7 @@ public interface Eval {
     // base = A&B, condition = A&B&C -> true
     //             condition = A&D   -> false
     // this computes base & condition == condition
-    boolean conditionIsMoreSpecificThan(Expression condition, Expression base);
+    boolean conditionIsMoreSpecificThan(Expression lessSpecific, Expression moreSpecific);
 
     // computes or(bases) && condition == false
     boolean conditionIsNotMoreSpecificThanAnyOf(Expression condition, Collection<Expression> bases);

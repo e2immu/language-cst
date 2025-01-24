@@ -31,18 +31,24 @@ public class EvalBoolean {
     }
 
     public boolean conditionIsNotMoreSpecificThanAnyOf(Expression condition, Collection<Expression> bases) {
-       return bases.stream().noneMatch(b -> isMoreSpecificThan(condition, b));
+        return bases.stream().noneMatch(b -> isMoreSpecificThan(condition, b));
     }
 
-    public boolean isMoreSpecificThan(Expression base, Expression condition) {
-        return runtime.and(base, condition).equals(condition);
+    public boolean isMoreSpecificThan(Expression lessSpecific, Expression moreSpecific) {
+        if (moreSpecific instanceof And andMore) {
+            if (lessSpecific instanceof And andLess) {
+                return andLess.expressions().stream().allMatch(l -> andMore.expressions().stream().anyMatch(l::equals));
+            }
+            return andMore.expressions().stream().anyMatch(lessSpecific::equals);
+        }
+        return runtime.and(lessSpecific, moreSpecific).equals(moreSpecific);
     }
 
     public boolean isNegationOf(Expression e1, Expression e2) {
-        if(e1 instanceof And && e2 instanceof And) {
+        if (e1 instanceof And && e2 instanceof And) {
             return false;
         }
-        if(e1 instanceof Or && e2 instanceof Or) {
+        if (e1 instanceof Or && e2 instanceof Or) {
             return false;
         }
         return e1.equals(runtime.negate(e2));
