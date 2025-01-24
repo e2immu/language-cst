@@ -122,9 +122,24 @@ public class EvalOr {
         if (prev != null) {
             R r3 = removeFromAnds(value, newConcat);
             if (r3.change) return r3;
+
+
+            R r4 = inAllClausesOfAnd(prev, value, newConcat);
+            if (r4.change) return r4;
+
+            R r5 = removeAnds(prev, value);
+            if (r5.change) return r5;
         }
         // default action
         newConcat.add(value);
+        return NO_CHANGE;
+    }
+
+    private R removeAnds(Expression prev, Expression value) {
+        // A || A&&B  -> remove A&&B
+        if (value instanceof And and && and.expressions().stream().anyMatch(prev::equals)) {
+            return CHANGE;
+        }
         return NO_CHANGE;
     }
 
@@ -149,6 +164,24 @@ public class EvalOr {
         return NO_CHANGE;
     }
 
+    // A || ((A||B)&&(A||C))
+    private R inAllClausesOfAnd(Expression prev, Expression value, ArrayList<Expression> newConcat) {
+        if (value instanceof And and) {
+            boolean inAllClauses = true;
+            for (Expression e : and.expressions()) {
+                if (!(e instanceof Or or) || or.expressions().stream().noneMatch(prev::equals)) {
+                    inAllClauses = false;
+                    break;
+                }
+            }
+            if (inAllClauses) {
+                // remove prev
+                newConcat.set(newConcat.size() - 1, value);
+                return CHANGE;
+            }
+        }
+        return NO_CHANGE;
+    }
 
     private R twoAnds(Expression prev, Expression value, ArrayList<Expression> newConcat) {
         if (value instanceof And and2 && and2.expressions().size() == 2

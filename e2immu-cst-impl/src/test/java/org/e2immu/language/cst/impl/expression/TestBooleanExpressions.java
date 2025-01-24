@@ -54,10 +54,10 @@ public class TestBooleanExpressions extends CommonTest {
         assertEquals("(a||b)&&(!a||!b)", n1AndN2.toString());
 
         Expression notA_andB = r.and(r.negate(a), b);
-        Expression bOrNotA = r.negate(notA_andB);
-        assertEquals("a||!b", bOrNotA.toString());
+        Expression notBOrA = r.negate(notA_andB);
+        assertEquals("a||!b", notBOrA.toString());
 
-        Expression n1AndN2AndN3 = r.and(n1AndN2, bOrNotA);
+        Expression n1AndN2AndN3 = r.and(n1AndN2, notBOrA);
         assertEquals("a&&!b", n1AndN2AndN3.toString());
     }
 
@@ -66,7 +66,7 @@ public class TestBooleanExpressions extends CommonTest {
         Expression aAndB = r.and(a, b);
         Expression notAandNotB = r.and(r.negate(a), r.negate(b));
         Expression aAndB_or_notAandNotB = r.or(aAndB, notAandNotB);
-        assertEquals("(a||!b)&&(!a||b)", aAndB_or_notAandNotB.toString());
+        assertEquals("a&&b||!a&&!b", aAndB_or_notAandNotB.toString());
 
         Expression not__aAndB_or_notAandNotB = r.negate(aAndB_or_notAandNotB);
         assertEquals("(a||b)&&(!a||!b)", not__aAndB_or_notAandNotB.toString());
@@ -92,7 +92,7 @@ public class TestBooleanExpressions extends CommonTest {
         Expression and = r.and(aNullOrBNotNull, aNotNullOrBNull);
         assertEquals("(null==a||null!=b)&&(null!=a||null==b)", and.toString());
         Expression notAnd = r.negate(and);
-        assertEquals("(null==a||null==b)&&(null!=a||null!=b)", notAnd.toString());
+        assertEquals("null==a&&null!=b||null!=a&&null==b", notAnd.toString());
         Expression notNotAnd = r.negate(notAnd);
         assertEquals("(null==a||null!=b)&&(null!=a||null==b)", notNotAnd.toString());
     }

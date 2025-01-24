@@ -72,9 +72,9 @@ public class TestAbstractValue extends CommonTest {
 
     @Test
     public void testExpandAndInOr() {
-        // A || (B && C)
+        // A || (B && C): as of 202501, we're not expanding anymore
         Expression v = r.or(a, r.and(b, c));
-        assertEquals("(a||b)&&(a||c)", v.toString());
+        assertEquals("a||b&&c", v.toString());
     }
 
     @Test
@@ -129,8 +129,10 @@ public class TestAbstractValue extends CommonTest {
             assertEquals(false, nullClauses.get(va));
         }
     */
-    public static final String EXPECTED = "(a||c)&&(a||d)&&(b||c)&&(b||d)";
-    public static final String EXPECTED2 = "(a||!c)&&(a||d)&&(!b||!c)&&(!b||d)";
+
+    // as of 202501, we're not expanding an or of ands.
+    public static final String EXPECTED = "a&&b||c&&d";
+    public static final String EXPECTED2 = "a&&!b||!c&&d";
 
     @Test
     public void testCNF() {

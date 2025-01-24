@@ -95,10 +95,9 @@ public class EvalAnd {
             // STEP 4c: reductions
 
             ArrayList<Expression> newConcat = new ArrayList<>(concat.size());
-            Expression prev = null;
             int pos = 0;
             for (Expression value : concat) {
-
+                Expression prev = newConcat.isEmpty() ? null : newConcat.get(newConcat.size() - 1);
                 Action action = analyse(pos, newConcat, prev, value);
                 switch (action) {
                     case FALSE:
@@ -122,8 +121,6 @@ public class EvalAnd {
                     default:
                         throw new UnsupportedOperationException();
                 }
-
-                prev = value;
                 pos++;
             }
             concat = newConcat;
