@@ -1,6 +1,7 @@
 package org.e2immu.language.cst.impl.expression.eval;
 
 import org.e2immu.language.cst.api.expression.And;
+import org.e2immu.language.cst.api.expression.BooleanConstant;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.expression.Or;
 import org.e2immu.language.cst.api.runtime.Runtime;
@@ -31,10 +32,16 @@ public class EvalBoolean {
     }
 
     public boolean conditionIsNotMoreSpecificThanAnyOf(Expression condition, Collection<Expression> bases) {
-        return bases.stream().noneMatch(b -> isMoreSpecificThan(condition, b));
+        return bases.stream().noneMatch(b -> isMoreSpecificThan(condition, b, true));
     }
 
-    public boolean isMoreSpecificThan(Expression lessSpecific, Expression moreSpecific) {
+    public boolean isMoreSpecificThan(Expression lessSpecific, Expression moreSpecific, boolean allowEquals) {
+        if (lessSpecific.equals(moreSpecific)) {
+            return allowEquals;
+        }
+        if (lessSpecific.isBoolValueTrue()) {
+            return true;
+        }
         if (moreSpecific instanceof And andMore) {
             if (lessSpecific instanceof And andLess) {
                 return andLess.expressions().stream().allMatch(l -> andMore.expressions().stream().anyMatch(l::equals));

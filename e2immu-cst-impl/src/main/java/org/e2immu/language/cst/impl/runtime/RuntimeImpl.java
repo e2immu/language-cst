@@ -53,8 +53,8 @@ public class RuntimeImpl extends FactoryImpl implements Runtime {
     }
 
     @Override
-    public boolean conditionIsMoreSpecificThan(Expression condition, Expression baseCondition) {
-        return eval.conditionIsMoreSpecificThan(condition, baseCondition);
+    public boolean conditionIsMoreSpecificThan(Expression lessSpecific, Expression moreSpecific, boolean allowEquals) {
+        return eval.conditionIsMoreSpecificThan(lessSpecific, moreSpecific, allowEquals);
     }
 
     @Override
