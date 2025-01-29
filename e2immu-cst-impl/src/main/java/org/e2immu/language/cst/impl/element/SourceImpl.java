@@ -1,6 +1,7 @@
 package org.e2immu.language.cst.impl.element;
 
 import org.e2immu.language.cst.api.element.CompilationUnit;
+import org.e2immu.language.cst.api.element.DetailedSources;
 import org.e2immu.language.cst.api.element.Element;
 import org.e2immu.language.cst.api.element.Source;
 
@@ -16,8 +17,14 @@ public class SourceImpl implements Source {
     private final short beginPos;
     private final short endLine;
     private final short endPos;
+    private final DetailedSources detailedSources;
 
     public SourceImpl(Element parent, String index, int beginLine, int beginPos, int endLine, int endPos) {
+        this(parent, index, beginLine, beginPos, endLine, endPos, null);
+    }
+
+    public SourceImpl(Element parent, String index, int beginLine, int beginPos, int endLine, int endPos,
+                      DetailedSources detailedSources) {
         this.parent = parent;
         // we internalize, because there are many repeats here ("0", "1", ...)
         this.index = index == null ? null : index.intern();
@@ -25,10 +32,22 @@ public class SourceImpl implements Source {
         this.beginPos = (short) beginPos;
         this.endLine = (short) endLine;
         this.endPos = (short) endPos;
+        this.detailedSources = detailedSources;
     }
 
     public static Source forCompiledClass(CompilationUnit compilationUnit) {
-        return new SourceImpl(compilationUnit, null, -1, -1, -1, -1);
+        return new SourceImpl(compilationUnit, null, -1, -1, -1, -1, null);
+    }
+
+    @Override
+    public DetailedSources detailedSources() {
+        return detailedSources;
+    }
+
+    @Override
+    public Source withDetailedSources(DetailedSources detailedSources) {
+        if (Objects.equals(detailedSources, this.detailedSources)) return this;
+        return new SourceImpl(parent, index, beginLine, beginPos, endLine, endPos, detailedSources);
     }
 
     @Override

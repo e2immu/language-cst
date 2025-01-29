@@ -20,6 +20,10 @@ public interface Source extends Comparable<Source> {
 
     boolean isCompiledClass();
 
+    DetailedSources detailedSources();
+
+    Source withDetailedSources(DetailedSources detailedSources);
+
     // computations: override if you need to use these frequently
 
     default Info info() {
@@ -31,13 +35,17 @@ public interface Source extends Comparable<Source> {
     }
 
     default CompilationUnit compilationUnit() {
-        if(parent() instanceof CompilationUnit cu) return cu;
+        if (parent() instanceof CompilationUnit cu) return cu;
         Info info = info();
         return info == null ? null : info.compilationUnit();
     }
 
     default String compact() {
         return beginLine() + "-" + beginPos();
+    }
+
+    default String compact2() {
+        return beginLine() + "-" + beginPos() + ":" + endLine() + "-" + endPos();
     }
 
     Source withIndex(String newIndex);

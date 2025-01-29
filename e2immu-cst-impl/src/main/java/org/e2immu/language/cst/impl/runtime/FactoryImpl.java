@@ -650,6 +650,11 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
+    public DetailedSources.Builder newDetailedSourcesBuilder() {
+        return new DetailedSourcesImpl.BuilderImpl();
+    }
+
+    @Override
     public Wildcard wildcardExtends() {
         return WildcardEnum.EXTENDS;
     }
