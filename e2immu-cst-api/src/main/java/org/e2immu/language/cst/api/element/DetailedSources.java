@@ -1,15 +1,18 @@
 package org.e2immu.language.cst.api.element;
 
-public interface DetailedSources {
-    DetailedSources layer(String layer);
+import java.util.List;
 
+public interface DetailedSources {
     Source detail(Object object);
+
+    // use for types
+    List<Source> details(Object object);
 
     interface Builder {
 
-        Builder put(Object object, Source source);
+        Builder copy();
 
-        Builder addLayer(String key, DetailedSources detailedSources);
+        Builder put(Object object, Source source);
 
         DetailedSources build();
     }

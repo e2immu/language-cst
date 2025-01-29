@@ -3,50 +3,56 @@ package org.e2immu.language.cst.impl.element;
 import org.e2immu.language.cst.api.element.DetailedSources;
 import org.e2immu.language.cst.api.element.Source;
 
-import java.util.HashMap;
-import java.util.IdentityHashMap;
-import java.util.Map;
+import java.util.*;
 
 public class DetailedSourcesImpl implements DetailedSources {
-    private final IdentityHashMap<Object, Source> identityHashMap;
-    private final Map<String, DetailedSources> layers;
+    private final IdentityHashMap<Object, Object> identityHashMap;
 
-    private DetailedSourcesImpl(IdentityHashMap<Object, Source> identityHashMap,
-                                Map<String, DetailedSources> layers) {
+    private DetailedSourcesImpl(IdentityHashMap<Object, Object> identityHashMap) {
         this.identityHashMap = identityHashMap;
-        this.layers = layers;
     }
 
     public static class BuilderImpl implements DetailedSources.Builder {
-        private IdentityHashMap<Object, Source> identityHashMap;
-        private Map<String, DetailedSources> layers;
+        private final IdentityHashMap<Object, Object> identityHashMap = new IdentityHashMap<>();
 
         @Override
-        public Builder put(Object object, Source source) {
-            if (identityHashMap == null) identityHashMap = new IdentityHashMap<>();
-            identityHashMap.put(object, source);
-            return this;
+        public Builder copy() {
+            BuilderImpl copy = new BuilderImpl();
+            copy.identityHashMap.putAll(identityHashMap);
+            return copy;
         }
 
+        @SuppressWarnings("unchecked")
         @Override
-        public Builder addLayer(String key, DetailedSources detailedSources) {
-            if (layers == null) layers = new HashMap<>();
-            layers.put(key, detailedSources);
+        public Builder put(Object object, Source source) {
+            Object current = identityHashMap.get(object);
+            if (current == null) {
+                identityHashMap.put(object, source);
+            } else if (current instanceof List list) {
+                list.add(source);
+            } else if (current instanceof Source s) {
+                List<Source> list = new ArrayList<>();
+                list.add(s);
+                list.add(source);
+                identityHashMap.put(object, list);
+            }
             return this;
         }
 
         @Override
         public DetailedSourcesImpl build() {
-            return new DetailedSourcesImpl(identityHashMap, layers);
+            return new DetailedSourcesImpl(identityHashMap);
         }
     }
 
+
+    @SuppressWarnings("unchecked")
     @Override
-    public DetailedSources layer(String layer) {
-        return layers == null ? null : layers.get(layer);
+    public List<Source> details(Object object) {
+        return (List<Source>) identityHashMap.get(object);
     }
 
     public Source detail(Object object) {
-        return identityHashMap.get(object);
+        return (Source) identityHashMap.get(object);
     }
 }
