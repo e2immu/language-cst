@@ -39,6 +39,28 @@ public class ClassExpressionImpl extends ConstantExpressionImpl<ParameterizedTyp
         this.classType = Objects.requireNonNull(classType);
     }
 
+    public static class Builder extends ElementImpl.Builder<ClassExpression.Builder> implements ClassExpression.Builder {
+        private ParameterizedType parameterizedType;
+        private ParameterizedType classType;
+
+        @Override
+        public ClassExpression.Builder setParameterizedType(ParameterizedType type) {
+            this.parameterizedType = type;
+            return this;
+        }
+
+        @Override
+        public Builder setClassType(ParameterizedType classType) {
+            this.classType = classType;
+            return this;
+        }
+
+        @Override
+        public ClassExpression build() {
+            return new ClassExpressionImpl(comments, source, parameterizedType, classType);
+        }
+    }
+
     @Override
     public Expression withSource(Source source) {
         return new ClassExpressionImpl(comments(), source, parameterizedType, classType);

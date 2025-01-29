@@ -1088,10 +1088,10 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
-    public ClassExpression newClassExpression(TypeInfo typeInfo) {
+    public ClassExpression.Builder newClassExpressionBuilder(TypeInfo typeInfo) {
         ParameterizedType pt = newParameterizedType(typeInfo, 0);
         ParameterizedType classPt = newParameterizedType(classTypeInfo(), List.of(pt));
-        return new ClassExpressionImpl(List.of(), null, pt, classPt);
+        return new ClassExpressionImpl.Builder().setParameterizedType(pt).setClassType(classPt);
     }
 
     @Override

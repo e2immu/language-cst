@@ -159,7 +159,7 @@ public interface Factory {
 
     CharConstant newChar(char c);
 
-    ClassExpression newClassExpression(TypeInfo typeInfo);
+    ClassExpression.Builder newClassExpressionBuilder(TypeInfo typeInfo);
 
     CommaExpression.Builder newCommaBuilder();
 
