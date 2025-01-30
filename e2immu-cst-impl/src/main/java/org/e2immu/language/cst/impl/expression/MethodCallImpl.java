@@ -1,5 +1,6 @@
 package org.e2immu.language.cst.impl.expression;
 
+import org.e2immu.language.cst.api.analysis.PropertyValueMap;
 import org.e2immu.language.cst.api.element.Comment;
 import org.e2immu.language.cst.api.element.Element;
 import org.e2immu.language.cst.api.element.Source;
@@ -16,6 +17,7 @@ import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.variable.DescendMode;
 import org.e2immu.language.cst.api.variable.This;
 import org.e2immu.language.cst.api.variable.Variable;
+import org.e2immu.language.cst.impl.analysis.PropertyValueMapImpl;
 import org.e2immu.language.cst.impl.element.ElementImpl;
 import org.e2immu.language.cst.impl.expression.util.ExpressionComparator;
 import org.e2immu.language.cst.impl.expression.util.PrecedenceEnum;
@@ -33,11 +35,20 @@ public class MethodCallImpl extends ExpressionImpl implements MethodCall {
     private final List<Expression> parameterExpressions;
     private final ParameterizedType concreteReturnType;
     private final String modificationTimes;
+    private final PropertyValueMap propertyValueMap;
 
     public MethodCallImpl(List<Comment> comments, Source source,
                           Expression object, boolean objectIsImplicit, MethodInfo methodInfo,
                           List<Expression> parameterExpressions, ParameterizedType concreteReturnType,
                           String modificationTimes) {
+        this(comments, source, object, objectIsImplicit, methodInfo, parameterExpressions, concreteReturnType,
+                modificationTimes, new PropertyValueMapImpl());
+    }
+
+    private MethodCallImpl(List<Comment> comments, Source source,
+                           Expression object, boolean objectIsImplicit, MethodInfo methodInfo,
+                           List<Expression> parameterExpressions, ParameterizedType concreteReturnType,
+                           String modificationTimes, PropertyValueMap propertyValueMap) {
         super(comments, source, object.complexity()
                                 + parameterExpressions.stream().mapToInt(Expression::complexity).sum());
         this.object = Objects.requireNonNull(object);
@@ -47,12 +58,13 @@ public class MethodCallImpl extends ExpressionImpl implements MethodCall {
         this.methodInfo = Objects.requireNonNull(methodInfo);
         this.modificationTimes = Objects.requireNonNull(modificationTimes);
         assert !(object instanceof TypeExpression) || methodInfo.isStatic();
+        this.propertyValueMap = propertyValueMap;
     }
 
     @Override
     public Expression withSource(Source source) {
         return new MethodCallImpl(comments(), source, object, objectIsImplicit, methodInfo, parameterExpressions,
-                concreteReturnType, modificationTimes);
+                concreteReturnType, modificationTimes, propertyValueMap);
     }
 
     public static class Builder extends ElementImpl.Builder<MethodCall.Builder> implements MethodCall.Builder {
@@ -173,13 +185,13 @@ public class MethodCallImpl extends ExpressionImpl implements MethodCall {
     @Override
     public MethodCall withParameterExpressions(List<Expression> parameterExpressions) {
         return new MethodCallImpl(comments(), source(), object, objectIsImplicit, methodInfo, parameterExpressions,
-                concreteReturnType, modificationTimes);
+                concreteReturnType, modificationTimes, propertyValueMap);
     }
 
     @Override
     public MethodCall withObject(Expression object) {
         return new MethodCallImpl(comments(), source(), object, objectIsImplicit, methodInfo, parameterExpressions,
-                concreteReturnType, modificationTimes);
+                concreteReturnType, modificationTimes, propertyValueMap);
     }
 
     @Override
@@ -331,14 +343,21 @@ public class MethodCallImpl extends ExpressionImpl implements MethodCall {
         if (translatedMethod.size() == 1 && translatedMethod.get(0) == methodInfo && translatedObject == object
             && translatedReturnType == concreteReturnType
             && translatedParameters == parameterExpressions
-            && newModificationTimes.equals(modificationTimes)) {
+            && newModificationTimes.equals(modificationTimes)
+            && (propertyValueMap.isEmpty() || !translationMap.isClearAnalysis())) {
             return this;
         }
         MethodCall translatedMc = new MethodCallImpl(comments(), source(), translatedObject, objectIsImplicit,
-                translatedMethod.get(0), translatedParameters, translatedReturnType, newModificationTimes);
+                translatedMethod.get(0), translatedParameters, translatedReturnType, newModificationTimes,
+                translationMap.isClearAnalysis() ? new PropertyValueMapImpl() : propertyValueMap);
         if (translationMap.translateAgain() && !this.equals(translatedMc)) {
             return translatedMc.translate(translationMap);
         }
         return translatedMc;
+    }
+
+    @Override
+    public PropertyValueMap analysis() {
+        return propertyValueMap;
     }
 }
