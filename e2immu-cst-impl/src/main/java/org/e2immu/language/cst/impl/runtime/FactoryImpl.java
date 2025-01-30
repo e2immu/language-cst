@@ -900,8 +900,8 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
-    public ImportStatement newImportStatement(String importString, boolean isStatic) {
-        return new ImportStatementImpl(importString, isStatic);
+    public ImportStatement.Builder newImportStatementBuilder() {
+        return new ImportStatementImpl.Builder();
     }
 
     @Override

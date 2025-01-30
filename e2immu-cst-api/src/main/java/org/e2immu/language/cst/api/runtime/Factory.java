@@ -220,7 +220,7 @@ public interface Factory {
 
     IfElseStatement.Builder newIfElseBuilder();
 
-    ImportStatement newImportStatement(String importString, boolean isStatic);
+    ImportStatement.Builder newImportStatementBuilder();
 
     InlineConditional newInlineConditional(Expression condition, Expression ifTrue, Expression ifFalse);
 

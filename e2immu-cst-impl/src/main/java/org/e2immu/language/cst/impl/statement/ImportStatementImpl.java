@@ -1,8 +1,6 @@
 package org.e2immu.language.cst.impl.statement;
 
-import org.e2immu.language.cst.api.element.Element;
-import org.e2immu.language.cst.api.element.ImportStatement;
-import org.e2immu.language.cst.api.element.Visitor;
+import org.e2immu.language.cst.api.element.*;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.statement.Block;
@@ -10,6 +8,7 @@ import org.e2immu.language.cst.api.statement.Statement;
 import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.variable.DescendMode;
 import org.e2immu.language.cst.api.variable.Variable;
+import org.e2immu.language.cst.impl.element.ElementImpl;
 import org.e2immu.language.cst.impl.output.SpaceEnum;
 import org.e2immu.language.cst.impl.output.SymbolEnum;
 import org.e2immu.language.cst.impl.output.TextImpl;
@@ -23,9 +22,32 @@ public class ImportStatementImpl extends StatementImpl implements ImportStatemen
     private final String importString;
     private final boolean isStatic;
 
-    public ImportStatementImpl(String importString, boolean isStatic) {
+    public ImportStatementImpl(List<Comment> comments, Source source, String importString, boolean isStatic) {
+        super(comments, source, List.of(), 1, null);
         this.importString = importString;
         this.isStatic = isStatic;
+    }
+
+    public static class Builder extends ElementImpl.Builder<ImportStatement.Builder> implements ImportStatement.Builder {
+        private String importString;
+        private boolean isStatic;
+
+        @Override
+        public ImportStatement build() {
+            return new ImportStatementImpl(comments, source, importString, isStatic);
+        }
+
+        @Override
+        public Builder setImport(String importString) {
+            this.importString = importString;
+            return this;
+        }
+
+        @Override
+        public Builder setIsStatic(boolean isStatic) {
+            this.isStatic = isStatic;
+            return this;
+        }
     }
 
     @Override
@@ -91,7 +113,9 @@ public class ImportStatementImpl extends StatementImpl implements ImportStatemen
     public List<Statement> translate(TranslationMap translationMap) {
         List<Statement> direct = translationMap.translateStatement(this);
         if (hasBeenTranslated(direct, this)) return direct;
-        if (translationMap.isClearAnalysis()) return List.of(new ImportStatementImpl(importString, isStatic));
+        if (translationMap.isClearAnalysis()) {
+            return List.of(new ImportStatementImpl(comments(), source(), importString, isStatic));
+        }
         return List.of(this);
     }
 
