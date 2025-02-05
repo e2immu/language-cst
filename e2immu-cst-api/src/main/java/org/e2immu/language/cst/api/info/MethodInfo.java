@@ -7,7 +7,6 @@ import org.e2immu.language.cst.api.element.CompilationUnit;
 import org.e2immu.language.cst.api.element.Source;
 import org.e2immu.language.cst.api.expression.AnnotationExpression;
 import org.e2immu.language.cst.api.expression.Expression;
-import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.statement.Block;
 import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.type.ParameterizedType;
@@ -15,6 +14,7 @@ import org.e2immu.language.cst.api.type.TypeParameter;
 import org.e2immu.language.cst.api.util.ParSeq;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 public interface MethodInfo extends Info {
 
@@ -45,6 +45,8 @@ public interface MethodInfo extends Info {
     boolean isDefault();
 
     boolean isVoid();
+
+    Stream<TypeReference> typesReferenced(boolean includeBody);
 
     boolean complexityGreaterThanCOMPLEXITY_METHOD_WITHOUT_CODE();
 
