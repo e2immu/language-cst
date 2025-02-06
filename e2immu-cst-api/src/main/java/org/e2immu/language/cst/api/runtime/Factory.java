@@ -119,11 +119,13 @@ public interface Factory {
 
     MethodInfo.MethodType methodTypeStaticMethod();
 
+    MethodInfo.MethodType methodTypeSyntheticArrayConstructor();
+
     MethodInfo.MethodType methodTypeSyntheticConstructor();
 
-    AnnotationExpression.Builder newAnnotationExpressionBuilder();
-
     And.Builder newAndBuilder();
+
+    AnnotationExpression.Builder newAnnotationExpressionBuilder();
 
     TypeInfo newAnonymousType(TypeInfo enclosingType, int index);
 
@@ -147,6 +149,8 @@ public interface Factory {
 
     BooleanConstant newBoolean(boolean value);
 
+    BooleanConstant newBoolean(List<Comment> comments, Source source, boolean value);
+
     BreakStatement.Builder newBreakBuilder();
 
     ByteConstant newByte(byte b);
@@ -159,15 +163,13 @@ public interface Factory {
 
     CharConstant newChar(char c);
 
+    CharConstant newChar(List<Comment> comments, Source source, char c);
+
     ClassExpression.Builder newClassExpressionBuilder(TypeInfo typeInfo);
 
     CommaExpression.Builder newCommaBuilder();
 
     CompilationUnit.Builder newCompilationUnitBuilder();
-
-    DetailedSources.Builder newDetailedSourcesBuilder();
-
-    Precedence precedenceOfBinaryOperator(MethodInfo op);
 
     Source newCompiledClassSource(CompilationUnit compilationUnit);
 
@@ -184,7 +186,15 @@ public interface Factory {
     // Direct access, useful for synthetic constructs. Preferably use other method.
     DependentVariable newDependentVariable(Variable arrayVariable, ParameterizedType parameterizedType, Variable indexVariable);
 
+    DependentVariable newDependentVariable(Variable arrayVariable,
+                                           ParameterizedType parameterizedType,
+                                           Expression indexExpression);
+
+    DetailedSources.Builder newDetailedSourcesBuilder();
+
     DoStatement.Builder newDoBuilder();
+
+    DoubleConstant newDouble(List<Comment> comments, Source source, double v);
 
     DoubleConstant newDouble(double d);
 
@@ -210,6 +220,8 @@ public interface Factory {
 
     FieldReference newFieldReference(FieldInfo fieldInfo, Expression scope, ParameterizedType concreteReturnType);
 
+    FloatConstant newFloat(List<Comment> comments, Source source, float v);
+
     FloatConstant newFloat(float f);
 
     ForStatement.Builder newForBuilder();
@@ -228,6 +240,8 @@ public interface Factory {
 
     InstanceOf.Builder newInstanceOfBuilder();
 
+    IntConstant newInt(List<Comment> comments, Source source, int i);
+
     IntConstant newInt(int i);
 
     Lambda.Builder newLambdaBuilder();
@@ -240,6 +254,8 @@ public interface Factory {
 
     LocalVariableCreation.Builder newLocalVariableCreationBuilder();
 
+    LongConstant newLong(List<Comment> comments, Source source, long l);
+
     LongConstant newLong(long l);
 
     MethodInfo newMethod(TypeInfo owner, String name, MethodInfo.MethodType methodType);
@@ -250,17 +266,13 @@ public interface Factory {
 
     MethodReference.Builder newMethodReferenceBuilder();
 
-    DependentVariable newDependentVariable(Variable arrayVariable,
-                                           ParameterizedType parameterizedType,
-                                           Expression indexExpression);
-
     Expression newMultiExpressions(List<Expression> newExpressions);
 
     Comment newMultilineComment(String comment);
 
-    Or.Builder newOrBuilder();
+    NullConstant newNullConstant(List<Comment> comments, Source source);
 
-    MethodInfo.MethodType methodTypeSyntheticArrayConstructor();
+    Or.Builder newOrBuilder();
 
     OutputBuilder newOutputBuilder();
 
@@ -286,6 +298,8 @@ public interface Factory {
                                          List<Expression> labels, List<Statement> statements);
 
     Expression newStringConcat(Expression l, Expression r);
+
+    StringConstant newStringConstant(List<Comment> comments, Source source, String string);
 
     StringConstant newStringConstant(String string);
 
@@ -359,33 +373,35 @@ public interface Factory {
 
     Precedence precedenceAdditive();
 
-    Precedence precedenceBitwiseAnd();
-
     Precedence precedenceArrayAccess();
 
     Precedence precedenceAssignment();
+
+    Precedence precedenceBitwiseAnd();
+
+    Precedence precedenceBitwiseOr();
+
+    Precedence precedenceBitwiseXor();
 
     Precedence precedenceBottom();
 
     Precedence precedenceEquality();
 
-    Precedence precedenceRelational();
+    Precedence precedenceLogicalAnd();
+
+    Precedence precedenceLogicalOr();
 
     Precedence precedenceMultiplicative();
 
-    Precedence precedenceBitwiseOr();
+    Precedence precedenceOfBinaryOperator(MethodInfo op);
+
+    Precedence precedenceRelational();
 
     Precedence precedenceShift();
 
     Precedence precedenceTop();
 
     Precedence precedenceUnary();
-
-    Precedence precedenceBitwiseXor();
-
-    Precedence precedenceLogicalAnd();
-
-    Precedence precedenceLogicalOr();
 
     Qualification qualificationFullyQualifiedNames();
 
