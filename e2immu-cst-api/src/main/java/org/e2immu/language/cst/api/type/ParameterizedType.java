@@ -163,6 +163,8 @@ public interface ParameterizedType {
         return typeInfo == null ? typeParameter() : typeInfo;
     }
 
+    Stream<ParameterizedType> components();
+
     Stream<Element.TypeReference> typesReferenced();
 
     Stream<Element.TypeReference> typesReferencedMadeExplicit();

@@ -139,6 +139,11 @@ public class ParameterizedTypeImpl implements ParameterizedType {
     }
 
     @Override
+    public Stream<ParameterizedType> components() {
+        return Stream.concat(Stream.of(this), parameters.stream().flatMap(ParameterizedType::components));
+    }
+
+    @Override
     public Stream<Element.TypeReference> typesReferencedMadeExplicit() {
         return typesReferenced().map(Element.TypeReference::typeInfo).filter(Objects::nonNull)
                 .map(ti -> new ElementImpl.TypeReference(ti, true));
