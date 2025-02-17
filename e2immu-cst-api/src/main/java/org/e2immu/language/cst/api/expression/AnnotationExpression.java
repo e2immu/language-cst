@@ -42,4 +42,6 @@ public interface AnnotationExpression extends Expression {
     boolean extractBoolean(String key);
 
     String extractString(String key, String defaultValue);
+
+    AnnotationExpression withKeyValuePair(String key, Expression value);
 }

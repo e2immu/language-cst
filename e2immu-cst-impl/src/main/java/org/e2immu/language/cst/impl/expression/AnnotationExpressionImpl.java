@@ -35,6 +35,12 @@ public class AnnotationExpressionImpl extends ExpressionImpl implements Annotati
     }
 
     @Override
+    public AnnotationExpression withKeyValuePair(String key, Expression value) {
+        return new AnnotationExpressionImpl(comments(), source(), typeInfo,
+                Stream.concat(Stream.of(new KVI(key, value)), keyValuePairs.stream()).toList());
+    }
+
+    @Override
     public Expression withSource(Source source) {
         return new AnnotationExpressionImpl(comments(), source, typeInfo, keyValuePairs);
     }
