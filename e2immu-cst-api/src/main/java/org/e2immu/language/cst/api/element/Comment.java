@@ -5,4 +5,6 @@ import org.e2immu.language.cst.api.output.Qualification;
 
 public interface Comment {
     OutputBuilder print(Qualification qualification);
+
+    String comment();
 }

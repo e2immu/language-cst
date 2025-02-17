@@ -37,6 +37,7 @@ public class MultiLineComment implements Comment {
         return new OutputBuilderImpl().add(joinedText);
     }
 
+    @Override
     public String comment() {
         return comment;
     }

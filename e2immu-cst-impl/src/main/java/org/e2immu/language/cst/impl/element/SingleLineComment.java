@@ -28,6 +28,7 @@ public class SingleLineComment implements Comment {
         return ob.add(SpaceEnum.NEWLINE);
     }
 
+    @Override
     public String comment() {
         return comment;
     }
