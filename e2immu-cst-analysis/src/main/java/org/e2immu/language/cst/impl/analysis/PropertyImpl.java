@@ -14,7 +14,7 @@ public class PropertyImpl implements Property {
             = new PropertyImpl("immutableTypeDeterminedByParameters");
 
     // method
-    public static final Property NON_MODIFYING_METHOD = new PropertyImpl("modifiedMethod");
+    public static final Property NON_MODIFYING_METHOD = new PropertyImpl("nonModifyingMethod");
     public static final Property MODIFIED_COMPONENTS_METHOD = new PropertyImpl("modifiedComponentsMethod",
             ValueImpl.VariableBooleanMapImpl.EMPTY);
     public static final Property FLUENT_METHOD = new PropertyImpl("fluentMethod");
@@ -48,7 +48,7 @@ public class PropertyImpl implements Property {
             ValueImpl.GetSetEquivalentImpl.EMPTY);
 
     // parameter
-    public static final Property UNMODIFIED_PARAMETER = new PropertyImpl("modifiedParameter");
+    public static final Property UNMODIFIED_PARAMETER = new PropertyImpl("unmodifiedParameter");
     public static final Property MODIFIED_FI_COMPONENTS_PARAMETER = new PropertyImpl("modifiedFunctionalInterfaceComponentsParameter",
             ValueImpl.VariableBooleanMapImpl.EMPTY);
     public static final Property MODIFIED_COMPONENTS_PARAMETER = new PropertyImpl("modifiedComponentsParameter",
@@ -67,7 +67,7 @@ public class PropertyImpl implements Property {
     public static final Property FINAL_FIELD = new PropertyImpl("finalField");
     public static final Property NOT_NULL_FIELD = new PropertyImpl("notNullField", ValueImpl.NotNullImpl.NULLABLE);
     public static final Property IGNORE_MODIFICATIONS_FIELD = new PropertyImpl("ignoreModificationsField");
-    public static final Property UNMODIFIED_FIELD = new PropertyImpl("modifiedField");
+    public static final Property UNMODIFIED_FIELD = new PropertyImpl("unmodifiedField");
     public static final Property IMMUTABLE_FIELD = new PropertyImpl("immutableField"
             , ValueImpl.ImmutableImpl.MUTABLE);
     public static final Property CONTAINER_FIELD = new PropertyImpl("containerField", ValueImpl.BoolImpl.FALSE);
