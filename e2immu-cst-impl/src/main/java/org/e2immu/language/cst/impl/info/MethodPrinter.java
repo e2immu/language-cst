@@ -155,6 +155,14 @@ public record MethodPrinter(TypeInfo typeInfo, MethodInfo methodInfo) {
 
     private OutputBuilder outputDeclaration(ParameterInfo pi, Qualification qualification) {
         OutputBuilder outputBuilder = new OutputBuilderImpl();
+        Stream<Comment> commentStream;
+        if (qualification.decorator() != null) {
+            commentStream = Stream.concat(pi.comments().stream(), qualification.decorator().comments(pi).stream());
+        } else {
+            commentStream = pi.comments().stream();
+        }
+        commentStream.forEach(c -> outputBuilder.add(c.print(qualification)));
+
         for (AnnotationExpression annotation : pi.annotations()) {
             outputBuilder.add(annotation.print(qualification));
             outputBuilder.add(SpaceEnum.ONE);

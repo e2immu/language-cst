@@ -33,20 +33,13 @@ public class ParameterInfoImpl implements ParameterInfo {
     private final MethodInfo methodInfo;
     private final ParameterizedType parameterizedType;
     private final EventuallyFinal<ParameterInspection> inspection;
-    private final List<AnnotationExpression> annotations;
-    private final Source source;
     private final PropertyValueMap analysis = new PropertyValueMapImpl();
-    private final List<Comment> comments;
 
-    public ParameterInfoImpl(MethodInfo methodInfo, int index, String name, ParameterizedType parameterizedType,
-                             List<Comment> comments, Source source, List<AnnotationExpression> annotations) {
+    public ParameterInfoImpl(MethodInfo methodInfo, int index, String name, ParameterizedType parameterizedType) {
         this.methodInfo = methodInfo;
         this.index = index;
         this.name = name;
         this.parameterizedType = parameterizedType;
-        this.source = source;
-        this.annotations = annotations;
-        this.comments = comments;
         inspection = new EventuallyFinal<>();
         inspection.setVariable(new ParameterInspectionImpl.Builder(this));
     }
@@ -151,12 +144,12 @@ public class ParameterInfoImpl implements ParameterInfo {
 
     @Override
     public List<Comment> comments() {
-        return comments;
+        return inspection.get().comments();
     }
 
     @Override
     public Source source() {
-        return source;
+        return inspection.get().source();
     }
 
     @Override
@@ -232,7 +225,7 @@ public class ParameterInfoImpl implements ParameterInfo {
 
     @Override
     public List<AnnotationExpression> annotations() {
-        return annotations;
+        return inspection.get().annotations();
     }
 
     @Override
