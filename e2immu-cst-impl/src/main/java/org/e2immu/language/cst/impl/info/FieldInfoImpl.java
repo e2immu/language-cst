@@ -337,7 +337,12 @@ public class FieldInfoImpl extends InfoImpl implements FieldInfo {
     }
 
     @Override
-    public boolean isModified() {
-        return analysis().getOrDefault(PropertyImpl.MODIFIED_FIELD, ValueImpl.BoolImpl.FALSE).isTrue();
+    public boolean isUnmodified() {
+        return analysis().getOrDefault(PropertyImpl.UNMODIFIED_FIELD, ValueImpl.BoolImpl.FALSE).isTrue();
+    }
+
+    @Override
+    public boolean isTriviallyImmutable() {
+        return type.isTriviallyImmutable();
     }
 }

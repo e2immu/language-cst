@@ -713,4 +713,9 @@ public class ParameterizedTypeImpl implements ParameterizedType {
                && ("java.util.List".equals(bestType.fullyQualifiedName()) || bestType.superTypesExcludingJavaLangObject().stream()
                 .anyMatch(ti -> "java.util.List".equals(ti.fullyQualifiedName())));
     }
+
+    @Override
+    public boolean isTriviallyImmutable() {
+        return isPrimitiveStringClass();
+    }
 }

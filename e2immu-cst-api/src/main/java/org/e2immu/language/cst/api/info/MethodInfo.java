@@ -128,11 +128,19 @@ public interface MethodInfo extends Info {
 
     // from analysis
 
-    boolean isModifying();
+    boolean isNotModifying();
 
-    boolean isFluent();
+    // depends on the method signature
+    boolean isPotentiallyFluent();
 
-    boolean isIdentity();
+    // result of analysis
+    boolean isNotFluent();
+
+    // depends on the method signature
+    boolean isPotentiallyIdentity();
+
+    // result of analysis
+    boolean isNotIdentity();
 
     boolean isStaticSideEffects();
 

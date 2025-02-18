@@ -57,6 +57,8 @@ public interface ParameterizedType {
 
     boolean isShort();
 
+    boolean isTriviallyImmutable();
+
     // Qualification: SimpleNames, vararg: false, Diamond: ShowAll
     String simpleString();
 

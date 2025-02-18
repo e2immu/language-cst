@@ -201,8 +201,8 @@ public class ParameterInfoImpl implements ParameterInfo {
     }
 
     @Override
-    public boolean isModified() {
-        return analysis.getOrDefault(PropertyImpl.MODIFIED_PARAMETER, ValueImpl.BoolImpl.FALSE).isTrue();
+    public boolean isUnmodified() {
+        return analysis.getOrDefault(PropertyImpl.UNMODIFIED_PARAMETER, ValueImpl.BoolImpl.FALSE).isTrue();
     }
 
     @Override
@@ -238,5 +238,10 @@ public class ParameterInfoImpl implements ParameterInfo {
     @Override
     public List<ParameterInfo> translate(TranslationMap translationMap) {
         throw new UnsupportedOperationException("because of the back-link, translation takes place in MethodImpl");
+    }
+
+    @Override
+    public boolean isTriviallyImmutable() {
+        return parameterizedType.isTriviallyImmutable();
     }
 }

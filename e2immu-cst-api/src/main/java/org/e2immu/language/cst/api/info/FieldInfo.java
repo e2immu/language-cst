@@ -27,7 +27,7 @@ public interface FieldInfo extends Info {
         throw new UnsupportedOperationException();
     }
 
-    boolean isModified();
+    boolean isUnmodified();
 
     String name();
 

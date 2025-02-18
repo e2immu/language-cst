@@ -38,4 +38,8 @@ public interface Info extends Element {
         void commit();
     }
 
+    /*
+    method: returnType
+     */
+    boolean isTriviallyImmutable();
 }

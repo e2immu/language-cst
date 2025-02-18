@@ -347,18 +347,28 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
     }
 
     @Override
-    public boolean isModifying() {
-        return analysis().getOrDefault(PropertyImpl.MODIFIED_METHOD, ValueImpl.BoolImpl.FALSE).isTrue();
+    public boolean isNotModifying() {
+        return analysis().getOrDefault(PropertyImpl.NON_MODIFYING_METHOD, ValueImpl.BoolImpl.FALSE).isTrue();
     }
 
     @Override
-    public boolean isFluent() {
-        return analysis().getOrDefault(PropertyImpl.FLUENT_METHOD, ValueImpl.BoolImpl.FALSE).isTrue();
+    public boolean isNotFluent() {
+        return analysis().getOrDefault(PropertyImpl.NOT_A_FLUENT_METHOD, ValueImpl.BoolImpl.FALSE).isTrue();
     }
 
     @Override
-    public boolean isIdentity() {
-        return analysis().getOrDefault(PropertyImpl.IDENTITY_METHOD, ValueImpl.BoolImpl.FALSE).isTrue();
+    public boolean isPotentiallyFluent() {
+        return returnType().equals(typeInfo.asParameterizedType());
+    }
+
+    @Override
+    public boolean isNotIdentity() {
+        return analysis().getOrDefault(PropertyImpl.NOT_AN_IDENTITY_METHOD, ValueImpl.BoolImpl.FALSE).isTrue();
+    }
+
+    @Override
+    public boolean isPotentiallyIdentity() {
+        return !parameters().isEmpty() && parameters().get(0).parameterizedType().equals(returnType());
     }
 
     @Override
@@ -623,5 +633,10 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
     @Override
     public boolean isSyntheticArrayConstructor() {
         return methodType == MethodTypeEnum.SYNTHETIC_ARRAY_CONSTRUCTOR;
+    }
+
+    @Override
+    public boolean isTriviallyImmutable() {
+        return returnType().isTriviallyImmutable();
     }
 }

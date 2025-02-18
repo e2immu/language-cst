@@ -75,6 +75,11 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     }
 
     @Override
+    public boolean isTriviallyImmutable() {
+        return isPrimitiveExcludingVoid() || "java.lang.String".equals(fullyQualifiedName) || "java.lang.Class".equals(fullyQualifiedName);
+    }
+
+    @Override
     public String packageName() {
         if (compilationUnitOrEnclosingType.isLeft()) return compilationUnitOrEnclosingType.getLeft().packageName();
         return compilationUnitOrEnclosingType.getRight().packageName();

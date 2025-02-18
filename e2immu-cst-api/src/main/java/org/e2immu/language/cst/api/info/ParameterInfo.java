@@ -31,7 +31,7 @@ public interface ParameterInfo extends Variable, Info {
 
     // from analysis
 
-    boolean isModified();
+    boolean isUnmodified();
 
     boolean isIgnoreModifications();
 
