@@ -33,6 +33,10 @@ public interface ParameterInfo extends Variable, Info {
 
     boolean isUnmodified();
 
+    default boolean isModified() {
+        return !isUnmodified();
+    }
+
     boolean isIgnoreModifications();
 
     Value.AssignedToField assignedToField();

@@ -36,6 +36,8 @@ public interface Value extends Comparable<Value> {
         boolean hasAValue();
 
         Bool or(Bool bool);
+
+        Bool and(Bool bool);
     }
 
 

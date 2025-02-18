@@ -126,21 +126,18 @@ public interface MethodInfo extends Info {
 
     boolean isStaticBlock();
 
-    // from analysis
+    default boolean isModifying() {
+        return !isNotModifying();
+    }
 
+    // result of analysis
     boolean isNotModifying();
 
-    // depends on the method signature
-    boolean isPotentiallyFluent();
+    // result of analysis
+    boolean isFluent();
 
     // result of analysis
-    boolean isNotFluent();
-
-    // depends on the method signature
-    boolean isPotentiallyIdentity();
-
-    // result of analysis
-    boolean isNotIdentity();
+    boolean isIdentity();
 
     boolean isStaticSideEffects();
 

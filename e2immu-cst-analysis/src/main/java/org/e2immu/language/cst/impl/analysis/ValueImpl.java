@@ -62,6 +62,13 @@ public abstract class ValueImpl implements Value {
         }
 
         @Override
+        public Bool and(Bool bool) {
+            if (this == NO_VALUE) return bool;
+            if (bool == NO_VALUE) return this;
+            return isTrue() && bool.isTrue() ? TRUE : FALSE;
+        }
+
+        @Override
         public boolean isTrue() {
             return value == 1;
         }

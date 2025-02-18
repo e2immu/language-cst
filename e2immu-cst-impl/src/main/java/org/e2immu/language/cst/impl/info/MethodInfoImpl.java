@@ -352,23 +352,13 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
     }
 
     @Override
-    public boolean isNotFluent() {
-        return analysis().getOrDefault(PropertyImpl.NOT_A_FLUENT_METHOD, ValueImpl.BoolImpl.FALSE).isTrue();
+    public boolean isFluent() {
+        return analysis().getOrDefault(PropertyImpl.FLUENT_METHOD, ValueImpl.BoolImpl.FALSE).isTrue();
     }
 
     @Override
-    public boolean isPotentiallyFluent() {
-        return returnType().equals(typeInfo.asParameterizedType());
-    }
-
-    @Override
-    public boolean isNotIdentity() {
-        return analysis().getOrDefault(PropertyImpl.NOT_AN_IDENTITY_METHOD, ValueImpl.BoolImpl.FALSE).isTrue();
-    }
-
-    @Override
-    public boolean isPotentiallyIdentity() {
-        return !parameters().isEmpty() && parameters().get(0).parameterizedType().equals(returnType());
+    public boolean isIdentity() {
+        return analysis().getOrDefault(PropertyImpl.IDENTITY_METHOD, ValueImpl.BoolImpl.FALSE).isTrue();
     }
 
     @Override
