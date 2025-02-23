@@ -16,12 +16,17 @@ package org.e2immu.language.cst.impl.output;
 
 import org.e2immu.language.cst.api.output.FormattingOptions;
 import org.e2immu.language.cst.api.output.element.Text;
+import org.e2immu.language.cst.api.output.element.TextBlockFormatting;
 import org.e2immu.util.internal.util.StringUtil;
 
-public record TextImpl(String text) implements Text {
+public record TextImpl(String text, TextBlockFormatting textBlockFormatting) implements Text {
 
     public TextImpl {
         assert text != null && !text.isBlank();
+    }
+
+    public TextImpl(String text) {
+        this(text, null);
     }
 
     @Override
@@ -43,4 +48,5 @@ public record TextImpl(String text) implements Text {
     public String generateJavaForDebugging() {
         return ".add(new TextImpl(" + StringUtil.quote(text) + "))";
     }
+
 }

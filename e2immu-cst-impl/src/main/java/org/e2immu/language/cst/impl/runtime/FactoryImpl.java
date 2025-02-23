@@ -9,6 +9,7 @@ import org.e2immu.language.cst.api.output.OutputElement;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.output.element.ElementarySpace;
 import org.e2immu.language.cst.api.output.element.Split;
+import org.e2immu.language.cst.api.output.element.TextBlockFormatting;
 import org.e2immu.language.cst.api.runtime.Factory;
 import org.e2immu.language.cst.api.statement.*;
 import org.e2immu.language.cst.api.statement.SwitchEntry;
@@ -1188,6 +1189,19 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     @Override
     public Wildcard wildcardSuper() {
         return WildcardEnum.SUPER;
+    }
+
+    @Override
+    public TextBlockFormatting.Builder newTextBlockFormattingBuilder() {
+        return new TextBlockFormattingImpl.Builder();
+    }
+
+    @Override
+    public TextBlock newTextBlock(List<Comment> comments,
+                                  Source source,
+                                  String content,
+                                  TextBlockFormatting textBlockFormatting) {
+        return new TextBlockImpl(comments, source, stringParameterizedType(), content, textBlockFormatting);
     }
 }
 

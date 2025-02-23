@@ -8,6 +8,7 @@ import org.e2immu.language.cst.api.output.OutputElement;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.output.element.ElementarySpace;
 import org.e2immu.language.cst.api.output.element.Split;
+import org.e2immu.language.cst.api.output.element.TextBlockFormatting;
 import org.e2immu.language.cst.api.statement.*;
 import org.e2immu.language.cst.api.statement.SwitchEntry;
 import org.e2immu.language.cst.api.translate.TranslationMap;
@@ -15,6 +16,7 @@ import org.e2immu.language.cst.api.type.*;
 import org.e2immu.language.cst.api.variable.*;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collector;
 
 public interface Factory {
@@ -318,6 +320,10 @@ public interface Factory {
     SynchronizedStatement.Builder newSynchronizedBuilder();
 
     OutputElement newText(String text);
+
+    TextBlock newTextBlock(List<Comment> comments, Source source, String content, TextBlockFormatting textBlockFormatting);
+
+    TextBlockFormatting.Builder newTextBlockFormattingBuilder();
 
     default This newThis(ParameterizedType parameterizedType) {
         return newThis(parameterizedType, null, false);

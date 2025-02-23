@@ -142,6 +142,15 @@ public class AnnotationExpressionImpl extends ExpressionImpl implements Annotati
     }
 
     @Override
+    public String[] extractStringArray(String key) {
+        return keyValuePairs.stream()
+                .filter(kv -> key.equals(kv.key()))
+                .map(kv -> ((ArrayInitializer) kv.value()).expressions().stream()
+                        .map(e -> ((StringConstant) e).constant()).toArray(String[]::new))
+                .findFirst().orElse(null);
+    }
+
+    @Override
     public String extractString(String key, String defaultValue) {
         return keyValuePairs.stream()
                 .filter(kv -> key.equals(kv.key()))
