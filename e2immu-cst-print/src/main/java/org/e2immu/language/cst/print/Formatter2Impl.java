@@ -16,16 +16,15 @@ public record Formatter2Impl(Runtime runtime, FormattingOptions options) impleme
         List<OutputElement> list = options.skipComments() ? Util.removeComments(outputBuilder.list())
                 : outputBuilder.list();
         Iterator<OutputElement> iterator = list.iterator();
-        Block block = collectElements(iterator, 0, null);
-        if (block == null) return "";
-        return block.write(options);
+        R r = collectElements(iterator, 0);
+        return r.block == null ? "" : r.block.write(options);
     }
 
     // for testing
     public String minimal(OutputBuilder outputBuilder) {
         Iterator<OutputElement> iterator = outputBuilder.list().iterator();
-        Block block = collectElements(iterator, 0, null);
-        return block == null ? "" : block.minimal();
+        R r = collectElements(iterator, 0);
+        return r.block == null ? "" : r.block.minimal();
     }
 
     record Block(int tab, List<OutputElement> elements, Guide guide) implements OutputElement {
@@ -39,15 +38,28 @@ public record Formatter2Impl(Runtime runtime, FormattingOptions options) impleme
         @Override
         public String minimal() {
             StringBuilder sb = new StringBuilder();
-            if (guide != null && guide.startWithNewLine()) sb.append("\n");
-            for (int i = 0; i < elements.size(); ++i) {
-                sb.append(" ".repeat(tab * 2));
-                String minimal = elements.get(i).minimal();
-                sb.append(minimal);
-                if (i != elements.size() - 1) sb.append("\n");
+            if (guide != null && guide.startWithNewLine()) {
+                sb.append("\n");
+                indent(sb);
             }
-            if (guide != null && guide.endWithNewLine()) sb.append("\n");
+            for (int i = 0; i < elements.size(); ++i) {
+                OutputElement element = elements.get(i);
+                if (element.isNewLine()) {
+                    indent(sb);
+                }
+                String minimal = element.minimal();
+                sb.append(minimal);
+                if (i == elements.size() - 1) sb.append("\n");
+            }
+            if (guide != null && guide.endWithNewLine()) {
+                sb.append("\n");
+                indent(sb);
+            }
             return sb.toString();
+        }
+
+        private void indent(StringBuilder sb) {
+            sb.append(" ".repeat(tab * 2));
         }
 
         @Override
@@ -61,24 +73,47 @@ public record Formatter2Impl(Runtime runtime, FormattingOptions options) impleme
         }
     }
 
-    private Block collectElements(Iterator<OutputElement> iterator, int tab, Guide guide) {
+    private record R(boolean mid, Block block) {
+    }
+
+    private R collectElements(Iterator<OutputElement> iterator, int tab) {
         List<OutputElement> elements = new ArrayList<>();
+        Guide endGuide = null;
         while (iterator.hasNext()) {
             OutputElement element = iterator.next();
             if (element instanceof Guide g) {
-                if (g.positionIsStart() || g.positionIsMid()) {
-                    Block sub = collectElements(iterator, tab + 1, g);
-                    if (sub != null) {
-                        elements.add(sub);
+                if (g.positionIsStart()) {
+                    Block block = parseBlock(iterator, tab, g);
+                    if (block != null) {
+                        elements.add(block);
                     }
-                } // else: end; we'll ignore this one
+                } else {
+                    endGuide = g;
+                    break;
+                }
             } else {
                 elements.add(element);
             }
         }
-        if (elements.isEmpty()) {
-            return null;
+        boolean mid = endGuide != null && endGuide.positionIsMid();
+        if (!elements.isEmpty()) {
+            return new R(mid, new Block(tab, List.copyOf(elements), null));
         }
-        return new Block(tab, List.copyOf(elements), guide);
+        return new R(mid, null);
+    }
+
+    private Block parseBlock(Iterator<OutputElement> iterator, int tab, Guide g) {
+        List<OutputElement> subBlocks = new ArrayList<>();
+        while (true) {
+            R r = collectElements(iterator, tab + 1);
+            if (r.block != null) {
+                subBlocks.add(r.block);
+            }
+            if (!r.mid) {
+                break;
+            }
+        }
+        if (subBlocks.isEmpty()) return null;
+        return new Block(tab, subBlocks, g);
     }
 }

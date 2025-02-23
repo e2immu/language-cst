@@ -45,7 +45,7 @@ public class TestFormatter1 {
 
     // public int method(int p1, int p2) { return p1+p2; }
     //        10|     18|            33|
-    private OutputBuilder createExample1() {
+    public static OutputBuilder createExample1() {
         GuideImpl.GuideGenerator gg = GuideImpl.generatorForParameterDeclaration();
         GuideImpl.GuideGenerator gg2 = GuideImpl.generatorForBlock();
 
@@ -154,7 +154,7 @@ public class TestFormatter1 {
                 new FormatterImpl(runtime, options).write(createExample1()));
     }
 
-    private OutputBuilder createExample2() {
+    public static OutputBuilder createExample2() {
         GuideImpl.GuideGenerator gg = GuideImpl.generatorForParameterDeclaration();
         GuideImpl.GuideGenerator gg1 = GuideImpl.generatorForBlock();
         GuideImpl.GuideGenerator gg2 = GuideImpl.defaultGuideGenerator();
