@@ -241,7 +241,7 @@ public class TestFormatter1 {
                 new FormatterImpl(runtime, options).write(createExample2()));
     }
 
-    private OutputBuilder createExample3() {
+    public static OutputBuilder createExample3() {
         GuideImpl.GuideGenerator gg = GuideImpl.generatorForBlock();
         GuideImpl.GuideGenerator gg1 = GuideImpl.generatorForBlock();
         GuideImpl.GuideGenerator gg2 = GuideImpl.generatorForBlock();

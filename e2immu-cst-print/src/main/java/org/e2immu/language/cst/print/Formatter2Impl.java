@@ -38,22 +38,16 @@ public record Formatter2Impl(Runtime runtime, FormattingOptions options) impleme
         @Override
         public String minimal() {
             StringBuilder sb = new StringBuilder();
-            if (guide != null && guide.startWithNewLine()) {
-                sb.append("\n");
-                indent(sb);
-            }
-            for (int i = 0; i < elements.size(); ++i) {
-                OutputElement element = elements.get(i);
+            sb.append("\n");
+            indent(sb);
+            for (OutputElement element : elements) {
                 if (element.isNewLine()) {
+                    sb.append('\n');
                     indent(sb);
+                } else {
+                    String minimal = element.minimal();
+                    sb.append(minimal);
                 }
-                String minimal = element.minimal();
-                sb.append(minimal);
-                if (i == elements.size() - 1) sb.append("\n");
-            }
-            if (guide != null && guide.endWithNewLine()) {
-                sb.append("\n");
-                indent(sb);
             }
             return sb.toString();
         }
