@@ -14,6 +14,8 @@ public interface OutputElement {
         return false;
     }
 
+    default boolean isSingleLineComment() { return false; }
+
     String minimal();
 
     String write(FormattingOptions options);

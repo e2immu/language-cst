@@ -12,7 +12,7 @@
  * License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.e2immu.language.cst.print;
+package org.e2immu.language.cst.print.formatter;
 
 import org.e2immu.language.cst.api.output.Formatter;
 import org.e2immu.language.cst.api.output.FormattingOptions;
@@ -20,6 +20,8 @@ import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.runtime.Runtime;
 import org.e2immu.language.cst.impl.output.*;
 import org.e2immu.language.cst.impl.runtime.RuntimeImpl;
+import org.e2immu.language.cst.print.FormatterImpl;
+import org.e2immu.language.cst.print.FormattingOptionsImpl;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

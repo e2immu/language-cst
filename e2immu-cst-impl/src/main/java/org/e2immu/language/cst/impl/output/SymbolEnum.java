@@ -127,4 +127,9 @@ public record SymbolEnum(String symbol, Space left, Space right, String constant
     public boolean isRightBlockComment() {
         return this == RIGHT_BLOCK_COMMENT;
     }
+
+    @Override
+    public boolean isSingleLineComment() {
+        return this == SINGLE_LINE_COMMENT;
+    }
 }
