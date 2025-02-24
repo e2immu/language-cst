@@ -187,20 +187,22 @@ public class BlockPrinter {
             // then, split
             for (int relativePos : splits) {
                 int pos = relativePos + start;
-                char atPos = stringBuilder.charAt(pos);
-                remainder = stringBuilder.length() - pos;
-                if (atPos == ' ') {
-                    stringBuilder.replace(pos, pos + 1, insert);
-                    start += indent;
-                } else {
-                    stringBuilder.insert(pos, insert);
-                    start += indent + 1;
+                if (pos >= 0) {
+                    char atPos = stringBuilder.charAt(pos);
+                    remainder = stringBuilder.length() - pos;
+                    if (atPos == ' ') {
+                        stringBuilder.replace(pos, pos + 1, insert);
+                        start += indent;
+                    } else if(atPos != '\n'){
+                        stringBuilder.insert(pos, insert);
+                        start += indent + 1;
+                    }
                 }
             }
             available.set(maxAvailable - (remainder + indent));
             extraLines.set(true);
         } else {
-            if (stringBuilder.charAt(stringBuilder.length() - 1) == '\n') {
+            if (!stringBuilder.isEmpty() && stringBuilder.charAt(stringBuilder.length() - 1) == '\n') {
                 stringBuilder.append(" ".repeat(indent));
                 available.set(maxAvailable - indent);
             }

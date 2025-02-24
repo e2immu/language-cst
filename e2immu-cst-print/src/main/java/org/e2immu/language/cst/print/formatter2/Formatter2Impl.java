@@ -68,7 +68,7 @@ public record Formatter2Impl(Runtime runtime, FormattingOptions options) impleme
                     indent(sb);
                 } else {
                     String minimal = element.minimal();
-                    if(minimal.startsWith("\n")) trim(sb);
+                    if (minimal.startsWith("\n")) trim(sb);
                     sb.append(minimal);
                 }
             }
@@ -92,7 +92,7 @@ public record Formatter2Impl(Runtime runtime, FormattingOptions options) impleme
         @Override
         public String write(FormattingOptions options) {
             BlockPrinter.Output output = new BlockPrinter().write(this, options);
-            return output.string().trim()+"\n";
+            return output.string().trim() + "\n";
         }
     }
 
@@ -108,7 +108,7 @@ public record Formatter2Impl(Runtime runtime, FormattingOptions options) impleme
             OutputElement element = iterator.next();
             if (element instanceof Guide g) {
                 if (g.positionIsStart()) {
-                    Block block = parseBlock(iterator, tab + 1, g);
+                    Block block = parseBlock(iterator, tab + g.tabs(), g);
                     if (block != null) {
                         elements.add(block);
                     }
