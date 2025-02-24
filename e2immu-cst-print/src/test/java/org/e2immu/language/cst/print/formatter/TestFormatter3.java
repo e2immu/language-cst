@@ -104,7 +104,7 @@ public class TestFormatter3 {
                 .add(SpaceEnum.ONE)
                 .add(new TextImpl("String"))
                 .add(SpaceEnum.ONE)
-                .add(new TextImpl("constraints"))
+                .add(new TextImpl("input"))
                 .add(gg23.end()) // priority=false, startNL=true, endNL=false
                 .add(SymbolEnum.RIGHT_PARENTHESIS)
                 .add(SymbolEnum.LEFT_BRACE)
@@ -116,7 +116,7 @@ public class TestFormatter3 {
                 .add(SymbolEnum.DOT)
                 .add(new TextImpl("of"))
                 .add(SymbolEnum.LEFT_PARENTHESIS)
-                .add(new QualifiedNameImpl("constraints"))
+                .add(new QualifiedNameImpl("input"))
                 .add(SymbolEnum.RIGHT_PARENTHESIS)
                 .add(gg25.mid()) // priority=false, startNL=false, endNL=false
                 .add(SymbolEnum.DOT)
@@ -185,8 +185,8 @@ public class TestFormatter3 {
                   public class Basics_5 {
                       @NotModified
                       @NotNull
-                      public static String add(@NotNull String constraints) {
-                          return Stream.of(constraints).map(s -> { if(s == null) { return "null"; } return s + "something"; }).findAny().get();
+                      public static String add(@NotNull String input) {
+                          return Stream.of(input).map(s -> { if(s == null) { return "null"; } return s + "something"; }).findAny().get();
                       }
                   }
                   """, formatter.write(example));
