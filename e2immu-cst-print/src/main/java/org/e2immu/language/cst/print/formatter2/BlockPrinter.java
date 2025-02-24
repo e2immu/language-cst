@@ -1,9 +1,11 @@
 package org.e2immu.language.cst.print.formatter2;
 
+import org.e2immu.language.cst.api.expression.TextBlock;
 import org.e2immu.language.cst.api.output.FormattingOptions;
 import org.e2immu.language.cst.api.output.OutputElement;
 import org.e2immu.language.cst.api.output.element.Space;
 import org.e2immu.language.cst.api.output.element.Symbol;
+import org.e2immu.language.cst.api.output.element.Text;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -118,7 +120,13 @@ public class BlockPrinter {
             while (pos - 1 >= 0 && stringBuilder.charAt(pos - 1) == ' ') --pos;
             addSplitPoint(possibleSplits, pos, spaceBefore);
         }
-        String string = element.write(options);
+        String string;
+        if (element instanceof Text tb && tb.textBlockFormatting() != null) {
+            extraLines.set(true);
+            string = WriteTextBlock.write(options.spacesInTab() * block.tab(), tb.minimal(), tb.textBlockFormatting());
+        } else {
+            string = element.write(options);
+        }
         if (string.startsWith(" ") || string.startsWith("\n")) available.addAndGet(trim(stringBuilder));
         stringBuilder.append(string);
         if (!lastElement && spaceAfter != null && !spaceAfter.split().isNever()) {
@@ -193,7 +201,7 @@ public class BlockPrinter {
                     if (atPos == ' ') {
                         stringBuilder.replace(pos, pos + 1, insert);
                         start += indent;
-                    } else if(atPos != '\n'){
+                    } else if (atPos != '\n') {
                         stringBuilder.insert(pos, insert);
                         start += indent + 1;
                     }
