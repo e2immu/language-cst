@@ -1,6 +1,5 @@
 package org.e2immu.language.cst.print.formatter2;
 
-import org.e2immu.language.cst.api.output.Formatter;
 import org.e2immu.language.cst.api.output.FormattingOptions;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.runtime.Runtime;
@@ -39,7 +38,7 @@ public class TestBlockPrinter1 {
     }
 
     @Test
-    public void test1() {
+    public void test1a() {
         OutputBuilder outputBuilder = createExample1();
         Formatter2Impl.Block block = new Formatter2Impl.Block(0, outputBuilder.list(), null);
         FormattingOptions options = new FormattingOptionsImpl.Builder().setLengthOfLine(120).setSpacesInTab(4).build();
@@ -55,7 +54,7 @@ public class TestBlockPrinter1 {
     }
 
     @Test
-    public void test2() {
+    public void test1b() {
         OutputBuilder outputBuilder = createExample1();
         Formatter2Impl.Block block = new Formatter2Impl.Block(1, outputBuilder.list(), null);
         FormattingOptions options = new FormattingOptionsImpl.Builder().setLengthOfLine(70).setSpacesInTab(4).build();
@@ -74,7 +73,7 @@ public class TestBlockPrinter1 {
 
 
     @Test
-    public void test3() {
+    public void test1c() {
         OutputBuilder outputBuilder = createExample1();
         Formatter2Impl.Block block = new Formatter2Impl.Block(1, outputBuilder.list(), null);
         FormattingOptions options = new FormattingOptionsImpl.Builder().setLengthOfLine(50).setSpacesInTab(4).build();
@@ -91,4 +90,52 @@ public class TestBlockPrinter1 {
         // note that the space between record and Record is 'ONE', which does not allow a split
         assertEquals("{3=[6]}", output.possibleSplits().toString());
     }
+
+
+    private static OutputBuilder createExample2() {
+        return new OutputBuilderImpl().add(new TextImpl("package"))
+                .add(SpaceEnum.ONE)
+                .add(new TextImpl("a.b.c"))
+                .add(SymbolEnum.SEMICOLON)
+                .add(new TextImpl("import"))
+                .add(SpaceEnum.ONE)
+                .add(new TextImpl("java.util.Set"))
+                .add(SymbolEnum.SEMICOLON)
+                .add(new TextImpl("import"))
+                .add(SpaceEnum.ONE)
+                .add(new TextImpl("java.util.List"))
+                .add(SymbolEnum.SEMICOLON)
+                .add(SpaceEnum.NEWLINE)
+                .add(SymbolEnum.SINGLE_LINE_COMMENT)
+                .add(new TextImpl("this is a comment"))
+                .add(SpaceEnum.NEWLINE)
+                .add(SymbolEnum.SINGLE_LINE_COMMENT)
+                .add(new TextImpl("this is a second comment"))
+                .add(SpaceEnum.NEWLINE)
+                .add(new TextImpl("record"))
+                .add(SpaceEnum.ONE)
+                .add(new TextImpl("Record"))
+                .add(SymbolEnum.OPEN_CLOSE_PARENTHESIS)
+                .add(SymbolEnum.LEFT_BRACE)
+                .add(SymbolEnum.RIGHT_BRACE);
+    }
+
+    @Test
+    public void test2a() {
+        OutputBuilder outputBuilder = createExample2();
+        Formatter2Impl.Block block = new Formatter2Impl.Block(1, outputBuilder.list(), null);
+        FormattingOptions options = new FormattingOptionsImpl.Builder().setLengthOfLine(120).setSpacesInTab(4).build();
+        BlockPrinter blockPrinter = new BlockPrinter();
+        BlockPrinter.Output output = blockPrinter.write(block, options);
+        String expect = """
+                package a.b.c; import java.util.Set; import java.util.List;\s
+                    //this is a comment
+                    //this is a second comment
+                    record Record() {  }\s""";
+        assertEquals(expect, output.string());
+        assertTrue(output.extraLines());
+        assertEquals(25, output.endPos());
+        assertEquals("{3=[135, 140], 4=[137, 138]}", output.possibleSplits().toString());
+    }
+
 }

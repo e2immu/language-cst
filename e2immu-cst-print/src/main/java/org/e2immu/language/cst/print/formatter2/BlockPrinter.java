@@ -7,10 +7,7 @@ import org.e2immu.language.cst.api.output.element.Symbol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
@@ -39,10 +36,10 @@ public class BlockPrinter {
 
         String string;
         if (block.guide() != null) {
-            string = handleGuideBlock(available, extraLines, possibleSplits, block, options);
-        } else {
-            string = handleElements(available, extraLines, possibleSplits, block, options);
+            return handleGuideBlock(available, extraLines, possibleSplits, block, options);
         }
+        string = handleElements(available, extraLines, possibleSplits, block, options);
+
         int endPos;
         if (extraLines.get()) {
             endPos = Util.charactersUntilNewline(string);
@@ -63,7 +60,10 @@ public class BlockPrinter {
             if (element instanceof Formatter2Impl.Block sub) {
                 Output output = write(sub, options);
                 LOGGER.debug("Recursion: received output of block: {}", output);
-
+                if(output.extraLines) {
+                    extraLines.set(true);
+                }
+                stringBuilder.append(output.string);
             } else {
                 Space spaceBefore;
                 Space space;
@@ -90,6 +90,9 @@ public class BlockPrinter {
                 if (string.endsWith("\n")) {
                     extraLines.set(true);
                     available = availableIn;
+                    possibleSplits.clear();
+                    int indent = block.tab() * options.spacesInTab();
+                    stringBuilder.append(" ".repeat(indent));
                 } else if (string.contains("\n")) {
                     extraLines.set(true);
                     available = availableIn - Util.charactersUntilNewline(string);
@@ -139,11 +142,43 @@ public class BlockPrinter {
         possibleSplits.computeIfAbsent(rank, r -> new TreeSet<>()).add(length);
     }
 
-    private String handleGuideBlock(int available,
+    private Output handleGuideBlock(int available,
                                     AtomicBoolean extraLines,
                                     TreeMap<Integer, TreeSet<Integer>> possibleSplits,
                                     Formatter2Impl.Block block,
                                     FormattingOptions options) {
+        List<Output> outputs = new ArrayList<>(block.elements().size());
+        int sum = 0;
+        boolean extraLine = false;
+        for (OutputElement element : block.elements()) {
+            if (element instanceof Formatter2Impl.Block sub) {
+                Output output = write(sub, options);
+                outputs.add(output);
+                extraLine |= output.extraLines;
+                sum += output.endPos;
+            } else throw new UnsupportedOperationException();
+        }
+        if (extraLine) {
+
+        } else {
+            if (sum < available) {
+                StringBuilder sb = new StringBuilder();
+                for (Output output : outputs) {
+                    sb.append(output.string);
+                    addToPossibleSplits(possibleSplits, output.possibleSplits, sb.length());
+                }
+                String string = sb.toString();
+                return new Output(string, false, string.length(), possibleSplits);
+            }
+        }
         throw new UnsupportedOperationException();
+    }
+
+    private static void addToPossibleSplits(TreeMap<Integer, TreeSet<Integer>> target,
+                                     TreeMap<Integer, TreeSet<Integer>> source, int length) {
+        for (Map.Entry<Integer, TreeSet<Integer>> entry : source.entrySet()) {
+            TreeSet<Integer> ts = target.computeIfAbsent(entry.getKey(), k -> new TreeSet<>());
+            entry.getValue().forEach(i -> ts.add(i + length));
+        }
     }
 }
