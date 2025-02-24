@@ -44,7 +44,7 @@ public class TestCollectElements {
                   double d){
                 
                   log(
-                \s\s
+
                     p1,
                     p2);
                   return p1+p2;}\
@@ -63,9 +63,9 @@ public class TestCollectElements {
                 try{
                 
                   if(a){
-                 \s
+
                     assert b;}else{
-                 \s
+
                     assert c;
                     exit(1);}}\
                 """;

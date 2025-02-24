@@ -30,16 +30,15 @@ public class BlockPrinter {
     }
 
     Output write(Formatter2Impl.Block block, FormattingOptions options) {
-        AtomicBoolean extraLines = new AtomicBoolean();
-        TreeMap<Integer, TreeSet<Integer>> possibleSplits = new TreeMap<>();
         int available = options.lengthOfLine() - block.tab() * options.spacesInTab();
 
         String string;
         if (block.guide() != null) {
-            return handleGuideBlock(available, extraLines, possibleSplits, block, options);
+            return handleGuideBlock(available, block, options);
         }
+        AtomicBoolean extraLines = new AtomicBoolean();
+        TreeMap<Integer, TreeSet<Integer>> possibleSplits = new TreeMap<>();
         string = handleElements(available, extraLines, possibleSplits, block, options);
-
         int endPos;
         if (extraLines.get()) {
             endPos = Util.charactersUntilNewline(string);
@@ -60,10 +59,34 @@ public class BlockPrinter {
             if (element instanceof Formatter2Impl.Block sub) {
                 Output output = write(sub, options);
                 LOGGER.debug("Recursion: received output of block: {}", output);
-                if(output.extraLines) {
+                if (output.extraLines) {
                     extraLines.set(true);
                 }
-                stringBuilder.append(output.string);
+                if (output.string.length() > available) {
+                    LOGGER.debug("We need to split, and we'll split along all '4' splits");
+                    int indent = sub.tab() * options.spacesInTab();
+                    String insert = "\n" + (" ".repeat(indent));
+                    int remainder = 0;
+                    int start = stringBuilder.length();
+                    stringBuilder.append(output.string);
+                    TreeSet<Integer> splits = output.possibleSplits.getOrDefault(4, new TreeSet<>());
+                    for (int relativePos : splits) {
+                        int pos = relativePos + start;
+                        char atPos = stringBuilder.charAt(pos);
+                        remainder = stringBuilder.length() - pos;
+                        if (atPos == ' ') {
+                            stringBuilder.replace(pos, pos + 1, insert);
+                            start += indent;
+                        } else {
+                            stringBuilder.insert(pos, insert);
+                            start += indent + 1;
+                        }
+                    }
+                    available = availableIn - remainder - indent;
+                    extraLines.set(true);
+                } else {
+                    stringBuilder.append(output.string);
+                }
             } else {
                 Space spaceBefore;
                 Space space;
@@ -143,8 +166,6 @@ public class BlockPrinter {
     }
 
     private Output handleGuideBlock(int available,
-                                    AtomicBoolean extraLines,
-                                    TreeMap<Integer, TreeSet<Integer>> possibleSplits,
                                     Formatter2Impl.Block block,
                                     FormattingOptions options) {
         List<Output> outputs = new ArrayList<>(block.elements().size());
@@ -162,23 +183,18 @@ public class BlockPrinter {
 
         } else {
             if (sum < available) {
+                TreeMap<Integer, TreeSet<Integer>> possibleSplits = new TreeMap<>();
+                TreeSet<Integer> mainSplits = new TreeSet<>();
+                possibleSplits.put(4, mainSplits);
                 StringBuilder sb = new StringBuilder();
                 for (Output output : outputs) {
+                    mainSplits.add(sb.length());
                     sb.append(output.string);
-                    addToPossibleSplits(possibleSplits, output.possibleSplits, sb.length());
                 }
                 String string = sb.toString();
                 return new Output(string, false, string.length(), possibleSplits);
             }
         }
         throw new UnsupportedOperationException();
-    }
-
-    private static void addToPossibleSplits(TreeMap<Integer, TreeSet<Integer>> target,
-                                     TreeMap<Integer, TreeSet<Integer>> source, int length) {
-        for (Map.Entry<Integer, TreeSet<Integer>> entry : source.entrySet()) {
-            TreeSet<Integer> ts = target.computeIfAbsent(entry.getKey(), k -> new TreeSet<>());
-            entry.getValue().forEach(i -> ts.add(i + length));
-        }
     }
 }

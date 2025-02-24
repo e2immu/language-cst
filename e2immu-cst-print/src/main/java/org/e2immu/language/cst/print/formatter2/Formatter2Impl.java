@@ -63,14 +63,20 @@ public record Formatter2Impl(Runtime runtime, FormattingOptions options) impleme
             indent(sb);
             for (OutputElement element : elements) {
                 if (element.isNewLine()) {
+                    trim(sb);
                     sb.append('\n');
                     indent(sb);
                 } else {
                     String minimal = element.minimal();
+                    if(minimal.startsWith("\n")) trim(sb);
                     sb.append(minimal);
                 }
             }
             return sb.toString();
+        }
+
+        private static void trim(StringBuilder sb) {
+            while (!sb.isEmpty() && sb.charAt(sb.length() - 1) == ' ') sb.deleteCharAt(sb.length() - 1);
         }
 
         private void indent(StringBuilder sb) {
@@ -102,7 +108,7 @@ public record Formatter2Impl(Runtime runtime, FormattingOptions options) impleme
             OutputElement element = iterator.next();
             if (element instanceof Guide g) {
                 if (g.positionIsStart()) {
-                    Block block = parseBlock(iterator, tab, g);
+                    Block block = parseBlock(iterator, tab + 1, g);
                     if (block != null) {
                         elements.add(block);
                     }
@@ -124,7 +130,7 @@ public record Formatter2Impl(Runtime runtime, FormattingOptions options) impleme
     private static Block parseBlock(Iterator<OutputElement> iterator, int tab, Guide g) {
         List<OutputElement> subBlocks = new ArrayList<>();
         while (true) {
-            MidBlock r = collectElements(iterator, tab + 1);
+            MidBlock r = collectElements(iterator, tab);
             if (r.block != null) {
                 subBlocks.add(r.block);
             }
