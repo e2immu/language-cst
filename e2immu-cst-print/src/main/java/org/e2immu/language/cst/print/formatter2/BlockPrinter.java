@@ -54,7 +54,7 @@ public class BlockPrinter {
         for (OutputElement element : block.elements()) {
             if (element instanceof Formatter2Impl.Block sub) {
                 Output output = write(sub, options);
-                mainSplits.add(Math.max(0, sb.length() - 1));
+                mainSplits.add(sb.length() - 1);
                 sb.append(output.string);
                 extraLine |= output.extraLines;
             } else throw new UnsupportedOperationException();

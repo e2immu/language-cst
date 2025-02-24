@@ -36,10 +36,10 @@ public class TestBlockPrinter2 {
         FormattingOptions options = new FormattingOptionsImpl.Builder().setLengthOfLine(30).setSpacesInTab(4).build();
         Formatter formatter = new Formatter2Impl(runtime, options);
         String string  = formatter.write(outputBuilder);
-        // TODO } to new line
+        // TODO ( prev line, } to new line
         String expect = """
-                public int method(
-                    int p1,
+                public int method
+                    (int p1,
                     int p2) {
                     return p1 + p2; }
                 """;
@@ -53,8 +53,8 @@ public class TestBlockPrinter2 {
         Formatter formatter = new Formatter2Impl(runtime, options);
         String string  = formatter.write(outputBuilder);
         String expect = """
-                public int method(
-                  int p1,
+                public int method
+                  (int p1,
                   int p2,
                   double somewhatLonger,
                   double d) {
