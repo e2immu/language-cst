@@ -1,4 +1,4 @@
-package org.e2immu.language.cst.print;
+package org.e2immu.language.cst.print.formatter2;
 
 import org.e2immu.language.cst.api.output.Formatter;
 import org.e2immu.language.cst.api.output.FormattingOptions;
@@ -6,25 +6,43 @@ import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.OutputElement;
 import org.e2immu.language.cst.api.output.element.Guide;
 import org.e2immu.language.cst.api.runtime.Runtime;
-import org.e2immu.language.cst.print.formatter2.Util;
 
 import java.util.*;
 
+/*
+ Block structure: fully recursive
+
+ element
+ element (last element before start)
+ block + guide
+    block (tab + 1)
+        element (first element after start)
+        element
+    block (tab + 1)
+        element (first element after first mid)
+        element
+    block (tab + 1)
+        element (first element after 2nd mid)
+        ...
+        element (last element before end)
+ element (first element after end)
+
+ */
 public record Formatter2Impl(Runtime runtime, FormattingOptions options) implements Formatter {
     @Override
     public String write(OutputBuilder outputBuilder) {
         List<OutputElement> list = options.skipComments() ? Util.removeComments(outputBuilder.list())
                 : outputBuilder.list();
         Iterator<OutputElement> iterator = list.iterator();
-        R r = collectElements(iterator, 0);
-        return r.block == null ? "" : r.block.write(options);
+        MidBlock mb = collectElements(iterator, 0);
+        return mb.block == null ? "" : mb.block.write(options);
     }
 
     // for testing
     public String minimal(OutputBuilder outputBuilder) {
         Iterator<OutputElement> iterator = outputBuilder.list().iterator();
-        R r = collectElements(iterator, 0);
-        return r.block == null ? "" : r.block.minimal();
+        MidBlock mb = collectElements(iterator, 0);
+        return mb.block == null ? "" : mb.block.minimal();
     }
 
     record Block(int tab, List<OutputElement> elements, Guide guide) implements OutputElement {
@@ -35,6 +53,9 @@ public record Formatter2Impl(Runtime runtime, FormattingOptions options) impleme
             this.guide = guide;
         }
 
+        /*
+        Extremely simple system that shows the block structure, and can therefore be used to test exactly that.
+         */
         @Override
         public String minimal() {
             StringBuilder sb = new StringBuilder();
@@ -53,7 +74,8 @@ public record Formatter2Impl(Runtime runtime, FormattingOptions options) impleme
         }
 
         private void indent(StringBuilder sb) {
-            sb.append(" ".repeat(tab * 2));
+            int count = tab * 2;
+            sb.append(" ".repeat(count));
         }
 
         @Override
@@ -63,14 +85,18 @@ public record Formatter2Impl(Runtime runtime, FormattingOptions options) impleme
 
         @Override
         public String write(FormattingOptions options) {
-            return "";
+            BlockPrinter.Constraints constraints = new BlockPrinter.Constraints(0);
+            BlockPrinter.Output output = new BlockPrinter().write(this, options, constraints);
+            return output.string();
         }
     }
 
-    private record R(boolean mid, Block block) {
+    // ------- code for collectElements ---------
+
+    private record MidBlock(boolean mid, Block block) {
     }
 
-    private R collectElements(Iterator<OutputElement> iterator, int tab) {
+    private static MidBlock collectElements(Iterator<OutputElement> iterator, int tab) {
         List<OutputElement> elements = new ArrayList<>();
         Guide endGuide = null;
         while (iterator.hasNext()) {
@@ -91,15 +117,15 @@ public record Formatter2Impl(Runtime runtime, FormattingOptions options) impleme
         }
         boolean mid = endGuide != null && endGuide.positionIsMid();
         if (!elements.isEmpty()) {
-            return new R(mid, new Block(tab, List.copyOf(elements), null));
+            return new MidBlock(mid, new Block(tab, List.copyOf(elements), null));
         }
-        return new R(mid, null);
+        return new MidBlock(mid, null);
     }
 
-    private Block parseBlock(Iterator<OutputElement> iterator, int tab, Guide g) {
+    private static Block parseBlock(Iterator<OutputElement> iterator, int tab, Guide g) {
         List<OutputElement> subBlocks = new ArrayList<>();
         while (true) {
-            R r = collectElements(iterator, tab + 1);
+            MidBlock r = collectElements(iterator, tab + 1);
             if (r.block != null) {
                 subBlocks.add(r.block);
             }

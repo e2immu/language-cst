@@ -9,6 +9,12 @@ import java.util.List;
 
 public class Util {
 
+    public static int charactersUntilNewline(String string) {
+        int nl = string.lastIndexOf('\n');
+        if (nl < 0) throw new UnsupportedOperationException();
+        return string.length() - (nl + 1);
+    }
+
     public static void indent(int spaces, Writer writer) throws IOException {
         for (int i = 0; i < spaces; i++) writer.write(" ");
     }

@@ -3,7 +3,6 @@ package org.e2immu.language.cst.print.formatter2;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.runtime.Runtime;
 import org.e2immu.language.cst.impl.runtime.RuntimeImpl;
-import org.e2immu.language.cst.print.Formatter2Impl;
 import org.e2immu.language.cst.print.FormattingOptionsImpl;
 import org.e2immu.language.cst.print.formatter.TestFormatter1;
 import org.junit.jupiter.api.Test;
