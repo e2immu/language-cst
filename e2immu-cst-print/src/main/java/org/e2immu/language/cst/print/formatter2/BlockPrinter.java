@@ -18,8 +18,9 @@ public class BlockPrinter {
      * This class's main method returns an Output object.
      * The resulting string has either already been split, or not (extraLines).
      *
-     * @param string         already indented according to options and block.tab
-     * @param extraLines     false = everything fits on one line, string.length == endPos
+     * @param string         already indented according to options and block.tab, on all lines except the first.
+     * @param extraLines     false = everything fits on one line, string.length == endPos; true = multiple lines
+     *                       were needed. all lines except the first have been indented. endPos is computed wrt the last line.
      * @param endPos         when multiple lines, this one gives the length of the last line if it makes sense to
      *                       continue there (e.g. closing """ of a text block, closing ')'). It equals 0 when a line has
      *                       been completed (e.g., end of statement, closing '}').
@@ -31,14 +32,63 @@ public class BlockPrinter {
 
     Output write(Formatter2Impl.Block block, FormattingOptions options) {
         int available = options.lengthOfLine() - block.tab() * options.spacesInTab();
-
-        String string;
         if (block.guide() != null) {
-            return handleGuideBlock(available, block, options);
+            return handleGuideBlock(block, options);
         }
+        return handleElements(available, block, options);
+    }
+
+    /*
+    The elements of a guide block are blocks themselves.
+
+     */
+    Output handleGuideBlock(Formatter2Impl.Block block, FormattingOptions options) {
+        List<Output> outputs = new ArrayList<>(block.elements().size());
+        boolean extraLine = false;
+        for (OutputElement element : block.elements()) {
+            if (element instanceof Formatter2Impl.Block sub) {
+                Output output = write(sub, options);
+                outputs.add(output);
+                extraLine |= output.extraLines;
+            } else throw new UnsupportedOperationException();
+        }
+
+        TreeMap<Integer, TreeSet<Integer>> possibleSplits = new TreeMap<>();
+        TreeSet<Integer> mainSplits = new TreeSet<>();
+        possibleSplits.put(4, mainSplits);
+        StringBuilder sb = new StringBuilder();
+        for (Output output : outputs) {
+            mainSplits.add(sb.length());
+            sb.append(output.string);
+        }
+        int endPos;
+        String string = sb.toString();
+        if (block.guide().endWithNewLine()) {
+            //mainSplits.add(string.length());
+            extraLine = true;
+            endPos = 0;
+        } else {
+            endPos = extraLine ? Util.charactersUntilNewline(string) : 0;
+        }
+        return new Output(string, extraLine, endPos, possibleSplits);
+    }
+
+    Output handleElements(int availableIn,
+                                  Formatter2Impl.Block block,
+                                  FormattingOptions options) {
         AtomicBoolean extraLines = new AtomicBoolean();
         TreeMap<Integer, TreeSet<Integer>> possibleSplits = new TreeMap<>();
-        string = handleElements(available, extraLines, possibleSplits, block, options);
+        int available = availableIn;
+        StringBuilder stringBuilder = new StringBuilder();
+        for (OutputElement element : block.elements()) {
+            if (element instanceof Formatter2Impl.Block sub) {
+                available = handleBlock(availableIn, extraLines, options, sub, available, stringBuilder);
+            } else {
+                available = handleElement(availableIn, extraLines, possibleSplits, block, options, element,
+                        stringBuilder, available);
+            }
+        }
+        String string = stringBuilder.toString();
         int endPos;
         if (extraLines.get()) {
             endPos = Util.charactersUntilNewline(string);
@@ -48,99 +98,101 @@ public class BlockPrinter {
         return new Output(string, extraLines.get(), endPos, possibleSplits);
     }
 
-    private String handleElements(int availableIn,
-                                  AtomicBoolean extraLines,
-                                  TreeMap<Integer, TreeSet<Integer>> possibleSplits,
-                                  Formatter2Impl.Block block,
-                                  FormattingOptions options) {
-        int available = availableIn;
-        StringBuilder stringBuilder = new StringBuilder();
-        for (OutputElement element : block.elements()) {
-            if (element instanceof Formatter2Impl.Block sub) {
-                Output output = write(sub, options);
-                LOGGER.debug("Recursion: received output of block: {}", output);
-                if (output.extraLines) {
-                    extraLines.set(true);
-                }
-                if (output.string.length() > available) {
-                    LOGGER.debug("We need to split, and we'll split along all '4' splits");
-                    int indent = sub.tab() * options.spacesInTab();
-                    String insert = "\n" + (" ".repeat(indent));
-                    int remainder = 0;
-                    int start = stringBuilder.length();
-                    stringBuilder.append(output.string);
-                    TreeSet<Integer> splits = output.possibleSplits.getOrDefault(4, new TreeSet<>());
-                    for (int relativePos : splits) {
-                        int pos = relativePos + start;
-                        char atPos = stringBuilder.charAt(pos);
-                        remainder = stringBuilder.length() - pos;
-                        if (atPos == ' ') {
-                            stringBuilder.replace(pos, pos + 1, insert);
-                            start += indent;
-                        } else {
-                            stringBuilder.insert(pos, insert);
-                            start += indent + 1;
-                        }
-                    }
-                    available = availableIn - remainder - indent;
-                    extraLines.set(true);
-                } else {
-                    stringBuilder.append(output.string);
-                }
-            } else {
-                Space spaceBefore;
-                Space space;
-                if (element instanceof Space s && !s.isNewLine()) {
-                    space = null;
-                    spaceBefore = s;
-                } else if (element instanceof Symbol symbol) {
-                    space = symbol.right();
-                    spaceBefore = symbol.left();
-                } else {
-                    space = null;
-                    spaceBefore = null;
-                }
-                if (spaceBefore != null && !spaceBefore.split().isNever()) {
-                    addSplitPoint(possibleSplits, stringBuilder.length(), spaceBefore);
-                }
-                String string = element.write(options);
-                stringBuilder.append(string);
-                if (space != null && !space.split().isNever()) {
-                    int pos = stringBuilder.length() - (string.endsWith(" ") ? 1 : 0);
-                    addSplitPoint(possibleSplits, pos, space);
-                }
+    int handleElement(int availableIn,
+                              AtomicBoolean extraLines,
+                              TreeMap<Integer, TreeSet<Integer>> possibleSplits,
+                              Formatter2Impl.Block block,
+                              FormattingOptions options,
+                              OutputElement element,
+                              StringBuilder stringBuilder,
+                              int available) {
+        Space spaceBefore;
+        Space space;
+        if (element instanceof Space s && !s.isNewLine()) {
+            space = null;
+            spaceBefore = s;
+        } else if (element instanceof Symbol symbol) {
+            space = symbol.right();
+            spaceBefore = symbol.left();
+        } else {
+            space = null;
+            spaceBefore = null;
+        }
+        if (spaceBefore != null && !spaceBefore.split().isNever()) {
+            addSplitPoint(possibleSplits, stringBuilder.length(), spaceBefore);
+        }
+        String string = element.write(options);
+        stringBuilder.append(string);
+        if (space != null && !space.split().isNever()) {
+            int pos = stringBuilder.length() - (string.endsWith(" ") ? 1 : 0);
+            addSplitPoint(possibleSplits, pos, space);
+        }
 
-                if (string.endsWith("\n")) {
-                    extraLines.set(true);
-                    available = availableIn;
-                    possibleSplits.clear();
-                    int indent = block.tab() * options.spacesInTab();
-                    stringBuilder.append(" ".repeat(indent));
-                } else if (string.contains("\n")) {
-                    extraLines.set(true);
-                    available = availableIn - Util.charactersUntilNewline(string);
+        if (string.endsWith("\n")) {
+            extraLines.set(true);
+            available = availableIn;
+            possibleSplits.clear();
+            int indent = block.tab() * options.spacesInTab();
+            stringBuilder.append(" ".repeat(indent));
+        } else if (string.contains("\n")) {
+            extraLines.set(true);
+            available = availableIn - Util.charactersUntilNewline(string);
+        } else {
+            available -= string.length();
+            LOGGER.debug("Appended string '{}' without newlines; available now {}", string, available);
+            if (available < 0 && !possibleSplits.isEmpty()) {
+                LOGGER.debug("We must split: we're over the bound");
+                int indent = block.tab() * options.spacesInTab();
+                int pos = updateForSplit(possibleSplits, indent);
+                String insert = "\n" + (" ".repeat(indent));
+                char atPos = stringBuilder.charAt(pos);
+                int remainder = stringBuilder.length() - pos;
+                if (atPos == ' ') {
+                    stringBuilder.replace(pos, pos + 1, insert);
                 } else {
-                    available -= string.length();
-                    LOGGER.debug("Appended string '{}' without newlines; available now {}", string, available);
-                    if (available < 0 && !possibleSplits.isEmpty()) {
-                        LOGGER.debug("We must split: we're over the bound");
-                        int indent = block.tab() * options.spacesInTab();
-                        int pos = updateForSplit(possibleSplits, indent);
-                        String insert = "\n" + (" ".repeat(indent));
-                        char atPos = stringBuilder.charAt(pos);
-                        int remainder = stringBuilder.length() - pos;
-                        if (atPos == ' ') {
-                            stringBuilder.replace(pos, pos + 1, insert);
-                        } else {
-                            stringBuilder.insert(pos, insert);
-                        }
-                        available = availableIn - remainder - indent;
-                        extraLines.set(true);
-                    }
+                    stringBuilder.insert(pos, insert);
                 }
+                available = availableIn - remainder - indent;
+                extraLines.set(true);
             }
         }
-        return stringBuilder.toString();
+        return available;
+    }
+
+    int handleBlock(int availableIn,
+                            AtomicBoolean extraLines,
+                            FormattingOptions options,
+                            Formatter2Impl.Block sub,
+                            int available,
+                            StringBuilder stringBuilder) {
+        Output output = write(sub, options);
+        LOGGER.debug("Recursion: received output of block: {}", output);
+        if (output.extraLines || output.endPos > available) {
+            LOGGER.debug("We need to split, and we'll split along all '4' splits");
+            int indent = sub.tab() * options.spacesInTab();
+            String insert = "\n" + (" ".repeat(indent));
+            int remainder = 0;
+            int start = stringBuilder.length();
+            stringBuilder.append(output.string);
+            TreeSet<Integer> splits = output.possibleSplits.getOrDefault(4, new TreeSet<>());
+            for (int relativePos : splits) {
+                int pos = relativePos + start;
+                char atPos = stringBuilder.charAt(pos);
+                remainder = stringBuilder.length() - pos;
+                if (atPos == ' ') {
+                    stringBuilder.replace(pos, pos + 1, insert);
+                    start += indent;
+                } else {
+                    stringBuilder.insert(pos, insert);
+                    start += indent + 1;
+                }
+            }
+            available = availableIn - remainder - indent;
+            extraLines.set(true);
+        } else {
+            stringBuilder.append(output.string);
+        }
+        return available;
     }
 
     private int updateForSplit(TreeMap<Integer, TreeSet<Integer>> possibleSplits, int indent) {
@@ -165,36 +217,4 @@ public class BlockPrinter {
         possibleSplits.computeIfAbsent(rank, r -> new TreeSet<>()).add(length);
     }
 
-    private Output handleGuideBlock(int available,
-                                    Formatter2Impl.Block block,
-                                    FormattingOptions options) {
-        List<Output> outputs = new ArrayList<>(block.elements().size());
-        int sum = 0;
-        boolean extraLine = false;
-        for (OutputElement element : block.elements()) {
-            if (element instanceof Formatter2Impl.Block sub) {
-                Output output = write(sub, options);
-                outputs.add(output);
-                extraLine |= output.extraLines;
-                sum += output.endPos;
-            } else throw new UnsupportedOperationException();
-        }
-        if (extraLine) {
-
-        } else {
-            if (sum < available) {
-                TreeMap<Integer, TreeSet<Integer>> possibleSplits = new TreeMap<>();
-                TreeSet<Integer> mainSplits = new TreeSet<>();
-                possibleSplits.put(4, mainSplits);
-                StringBuilder sb = new StringBuilder();
-                for (Output output : outputs) {
-                    mainSplits.add(sb.length());
-                    sb.append(output.string);
-                }
-                String string = sb.toString();
-                return new Output(string, false, string.length(), possibleSplits);
-            }
-        }
-        throw new UnsupportedOperationException();
-    }
 }

@@ -47,4 +47,17 @@ public class TestBlockPrinter2 {
                     int p2) { return p1 + p2;  }\s""";
         assertEquals(expect, string);
     }
+
+    @Test
+    public void test2a() {
+        OutputBuilder outputBuilder = TestFormatter1.createExample2();
+        FormattingOptions options = new FormattingOptionsImpl.Builder().setLengthOfLine(20).setSpacesInTab(2).build();
+        Formatter formatter = new Formatter2Impl(runtime, options);
+        String string  = formatter.write(outputBuilder);
+        String expect = """
+                public int method(
+                    int p1,\s
+                    int p2) { return p1 + p2;  }\s""";
+        assertEquals(expect, string);
+    }
 }
