@@ -7,10 +7,12 @@ import org.e2immu.language.cst.api.output.element.Symbol;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 public class BlockPrinter {
     private static final Logger LOGGER = LoggerFactory.getLogger(BlockPrinter.class);
@@ -27,12 +29,12 @@ public class BlockPrinter {
      * @param possibleSplits even if it fits on one theoretical line, we may still want to split. this map returns
      *                       the best positions to split
      */
-    record Output(String string, boolean extraLines, int endPos, TreeMap<Integer, Set<Integer>> possibleSplits) {
+    record Output(String string, boolean extraLines, int endPos, TreeMap<Integer, TreeSet<Integer>> possibleSplits) {
     }
 
     Output write(Formatter2Impl.Block block, FormattingOptions options) {
         AtomicBoolean extraLines = new AtomicBoolean();
-        TreeMap<Integer, Set<Integer>> possibleSplits = new TreeMap<>();
+        TreeMap<Integer, TreeSet<Integer>> possibleSplits = new TreeMap<>();
         int available = options.lengthOfLine() - block.tab() * options.spacesInTab();
 
         String string;
@@ -52,7 +54,7 @@ public class BlockPrinter {
 
     private String handleElements(int availableIn,
                                   AtomicBoolean extraLines,
-                                  TreeMap<Integer, Set<Integer>> possibleSplits,
+                                  TreeMap<Integer, TreeSet<Integer>> possibleSplits,
                                   Formatter2Impl.Block block,
                                   FormattingOptions options) {
         int available = availableIn;
@@ -65,9 +67,9 @@ public class BlockPrinter {
             } else {
                 Space spaceBefore;
                 Space space;
-                if (element instanceof Space s) {
-                    space = s;
-                    spaceBefore = null;
+                if (element instanceof Space s && !s.isNewLine()) {
+                    space = null;
+                    spaceBefore = s;
                 } else if (element instanceof Symbol symbol) {
                     space = symbol.right();
                     spaceBefore = symbol.left();
@@ -81,7 +83,8 @@ public class BlockPrinter {
                 String string = element.write(options);
                 stringBuilder.append(string);
                 if (space != null && !space.split().isNever()) {
-                    addSplitPoint(possibleSplits, stringBuilder.length(), space);
+                    int pos = stringBuilder.length() - (string.endsWith(" ") ? 1 : 0);
+                    addSplitPoint(possibleSplits, pos, space);
                 }
 
                 if (string.endsWith("\n")) {
@@ -93,8 +96,20 @@ public class BlockPrinter {
                 } else {
                     available -= string.length();
                     LOGGER.debug("Appended string '{}' without newlines; available now {}", string, available);
-                    if (available < 0) {
-                        LOGGER.debug("We must split: we're oven the bound");
+                    if (available < 0 && !possibleSplits.isEmpty()) {
+                        LOGGER.debug("We must split: we're over the bound");
+                        int indent = block.tab() * options.spacesInTab();
+                        int pos = updateForSplit(possibleSplits, indent);
+                        String insert = "\n" + (" ".repeat(indent));
+                        char atPos = stringBuilder.charAt(pos);
+                        int remainder = stringBuilder.length() - pos;
+                        if (atPos == ' ') {
+                            stringBuilder.replace(pos, pos + 1, insert);
+                        } else {
+                            stringBuilder.insert(pos, insert);
+                        }
+                        available = availableIn - remainder - indent;
+                        extraLines.set(true);
                     }
                 }
             }
@@ -102,13 +117,31 @@ public class BlockPrinter {
         return stringBuilder.toString();
     }
 
-    private void addSplitPoint(TreeMap<Integer, Set<Integer>> possibleSplits, int length, Space spaceBefore) {
-        LOGGER.debug("Adding split point in string builder at positio {}", length);
+    private int updateForSplit(TreeMap<Integer, TreeSet<Integer>> possibleSplits, int indent) {
+        int pos = possibleSplits.lastEntry().getValue().last();
+        Iterator<Map.Entry<Integer, TreeSet<Integer>>> iterator = possibleSplits.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<Integer, TreeSet<Integer>> entry = iterator.next();
+            TreeSet<Integer> updated = entry.getValue().stream().map(i -> i - pos).filter(i -> i > 0)
+                    .map(i -> i + indent).collect(Collectors.toCollection(TreeSet::new));
+            if (updated.isEmpty()) {
+                iterator.remove();
+            } else {
+                entry.setValue(updated);
+            }
+        }
+        return pos;
+    }
+
+    private void addSplitPoint(TreeMap<Integer, TreeSet<Integer>> possibleSplits, int length, Space space) {
+        LOGGER.debug("Adding split point in string builder at position {}", length);
+        int rank = space.split().rank();
+        possibleSplits.computeIfAbsent(rank, r -> new TreeSet<>()).add(length);
     }
 
     private String handleGuideBlock(int available,
                                     AtomicBoolean extraLines,
-                                    TreeMap<Integer, Set<Integer>> possibleSplits,
+                                    TreeMap<Integer, TreeSet<Integer>> possibleSplits,
                                     Formatter2Impl.Block block,
                                     FormattingOptions options) {
         throw new UnsupportedOperationException();
