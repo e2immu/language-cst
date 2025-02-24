@@ -70,11 +70,13 @@ public class AnnotationExpressionImpl extends ExpressionImpl implements Annotati
         OutputBuilder outputBuilder = new OutputBuilderImpl().add(TypeNameImpl.typeName(typeInfo,
                 qualification.qualifierRequired(typeInfo), true));
         if (!keyValuePairs.isEmpty()) {
+            boolean singleKvPair = keyValuePairs.size() == 1;
             outputBuilder.add(SymbolEnum.LEFT_PARENTHESIS)
                     .add(keyValuePairs.stream()
                             .map(kv ->
-                                    new OutputBuilderImpl().addIf(!kv.keyIsDefault(), new TextImpl(kv.key()))
-                                            .addIf(!kv.keyIsDefault(), SymbolEnum.assignment("="))
+                                    new OutputBuilderImpl()
+                                            .addIf(!singleKvPair || !kv.keyIsDefault(), new TextImpl(kv.key()))
+                                            .addIf(!singleKvPair || !kv.keyIsDefault(), SymbolEnum.assignment("="))
                                             .add(kv.value().print(qualification)))
                             .collect(OutputBuilderImpl.joining(SymbolEnum.COMMA)))
                     .add(SymbolEnum.RIGHT_PARENTHESIS);

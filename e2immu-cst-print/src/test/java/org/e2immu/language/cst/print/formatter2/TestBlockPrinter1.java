@@ -49,7 +49,7 @@ public class TestBlockPrinter1 {
         assertFalse(output.extraLines());
         assertEquals(80, output.endPos());
         // 14, 36, 59 = space after ; 75 = space after ); 77 = space after {
-        assertEquals("{3=[14, 36, 59, 75], 4=[77]}", output.possibleSplits().toString());
+        assertEquals("{3={14=false, 36=false, 59=false, 75=false}, 4={77=false}}", output.splitInfo().map().toString());
         Formatter2Impl formatter2 = new Formatter2Impl(runtime, options);
         assertEquals(expect + "\n", formatter2.write(outputBuilder));
     }
@@ -69,7 +69,7 @@ public class TestBlockPrinter1 {
         assertEquals(24, output.endPos());
         // the newline in expect is at position 59; indent = 4, so 'record' starts at 63
         // note that the space between record and Record is 'ONE', which does not allow a split
-        assertEquals("{3=[79], 4=[81]}", output.possibleSplits().toString());
+        assertEquals("{3={79=false}, 4={81=false}}", output.splitInfo().map().toString());
         Formatter2Impl formatter2 = new Formatter2Impl(runtime, options);
         String formatted = """
                 package a.b.c; import java.util.Set; import java.util.List;
@@ -93,7 +93,7 @@ public class TestBlockPrinter1 {
         assertEquals(expect, output.string());
         assertTrue(output.extraLines());
         assertEquals(6, output.endPos());
-        assertEquals("{}", output.possibleSplits().toString());
+        assertEquals("{}", output.splitInfo().map().toString());
     }
 
 
@@ -110,7 +110,7 @@ public class TestBlockPrinter1 {
         assertEquals(expect, output.string());
         assertTrue(output.extraLines());
         assertEquals(47, output.endPos());
-        assertEquals("{3=[63, 79], 4=[81]}", output.possibleSplits().toString());
+        assertEquals("{3={63=false, 79=false}, 4={81=false}}", output.splitInfo().map().toString());
     }
 
 
@@ -157,7 +157,7 @@ public class TestBlockPrinter1 {
         assertEquals(expect, output.string());
         assertTrue(output.extraLines());
         assertEquals(24, output.endPos());
-        assertEquals("{3=[134], 4=[136]}", output.possibleSplits().toString());
+        assertEquals("{3={134=false}, 4={136=false}}", output.splitInfo().map().toString());
     }
 
 }

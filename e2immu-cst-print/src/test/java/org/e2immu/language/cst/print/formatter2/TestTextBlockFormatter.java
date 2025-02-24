@@ -102,7 +102,7 @@ public class TestTextBlockFormatter {
         FormattingOptions options = new FormattingOptionsImpl.Builder().setLengthOfLine(80).setSpacesInTab(4).build();
         Formatter formatter = new Formatter2Impl(runtime, options);
         String out = formatter.write(outputBuilder);
-        // TODO }
+
         @Language("java")
         String expect = """
                 package a.b.c;
