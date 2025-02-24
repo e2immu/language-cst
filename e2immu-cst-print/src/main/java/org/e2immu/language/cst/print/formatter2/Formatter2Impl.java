@@ -85,8 +85,7 @@ public record Formatter2Impl(Runtime runtime, FormattingOptions options) impleme
 
         @Override
         public String write(FormattingOptions options) {
-            BlockPrinter.Constraints constraints = new BlockPrinter.Constraints(0);
-            BlockPrinter.Output output = new BlockPrinter().write(this, options, constraints);
+            BlockPrinter.Output output = new BlockPrinter().write(this, options);
             return output.string();
         }
     }

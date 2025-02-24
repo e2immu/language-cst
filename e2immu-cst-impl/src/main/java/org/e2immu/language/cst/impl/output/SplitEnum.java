@@ -39,4 +39,9 @@ public enum SplitEnum implements Split {
     public Split easiest(Split split) {
         return split.rank() > this.rank ? split : this;
     }
+
+    @Override
+    public boolean isNever() {
+        return rank == 0;
+    }
 }
