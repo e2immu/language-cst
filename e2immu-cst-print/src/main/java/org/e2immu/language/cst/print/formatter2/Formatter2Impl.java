@@ -92,7 +92,7 @@ public record Formatter2Impl(Runtime runtime, FormattingOptions options) impleme
         @Override
         public String write(FormattingOptions options) {
             BlockPrinter.Output output = new BlockPrinter().write(this, options);
-            return output.string();
+            return output.string().trim()+"\n";
         }
     }
 

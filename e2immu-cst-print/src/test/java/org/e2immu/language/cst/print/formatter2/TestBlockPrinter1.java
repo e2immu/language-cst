@@ -44,13 +44,14 @@ public class TestBlockPrinter1 {
         FormattingOptions options = new FormattingOptionsImpl.Builder().setLengthOfLine(120).setSpacesInTab(4).build();
         BlockPrinter blockPrinter = new BlockPrinter();
         BlockPrinter.Output output = blockPrinter.write(block, options);
-        String expect = "package a.b.c; import java.util.Set; import java.util.List; record Record() {  } ";
-        assertEquals(expect, output.string());
+        String expect = "package a.b.c; import java.util.Set; import java.util.List; record Record() { }";
+        assertEquals(expect + " ", output.string());
         assertFalse(output.extraLines());
-        assertEquals(81, output.endPos());
+        assertEquals(80, output.endPos());
+        // 14, 36, 59 = space after ; 75 = space after ); 77 = space after {
         assertEquals("{3=[14, 36, 59, 75], 4=[77]}", output.possibleSplits().toString());
         Formatter2Impl formatter2 = new Formatter2Impl(runtime, options);
-        assertEquals(expect, formatter2.write(outputBuilder));
+        assertEquals(expect + "\n", formatter2.write(outputBuilder));
     }
 
     @Test
@@ -62,13 +63,19 @@ public class TestBlockPrinter1 {
         BlockPrinter.Output output = blockPrinter.write(block, options);
         String expect = """
                 package a.b.c; import java.util.Set; import java.util.List;
-                    record Record() {  }\s""";
+                    record Record() { }\s""";
         assertEquals(expect, output.string());
         assertTrue(output.extraLines());
-        assertEquals(25, output.endPos());
+        assertEquals(24, output.endPos());
         // the newline in expect is at position 59; indent = 4, so 'record' starts at 63
         // note that the space between record and Record is 'ONE', which does not allow a split
-        assertEquals("{3=[79, 84], 4=[81, 82]}", output.possibleSplits().toString());
+        assertEquals("{3=[79], 4=[81]}", output.possibleSplits().toString());
+        Formatter2Impl formatter2 = new Formatter2Impl(runtime, options);
+        String formatted = """
+                package a.b.c; import java.util.Set; import java.util.List;
+                record Record() { }
+                """;
+        assertEquals(formatted, formatter2.write(outputBuilder));
     }
 
 
@@ -81,14 +88,29 @@ public class TestBlockPrinter1 {
         BlockPrinter.Output output = blockPrinter.write(block, options);
         String expect = """
                 package a.b.c; import java.util.Set;
-                    import java.util.List; record Record() {\s
+                    import java.util.List; record Record() {
                     }\s""";
         assertEquals(expect, output.string());
         assertTrue(output.extraLines());
         assertEquals(6, output.endPos());
-        // the newline in expect is at position 59; indent = 4, so 'record' starts at 63
-        // note that the space between record and Record is 'ONE', which does not allow a split
-        assertEquals("{3=[6]}", output.possibleSplits().toString());
+        assertEquals("{}", output.possibleSplits().toString());
+    }
+
+
+    @Test
+    public void test1d() {
+        OutputBuilder outputBuilder = createExample1();
+        Formatter2Impl.Block block = new Formatter2Impl.Block(1, outputBuilder.list(), null);
+        FormattingOptions options = new FormattingOptionsImpl.Builder().setLengthOfLine(55).setSpacesInTab(4).build();
+        BlockPrinter blockPrinter = new BlockPrinter();
+        BlockPrinter.Output output = blockPrinter.write(block, options);
+        String expect = """
+                package a.b.c; import java.util.Set;
+                    import java.util.List; record Record() { }\s""";
+        assertEquals(expect, output.string());
+        assertTrue(output.extraLines());
+        assertEquals(47, output.endPos());
+        assertEquals("{3=[63, 79], 4=[81]}", output.possibleSplits().toString());
     }
 
 
@@ -128,14 +150,14 @@ public class TestBlockPrinter1 {
         BlockPrinter blockPrinter = new BlockPrinter();
         BlockPrinter.Output output = blockPrinter.write(block, options);
         String expect = """
-                package a.b.c; import java.util.Set; import java.util.List;\s
+                package a.b.c; import java.util.Set; import java.util.List;
                     //this is a comment
                     //this is a second comment
-                    record Record() {  }\s""";
+                    record Record() { }\s""";
         assertEquals(expect, output.string());
         assertTrue(output.extraLines());
-        assertEquals(25, output.endPos());
-        assertEquals("{3=[135, 140], 4=[137, 138]}", output.possibleSplits().toString());
+        assertEquals(24, output.endPos());
+        assertEquals("{3=[134], 4=[136]}", output.possibleSplits().toString());
     }
 
 }

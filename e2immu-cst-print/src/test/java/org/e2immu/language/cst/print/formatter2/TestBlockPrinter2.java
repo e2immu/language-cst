@@ -21,31 +21,28 @@ public class TestBlockPrinter2 {
         FormattingOptions options = new FormattingOptionsImpl.Builder().setLengthOfLine(70).setSpacesInTab(4).build();
         BlockPrinter blockPrinter = new BlockPrinter();
         BlockPrinter.Output output = blockPrinter.write(block, options);
-        String expect = "public int method(int p1, int p2) { return p1 + p2;  } ";
+        String expect = "public int method(int p1, int p2) { return p1 + p2; } ";
         assertEquals(expect, output.string());
+
+        Formatter formatter = new Formatter2Impl(runtime, options);
+        String string  = formatter.write(outputBuilder);
+        String formatted = "public int method(int p1, int p2) { return p1 + p2; }\n";
+        assertEquals(formatted, string);
     }
 
     @Test
     public void test1b() {
         OutputBuilder outputBuilder = TestFormatter1.createExample1();
-        FormattingOptions options = new FormattingOptionsImpl.Builder().setLengthOfLine(70).setSpacesInTab(4).build();
-        Formatter formatter = new Formatter2Impl(runtime, options);
-        String string  = formatter.write(outputBuilder);
-        String expect = "public int method(int p1, int p2) { return p1 + p2;  } ";
-        assertEquals(expect, string);
-    }
-
-    @Test
-    public void test1c() {
-        OutputBuilder outputBuilder = TestFormatter1.createExample1();
         FormattingOptions options = new FormattingOptionsImpl.Builder().setLengthOfLine(30).setSpacesInTab(4).build();
         Formatter formatter = new Formatter2Impl(runtime, options);
         String string  = formatter.write(outputBuilder);
+        // TODO } to new line
         String expect = """
                 public int method(
                     int p1,
-                    int p2) {\s
-                    return p1 + p2;  }\s""";
+                    int p2) {
+                    return p1 + p2; }
+                """;
         assertEquals(expect, string);
     }
 
@@ -60,10 +57,11 @@ public class TestBlockPrinter2 {
                   int p1,
                   int p2,
                   double somewhatLonger,
-                  double d) {\s
+                  double d) {
                   log(p1, p2);
-                  return p1 + p2;\s
-                }\s""";
+                  return p1 + p2;
+                }
+                """;
         assertEquals(expect, string);
     }
 }
