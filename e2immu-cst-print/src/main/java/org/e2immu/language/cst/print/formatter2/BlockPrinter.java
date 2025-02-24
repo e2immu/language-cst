@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 public class BlockPrinter {
@@ -21,13 +22,13 @@ public class BlockPrinter {
      * @param string         already indented according to options and block.tab, on all lines except the first.
      * @param extraLines     false = everything fits on one line, string.length == endPos; true = multiple lines
      *                       were needed. all lines except the first have been indented. endPos is computed wrt the last line.
-     * @param endPos         when multiple lines, this one gives the length of the last line if it makes sense to
-     *                       continue there (e.g. closing """ of a text block, closing ')'). It equals 0 when a line has
-     *                       been completed (e.g., end of statement, closing '}').
      * @param possibleSplits even if it fits on one theoretical line, we may still want to split. this map returns
      *                       the best positions to split
      */
-    record Output(String string, boolean extraLines, int endPos, TreeMap<Integer, TreeSet<Integer>> possibleSplits) {
+    record Output(String string, boolean extraLines, TreeMap<Integer, TreeSet<Integer>> possibleSplits) {
+        int endPos() {
+            return extraLines ? Util.charactersUntilNewline(string) : string.length();
+        }
     }
 
     Output write(Formatter2Impl.Block block, FormattingOptions options) {
@@ -40,72 +41,65 @@ public class BlockPrinter {
 
     /*
     The elements of a guide block are blocks themselves.
-
+    This method does not carry out line splitting, it simply marks possible split positions at the beginning, and at
+    the mid positions of the guide. It forwards the 'extraLine' boolean, and computes an 'endPos'.
      */
     Output handleGuideBlock(Formatter2Impl.Block block, FormattingOptions options) {
-        List<Output> outputs = new ArrayList<>(block.elements().size());
-        boolean extraLine = false;
-        for (OutputElement element : block.elements()) {
-            if (element instanceof Formatter2Impl.Block sub) {
-                Output output = write(sub, options);
-                outputs.add(output);
-                extraLine |= output.extraLines;
-            } else throw new UnsupportedOperationException();
-        }
-
         TreeMap<Integer, TreeSet<Integer>> possibleSplits = new TreeMap<>();
         TreeSet<Integer> mainSplits = new TreeSet<>();
         possibleSplits.put(4, mainSplits);
         StringBuilder sb = new StringBuilder();
-        for (Output output : outputs) {
-            mainSplits.add(sb.length());
-            sb.append(output.string);
-        }
-        int endPos;
-        String string = sb.toString();
-        if (block.guide().endWithNewLine()) {
-            //mainSplits.add(string.length());
-            extraLine = true;
-            endPos = 0;
-        } else {
-            endPos = extraLine ? Util.charactersUntilNewline(string) : 0;
-        }
-        return new Output(string, extraLine, endPos, possibleSplits);
-    }
 
-    Output handleElements(int availableIn,
-                                  Formatter2Impl.Block block,
-                                  FormattingOptions options) {
-        AtomicBoolean extraLines = new AtomicBoolean();
-        TreeMap<Integer, TreeSet<Integer>> possibleSplits = new TreeMap<>();
-        int available = availableIn;
-        StringBuilder stringBuilder = new StringBuilder();
+        boolean extraLine = false;
         for (OutputElement element : block.elements()) {
             if (element instanceof Formatter2Impl.Block sub) {
-                available = handleBlock(availableIn, extraLines, options, sub, available, stringBuilder);
-            } else {
-                available = handleElement(availableIn, extraLines, possibleSplits, block, options, element,
-                        stringBuilder, available);
-            }
+                Output output = write(sub, options);
+                mainSplits.add(Math.max(0, sb.length() - 1));
+                sb.append(output.string);
+                extraLine |= output.extraLines;
+            } else throw new UnsupportedOperationException();
         }
-        String string = stringBuilder.toString();
-        int endPos;
-        if (extraLines.get()) {
-            endPos = Util.charactersUntilNewline(string);
-        } else {
-            endPos = string.length();
-        }
-        return new Output(string, extraLines.get(), endPos, possibleSplits);
+
+        String string = sb.toString();
+        return new Output(string, extraLine, possibleSplits);
     }
 
-    int handleElement(int availableIn,
-                              AtomicBoolean extraLines,
-                              TreeMap<Integer, TreeSet<Integer>> possibleSplits,
-                              Formatter2Impl.Block block,
-                              FormattingOptions options,
-                              OutputElement element,
-                              StringBuilder stringBuilder,
-                              int available) {
+    /*
+    The elements of a normal block are either guide blocks, or non-block (normal) output elements.
+     */
+    Output handleElements(int availableIn,
+                          Formatter2Impl.Block block,
+                          FormattingOptions options) {
+        AtomicBoolean extraLines = new AtomicBoolean();
+        TreeMap<Integer, TreeSet<Integer>> possibleSplits = new TreeMap<>();
+        AtomicInteger available = new AtomicInteger(availableIn);
+        StringBuilder sb = new StringBuilder();
+        int i = 0;
+        int n = block.elements().size();
+        for (OutputElement element : block.elements()) {
+            if (element instanceof Formatter2Impl.Block sub) {
+                handleBlock(available, extraLines, options, sub, sb);
+            } else {
+                boolean lastElement = i == n - 1;
+                handleElement(available, extraLines, possibleSplits, block, options, element, sb, lastElement);
+            }
+            ++i;
+        }
+        String string = sb.toString();
+        return new Output(string, extraLines.get(), possibleSplits);
+    }
+
+    /*
+    The method does not add split points for spaces as the last element.
+     */
+    void handleElement(AtomicInteger available,
+                       AtomicBoolean extraLines,
+                       TreeMap<Integer, TreeSet<Integer>> possibleSplits,
+                       Formatter2Impl.Block block,
+                       FormattingOptions options,
+                       OutputElement element,
+                       StringBuilder stringBuilder,
+                       boolean lastElement) {
         Space spaceBefore;
         Space space;
         if (element instanceof Space s && !s.isNewLine()) {
@@ -118,29 +112,28 @@ public class BlockPrinter {
             space = null;
             spaceBefore = null;
         }
-        if (spaceBefore != null && !spaceBefore.split().isNever()) {
+        if (!lastElement && spaceBefore != null && !spaceBefore.split().isNever()) {
             addSplitPoint(possibleSplits, stringBuilder.length(), spaceBefore);
         }
         String string = element.write(options);
         stringBuilder.append(string);
-        if (space != null && !space.split().isNever()) {
+        if (!lastElement && space != null && !space.split().isNever()) {
             int pos = stringBuilder.length() - (string.endsWith(" ") ? 1 : 0);
             addSplitPoint(possibleSplits, pos, space);
         }
 
         if (string.endsWith("\n")) {
             extraLines.set(true);
-            available = availableIn;
             possibleSplits.clear();
             int indent = block.tab() * options.spacesInTab();
             stringBuilder.append(" ".repeat(indent));
         } else if (string.contains("\n")) {
             extraLines.set(true);
-            available = availableIn - Util.charactersUntilNewline(string);
+            available.addAndGet(-Util.charactersUntilNewline(string));
         } else {
-            available -= string.length();
+            available.addAndGet(-string.length());
             LOGGER.debug("Appended string '{}' without newlines; available now {}", string, available);
-            if (available < 0 && !possibleSplits.isEmpty()) {
+            if (available.get() < 0 && !possibleSplits.isEmpty()) {
                 LOGGER.debug("We must split: we're over the bound");
                 int indent = block.tab() * options.spacesInTab();
                 int pos = updateForSplit(possibleSplits, indent);
@@ -152,29 +145,38 @@ public class BlockPrinter {
                 } else {
                     stringBuilder.insert(pos, insert);
                 }
-                available = availableIn - remainder - indent;
+                available.addAndGet(-(remainder + indent));
                 extraLines.set(true);
             }
         }
-        return available;
     }
 
-    int handleBlock(int availableIn,
-                            AtomicBoolean extraLines,
-                            FormattingOptions options,
-                            Formatter2Impl.Block sub,
-                            int available,
-                            StringBuilder stringBuilder) {
+    /*
+    Add a guide block to the current output.
+
+    The block will be split across the lines indicated by "handleGuideBlock" if it does not fit on the remainder
+    of the line, or if it already contains multiple lines.
+     */
+    void handleBlock(AtomicInteger available,
+                     AtomicBoolean extraLines,
+                     FormattingOptions options,
+                     Formatter2Impl.Block sub,
+                     StringBuilder stringBuilder) {
         Output output = write(sub, options);
         LOGGER.debug("Recursion: received output of block: {}", output);
-        if (output.extraLines || output.endPos > available) {
-            LOGGER.debug("We need to split, and we'll split along all '4' splits");
+        if (output.extraLines || output.endPos() > available.get()) {
+            TreeSet<Integer> splits = output.possibleSplits.getOrDefault(4, new TreeSet<>());
             int indent = sub.tab() * options.spacesInTab();
+            LOGGER.debug("We need to split, and we'll split along all '4' splits: {}; each line will be indented {}",
+                    splits, indent);
             String insert = "\n" + (" ".repeat(indent));
             int remainder = 0;
+
+            // first, add
             int start = stringBuilder.length();
             stringBuilder.append(output.string);
-            TreeSet<Integer> splits = output.possibleSplits.getOrDefault(4, new TreeSet<>());
+
+            // then, split
             for (int relativePos : splits) {
                 int pos = relativePos + start;
                 char atPos = stringBuilder.charAt(pos);
@@ -187,12 +189,12 @@ public class BlockPrinter {
                     start += indent + 1;
                 }
             }
-            available = availableIn - remainder - indent;
+            available.addAndGet(-(remainder + indent));
             extraLines.set(true);
         } else {
             stringBuilder.append(output.string);
+            available.addAndGet(-output.string.length());
         }
-        return available;
     }
 
     private int updateForSplit(TreeMap<Integer, TreeSet<Integer>> possibleSplits, int indent) {

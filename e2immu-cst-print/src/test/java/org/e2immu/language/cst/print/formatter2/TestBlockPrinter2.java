@@ -43,8 +43,9 @@ public class TestBlockPrinter2 {
         String string  = formatter.write(outputBuilder);
         String expect = """
                 public int method(
-                    int p1,\s
-                    int p2) { return p1 + p2;  }\s""";
+                    int p1,
+                    int p2) {\s
+                    return p1 + p2;  }\s""";
         assertEquals(expect, string);
     }
 
@@ -56,8 +57,13 @@ public class TestBlockPrinter2 {
         String string  = formatter.write(outputBuilder);
         String expect = """
                 public int method(
-                    int p1,\s
-                    int p2) { return p1 + p2;  }\s""";
+                  int p1,
+                  int p2,
+                  double somewhatLonger,
+                  double d) {\s
+                  log(p1, p2);
+                  return p1 + p2;\s
+                }\s""";
         assertEquals(expect, string);
     }
 }

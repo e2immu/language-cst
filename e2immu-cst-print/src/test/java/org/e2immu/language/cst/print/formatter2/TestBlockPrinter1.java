@@ -48,7 +48,7 @@ public class TestBlockPrinter1 {
         assertEquals(expect, output.string());
         assertFalse(output.extraLines());
         assertEquals(81, output.endPos());
-        assertEquals("{3=[14, 36, 59, 75, 80], 4=[77, 78]}", output.possibleSplits().toString());
+        assertEquals("{3=[14, 36, 59, 75], 4=[77]}", output.possibleSplits().toString());
         Formatter2Impl formatter2 = new Formatter2Impl(runtime, options);
         assertEquals(expect, formatter2.write(outputBuilder));
     }
