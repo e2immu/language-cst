@@ -91,6 +91,8 @@ public interface Factory {
 
     LocalVariableCreation.Modifier localVariableModifierVar();
 
+    MethodInfo.MissingData methodMissingMethodBody();
+
     MethodModifier methodModifierAbstract();
 
     MethodModifier methodModifierDefault();

@@ -624,4 +624,9 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
     public boolean isSyntheticArrayConstructor() {
         return methodType == MethodTypeEnum.SYNTHETIC_ARRAY_CONSTRUCTOR;
     }
+
+    @Override
+    public MissingData missingData() {
+        return inspection.get().missingData();
+    }
 }

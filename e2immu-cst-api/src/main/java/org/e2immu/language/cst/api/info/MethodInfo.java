@@ -88,6 +88,12 @@ public interface MethodInfo extends Info {
         boolean isDefault();
     }
 
+    interface MissingData {
+        boolean methodBody();
+
+        boolean overrides();
+    }
+
     String name();
 
     boolean isStatic();
@@ -135,6 +141,8 @@ public interface MethodInfo extends Info {
     boolean isIdentity();
 
     boolean isStaticSideEffects();
+
+    MissingData missingData();
 
     Map<FieldInfo, Boolean> areOwnFieldsReadModified();
 
@@ -226,6 +234,9 @@ public interface MethodInfo extends Info {
         // used for translations
         @Fluent
         Builder addParameter(ParameterInfo parameterInfo);
+
+        @Fluent
+        Builder setMissingData(MissingData missingData);
 
         List<ParameterInfo> parameters();
     }

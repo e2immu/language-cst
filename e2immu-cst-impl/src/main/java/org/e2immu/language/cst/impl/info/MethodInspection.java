@@ -34,5 +34,7 @@ public interface MethodInspection extends Inspection {
     String fullyQualifiedName();
 
     List<ParameterInfo> parameters();
+
+    MethodInfo.MissingData missingData();
 }
 

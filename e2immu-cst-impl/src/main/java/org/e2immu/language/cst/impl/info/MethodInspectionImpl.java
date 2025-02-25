@@ -22,6 +22,23 @@ import java.util.stream.Collectors;
 public class MethodInspectionImpl extends InspectionImpl implements MethodInspection {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodInspectionImpl.class);
 
+    public enum MissingDataEnum {
+        METHOD_BODY, OVERRIDES;
+    }
+
+    public record MissingDataImpl(EnumSet<MissingDataEnum> set) implements MethodInfo.MissingData {
+
+        @Override
+        public boolean methodBody() {
+            return set.contains(MissingDataEnum.METHOD_BODY);
+        }
+
+        @Override
+        public boolean overrides() {
+            return set.contains(MissingDataEnum.OVERRIDES);
+        }
+    }
+
     private final ParameterizedType returnType;
     private final OperatorType operatorType;
     private final Block methodBody;
@@ -31,6 +48,7 @@ public class MethodInspectionImpl extends InspectionImpl implements MethodInspec
     private final List<ParameterInfo> parameters;
     private final Set<MethodModifier> methodModifiers;
     private final List<ParameterizedType> exceptionTypes;
+    private final MethodInfo.MissingData missingData;
 
     public MethodInspectionImpl(Inspection inspection,
                                 ParameterizedType returnType,
@@ -41,9 +59,10 @@ public class MethodInspectionImpl extends InspectionImpl implements MethodInspec
                                 OperatorType operatorType,
                                 Block methodBody,
                                 String fullyQualifiedName,
-                                Set<MethodInfo> overrides) {
+                                Set<MethodInfo> overrides,
+                                MethodInfo.MissingData missingData) {
         this(inspection, inspection.isSynthetic(), returnType, typeParameters, parameters, methodModifiers,
-                exceptionTypes, operatorType, methodBody, fullyQualifiedName, overrides);
+                exceptionTypes, operatorType, methodBody, fullyQualifiedName, overrides, missingData);
     }
 
     public MethodInspectionImpl(Inspection inspection,
@@ -56,7 +75,8 @@ public class MethodInspectionImpl extends InspectionImpl implements MethodInspec
                                 OperatorType operatorType,
                                 Block methodBody,
                                 String fullyQualifiedName,
-                                Set<MethodInfo> overrides) {
+                                Set<MethodInfo> overrides,
+                                MethodInfo.MissingData missingData) {
         super(inspection.access(), inspection.comments(), inspection.source(), synthetic, inspection.annotations());
         this.returnType = returnType;
         this.operatorType = operatorType;
@@ -67,12 +87,13 @@ public class MethodInspectionImpl extends InspectionImpl implements MethodInspec
         this.typeParameters = typeParameters;
         this.methodModifiers = methodModifiers;
         this.exceptionTypes = exceptionTypes;
+        this.missingData = missingData;
     }
 
     @Override
     public MethodInspection withSynthetic(boolean synthetic) {
         return new MethodInspectionImpl(this, synthetic, returnType, typeParameters, parameters,
-                methodModifiers, exceptionTypes, operatorType, methodBody, fullyQualifiedName, overrides);
+                methodModifiers, exceptionTypes, operatorType, methodBody, fullyQualifiedName, overrides, missingData);
     }
 
     @Override
@@ -120,10 +141,16 @@ public class MethodInspectionImpl extends InspectionImpl implements MethodInspec
         return parameters;
     }
 
+    @Override
+    public MethodInfo.MissingData missingData() {
+        return missingData;
+    }
+
     public static class Builder extends InspectionImpl.Builder<MethodInfo.Builder> implements MethodInspection, MethodInfo.Builder {
         private ParameterizedType returnType;
         private OperatorType operatorType;
         private Block methodBody;
+        private MethodInfo.MissingData missingData = new MissingDataImpl(EnumSet.noneOf(MissingDataEnum.class));
         private final SetOnce<String> fullyQualifiedName = new SetOnce<>();
         private final List<ParameterInfo> parameters = new ArrayList<>();
         private final List<TypeParameter> typeParameters = new ArrayList<>();
@@ -137,6 +164,11 @@ public class MethodInspectionImpl extends InspectionImpl implements MethodInspec
             if (methodInfo.isStatic()) {
                 addMethodModifier(MethodModifierEnum.STATIC);
             }
+        }
+
+        @Override
+        public MethodInfo.MissingData missingData() {
+            return missingData;
         }
 
         @Override
@@ -278,7 +310,7 @@ public class MethodInspectionImpl extends InspectionImpl implements MethodInspec
             if (!fullyQualifiedName.isSet()) commitParameters();
             MethodInspection mi = new MethodInspectionImpl(this, returnType, List.copyOf(typeParameters),
                     List.copyOf(parameters), Set.copyOf(methodModifiers), List.copyOf(exceptionTypes),
-                    operatorType, methodBody, fullyQualifiedName.get(), Set.copyOf(overrides));
+                    operatorType, methodBody, fullyQualifiedName.get(), Set.copyOf(overrides), missingData);
             methodInfo.commit(mi);
         }
 
@@ -314,6 +346,12 @@ public class MethodInspectionImpl extends InspectionImpl implements MethodInspec
         @Override
         public MethodInfo.Builder addParameter(ParameterInfo parameterInfo) {
             parameters.add(parameterInfo);
+            return this;
+        }
+
+        @Override
+        public Builder setMissingData(MethodInfo.MissingData missingData) {
+            this.missingData = missingData;
             return this;
         }
     }

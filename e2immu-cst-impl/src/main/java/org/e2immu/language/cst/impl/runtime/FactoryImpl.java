@@ -30,6 +30,7 @@ import org.e2immu.language.cst.api.type.*;
 import org.e2immu.language.cst.api.variable.*;
 import org.e2immu.support.Either;
 
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -237,6 +238,11 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     @Override
     public LocalVariableCreation.Modifier localVariableModifierVar() {
         return LocalVariableCreationImpl.ModifierEnum.VAR;
+    }
+
+    @Override
+    public MethodInfo.MissingData methodMissingMethodBody() {
+        return new MethodInspectionImpl.MissingDataImpl(EnumSet.of(MethodInspectionImpl.MissingDataEnum.METHOD_BODY));
     }
 
     @Override
