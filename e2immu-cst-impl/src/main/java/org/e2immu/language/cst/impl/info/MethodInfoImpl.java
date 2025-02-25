@@ -633,4 +633,9 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
     public boolean isTriviallyImmutable() {
         return returnType().isTriviallyImmutable();
     }
+
+    @Override
+    public MissingData missingData() {
+        return inspection.get().missingData();
+    }
 }

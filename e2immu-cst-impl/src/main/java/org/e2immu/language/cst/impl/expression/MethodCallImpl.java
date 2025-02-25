@@ -1,6 +1,7 @@
 package org.e2immu.language.cst.impl.expression;
 
 import org.e2immu.language.cst.api.analysis.PropertyValueMap;
+import org.e2immu.language.cst.api.analysis.Value;
 import org.e2immu.language.cst.api.element.Comment;
 import org.e2immu.language.cst.api.element.Element;
 import org.e2immu.language.cst.api.element.Source;
@@ -15,13 +16,17 @@ import org.e2immu.language.cst.api.output.element.TypeName;
 import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.variable.DescendMode;
+import org.e2immu.language.cst.api.variable.FieldReference;
 import org.e2immu.language.cst.api.variable.This;
 import org.e2immu.language.cst.api.variable.Variable;
+import org.e2immu.language.cst.impl.analysis.PropertyImpl;
 import org.e2immu.language.cst.impl.analysis.PropertyValueMapImpl;
+import org.e2immu.language.cst.impl.analysis.ValueImpl;
 import org.e2immu.language.cst.impl.element.ElementImpl;
 import org.e2immu.language.cst.impl.expression.util.ExpressionComparator;
 import org.e2immu.language.cst.impl.expression.util.PrecedenceEnum;
 import org.e2immu.language.cst.impl.output.*;
+import org.e2immu.language.cst.impl.variable.FieldReferenceImpl;
 
 import java.util.List;
 import java.util.Objects;
@@ -315,8 +320,17 @@ public class MethodCallImpl extends ExpressionImpl implements MethodCall {
 
     @Override
     public Stream<Variable> variables(DescendMode descendMode) {
-        return Stream.concat(object.variables(descendMode),
-                parameterExpressions.stream().flatMap(e -> e.variables(descendMode)));
+        Value.FieldValue currentGetSet = methodInfo.analysis().getOrDefault(PropertyImpl.GET_SET_FIELD,
+                ValueImpl.GetSetValueImpl.EMPTY);
+        FieldReference getSetField;
+        if (currentGetSet.field() != null) {
+            getSetField = new FieldReferenceImpl(currentGetSet.field(), object, null,
+                    currentGetSet.field().type());
+        } else {
+            getSetField = null;
+        }
+        return Stream.concat(Stream.ofNullable(getSetField), Stream.concat(object.variables(descendMode),
+                parameterExpressions.stream().flatMap(e -> e.variables(descendMode))));
     }
 
     @Override

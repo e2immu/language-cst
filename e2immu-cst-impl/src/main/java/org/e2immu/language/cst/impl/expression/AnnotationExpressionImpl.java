@@ -70,11 +70,13 @@ public class AnnotationExpressionImpl extends ExpressionImpl implements Annotati
         OutputBuilder outputBuilder = new OutputBuilderImpl().add(TypeNameImpl.typeName(typeInfo,
                 qualification.qualifierRequired(typeInfo), true));
         if (!keyValuePairs.isEmpty()) {
+            boolean singleKvPair = keyValuePairs.size() == 1;
             outputBuilder.add(SymbolEnum.LEFT_PARENTHESIS)
                     .add(keyValuePairs.stream()
                             .map(kv ->
-                                    new OutputBuilderImpl().addIf(!kv.keyIsDefault(), new TextImpl(kv.key()))
-                                            .addIf(!kv.keyIsDefault(), SymbolEnum.assignment("="))
+                                    new OutputBuilderImpl()
+                                            .addIf(!singleKvPair || !kv.keyIsDefault(), new TextImpl(kv.key()))
+                                            .addIf(!singleKvPair || !kv.keyIsDefault(), SymbolEnum.assignment("="))
                                             .add(kv.value().print(qualification)))
                             .collect(OutputBuilderImpl.joining(SymbolEnum.COMMA)))
                     .add(SymbolEnum.RIGHT_PARENTHESIS);
@@ -138,6 +140,15 @@ public class AnnotationExpressionImpl extends ExpressionImpl implements Annotati
                 .filter(kv -> key.equals(kv.key()))
                 .map(kv -> ((ArrayInitializer) kv.value()).expressions().stream()
                         .mapToInt(e -> ((IntConstant) e).constant()).toArray())
+                .findFirst().orElse(null);
+    }
+
+    @Override
+    public String[] extractStringArray(String key) {
+        return keyValuePairs.stream()
+                .filter(kv -> key.equals(kv.key()))
+                .map(kv -> ((ArrayInitializer) kv.value()).expressions().stream()
+                        .map(e -> ((StringConstant) e).constant()).toArray(String[]::new))
                 .findFirst().orElse(null);
     }
 

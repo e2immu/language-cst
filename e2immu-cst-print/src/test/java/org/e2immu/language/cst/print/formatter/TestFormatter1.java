@@ -12,7 +12,7 @@
  * License along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.e2immu.language.cst.print;
+package org.e2immu.language.cst.print.formatter;
 
 import org.e2immu.language.cst.api.output.Formatter;
 import org.e2immu.language.cst.api.output.FormattingOptions;
@@ -22,8 +22,9 @@ import org.e2immu.language.cst.api.output.element.Guide;
 import org.e2immu.language.cst.api.runtime.Runtime;
 import org.e2immu.language.cst.impl.output.*;
 import org.e2immu.language.cst.impl.runtime.RuntimeImpl;
-import org.e2immu.language.cst.print.formatter.Forward;
-import org.e2immu.language.cst.print.formatter.ForwardInfo;
+import org.e2immu.language.cst.print.FormatterImpl;
+import org.e2immu.language.cst.print.FormattingOptionsImpl;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
@@ -44,7 +45,7 @@ public class TestFormatter1 {
 
     // public int method(int p1, int p2) { return p1+p2; }
     //        10|     18|            33|
-    private OutputBuilder createExample1() {
+    public static OutputBuilder createExample1() {
         GuideImpl.GuideGenerator gg = GuideImpl.generatorForParameterDeclaration();
         GuideImpl.GuideGenerator gg2 = GuideImpl.generatorForBlock();
 
@@ -69,7 +70,7 @@ public class TestFormatter1 {
         String PACKAGE = "org.e2immu.analyser.output";
         OutputBuilder outputBuilder = new OutputBuilderImpl().add(KeywordImpl.PACKAGE).add(SpaceEnum.ONE).add(new TextImpl(PACKAGE));
         assertEquals("package " + PACKAGE, outputBuilder.toString());
-        assertEquals("package " + PACKAGE + "\n", new FormatterImpl(runtime, FormattingOptionsImpl.DEFAULT).write(outputBuilder));
+        Assertions.assertEquals("package " + PACKAGE + "\n", new FormatterImpl(runtime, FormattingOptionsImpl.DEFAULT).write(outputBuilder));
 
         FormattingOptions options = new FormattingOptionsImpl.Builder().setLengthOfLine(20)
                 .setSpacesInTab(2).setTabsForLineSplit(2).build();
@@ -153,7 +154,7 @@ public class TestFormatter1 {
                 new FormatterImpl(runtime, options).write(createExample1()));
     }
 
-    private OutputBuilder createExample2() {
+    public static OutputBuilder createExample2() {
         GuideImpl.GuideGenerator gg = GuideImpl.generatorForParameterDeclaration();
         GuideImpl.GuideGenerator gg1 = GuideImpl.generatorForBlock();
         GuideImpl.GuideGenerator gg2 = GuideImpl.defaultGuideGenerator();
@@ -240,7 +241,7 @@ public class TestFormatter1 {
                 new FormatterImpl(runtime, options).write(createExample2()));
     }
 
-    private OutputBuilder createExample3() {
+    public static OutputBuilder createExample3() {
         GuideImpl.GuideGenerator gg = GuideImpl.generatorForBlock();
         GuideImpl.GuideGenerator gg1 = GuideImpl.generatorForBlock();
         GuideImpl.GuideGenerator gg2 = GuideImpl.generatorForBlock();

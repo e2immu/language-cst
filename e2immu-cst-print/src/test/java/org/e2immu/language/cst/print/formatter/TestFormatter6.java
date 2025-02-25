@@ -1,10 +1,12 @@
-package org.e2immu.language.cst.print;
+package org.e2immu.language.cst.print.formatter;
 
 import org.e2immu.language.cst.api.output.Formatter;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.runtime.Runtime;
 import org.e2immu.language.cst.impl.output.*;
 import org.e2immu.language.cst.impl.runtime.RuntimeImpl;
+import org.e2immu.language.cst.print.FormatterImpl;
+import org.e2immu.language.cst.print.FormattingOptionsImpl;
 import org.intellij.lang.annotations.Language;
 import org.junit.jupiter.api.Test;
 
