@@ -134,26 +134,34 @@ public class BlockPrinter {
         } else {
             string = element.write(options);
         }
-        if (string.startsWith(" ") || string.startsWith("\n")) available.addAndGet(trim(stringBuilder));
-        stringBuilder.append(string);
+        String string2;
+        if (string.startsWith("\n")) {
+            // eat all current spacing, not needed
+            available.addAndGet(trim(stringBuilder));
+            string2 = string;
+        } else {
+            // for example, LEFT_BLOCK_COMMENT prints to ' /*'
+            string2 = removeLeadingSpacesWhenBuilderEndsInSpace(stringBuilder, string);
+        }
+        stringBuilder.append(string2);
         if (!lastElement && spaceAfter != null && !spaceAfter.split().isNever()) {
             int pos = stringBuilder.length();
             while (pos - 1 >= 0 && stringBuilder.charAt(pos - 1) == ' ') --pos;
             addSplitPoint(splitInfo, pos, spaceAfter);
         }
 
-        if (string.endsWith("\n")) {
+        if (string2.endsWith("\n")) {
             extraLines.set(true);
             splitInfo.map.clear();
             int indent = block.tab() * options.spacesInTab();
             stringBuilder.append(" ".repeat(indent));
             available.set(maxAvailable - indent);
-        } else if (string.contains("\n")) {
+        } else if (string2.contains("\n")) {
             extraLines.set(true);
-            available.set(maxAvailable - Util.charactersUntilNewline(string));
+            available.set(maxAvailable - Util.charactersUntilNewline(string2));
         } else {
-            available.addAndGet(-string.length());
-            LOGGER.debug("Appended string '{}' without newlines; available now {}", string, available);
+            available.addAndGet(-string2.length());
+            LOGGER.debug("Appended string '{}' without newlines; available now {}", string2, available);
             if (available.get() < 0 && !splitInfo.map.isEmpty()) {
                 LOGGER.debug("We must split: we're over the bound");
                 int indent = block.tab() * options.spacesInTab();
@@ -171,6 +179,13 @@ public class BlockPrinter {
                 extraLines.set(true);
             }
         }
+    }
+
+    private String removeLeadingSpacesWhenBuilderEndsInSpace(StringBuilder sb, String string) {
+        if (sb.isEmpty() || Character.isSpaceChar(sb.charAt(sb.length() - 1))) {
+            return string.stripLeading();
+        }
+        return string;
     }
 
     /*
