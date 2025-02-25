@@ -27,7 +27,6 @@ public class Test3 {
                 import java.util.stream.Stream;
                 import org.e2immu.annotation.NotModified;
                 import org.e2immu.annotation.NotNull;
-                
                 @E2Container
                 @ExtensionClass
                 public class Basics_5 {
@@ -54,7 +53,6 @@ public class Test3 {
                 import java.util.stream.Stream;
                 import org.e2immu.annotation.NotModified;
                 import org.e2immu.annotation.NotNull;
-                
                 @E2Container
                 @ExtensionClass
                 public class Basics_5 {
@@ -66,7 +64,8 @@ public class Test3 {
                             .of(input)
                             .map(s -> {
                                 if(s == null) { return "null"; }
-                                return s + "something"; } )
+                                return s + "something";
+                            } )
                             .findAny()
                             .get();
                     }

@@ -155,8 +155,8 @@ public class TestBlockPrinter1 {
                     //this is a second comment
                     record Record() { }\s""";
         assertEquals(expect, output.string());
-        assertTrue(output.extraLines());
-        assertEquals(24, output.endPos());
+        assertFalse(output.extraLines());
+        assertEquals(139, output.endPos());
         assertEquals("{3={134=false}, 4={136=false}}", output.splitInfo().map().toString());
     }
 

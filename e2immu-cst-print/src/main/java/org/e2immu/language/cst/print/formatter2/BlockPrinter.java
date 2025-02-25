@@ -85,12 +85,19 @@ public class BlockPrinter {
         StringBuilder sb = new StringBuilder();
         int i = 0;
         int n = block.elements().size();
+        boolean protectSpaces = false;
+        boolean symmetricalSplit = false;
         for (OutputElement element : block.elements()) {
             if (element instanceof Formatter2Impl.Block sub) {
-                handleBlock(maxAvailable, available, extraLines, options, sub, sb);
+                boolean split = handleBlock(maxAvailable, available, extraLines, options, sub, sb);
+                symmetricalSplit = split && sub.guide().endWithNewLine();
             } else {
                 boolean lastElement = i == n - 1;
-                handleElement(maxAvailable, available, extraLines, splitInfo, block, options, element, sb, lastElement);
+                handleElement(maxAvailable, available, extraLines, splitInfo, block, options, element, sb, lastElement,
+                        protectSpaces, symmetricalSplit);
+                if (element.isLeftBlockComment()) protectSpaces = true;
+                if (element.isRightBlockComment()) protectSpaces = false;
+                symmetricalSplit = false;
             }
             ++i;
         }
@@ -109,7 +116,9 @@ public class BlockPrinter {
                        FormattingOptions options,
                        OutputElement element,
                        StringBuilder stringBuilder,
-                       boolean lastElement) {
+                       boolean lastElement,
+                       boolean protectSpaces,
+                       boolean symmetricalSplit) {
         Space spaceBefore;
         Space spaceAfter;
         if (element instanceof Space s && !s.isNewLine()) {
@@ -133,10 +142,16 @@ public class BlockPrinter {
             string = WriteTextBlock.write(options.spacesInTab() * (block.tab() + 2),
                     tb.minimal(), tb.textBlockFormatting());
         } else {
-            string = element.write(options);
+            if (spaceBefore != null && spaceBefore.split().rank() == 4 && symmetricalSplit) {
+                string = "\n" + (" ".repeat(options.spacesInTab() * block.tab())) + element.write(options).stripLeading();
+            } else {
+                string = element.write(options);
+            }
         }
         String string2;
-        if (string.startsWith("\n")) {
+        if (protectSpaces) {
+            string2 = string;
+        } else if (string.startsWith("\n")) {
             // eat all current spacing, not needed
             available.addAndGet(trim(stringBuilder));
             string2 = string;
@@ -152,7 +167,7 @@ public class BlockPrinter {
         }
 
         if (string2.endsWith("\n")) {
-            extraLines.set(true);
+            // extraLines.set(true);
             splitInfo.map.clear();
             int indent = block.tab() * options.spacesInTab();
             stringBuilder.append(" ".repeat(indent));
@@ -183,7 +198,7 @@ public class BlockPrinter {
     }
 
     private String removeLeadingSpacesWhenBuilderEndsInSpace(StringBuilder sb, String string) {
-        if (sb.isEmpty() || Character.isSpaceChar(sb.charAt(sb.length() - 1))) {
+        if (sb.isEmpty() || Character.isWhitespace(sb.charAt(sb.length() - 1))) {
             return string.stripLeading();
         }
         return string;
@@ -195,12 +210,12 @@ public class BlockPrinter {
     The block will be split across the lines indicated by "handleGuideBlock" if it does not fit on the remainder
     of the line, or if it already contains multiple lines.
      */
-    void handleBlock(int maxAvailable,
-                     AtomicInteger available,
-                     AtomicBoolean extraLines,
-                     FormattingOptions options,
-                     Formatter2Impl.Block sub,
-                     StringBuilder stringBuilder) {
+    boolean handleBlock(int maxAvailable,
+                        AtomicInteger available,
+                        AtomicBoolean extraLines,
+                        FormattingOptions options,
+                        Formatter2Impl.Block sub,
+                        StringBuilder stringBuilder) {
         Output output = write(sub, options);
         LOGGER.debug("Recursion: received output of block: {}", output);
         int indent = sub.tab() * options.spacesInTab();
@@ -241,18 +256,20 @@ public class BlockPrinter {
             }
             available.set(maxAvailable - (remainder + indent));
             extraLines.set(true);
-        } else {
-            if (!stringBuilder.isEmpty() && stringBuilder.charAt(stringBuilder.length() - 1) == '\n') {
-                stringBuilder.append(" ".repeat(indent));
-                available.set(maxAvailable - indent);
-            }
-            stringBuilder.append(output.string);
-            available.addAndGet(-output.string.length());
+            return true;
         }
+
+        if (!stringBuilder.isEmpty() && stringBuilder.charAt(stringBuilder.length() - 1) == '\n') {
+            stringBuilder.append(" ".repeat(indent));
+            available.set(maxAvailable - indent);
+        }
+        stringBuilder.append(output.string);
+        available.addAndGet(-output.string.length());
+        return false;
     }
 
     private static int bestSplit(StringBuilder sb, int pos) {
-        while (pos >= 1 && Character.isSpaceChar(sb.charAt(pos - 1))) --pos;
+        while (pos >= 1 && Character.isWhitespace(sb.charAt(pos - 1))) --pos;
         return pos;
     }
 

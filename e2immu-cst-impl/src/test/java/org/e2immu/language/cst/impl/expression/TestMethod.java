@@ -31,7 +31,7 @@ public class TestMethod {
         TypePrinter tp = new TypePrinter(ti);
         String src = """
                 package com.foo;
-                 class Test{public String toString(){}}\
+                class Test{public String toString(){}}\
                 """;
         assertEquals(src, tp.print(new ImportComputerImpl(), runtime.qualificationFullyQualifiedNames(),
                 true).toString());

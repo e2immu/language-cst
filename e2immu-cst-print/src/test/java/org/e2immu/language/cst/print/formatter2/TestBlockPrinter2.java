@@ -134,6 +134,7 @@ public class TestBlockPrinter2 {
                 package a.b.c;
                 import java.util.Set;
                 import java.util.List;
+                
                 //this is a comment
                 //this is a second comment
                 /*block comment*/
@@ -144,4 +145,72 @@ public class TestBlockPrinter2 {
         assertEquals(expect, out);
     }
 
+
+    private static OutputBuilder createExample3b() {
+        return new OutputBuilderImpl()
+                .add(new TextImpl("package"))
+                .add(SpaceEnum.ONE)
+                .add(new TextImpl("a.b.c"))
+                .add(SymbolEnum.SEMICOLON)
+                .add(SpaceEnum.NEWLINE)
+
+                .add(new TextImpl("import"))
+                .add(SpaceEnum.ONE)
+                .add(new TextImpl("java.util.Set"))
+                .add(SymbolEnum.SEMICOLON)
+                .add(SpaceEnum.NEWLINE)
+
+                .add(new TextImpl("import"))
+                .add(SpaceEnum.ONE)
+                .add(new TextImpl("java.util.List"))
+                .add(SymbolEnum.SEMICOLON)
+                .add(SpaceEnum.NEWLINE)
+
+                .add(SymbolEnum.SINGLE_LINE_COMMENT)
+                .add(new TextImpl("this is a comment"))
+                .add(SpaceEnum.NEWLINE)
+
+                .add(SymbolEnum.SINGLE_LINE_COMMENT)
+                .add(new TextImpl("this is a second comment"))
+                .add(SpaceEnum.NEWLINE)
+
+                .add(SymbolEnum.LEFT_BLOCK_COMMENT)
+                .add(new TextImpl("block comment"))
+                .add(SymbolEnum.RIGHT_BLOCK_COMMENT)
+                .add(SpaceEnum.NEWLINE)
+
+                .add(SymbolEnum.LEFT_BLOCK_COMMENT)
+                .add(new TextImpl("block comment"))
+                .add(SpaceEnum.NEWLINE)
+                .add(new TextImpl("   on a second line"))
+                .add(SymbolEnum.RIGHT_BLOCK_COMMENT)
+                .add(SpaceEnum.NEWLINE)
+
+                .add(new TextImpl("record"))
+                .add(SpaceEnum.ONE)
+                .add(new TextImpl("Record"))
+                .add(SymbolEnum.OPEN_CLOSE_PARENTHESIS)
+                .add(SymbolEnum.LEFT_BRACE)
+                .add(SymbolEnum.RIGHT_BRACE);
+    }
+
+    @Test
+    public void test3b() {
+        OutputBuilder outputBuilder = createExample3b();
+        FormattingOptions options = new FormattingOptionsImpl.Builder().setLengthOfLine(80).setSpacesInTab(4).build();
+        Formatter formatter = new Formatter2Impl(runtime, options);
+        String out = formatter.write(outputBuilder);
+        String expect = """
+                package a.b.c;
+                import java.util.Set;
+                import java.util.List;
+                //this is a comment
+                //this is a second comment
+                /*block comment*/
+                /*block comment
+                   on a second line*/
+                record Record() { }
+                """;
+        assertEquals(expect, out);
+    }
 }
