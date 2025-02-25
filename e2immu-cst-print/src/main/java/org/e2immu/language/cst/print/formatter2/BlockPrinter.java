@@ -61,7 +61,8 @@ public class BlockPrinter {
             if (element instanceof Formatter2Impl.Block sub) {
                 Output output = write(sub, options);
                 boolean doubleSplit = prevOutput != null && prevOutput.extraLines && output.extraLines;
-                mainSplits.put(sb.length() - 1, doubleSplit);
+                int splitPos = bestSplit(sb, sb.length());
+                mainSplits.put(splitPos, doubleSplit);
                 sb.append(output.string);
                 extraLine |= output.extraLines;
                 prevOutput = output;
@@ -220,14 +221,20 @@ public class BlockPrinter {
                 boolean doubleSplit = entry.getValue();
                 int pos = relativePos + start;
                 if (pos >= 0) {
-                    char atPos = stringBuilder.charAt(pos);
-                    remainder = stringBuilder.length() - pos;
+                    int pos2 = bestSplit(stringBuilder, pos);
+                    char atPos = stringBuilder.charAt(pos2);
+                    remainder = stringBuilder.length() - pos2;
                     String insertWithDouble = doubleSplit ? "\n" + insert : insert;
                     if (atPos == ' ') {
-                        stringBuilder.replace(pos, pos + 1, insertWithDouble);
+                        // split is ' \n', and we'll replace at the space by '\n' rather than '\n   '
+                        if (pos2 < stringBuilder.length() - 1 && stringBuilder.charAt(pos2 + 1) == '\n') {
+                            stringBuilder.replace(pos2, pos2 + 1, doubleSplit ? "\n\n" : "\n");
+                        } else {
+                            stringBuilder.replace(pos2, pos2 + 1, insertWithDouble);
+                        }
                         start += indent;
                     } else if (atPos != '\n') {
-                        stringBuilder.insert(pos, insertWithDouble);
+                        stringBuilder.insert(pos2, insertWithDouble);
                         start += indent + 1;
                     }
                 }
@@ -242,6 +249,11 @@ public class BlockPrinter {
             stringBuilder.append(output.string);
             available.addAndGet(-output.string.length());
         }
+    }
+
+    private static int bestSplit(StringBuilder sb, int pos) {
+        while (pos >= 1 && Character.isSpaceChar(sb.charAt(pos - 1))) --pos;
+        return pos;
     }
 
     private static int trim(StringBuilder sb) {
