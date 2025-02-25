@@ -41,8 +41,7 @@ public record TypePrinter(TypeInfo typeInfo) {
         // PACKAGE AND IMPORTS
 
         OutputBuilder packageAndImports = new OutputBuilderImpl();
-
-
+        boolean isRecord = typeInfo.typeNature().isRecord();
         OutputBuilder afterAnnotations = new OutputBuilderImpl();
         if (doTypeDeclaration) {
             if (typeInfo.isPrimaryType()) {
@@ -56,12 +55,18 @@ public record TypePrinter(TypeInfo typeInfo) {
                         .add(new TextImpl(i)).add(SymbolEnum.SEMICOLON).add(SpaceEnum.NEWLINE));
             }
 
-            // the class name
+            // the modifiers
+            OutputBuilder minimalModifiers = minimalModifiers(typeInfo).stream()
+                    .map(mod -> new OutputBuilderImpl().add(mod.keyword()))
+                    .collect(OutputBuilderImpl.joining(SpaceEnum.ONE));
+            afterAnnotations.add(minimalModifiers);
+            if (!minimalModifiers.isEmpty()) afterAnnotations.add(SpaceEnum.ONE);
+
+            // the class nature and name
             afterAnnotations
-                    .add(minimalModifiers(typeInfo).stream().map(mod -> new OutputBuilderImpl().add(mod.keyword()))
-                            .collect(OutputBuilderImpl.joining(SpaceEnum.ONE)))
-                    .add(SpaceEnum.ONE).add(typeInfo.typeNature().keyword())
-                    .add(SpaceEnum.ONE).add(new TextImpl(typeInfo.simpleName()));
+                    .add(typeInfo.typeNature().keyword())
+                    .add(SpaceEnum.ONE)
+                    .add(new TextImpl(typeInfo.simpleName()));
 
             if (!typeInfo.typeParameters().isEmpty()) {
                 afterAnnotations.add(SymbolEnum.LEFT_ANGLE_BRACKET);
@@ -70,7 +75,7 @@ public record TypePrinter(TypeInfo typeInfo) {
                         .collect(OutputBuilderImpl.joining(SymbolEnum.COMMA)));
                 afterAnnotations.add(SymbolEnum.RIGHT_ANGLE_BRACKET);
             }
-            if (typeInfo.typeNature().isRecord()) {
+            if (isRecord) {
                 afterAnnotations.add(outputNonStaticFieldsAsParameters(insideType, typeInfo.fields()));
             }
             if (typeInfo.parentClass() != null && !typeInfo.parentClass().isJavaLangObject()) {
@@ -94,7 +99,7 @@ public record TypePrinter(TypeInfo typeInfo) {
         OutputBuilder main = Stream.concat(Stream.concat(Stream.concat(Stream.concat(
                                                 enumConstantStream(typeInfo, insideType),
                                                 typeInfo.fields().stream()
-                                                        .filter(f -> !f.isSynthetic())
+                                                        .filter(f -> !f.isSynthetic() && (!isRecord || f.isStatic()))
                                                         .map(f -> f.print(insideType))),
                                         typeInfo.subTypes().stream()
                                                 .filter(st -> !st.isSynthetic())

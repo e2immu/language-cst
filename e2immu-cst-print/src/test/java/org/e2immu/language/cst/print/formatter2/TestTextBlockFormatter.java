@@ -110,16 +110,16 @@ public class TestTextBlockFormatter {
                 import java.util.List;
                 class JavaUtil() {
                     public static final String INPUT_1 = ""\"
-                    abc
-                    123
-                       456
-                    ""\";
+                            abc
+                            123
+                               456
+                            ""\";
 
                     @TestInfo("this is a simple test", v = "1:23")
                     public static final String INPUT_2 = ""\"
-                    abc
-                    123
-                       456""\";
+                            abc
+                            123
+                               456""\";
                 }
                 """;
         assertEquals(expect, out);

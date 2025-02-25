@@ -159,7 +159,7 @@ public record IsAssignableFrom(Predefined runtime,
             return NOT_ASSIGNABLE;
         }
         if (target.arrays() > 0 && from.arrays() < target.arrays()) {
-            if(strictTypeParameterTargets) {
+            if (strictTypeParameterTargets) {
                 return NOT_ASSIGNABLE;
             }
             return ARRAY_PENALTY * (target.arrays() - from.arrays());
@@ -237,17 +237,9 @@ public record IsAssignableFrom(Predefined runtime,
         }
         return ListUtil.joinLists(target.parameters(), from.parameters())
                 .mapToInt(p -> {
-                    Mode newMode = mode == Mode.INVARIANT ? Mode.INVARIANT : modeFromWildcard(mode, p.k().wildcard());
+                    Mode newMode = mode == Mode.INVARIANT ? Mode.INVARIANT : Mode.COVARIANT;
                     return new IsAssignableFrom(runtime, p.k(), p.v()).execute(true, strictTypeParameterTargets, newMode);
                 }).reduce(0, REDUCER);
-    }
-
-    private Mode modeFromWildcard(Mode mode, Wildcard wildcard) {
-        if (wildcard == null) return Mode.INVARIANT;
-        if (wildcard.isUnbound()) return Mode.ANY;
-        if (wildcard.isExtends()) return mode == Mode.COVARIANT ? Mode.COVARIANT : Mode.CONTRAVARIANT;
-        assert wildcard.isSuper();
-        return mode == Mode.COVARIANT ? Mode.CONTRAVARIANT : Mode.COVARIANT;
     }
 
     private int differentNonNullTypeInfo(Mode mode, boolean strictTypeParameterTargets) {
