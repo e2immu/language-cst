@@ -167,8 +167,10 @@ public class FieldReferenceImpl extends VariableImpl implements FieldReference {
 
     @Override
     public Stream<Variable> variables(DescendMode descendMode) {
-        if (descendMode.isYes() && scopeVariable != null) {
-            return Stream.concat(Stream.of(this), scopeVariable.variables(descendMode));
+        if (descendMode.isYes()) {
+            Stream<Variable> fromScope = scopeVariable != null
+                    ? scopeVariable.variables(descendMode) : scope.variables(descendMode);
+            return Stream.concat(Stream.of(this), fromScope);
         }
         return Stream.of(this);
     }
