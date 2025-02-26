@@ -78,7 +78,9 @@ public record TypePrinter(TypeInfo typeInfo, boolean formatter2) {
             if (isRecord) {
                 afterAnnotations.add(outputNonStaticFieldsAsParameters(insideType, typeInfo.fields()));
             }
-            if (typeInfo.parentClass() != null && !typeInfo.parentClass().isJavaLangObject()) {
+            if (typeInfo.parentClass() != null && !typeInfo.parentClass().isJavaLangObject()
+                && (!typeInfo.typeNature().isEnum())
+                || !"java.lang.Enum".equals(typeInfo.parentClass().typeInfo().fullyQualifiedName())) {
                 afterAnnotations.add(SpaceEnum.ONE).add(KeywordImpl.EXTENDS).add(SpaceEnum.ONE)
                         .add(typeInfo.parentClass().print(insideType, false, DiamondEnum.SHOW_ALL));
             }
@@ -217,8 +219,7 @@ public record TypePrinter(TypeInfo typeInfo, boolean formatter2) {
                     }
                     outputBuilder.add(new TextImpl(fieldInfo.name()));
                     Expression initializer = fieldInfo.initializer();
-                    ConstructorCall constructorCall;
-                    if (initializer != null && (constructorCall = initializer.asInstanceOf(ConstructorCall.class)) != null) {
+                    if (initializer instanceof ConstructorCall constructorCall) {
                         if (!constructorCall.parameterExpressions().isEmpty()) {
                             GuideImpl.GuideGenerator args = GuideImpl.defaultGuideGenerator();
                             outputBuilder.add(SymbolEnum.LEFT_PARENTHESIS).add(args.start());
@@ -233,8 +234,9 @@ public record TypePrinter(TypeInfo typeInfo, boolean formatter2) {
                             }
                             outputBuilder.add(args.end()).add(SymbolEnum.RIGHT_PARENTHESIS);
                         }
-                    } else if (initializer != null) {
-                        throw new UnsupportedOperationException("Expect initialiser to be a NewObject");
+                    } else if (initializer != null && !initializer.isEmpty()) {
+                        throw new UnsupportedOperationException("Expect initializer to be a ConstructorCall expression, but have "
+                                                                + initializer.getClass() + " = " + initializer);
                     }
                 }
             }
