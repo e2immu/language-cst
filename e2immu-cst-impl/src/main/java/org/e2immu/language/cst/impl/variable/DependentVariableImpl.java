@@ -40,6 +40,7 @@ public class DependentVariableImpl extends VariableImpl implements DependentVari
     public static DependentVariable create(Expression array, Expression index) {
         Variable av = extractVariable(array);
         Variable iv = extractVariable(index);
+        assert array != null;
         assert array.parameterizedType().arrays() > 0;
         ParameterizedType pt = array.parameterizedType().copyWithOneFewerArrays();
         return new DependentVariableImpl(array, av, index, iv, pt);
