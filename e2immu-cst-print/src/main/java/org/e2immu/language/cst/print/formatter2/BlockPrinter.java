@@ -184,15 +184,17 @@ public class BlockPrinter {
                 int pos = updateForSplit(splitInfo, indent);
                 String insert = "\n" + (" ".repeat(indent));
                 // if we've just passed a ' ', then we replace that one
-                char atPos = stringBuilder.charAt(pos);
-                int remainder = stringBuilder.length() - pos;
-                if (atPos == ' ') {
-                    stringBuilder.replace(pos, pos + 1, insert);
-                } else {
-                    stringBuilder.insert(pos, insert);
+                if(pos < stringBuilder.length()) {
+                    char atPos = stringBuilder.charAt(pos);
+                    int remainder = stringBuilder.length() - pos;
+                    if (atPos == ' ') {
+                        stringBuilder.replace(pos, pos + 1, insert);
+                    } else {
+                        stringBuilder.insert(pos, insert);
+                    }
+                    available.set(maxAvailable - (remainder + indent));
+                    extraLines.set(true);
                 }
-                available.set(maxAvailable - (remainder + indent));
-                extraLines.set(true);
             }
         }
     }

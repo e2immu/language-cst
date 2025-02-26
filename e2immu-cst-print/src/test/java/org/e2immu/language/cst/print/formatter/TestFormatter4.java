@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class TestFormatter4 {
     private final Runtime runtime = new RuntimeImpl();
 
-    private static OutputBuilder createExample0() {
+    public static OutputBuilder createExample0() {
 
         GuideImpl.GuideGenerator gg2044 = GuideImpl.defaultGuideGenerator();
 

@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class TestFormatter5 {
     private final Runtime runtime = new RuntimeImpl();
 
-    private static OutputBuilder createExample0() {
+    public static OutputBuilder createExample0() {
 
         GuideImpl.GuideGenerator ggBlock = GuideImpl.generatorForBlock();
         GuideImpl.GuideGenerator ggComment = GuideImpl.generatorForMultilineComment();
@@ -57,7 +57,7 @@ public class TestFormatter5 {
         assertEquals("/*line 1 line 2*/ @ImmutableContainer /*IMPLIED*/ @NotNull /*OK*/\n", formatter.write(example));
     }
 
-    private static OutputBuilder createExample1() {
+    public static OutputBuilder createExample1() {
 
         GuideImpl.GuideGenerator ggBlock = GuideImpl.generatorForBlock();
         GuideImpl.GuideGenerator ggComment = GuideImpl.generatorForMultilineComment();
@@ -108,7 +108,7 @@ public class TestFormatter5 {
     }
 
 
-    private static OutputBuilder createExample2() {
+    public static OutputBuilder createExample2() {
 
         GuideImpl.GuideGenerator ggAnnot = GuideImpl.generatorForAnnotationList();
         GuideImpl.GuideGenerator ggComment = GuideImpl.generatorForMultilineComment();
@@ -236,10 +236,7 @@ public class TestFormatter5 {
                 }
                 """, formatter.write(example));
     }
-
-    @Test
-    public void testExample2bis() {
-        Formatter formatter = new FormatterImpl(runtime, FormattingOptionsImpl.DEFAULT);
+    public static OutputBuilder createExample2b() {
         OutputBuilder example = createExample2();
 //        assertEquals(90, example.list().size());
 
@@ -282,8 +279,13 @@ public class TestFormatter5 {
                 .add(ggBlock.end())
                 .add(SymbolEnum.RIGHT_BRACE)
                 .add(ggAnnot.end()); // 121
-   //     assertEquals(122, all.list().size());
-        String output = formatter.write(all);
+        //     assertEquals(122, all.list().size());
+        return all;
+    }
+    @Test
+    public void testExample2bis() {
+        Formatter formatter = new FormatterImpl(runtime, FormattingOptionsImpl.DEFAULT);
+        String output = formatter.write(createExample2b());
         assertEquals("""
                 package org.e2immu.analyser.parser.conditional.testexample;
                 import org.e2immu.annotation.ImmutableContainer;

@@ -36,12 +36,15 @@ public record MethodPrinter(TypeInfo typeInfo, MethodInfo methodInfo) {
             return result;
         }
         OutputBuilder builder = new OutputBuilderImpl();
+        GuideImpl.GuideGenerator gg = GuideImpl.generatorForAnnotationList();
+        builder.add(gg.start());
         Stream<Comment> commentStream;
         if (qualification.decorator() != null) {
             commentStream = Stream.concat(methodInfo.comments().stream(), qualification.decorator().comments(methodInfo).stream());
         } else {
             commentStream = methodInfo.comments().stream();
         }
+        builder.add(gg.mid());
         commentStream.forEach(c -> builder.add(c.print(qualification)));
         for (AnnotationExpression annotation : methodInfo.annotations()) {
             builder.add(annotation.print(qualification));
@@ -53,6 +56,7 @@ public record MethodPrinter(TypeInfo typeInfo, MethodInfo methodInfo) {
                 builder.add(SpaceEnum.ONE);
             }
         }
+        builder.add(gg.mid());
         List<MethodModifier> modifiers = minimalModifiers();
         builder.add(modifiers.stream()
                 .map(mod -> new OutputBuilderImpl().add(mod.keyword()))
@@ -103,6 +107,7 @@ public record MethodPrinter(TypeInfo typeInfo, MethodInfo methodInfo) {
             Qualification bodyQualification = makeBodyQualification(qualification);
             builder.add(methodInfo.methodBody().print(bodyQualification));
         }
+        builder.add(gg.end());
         return builder;
     }
 

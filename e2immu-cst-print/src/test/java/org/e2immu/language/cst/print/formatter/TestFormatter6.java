@@ -16,8 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class TestFormatter6 {
     private final Runtime runtime = new RuntimeImpl();
 
-    @Test
-    public void test() {
+    public static OutputBuilder create1() {
         OutputBuilder ob = new OutputBuilderImpl();
         GuideImpl.GuideGenerator gg616 = GuideImpl.generatorForBlock();
         GuideImpl.GuideGenerator gg618 = GuideImpl.generatorForParameterDeclaration();
@@ -161,9 +160,13 @@ public class TestFormatter6 {
                 .add(SymbolEnum.RIGHT_BRACE)
                 .add(gg616.end()) // priority=true, startNL=true, endNL=true
                 .add(SymbolEnum.RIGHT_BRACE);
+        return ob;
+    }
 
+    @Test
+    public void test() {
         Formatter formatter = new FormatterImpl(runtime, new FormattingOptionsImpl.Builder().build());
-        String out = formatter.write(ob);
+        String out = formatter.write(create1());
         @Language("java")
         String expected = """
                 package a.b;
@@ -185,9 +188,7 @@ public class TestFormatter6 {
         assertEquals(expected, out);
     }
 
-    // space does occur when there are no method parameters
-    @Test
-    public void test1a() {
+    public static OutputBuilder create2() {
         OutputBuilder ob = new OutputBuilderImpl();
         GuideImpl.GuideGenerator gg616 = GuideImpl.generatorForBlock();
         GuideImpl.GuideGenerator gg618 = GuideImpl.generatorForParameterDeclaration();
@@ -228,9 +229,13 @@ public class TestFormatter6 {
                 .add(SymbolEnum.RIGHT_BRACE)
                 .add(gg616.end()) // priority=true, startNL=true, endNL=true
                 .add(SymbolEnum.RIGHT_BRACE);
-
+        return ob;
+    }
+    // space does occur when there are no method parameters
+    @Test
+    public void test1a() {
         Formatter formatter = new FormatterImpl(runtime, new FormattingOptionsImpl.Builder().build());
-        String out = formatter.write(ob);
+        String out = formatter.write(create2());
         @Language("java")
         String expected = """
                 class X {
