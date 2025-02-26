@@ -320,17 +320,8 @@ public class MethodCallImpl extends ExpressionImpl implements MethodCall {
 
     @Override
     public Stream<Variable> variables(DescendMode descendMode) {
-        Value.FieldValue currentGetSet = methodInfo.analysis().getOrDefault(PropertyImpl.GET_SET_FIELD,
-                ValueImpl.GetSetValueImpl.EMPTY);
-        FieldReference getSetField;
-        if (currentGetSet.field() != null) {
-            getSetField = new FieldReferenceImpl(currentGetSet.field(), object, null,
-                    currentGetSet.field().type());
-        } else {
-            getSetField = null;
-        }
-        return Stream.concat(Stream.ofNullable(getSetField), Stream.concat(object.variables(descendMode),
-                parameterExpressions.stream().flatMap(e -> e.variables(descendMode))));
+        return Stream.concat(object.variables(descendMode),
+                parameterExpressions.stream().flatMap(e -> e.variables(descendMode)));
     }
 
     @Override

@@ -476,7 +476,8 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
 
     @Override
     public OutputBuilder print(Qualification qualification, boolean doTypeDeclaration) {
-        return new TypePrinter(this).print(new ImportComputerImpl(), qualification, doTypeDeclaration);
+        return new TypePrinter(this, false)
+                .print(new ImportComputerImpl(), qualification, doTypeDeclaration);
     }
 
     @Override
