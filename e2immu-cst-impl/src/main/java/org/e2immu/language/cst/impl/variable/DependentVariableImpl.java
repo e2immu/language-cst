@@ -17,7 +17,6 @@ import org.e2immu.language.cst.impl.output.OutputBuilderImpl;
 import org.e2immu.language.cst.impl.output.QualificationImpl;
 import org.e2immu.language.cst.impl.output.SymbolEnum;
 
-import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -37,13 +36,20 @@ public class DependentVariableImpl extends VariableImpl implements DependentVari
     private final String simpleName;
     private final String fullyQualifiedName;
 
-    public static DependentVariable create(Expression array, Expression index) {
-        Variable av = extractVariable(array);
-        Variable iv = extractVariable(index);
-        assert array != null;
-        assert array.parameterizedType().arrays() > 0;
-        ParameterizedType pt = array.parameterizedType().copyWithOneFewerArrays();
-        return new DependentVariableImpl(array, av, index, iv, pt);
+    public static DependentVariable create(Expression arrayExpression,
+                                           Expression indexExpression,
+                                           ParameterizedType parameterizedType) {
+        assert arrayExpression != null;
+        assert indexExpression != null;
+        Variable av = extractVariable(arrayExpression);
+        Variable iv = extractVariable(indexExpression);
+        ParameterizedType pt;
+        if (parameterizedType != null) {
+            pt = parameterizedType;
+        } else {
+            pt = arrayExpression.parameterizedType().copyWithOneFewerArrays();
+        }
+        return new DependentVariableImpl(arrayExpression, av, indexExpression, iv, pt);
     }
 
     private static Variable extractVariable(Expression e) {

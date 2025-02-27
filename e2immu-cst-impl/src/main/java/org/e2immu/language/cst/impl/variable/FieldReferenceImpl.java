@@ -17,12 +17,14 @@ import org.e2immu.language.cst.api.variable.FieldReference;
 import org.e2immu.language.cst.api.variable.This;
 import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.language.cst.impl.element.ElementImpl;
+import org.e2immu.language.cst.impl.element.SourceImpl;
 import org.e2immu.language.cst.impl.expression.TypeExpressionImpl;
 import org.e2immu.language.cst.impl.expression.VariableExpressionImpl;
 import org.e2immu.language.cst.impl.expression.util.PrecedenceEnum;
 import org.e2immu.language.cst.impl.output.*;
 import org.e2immu.language.cst.impl.type.DiamondEnum;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -55,13 +57,14 @@ public class FieldReferenceImpl extends VariableImpl implements FieldReference {
         // NOTE: for the sake of translations: if the scope is given, we take it, even if the result may not compile
         if (fieldInfo.isStatic()) {
             this.scope = scope == null
-                    ? new TypeExpressionImpl(fieldInfo.owner().asSimpleParameterizedType(), DiamondEnum.NO)
+                    ? new TypeExpressionImpl(List.of(), SourceImpl.NO_SOURCE,
+                    fieldInfo.owner().asSimpleParameterizedType(), DiamondEnum.NO)
                     : scope;
             isDefaultScope = scope instanceof TypeExpression te && fieldInfo.owner() == te.parameterizedType().typeInfo();
             this.scopeVariable = null;
         } else if (scope == null) {
             scopeVariable = new ThisImpl(fieldInfo.owner().asParameterizedType());
-            this.scope = new VariableExpressionImpl(scopeVariable);
+            this.scope = new VariableExpressionImpl(List.of(), SourceImpl.NO_SOURCE, scopeVariable, null);
             isDefaultScope = true;
         } else {
             this.scope = scope;
@@ -77,6 +80,7 @@ public class FieldReferenceImpl extends VariableImpl implements FieldReference {
         this.fullyQualifiedName = computeFqn(scope);
         assert !(scopeIsRecursivelyThis() && fieldInfo.isStatic());
         // know that: assert this.scope != null;
+        // assert this.scope.source() != null;
     }
 
     @Override
@@ -102,8 +106,13 @@ public class FieldReferenceImpl extends VariableImpl implements FieldReference {
         if (scopeVariable != null) {
             scopeFqn = scopeVariable.fullyQualifiedName();
         } else {
-            int unique = Math.abs(scope.hashCode());
-            scopeFqn = "scope" + unique;
+            String suffix;
+            if (scope.source() != null) {
+                suffix = scope.source().compact2();
+            } else {
+                suffix = "" + Math.abs(scope.hashCode());
+            }
+            scopeFqn = "scope" + suffix;
         }
         return fieldInfo.fullyQualifiedName() + "#" + scopeFqn;
     }

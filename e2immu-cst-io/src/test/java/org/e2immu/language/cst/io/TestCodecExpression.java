@@ -42,12 +42,14 @@ public class TestCodecExpression extends CommonTest {
     public void test2() {
         context.push(typeInfo);
         LocalVariable lv = runtime.newLocalVariable("lv", typeInfo.asParameterizedType());
-        VariableExpression scope = runtime.newVariableExpression(lv);
-        EnclosedExpression ee = runtime.newEnclosedExpressionBuilder().setExpression(scope).build();
+        VariableExpression scope = runtime.newVariableExpressionBuilder().setVariable(lv).setSource(runtime.parseSourceFromCompact2("2-3:4-5")).build();
+        EnclosedExpression ee = runtime.newEnclosedExpressionBuilder().setSource(runtime.parseSourceFromCompact2("1-2:3-4")).setExpression(scope).build();
         FieldReference fr = runtime.newFieldReference(f, ee, f.type());
         assertEquals("(lv).f", fr.toString());
 
-        String encoded = "[\"F\",[\"Ta.b.C\",\"Ff(0)\"],[\"enclosedExpression\",[\"variableExpression\",[\"L\",\"lv\",\"Ta.b.C\"]]]]";
+        String encoded = """
+                ["F",["Ta.b.C","Ff(0)"],["enclosedExpression","1-2:3-4",["variableExpression","2-3:4-5",["L","lv","Ta.b.C"]]]]\
+                """;
         assertEquals(encoded, codec.encodeVariable(context, fr).toString());
         CodecImpl.D d = makeD(encoded);
         assertEquals(fr, codec.decodeVariable(context, d));

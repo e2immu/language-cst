@@ -11,6 +11,7 @@ import java.util.Objects;
 we must be a bit memory-conscious: no unnecessary fields because there may be millions of elements
  */
 public class SourceImpl implements Source {
+    public static final Source NO_SOURCE = new SourceImpl(null, null, 0, 0, 0, 0);
     private final Element parent;
     private final String index;
     private final short beginLine;
@@ -112,6 +113,7 @@ public class SourceImpl implements Source {
 
     @Override
     public String toString() {
+        if (this == NO_SOURCE) return "NO_SOURCE";
         return index + "@" + beginLine + ":" + beginPos + "-" + endLine + ":" + endPos;
     }
 

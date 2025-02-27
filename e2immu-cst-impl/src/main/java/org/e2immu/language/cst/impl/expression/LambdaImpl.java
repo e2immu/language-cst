@@ -237,6 +237,7 @@ public class LambdaImpl extends ExpressionImpl implements Lambda {
     @Override
     public Expression translate(TranslationMap translationMap) {
         Expression tLambda = translationMap.translateExpression(this);
+        if (tLambda == null) return this;
         if (tLambda != this) return tLambda;
         TypeInfo tTypeInfo = methodInfo.typeInfo().translate(translationMap);
         if (tTypeInfo != methodInfo.typeInfo()) {

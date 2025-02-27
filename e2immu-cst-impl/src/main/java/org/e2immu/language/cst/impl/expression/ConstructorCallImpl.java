@@ -299,6 +299,7 @@ public class ConstructorCallImpl extends ExpressionImpl implements ConstructorCa
     @Override
     public Expression translate(TranslationMap translationMap) {
         Expression translated = translationMap.translateExpression(this);
+        if (translated == null) return this;
         if (translated != this) return translated;
 
         Expression translatedObject = object == null ? null : translationMap.translateExpression(object);

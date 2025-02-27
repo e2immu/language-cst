@@ -45,7 +45,9 @@ public class ExpressionCodec {
         assert eCodec != null : "No codec yet for " + e.name();
         List<Codec.EncodedValue> list = eCodec.encode(e);
         Codec.EncodedValue e0 = codec.encodeString(context, e.name());
-        return codec.encodeList(context, Stream.concat(Stream.of(e0), list.stream()).toList());
+        assert e.source() != null;
+        Codec.EncodedValue e1 = codec.encodeString(context, e.source().compact2());
+        return codec.encodeList(context, Stream.concat(Stream.of(e0, e1), list.stream()).toList());
     }
 
     public Expression decodeExpression(Codec.EncodedValue encodedValue) {
@@ -65,8 +67,12 @@ public class ExpressionCodec {
 
         @Override
         public Expression decode(List<Codec.EncodedValue> list) {
-            Variable variable = codec.decodeVariable(context, list.get(1));
-            return runtime.newVariableExpression(variable);
+            String source = codec.decodeString(context, list.get(1));
+            Variable variable = codec.decodeVariable(context, list.get(2));
+            return runtime.newVariableExpressionBuilder()
+                    .setVariable(variable)
+                    .setSource(runtime.parseSourceFromCompact2(source))
+                    .build();
         }
     }
 
@@ -79,8 +85,10 @@ public class ExpressionCodec {
 
         @Override
         public Expression decode(List<Codec.EncodedValue> list) {
-            Expression inner = decodeExpression(list.get(1));
-            return runtime.newEnclosedExpressionBuilder().setExpression(inner).build();
+            String source = codec.decodeString(context, list.get(1));
+            Expression inner = decodeExpression(list.get(2));
+            return runtime.newEnclosedExpressionBuilder().setSource(runtime.parseSourceFromCompact2(source))
+                    .setExpression(inner).build();
         }
     }
 
@@ -100,14 +108,16 @@ public class ExpressionCodec {
 
         @Override
         public Expression decode(List<Codec.EncodedValue> list) {
-            MethodInfo constructor = (MethodInfo) codec.decodeInfoOutOfContext(context, list.get(1));
-            Diamond diamond = decodeDiamond(list.get(2));
-            ParameterizedType concreteReturnType = codec.decodeType(context, list.get(3));
-            Expression object = codec.decodeExpression(context, list.get(4));
-            List<Expression> arguments = codec.decodeList(context, list.get(5))
+            String source = codec.decodeString(context, list.get(1));
+            MethodInfo constructor = (MethodInfo) codec.decodeInfoOutOfContext(context, list.get(2));
+            Diamond diamond = decodeDiamond(list.get(3));
+            ParameterizedType concreteReturnType = codec.decodeType(context, list.get(4));
+            Expression object = codec.decodeExpression(context, list.get(5));
+            List<Expression> arguments = codec.decodeList(context, list.get(6))
                     .stream().map(e -> codec.decodeExpression(context, e)).toList();
-            ArrayInitializer arrayInitializer = (ArrayInitializer) codec.decodeExpression(context, list.get(6));
+            ArrayInitializer arrayInitializer = (ArrayInitializer) codec.decodeExpression(context, list.get(7));
             return runtime.newConstructorCallBuilder()
+                    .setSource(runtime.parseSourceFromCompact2(source))
                     .setConstructor(constructor)
                     .setDiamond(diamond)
                     .setConcreteReturnType(concreteReturnType)
@@ -146,7 +156,8 @@ public class ExpressionCodec {
 
         @Override
         public Expression decode(List<Codec.EncodedValue> list) {
-            return runtime.nullConstant();
+            String source = codec.decodeString(context, list.get(1));
+            return runtime.newNullConstant(List.of(), runtime.parseSourceFromCompact2(source));
         }
     }
 
@@ -161,9 +172,13 @@ public class ExpressionCodec {
 
         @Override
         public Expression decode(List<Codec.EncodedValue> list) {
-            ParameterizedType type = codec.decodeType(context, list.get(1));
-            Expression expression = codec.decodeExpression(context, list.get(2));
-            return runtime.newCastBuilder().setParameterizedType(type).setExpression(expression).build();
+            String source = codec.decodeString(context, list.get(1));
+            ParameterizedType type = codec.decodeType(context, list.get(2));
+            Expression expression = codec.decodeExpression(context, list.get(3));
+            return runtime.newCastBuilder()
+                    .setSource(runtime.parseSourceFromCompact2(source))
+                    .setParameterizedType(type).setExpression(expression)
+                    .build();
         }
     }
 
@@ -176,7 +191,9 @@ public class ExpressionCodec {
 
         @Override
         public Expression decode(List<Codec.EncodedValue> list) {
-            return runtime.newBoolean(codec.decodeBoolean(context, list.get(1)));
+            String source = codec.decodeString(context, list.get(1));
+            return runtime.newBoolean(List.of(), runtime.parseSourceFromCompact2(source),
+                    codec.decodeBoolean(context, list.get(2)));
         }
     }
 }

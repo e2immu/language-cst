@@ -1,6 +1,5 @@
 package org.e2immu.language.cst.impl.runtime;
 
-import org.e2immu.language.cst.api.analysis.Value;
 import org.e2immu.language.cst.api.element.*;
 import org.e2immu.language.cst.api.expression.*;
 import org.e2immu.language.cst.api.info.*;
@@ -34,6 +33,8 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collector;
 
 public class FactoryImpl extends PredefinedImpl implements Factory {
@@ -185,6 +186,11 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     @Override
     public IntConstant intOne() {
         return one;
+    }
+
+    @Override
+    public IntConstant intOne(Source source) {
+        return new IntConstantImpl(List.of(), source, intParameterizedType(), 1);
     }
 
     @Override
@@ -490,19 +496,14 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
 
     @Override
     public DependentVariable newDependentVariable(Expression array, Expression index) {
-        return DependentVariableImpl.create(array, index);
+        return DependentVariableImpl.create(array, index, null);
     }
 
     @Override
-    public DependentVariable newDependentVariable(Variable arrayVariable, ParameterizedType parameterizedType, Variable indexVariable) {
-        return new DependentVariableImpl(newVariableExpression(arrayVariable), arrayVariable,
-                newVariableExpression(indexVariable), indexVariable, parameterizedType);
-    }
-
-    @Override
-    public DependentVariable newDependentVariable(Variable arrayVariable, ParameterizedType parameterizedType, Expression indexExpression) {
-        return new DependentVariableImpl(newVariableExpression(arrayVariable), arrayVariable,
-                indexExpression, indexExpression instanceof VariableExpression ve ? ve.variable() : null, parameterizedType);
+    public DependentVariable newDependentVariable(Expression arrayExpression,
+                                                  Expression indexExpression,
+                                                  ParameterizedType parameterizedType) {
+        return DependentVariableImpl.create(arrayExpression, indexExpression, parameterizedType);
     }
 
     @Override
@@ -579,6 +580,7 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
 
     @Override
     public FieldReference newFieldReference(FieldInfo fieldInfo, Expression scope, ParameterizedType concreteReturnType) {
+        // assert scope != null && scope.source() != null;
         return new FieldReferenceImpl(fieldInfo, scope, null, concreteReturnType);
     }
 
@@ -863,6 +865,11 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
+    public TypeExpression.Builder newTypeExpressionBuilder() {
+        return new TypeExpressionImpl.Builder();
+    }
+
+    @Override
     public TypeInfo newTypeInfo(TypeInfo typeInfo, String capitalized) {
         return new TypeInfoImpl(typeInfo, capitalized);
     }
@@ -910,6 +917,11 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     @Override
     public YieldStatement.Builder newYieldBuilder() {
         return new YieldStatementImpl.Builder();
+    }
+
+    @Override
+    public Source noSource() {
+        return SourceImpl.NO_SOURCE;
     }
 
     @Override
@@ -964,6 +976,18 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     @Override
     public ParameterizedType parameterizedTypeWildcard() {
         return ParameterizedTypeImpl.WILDCARD_PARAMETERIZED_TYPE;
+    }
+
+    private static final Pattern COMPACT2_PATTERN = Pattern.compile("(\\d+)-(\\d+):(\\d+)-(\\d+)");
+
+    @Override
+    public Source parseSourceFromCompact2(String compact2) {
+        Matcher m = COMPACT2_PATTERN.matcher(compact2);
+        if (m.matches()) {
+            return new SourceImpl(null, null, Integer.parseInt(m.group(1)), Integer.parseInt(m.group(2)),
+                    Integer.parseInt(m.group(3)), Integer.parseInt(m.group(4)));
+        }
+        throw new UnsupportedOperationException("Illegal format: " + compact2);
     }
 
     @Override

@@ -20,7 +20,9 @@ public class TestTranslateDependentVariable {
         TypeInfo ti = r.newTypeInfo(r.stringTypeInfo(), "X");
         FieldInfo fi = r.newFieldInfo("array", false, r.intParameterizedType().copyWithArrays(1), ti);
         LocalVariable x = r.newLocalVariable("x", ti.asParameterizedType());
-        FieldReference fr = r.newFieldReference(fi, r.newVariableExpression(x), fi.type());
+        FieldReference fr = r.newFieldReference(fi,
+                r.newVariableExpressionBuilder().setVariable(x).setSource(r.parseSourceFromCompact2("1-2:3-4")).build(),
+                fi.type());
         assertEquals("x.array", fr.toString());
         LocalVariable i = r.newLocalVariable("i", r.intParameterizedType());
         DependentVariable dv = r.newDependentVariable(r.newVariableExpression(fr), r.newVariableExpression(i));

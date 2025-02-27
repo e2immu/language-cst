@@ -3,6 +3,7 @@ package org.e2immu.language.cst.impl.analysis;
 import org.e2immu.language.cst.api.analysis.Codec;
 import org.e2immu.language.cst.api.analysis.Value;
 import org.e2immu.language.cst.api.expression.Expression;
+import org.e2immu.language.cst.api.expression.VariableExpression;
 import org.e2immu.language.cst.api.info.*;
 import org.e2immu.language.cst.api.runtime.Runtime;
 import org.e2immu.language.cst.api.util.ParSeq;
@@ -449,7 +450,11 @@ public abstract class ValueImpl implements Value {
                 return fieldReference;
             }
             // indexing: objects[i]
-            return runtime.newDependentVariable(runtime.newVariableExpression(fieldReference), indexOrNull);
+            VariableExpression arrayExpression = runtime.newVariableExpressionBuilder()
+                    .setVariable(fieldReference)
+                    .setSource(object.source())
+                    .build();
+            return runtime.newDependentVariable(arrayExpression, indexOrNull);
         }
     }
 

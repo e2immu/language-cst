@@ -1,5 +1,6 @@
 package org.e2immu.language.cst.api.runtime;
 
+import org.e2immu.language.cst.api.analysis.Codec;
 import org.e2immu.language.cst.api.element.*;
 import org.e2immu.language.cst.api.expression.*;
 import org.e2immu.language.cst.api.info.*;
@@ -72,6 +73,8 @@ public interface Factory {
     IntConstant intMinusOne();
 
     IntConstant intOne();
+
+    IntConstant intOne(Source source);
 
     Numeric intOrDouble(double v);
 
@@ -185,14 +188,13 @@ public interface Factory {
 
     ContinueStatement.Builder newContinueBuilder();
 
-    DependentVariable newDependentVariable(Expression array, Expression index);
+    DependentVariable newDependentVariable(Expression arrayExpression, Expression indexExpression);
 
-    // Direct access, useful for synthetic constructs. Preferably use other method.
-    DependentVariable newDependentVariable(Variable arrayVariable, ParameterizedType parameterizedType, Variable indexVariable);
-
-    DependentVariable newDependentVariable(Variable arrayVariable,
-                                           ParameterizedType parameterizedType,
-                                           Expression indexExpression);
+    // Direct access, useful for synthetic constructs. Preferably use the other method, where
+    // parameterizedType == arrayExpression.parameterizedType().copyWithOneFewerArrays().
+    DependentVariable newDependentVariable(Expression arrayExpression,
+                                           Expression indexExpression,
+                                           ParameterizedType parameterizedType);
 
     DetailedSources.Builder newDetailedSourcesBuilder();
 
@@ -343,6 +345,8 @@ public interface Factory {
 
     TypeExpression newTypeExpression(ParameterizedType parameterizedType, Diamond diamond);
 
+    TypeExpression.Builder newTypeExpressionBuilder();
+
     TypeInfo newTypeInfo(TypeInfo typeInfo, String simpleName);
 
     TypeInfo newTypeInfo(CompilationUnit cu, String simpleName);
@@ -365,6 +369,8 @@ public interface Factory {
 
     YieldStatement.Builder newYieldBuilder();
 
+    Source noSource();
+
     Expression notNull(Expression expression);
 
     Expression nullConstant();
@@ -378,6 +384,8 @@ public interface Factory {
     ParameterizedType parameterizedTypeReturnTypeOfConstructor();
 
     ParameterizedType parameterizedTypeWildcard();
+
+    Source parseSourceFromCompact2(String compact2);
 
     Precedence precedenceAdditive();
 

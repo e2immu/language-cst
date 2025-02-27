@@ -390,9 +390,9 @@ public class CodecImpl implements Codec {
             case "D" -> {
                 Expression a = decodeExpression(context, list.get(1));
                 Expression i = decodeExpression(context, list.get(2));
-                if(a instanceof VariableExpression ve) {
-                    // to allow for this[xxx] in StaticValues
-                    yield runtime.newDependentVariable(ve.variable(), ve.parameterizedType(), i);
+                if (a instanceof VariableExpression ve) {
+                    // explicitly mention the type, to allow for this[xxx] in StaticValues
+                    yield runtime.newDependentVariable(ve, i, ve.parameterizedType());
                 }
                 yield runtime.newDependentVariable(a, i);
             }
@@ -607,7 +607,7 @@ public class CodecImpl implements Codec {
             return encodeList(context, List.of(encodeString(context, "L"), encodeString(context, lv.simpleName()),
                     encodeType(context, lv.parameterizedType())));
         }
-        if(variable instanceof DependentVariable dv) {
+        if (variable instanceof DependentVariable dv) {
             return encodeList(context, List.of(encodeString(context, "D"),
                     encodeExpression(context, dv.arrayExpression()), encodeExpression(context, dv.indexExpression())));
         }

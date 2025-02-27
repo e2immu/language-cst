@@ -1,5 +1,6 @@
 package org.e2immu.language.cst.api.expression;
 
+import org.e2immu.language.cst.api.type.Diamond;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 
 public interface TypeExpression extends Expression {
@@ -10,5 +11,14 @@ public interface TypeExpression extends Expression {
     @Override
     default String name() {
         return NAME;
+    }
+
+
+    interface Builder extends Expression.Builder<Builder> {
+        Builder setParameterizedType(ParameterizedType parameterizedType);
+
+        Builder setDiamond(Diamond diamond);
+
+        TypeExpression build();
     }
 }

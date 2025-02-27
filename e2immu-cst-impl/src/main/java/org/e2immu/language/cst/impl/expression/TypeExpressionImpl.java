@@ -39,6 +39,28 @@ public class TypeExpressionImpl extends ExpressionImpl implements TypeExpression
         this.diamond = diamond;
     }
 
+    public static class Builder extends ElementImpl.Builder<TypeExpression.Builder> implements TypeExpression.Builder {
+        private ParameterizedType parameterizedType;
+        private Diamond diamond;
+
+        @Override
+        public TypeExpression.Builder setParameterizedType(ParameterizedType parameterizedType) {
+            this.parameterizedType = parameterizedType;
+            return this;
+        }
+
+        @Override
+        public Builder setDiamond(Diamond diamond) {
+            this.diamond = diamond;
+            return this;
+        }
+
+        @Override
+        public TypeExpression build() {
+            return new TypeExpressionImpl(comments, source, parameterizedType, diamond);
+        }
+    }
+
     @Override
     public Expression withSource(Source source) {
         return new TypeExpressionImpl(comments(), source, parameterizedType, diamond);

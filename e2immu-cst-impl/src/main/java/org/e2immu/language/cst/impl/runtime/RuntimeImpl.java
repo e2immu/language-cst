@@ -336,13 +336,21 @@ public class RuntimeImpl extends FactoryImpl implements Runtime {
             TypeInfo list = getFullyQualified(List.class, true);
             MethodInfo get = list.findUniqueMethod("get", 1);
             Value.FieldValue fv = get.getSetField();
-            fr2 = newFieldReference(fv.field(), newVariableExpression(fr), pt.copyWithArrays(pt.arrays() + 1));
+            VariableExpression scope = newVariableExpressionBuilder()
+                    .setVariable(fr)
+                    .setSource(methodCall.object().source())
+                    .build();
+            fr2 = newFieldReference(fv.field(), scope, pt.copyWithArrays(pt.arrays() + 1));
         } else {
             fr2 = fr;
         }
         Expression index = methodCall.parameterExpressions().get(0);
         assert index.parameterizedType().isMathematicallyInteger();
-        return newDependentVariable(newVariableExpression(fr2), index);
+        VariableExpression array = newVariableExpressionBuilder()
+                .setVariable(fr2)
+                .setSource(methodCall.object().source())
+                .build();
+        return newDependentVariable(array, index);
     }
 
 }
