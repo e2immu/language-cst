@@ -9,6 +9,7 @@ import org.e2immu.language.cst.impl.output.SymbolEnum;
 import org.e2immu.language.cst.impl.output.TextImpl;
 import org.e2immu.language.cst.impl.runtime.RuntimeImpl;
 import org.e2immu.language.cst.print.FormattingOptionsImpl;
+import org.intellij.lang.annotations.Language;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -44,10 +45,11 @@ public class TestBlockPrinter1 {
         FormattingOptions options = new FormattingOptionsImpl.Builder().setLengthOfLine(120).setSpacesInTab(4).build();
         BlockPrinter blockPrinter = new BlockPrinter();
         BlockPrinter.Output output = blockPrinter.write(block, options);
+        @Language("java")
         String expect = "package a.b.c; import java.util.Set; import java.util.List; record Record() { }";
-        assertEquals(expect + " ", output.string());
+        assertEquals(expect, output.string());
         assertFalse(output.hasBeenSplit());
-        assertEquals(80, output.endPos());
+        assertEquals(79, output.endPos());
         // 14, 36, 59 = space after ; 75 = space after ); 77 = space after {
         assertEquals("{3={14=false, 36=false, 59=false, 75=false}, 4={77=false}}", output.splitInfo().map().toString());
         Formatter2Impl formatter2 = new Formatter2Impl(runtime, options);
@@ -61,19 +63,21 @@ public class TestBlockPrinter1 {
         FormattingOptions options = new FormattingOptionsImpl.Builder().setLengthOfLine(70).setSpacesInTab(4).build();
         BlockPrinter blockPrinter = new BlockPrinter();
         BlockPrinter.Output output = blockPrinter.write(block, options);
+        @Language("java")
         String expect = """
                 package a.b.c; import java.util.Set; import java.util.List;
-                    record Record() { }\s""";
+                        record Record() { }""";
         assertEquals(expect, output.string());
         assertTrue(output.hasBeenSplit());
-        assertEquals(24, output.endPos());
+        assertEquals(27, output.endPos());
         // the newline in expect is at position 59; indent = 4, so 'record' starts at 63
         // note that the space between record and Record is 'ONE', which does not allow a split
-        assertEquals("{3={79=false}, 4={81=false}}", output.splitInfo().map().toString());
+        assertEquals("{3={83=false}, 4={85=false}}", output.splitInfo().map().toString());
         Formatter2Impl formatter2 = new Formatter2Impl(runtime, options);
+        @Language("java")
         String formatted = """
                 package a.b.c; import java.util.Set; import java.util.List;
-                record Record() { }
+                    record Record() { }
                 """;
         assertEquals(formatted, formatter2.write(outputBuilder));
     }
@@ -86,14 +90,14 @@ public class TestBlockPrinter1 {
         FormattingOptions options = new FormattingOptionsImpl.Builder().setLengthOfLine(50).setSpacesInTab(4).build();
         BlockPrinter blockPrinter = new BlockPrinter();
         BlockPrinter.Output output = blockPrinter.write(block, options);
+        @Language("java")
         String expect = """
                 package a.b.c; import java.util.Set;
-                    import java.util.List; record Record() {
-                    }\s""";
+                        import java.util.List; record Record() { }""";
         assertEquals(expect, output.string());
         assertTrue(output.hasBeenSplit());
-        assertEquals(6, output.endPos());
-        assertEquals("{}", output.splitInfo().map().toString());
+        assertEquals(50, output.endPos());
+        assertEquals("{3={67=false, 83=false}, 4={85=false}}", output.splitInfo().map().toString());
     }
 
 
@@ -101,12 +105,12 @@ public class TestBlockPrinter1 {
     public void test1d() {
         OutputBuilder outputBuilder = createExample1();
         Formatter2Impl.Block block = new Formatter2Impl.Block(1, outputBuilder.list(), null);
-        FormattingOptions options = new FormattingOptionsImpl.Builder().setLengthOfLine(55).setSpacesInTab(4).build();
+        FormattingOptions options = new FormattingOptionsImpl.Builder().setLengthOfLine(20).setSpacesInTab(4).build();
         BlockPrinter blockPrinter = new BlockPrinter();
         BlockPrinter.Output output = blockPrinter.write(block, options);
         String expect = """
                 package a.b.c; import java.util.Set;
-                    import java.util.List; record Record() { }\s""";
+                        import java.util.List; record Record() { }\s""";
         assertEquals(expect, output.string());
         assertTrue(output.hasBeenSplit());
         assertEquals(47, output.endPos());

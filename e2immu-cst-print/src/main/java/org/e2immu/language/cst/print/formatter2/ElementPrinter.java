@@ -28,81 +28,94 @@ public class ElementPrinter {
                                  boolean protectSpaces,
                                  boolean symmetricalSplit) {
 
-        boolean hasBeenSplit = false;
-        Space spaceBefore;
-        Space spaceAfter;
-        if (element instanceof Space s && !s.isNewLine()) {
-            spaceBefore = s;
-            spaceAfter = null;
-        } else if (element instanceof Symbol symbol) {
-            spaceBefore = symbol.left();
-            spaceAfter = symbol.right();
+        if (element instanceof Space space) {
+            return handleSpace(line, splitInfo, options, space, lastElement);
+        }
+        if (element instanceof Symbol symbol) {
+            return handleSymbol(line, splitInfo, block, options, symbol, protectSpaces, symmetricalSplit, lastElement);
+        }
+        return handleNonSpaceNonSymbol(line, splitInfo, block, options, element, protectSpaces);
+    }
+
+    private static boolean handleSymbol(Line line,
+                                        BlockPrinter.SplitInfo splitInfo,
+                                        Formatter2Impl.Block block,
+                                        FormattingOptions options,
+                                        Symbol symbol,
+                                        boolean protectSpaces,
+                                        boolean symmetricalSplit,
+                                        boolean lastElement) {
+        if (!lastElement && !symbol.left().split().isNever()) {
+            addSplitPoint(splitInfo, line.length(), symbol.left());
+        }
+        Line.SpaceLevel left = computeSpaceLevel(options, symbol.left());
+        line.mergeSpace(left);
+        boolean newLine = line.writeSpace(options.compact(), block.tab() * options.spacesInTab());
+        String string = symbol.symbol();
+        line.appendNoNewLine(string);
+        Line.SpaceLevel right = computeSpaceLevel(options, symbol.right());
+        line.setSpace(right);
+        if (!lastElement && !symbol.right().split().isNever()) {
+            addSplitPoint(splitInfo, line.length(), symbol.right());
+        }
+        return newLine;
+    }
+
+    private static boolean handleSpace(Line line,
+                                       BlockPrinter.SplitInfo splitInfo,
+                                       FormattingOptions options,
+                                       Space space,
+                                       boolean lastElement) {
+        Line.SpaceLevel spaceLevel = computeSpaceLevel(options, space);
+        line.setSpace(spaceLevel);
+        if (!lastElement && !space.split().isNever()) {
+            addSplitPoint(splitInfo, line.length(), space);
+        }
+        return space.isNewLine();
+    }
+
+    private static Line.SpaceLevel computeSpaceLevel(FormattingOptions options, Space space) {
+        Line.SpaceLevel spaceLevel;
+        if (space.isNewLine()) {
+            spaceLevel = Line.SpaceLevel.NEWLINE;
         } else {
-            
-        }
-
-        // there are a number of cases that we want to
-        // add split point before
-        if (spaceBefore != null && !spaceBefore.split().isNever()) {
-            int pos = line.length();
-            while (pos - 1 >= 0 && line.lastCharacter() == ' ') --pos; // TODO this is the same code as bestPos(...)
-            addSplitPoint(splitInfo, pos, spaceBefore);
-        }
-
-        String string = write(element, options, block);
-
-        //   if (spaceBefore != null && spaceBefore.split().rank() == BlockPrinter.GUIDE_SPLIT && symmetricalSplit) {
-        //                string = "\n" + (" ".repeat(options.spacesInTab() * block.tab())) + output.stripLeading();
-
-        if (!protectSpaces && (string.startsWith("\n") || string.startsWith(" "))) {
-            // eat all current spacing, not needed
-            line.trim();
-        }
-        // FIXME append point
-        if (!lastElement && spaceAfter != null && !spaceAfter.split().isNever()) {
-            int pos = stringBuilder.length();
-            while (pos - 1 >= 0 && stringBuilder.charAt(pos - 1) == ' ') --pos;
-            addSplitPoint(splitInfo, pos, spaceAfter);
-        }
-
-        if (string2.endsWith("\n")) {
-            // extraLines.set(true);
-            splitInfo.map().clear();
-            int indent = block.tab() * options.spacesInTab();
-            stringBuilder.append(" ".repeat(indent));
-            line.newAvailable(indent);
-            available.set(maxAvailable - indent);
-        } else if (string2.contains("\n")) {
-            hasBeenSplit = true;
-            available.set(maxAvailable - Util.charactersUntilAndExcludingLastNewline(string2));
-        } else {
-            available.addAndGet(-string2.length());
-            LOGGER.debug("Appended string '{}' without newlines; available now {}", string2, available);
-            if (available.get() < 0 && !splitInfo.map().isEmpty()) {
-                LOGGER.debug("We must split: we're over the bound");
-                int indent = block.tab() * options.spacesInTab();
-                int pos = updateForSplit(splitInfo, indent);
-                String insert = "\n" + (" ".repeat(indent));
-                // if we've just passed a ' ', then we replace that one
-                if (pos < stringBuilder.length()) {
-                    char atPos = stringBuilder.charAt(pos);
-                    int remainder = stringBuilder.length() - pos;
-                    if (atPos == ' ') {
-                        stringBuilder.replace(pos, pos + 1, insert);
-                    } else {
-                        stringBuilder.insert(pos, insert);
-                    }
-                    available.set(maxAvailable - (remainder + indent));
-                    hasBeenSplit = true;
-                }
+            String minimal = space.minimal();
+            String normal = space.write(options);
+            if (normal.isEmpty()) {
+                spaceLevel = Line.SpaceLevel.NONE;
+            } else if (minimal.isEmpty()) {
+                spaceLevel = Line.SpaceLevel.SPACE_IS_NICE;
+            } else {
+                spaceLevel = Line.SpaceLevel.SPACE;
             }
         }
-        return hasBeenSplit;
+        return spaceLevel;
+    }
+
+    private static boolean handleNonSpaceNonSymbol(Line line,
+                                                   BlockPrinter.SplitInfo splitInfo,
+                                                   Formatter2Impl.Block block,
+                                                   FormattingOptions options,
+                                                   OutputElement element,
+                                                   boolean protectSpaces) {
+        line.writeSpace(options.compact(), block.tab() * options.spacesInTab());
+        String string = write(element, options, block);
+        line.appendBeforeSplit(string);
+        boolean multiLine = line.computeAvailable();
+        if (multiLine) return true;
+        if (line.available() < 0 && !splitInfo.map().isEmpty()) {
+            int indent = block.tab() * options.spacesInTab();
+            int pos = updateForSplit(splitInfo, indent);
+            line.carryOutSplit(pos, indent + options.spacesInTab(), false);
+            line.computeAvailable();
+            return true;
+        }
+        return false;
     }
 
     private static String write(OutputElement element, FormattingOptions options, Formatter2Impl.Block block) {
         if (element instanceof Text tb && tb.textBlockFormatting() != null) {
-           return  WriteTextBlock.write(options.spacesInTab() * (block.tab() + 2),
+            return WriteTextBlock.write(options.spacesInTab() * (block.tab() + 2),
                     tb.minimal(), tb.textBlockFormatting());
         }
         return element.write(options);

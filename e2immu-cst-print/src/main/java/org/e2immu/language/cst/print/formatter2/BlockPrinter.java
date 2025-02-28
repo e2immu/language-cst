@@ -28,6 +28,10 @@ public class BlockPrinter {
      *                     the best positions to split
      */
     record Output(String string, boolean hasBeenSplit, SplitInfo splitInfo) {
+        Output {
+            assert !string.endsWith(" ") : "An output cannot end in a space";
+        }
+
         int endPos() {
             return hasBeenSplit ? Util.charactersUntilAndExcludingLastNewline(string) : string.length();
         }
@@ -43,7 +47,7 @@ public class BlockPrinter {
      * @return an output instance
      */
     Output write(Formatter2Impl.Block block, FormattingOptions options) {
-        int maxAvailable = options.lengthOfLine() - block.tab() * options.spacesInTab();
+        int maxAvailable = options.lengthOfLine();
         if (block.guide() != null) {
             return handleGuideBlock(block, options);
         }

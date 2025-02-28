@@ -1,10 +1,26 @@
 package org.e2immu.language.cst.print.formatter2;
 
 class Line {
+
+    enum SpaceLevel {
+        NONE, SPACE_IS_NICE, SPACE, NEWLINE,
+        ;
+
+        public SpaceLevel max(SpaceLevel other) {
+            if (this == NEWLINE || other == NEWLINE) return NEWLINE;
+            if (this == SPACE || other == SPACE) return SPACE;
+            if (this == SPACE_IS_NICE || other == SPACE_IS_NICE) return SPACE_IS_NICE;
+            return NONE;
+        }
+    }
+
     final int maxAvailable;
     final StringBuilder stringBuilder = new StringBuilder();
 
     private int available;
+    // space level at the end of the string in the stringBuilder.
+    // it is NOT counted in "available", and has not been added to the builder.
+    private SpaceLevel spaceLevel = SpaceLevel.NONE;
 
     Line(int maxAvailable) {
         this.maxAvailable = maxAvailable;
@@ -13,15 +29,49 @@ class Line {
 
     public void appendBeforeSplit(String string) {
         stringBuilder.append(string);
+        assert !string.endsWith("\n");
     }
 
-    public void computeAvailable() {
+    public void setSpace(SpaceLevel spaceLevel) {
+        this.spaceLevel = spaceLevel;
+    }
+
+    public void mergeSpace(SpaceLevel left) {
+        this.spaceLevel = this.spaceLevel.max(left);
+    }
+
+    public boolean writeSpace(boolean compact, int indent) {
+        SpaceLevel current = spaceLevel;
+        spaceLevel = SpaceLevel.NONE;
+        if (current == SpaceLevel.NONE) {
+            return false;
+        }
+        if (compact && current == SpaceLevel.SPACE_IS_NICE) {
+            return false;
+        }
+        if (current == SpaceLevel.NEWLINE) {
+            appendNewLine(indent);
+            return true;
+        }
+        appendNoNewLine(" ");
+        return false;
+    }
+
+    public void appendNewLine(int indent) {
+        stringBuilder.append("\n").append(" ".repeat(indent));
+        available = maxAvailable - indent;
+        spaceLevel = SpaceLevel.NONE;
+    }
+
+    public boolean computeAvailable() {
         int lastNewLine = stringBuilder.lastIndexOf("\n");
         if (lastNewLine < 0) {
-            available -= stringBuilder.length();
+            available = maxAvailable - stringBuilder.length();
+            return false;
         } else {
             int remainder = stringBuilder.length() - (lastNewLine + 1);
             available = maxAvailable - remainder;
+            return true;
         }
     }
 
@@ -52,47 +102,35 @@ class Line {
         return stringBuilder.toString();
     }
 
+    /*
+    spaceLevel has to be written out for this one to be correct
+     */
     boolean isNotEmptyDoesNotEndInNewLine() {
         return !stringBuilder.isEmpty() && '\n' != stringBuilder.charAt(stringBuilder.length() - 1);
     }
 
-    public void trim() {
-        while (!stringBuilder.isEmpty() && stringBuilder.charAt(stringBuilder.length() - 1) == ' ') {
-            stringBuilder.deleteCharAt(stringBuilder.length() - 1);
-            available++;
-        }
-    }
-
     /*
-    return the number of characters added FIXME needs more work
+    return the number of characters added
+
+    this operation leaves spaceLevel invariant.
+    however, available will be incorrect, and a computeAvailable() call will have to be made afterward.
      */
     public int carryOutSplit(int pos, int indent, boolean doubleSplit) {
-        String insert = (doubleSplit ? "\n\n" : "\n") + (" ".repeat(indent));
-        int pos2 = bestSplit(stringBuilder, pos);
-        char atPos = stringBuilder.charAt(pos2);
-        if (atPos == ' ') {
-            // split is ' \n', and we'll replace at the space by '\n' rather than '\n   '
-            if (pos2 < stringBuilder.length() - 1 && stringBuilder.charAt(pos2 + 1) == '\n') {
-                stringBuilder.replace(pos2, pos2 + 1, doubleSplit ? "\n\n" : "\n");
-            } else {
-                stringBuilder.replace(pos2, pos2 + 1, insert);
-            }
-            return indent;
-        } else if (atPos != '\n') {
-            stringBuilder.insert(pos2, insert);
-            return indent + 1;
+        assert pos < stringBuilder.length() - 1 : "do not split on the last character";
+        char atPos = stringBuilder.charAt(pos);
+        if (atPos == '\n') {
+            // we don't split at newlines
+            return 0;
         }
-        // we already have a newline here
-        // IGNORE, this may help with the double splits that are missing for comments
-        return 0;
-    }
-
-    /*
-    'xyz,', pos == 3, then pos stays the same, we'll split on the comma
-    'xyz {', pos == 4, then we'll split on the space, even though the FIXME why?
-     */
-    private static int bestSplit(StringBuilder sb, int pos) {
-        while (pos >= 1 && Character.isWhitespace(sb.charAt(pos - 1))) --pos;
-        return pos;
+        assert !stringBuilder.substring(0, pos).isBlank() : "head of split must not be blank";
+        assert !stringBuilder.substring(pos + 1).isBlank() : "tail of split must not be blank";
+        String insert = (doubleSplit ? "\n\n" : "\n") + (" ".repeat(indent));
+        if (atPos == ' ') {
+            // replace the space, rather than inserting
+            stringBuilder.replace(pos, pos + 1, insert);
+            return insert.length() - 1;
+        }
+        stringBuilder.insert(pos, insert);
+        return insert.length();
     }
 }
