@@ -14,7 +14,10 @@ class Line {
         }
     }
 
+    // number of characters allowed on a line, excluding the indentation (shrinks with increasing tabs)
     final int maxAvailable;
+    // space taken up by indent, on all lines except the first!!! (grows with increasing tabs)
+    final int indent;
     final StringBuilder stringBuilder = new StringBuilder();
 
     private int available;
@@ -22,9 +25,10 @@ class Line {
     // it is NOT counted in "available", and has not been added to the builder.
     private SpaceLevel spaceLevel = SpaceLevel.NONE;
 
-    Line(int maxAvailable) {
+    Line(int maxAvailable, int indent) {
         this.maxAvailable = maxAvailable;
         available = maxAvailable;
+        this.indent = indent;
     }
 
     public void appendBeforeSplit(String string) {
@@ -58,21 +62,22 @@ class Line {
     }
 
     public void appendNewLine(int indent) {
+        assert indent >= this.indent; // but could be more
         stringBuilder.append("\n").append(" ".repeat(indent));
-        available = maxAvailable - indent;
+        available = maxAvailable - (indent - this.indent);
         spaceLevel = SpaceLevel.NONE;
     }
 
     public boolean computeAvailable() {
         int lastNewLine = stringBuilder.lastIndexOf("\n");
         if (lastNewLine < 0) {
+            // there is no indentation on the first line
             available = maxAvailable - stringBuilder.length();
             return false;
-        } else {
-            int remainder = stringBuilder.length() - (lastNewLine + 1);
-            available = maxAvailable - remainder;
-            return true;
         }
+        int remainder = stringBuilder.length() - (lastNewLine + 1);
+        available = this.indent + maxAvailable - remainder;
+        return true;
     }
 
     public void appendNoNewLine(String string) {

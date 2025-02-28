@@ -32,9 +32,9 @@ public class ElementPrinter {
             return handleSpace(line, splitInfo, options, space, lastElement);
         }
         if (element instanceof Symbol symbol) {
-            return handleSymbol(line, splitInfo, block, options, symbol, protectSpaces, symmetricalSplit, lastElement);
+            return handleSymbol(line, splitInfo, block, options, symbol, lastElement);
         }
-        return handleNonSpaceNonSymbol(line, splitInfo, block, options, element, protectSpaces);
+        return handleNonSpaceNonSymbol(line, splitInfo, block, options, element);
     }
 
     private static boolean handleSymbol(Line line,
@@ -42,8 +42,6 @@ public class ElementPrinter {
                                         Formatter2Impl.Block block,
                                         FormattingOptions options,
                                         Symbol symbol,
-                                        boolean protectSpaces,
-                                        boolean symmetricalSplit,
                                         boolean lastElement) {
         if (!lastElement && !symbol.left().split().isNever()) {
             addSplitPoint(splitInfo, line.length(), symbol.left());
@@ -51,6 +49,10 @@ public class ElementPrinter {
         Line.SpaceLevel left = computeSpaceLevel(options, symbol.left());
         line.mergeSpace(left);
         boolean newLine = line.writeSpace(options.compact(), block.tab() * options.spacesInTab());
+        if (newLine && !splitInfo.map().isEmpty()) {
+            int pos = line.stringBuilder.lastIndexOf("\n");
+            updateForSplit(splitInfo, pos);
+        }
         String string = symbol.symbol();
         line.appendNoNewLine(string);
         Line.SpaceLevel right = computeSpaceLevel(options, symbol.right());
@@ -96,13 +98,11 @@ public class ElementPrinter {
                                                    BlockPrinter.SplitInfo splitInfo,
                                                    Formatter2Impl.Block block,
                                                    FormattingOptions options,
-                                                   OutputElement element,
-                                                   boolean protectSpaces) {
+                                                   OutputElement element) {
         line.writeSpace(options.compact(), block.tab() * options.spacesInTab());
         String string = write(element, options, block);
         line.appendBeforeSplit(string);
         boolean multiLine = line.computeAvailable();
-        if (multiLine) return true;
         if (line.available() < 0 && !splitInfo.map().isEmpty()) {
             int indent = block.tab() * options.spacesInTab();
             int pos = updateForSplit(splitInfo, indent);
@@ -110,7 +110,11 @@ public class ElementPrinter {
             line.computeAvailable();
             return true;
         }
-        return false;
+        if (multiLine && !splitInfo.map().isEmpty()) {
+            int pos = line.stringBuilder.lastIndexOf("\n");
+            updateForSplit(splitInfo, pos);
+        }
+        return multiLine;
     }
 
     private static String write(OutputElement element, FormattingOptions options, Formatter2Impl.Block block) {
@@ -119,16 +123,6 @@ public class ElementPrinter {
                     tb.minimal(), tb.textBlockFormatting());
         }
         return element.write(options);
-    }
-
-
-    private static int trim(StringBuilder sb) {
-        int cnt = 0;
-        while (!sb.isEmpty() && sb.charAt(sb.length() - 1) == ' ') {
-            sb.deleteCharAt(sb.length() - 1);
-            ++cnt;
-        }
-        return cnt;
     }
 
     private static int updateForSplit(BlockPrinter.SplitInfo splitInfo, int indent) {
@@ -155,12 +149,4 @@ public class ElementPrinter {
         int rank = space.split().rank();
         splitInfo.map().computeIfAbsent(rank, r -> new TreeMap<>()).put(length, false);
     }
-
-    static String removeLeadingSpacesWhenBuilderEndsInSpace(StringBuilder sb, String string) {
-        if (sb.isEmpty() || Character.isWhitespace(sb.charAt(sb.length() - 1))) {
-            return string.stripLeading();
-        }
-        return string;
-    }
-
 }

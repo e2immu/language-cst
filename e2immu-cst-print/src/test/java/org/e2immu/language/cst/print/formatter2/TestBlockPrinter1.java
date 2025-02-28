@@ -97,7 +97,7 @@ public class TestBlockPrinter1 {
         assertEquals(expect, output.string());
         assertTrue(output.hasBeenSplit());
         assertEquals(50, output.endPos());
-        assertEquals("{3={67=false, 83=false}, 4={85=false}}", output.splitInfo().map().toString());
+        assertEquals("{3={83=false}, 4={85=false}}", output.splitInfo().map().toString());
     }
 
 
@@ -108,13 +108,18 @@ public class TestBlockPrinter1 {
         FormattingOptions options = new FormattingOptionsImpl.Builder().setLengthOfLine(20).setSpacesInTab(4).build();
         BlockPrinter blockPrinter = new BlockPrinter();
         BlockPrinter.Output output = blockPrinter.write(block, options);
+        @Language("java")
         String expect = """
-                package a.b.c; import java.util.Set;
-                        import java.util.List; record Record() { }\s""";
+                package a.b.c;
+                        import java.util.Set;
+                        import java.util.List;
+                        record Record() { }""";
         assertEquals(expect, output.string());
         assertTrue(output.hasBeenSplit());
-        assertEquals(47, output.endPos());
-        assertEquals("{3={63=false, 79=false}, 4={81=false}}", output.splitInfo().map().toString());
+        assertEquals(27, output.endPos());
+        assertEquals(103, expect.length());
+        // space before {, space before }
+        assertEquals("{3={99=false}, 4={101=false}}", output.splitInfo().map().toString());
     }
 
 
@@ -157,10 +162,10 @@ public class TestBlockPrinter1 {
                 package a.b.c; import java.util.Set; import java.util.List;
                     //this is a comment
                     //this is a second comment
-                    record Record() { }\s""";
+                    record Record() { }""";
         assertEquals(expect, output.string());
-        assertFalse(output.hasBeenSplit());
-        assertEquals(139, output.endPos());
+        assertTrue(output.hasBeenSplit());
+        assertEquals(23, output.endPos());
         assertEquals("{3={134=false}, 4={136=false}}", output.splitInfo().map().toString());
     }
 

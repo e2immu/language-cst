@@ -9,7 +9,7 @@ import java.util.*;
 
 public class BlockPrinter {
     private static final Logger LOGGER = LoggerFactory.getLogger(BlockPrinter.class);
-    public static final int GUIDE_SPLIT = 4;
+    public static final int GUIDE_SPLIT = 10;
 
     // split level (the higher the better) to position to 'doubleSplit'
     // single split = on new line; double split = leave line empty
@@ -47,7 +47,7 @@ public class BlockPrinter {
      * @return an output instance
      */
     Output write(Formatter2Impl.Block block, FormattingOptions options) {
-        int maxAvailable = options.lengthOfLine();
+        int maxAvailable = options.lengthOfLine() - block.tab() * options.spacesInTab();
         if (block.guide() != null) {
             return handleGuideBlock(block, options);
         }
@@ -97,7 +97,7 @@ public class BlockPrinter {
                           FormattingOptions options) {
         boolean hasBeenSplit = false;
         SplitInfo splitInfo = new SplitInfo(new TreeMap<>());
-        Line line = new Line(maxAvailable);
+        Line line = new Line(maxAvailable, block.tab() * options.spacesInTab());
         int i = 0;
         int n = block.elements().size();
         boolean protectSpaces = false;
