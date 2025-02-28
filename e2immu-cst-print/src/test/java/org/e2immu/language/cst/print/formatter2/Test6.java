@@ -50,6 +50,7 @@ public class Test6 {
         FormattingOptions options = new FormattingOptionsImpl.Builder().setLengthOfLine(60).setSpacesInTab(4).build();
         Formatter formatter = new Formatter2Impl(runtime, options);
         String string = formatter.write(outputBuilder);
+        @Language("java")
         String expect = """
                 package a.b;
                 import java.io.IOException;

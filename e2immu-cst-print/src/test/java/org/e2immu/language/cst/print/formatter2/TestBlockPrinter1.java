@@ -46,7 +46,7 @@ public class TestBlockPrinter1 {
         BlockPrinter.Output output = blockPrinter.write(block, options);
         String expect = "package a.b.c; import java.util.Set; import java.util.List; record Record() { }";
         assertEquals(expect + " ", output.string());
-        assertFalse(output.extraLines());
+        assertFalse(output.hasBeenSplit());
         assertEquals(80, output.endPos());
         // 14, 36, 59 = space after ; 75 = space after ); 77 = space after {
         assertEquals("{3={14=false, 36=false, 59=false, 75=false}, 4={77=false}}", output.splitInfo().map().toString());
@@ -65,7 +65,7 @@ public class TestBlockPrinter1 {
                 package a.b.c; import java.util.Set; import java.util.List;
                     record Record() { }\s""";
         assertEquals(expect, output.string());
-        assertTrue(output.extraLines());
+        assertTrue(output.hasBeenSplit());
         assertEquals(24, output.endPos());
         // the newline in expect is at position 59; indent = 4, so 'record' starts at 63
         // note that the space between record and Record is 'ONE', which does not allow a split
@@ -91,7 +91,7 @@ public class TestBlockPrinter1 {
                     import java.util.List; record Record() {
                     }\s""";
         assertEquals(expect, output.string());
-        assertTrue(output.extraLines());
+        assertTrue(output.hasBeenSplit());
         assertEquals(6, output.endPos());
         assertEquals("{}", output.splitInfo().map().toString());
     }
@@ -108,7 +108,7 @@ public class TestBlockPrinter1 {
                 package a.b.c; import java.util.Set;
                     import java.util.List; record Record() { }\s""";
         assertEquals(expect, output.string());
-        assertTrue(output.extraLines());
+        assertTrue(output.hasBeenSplit());
         assertEquals(47, output.endPos());
         assertEquals("{3={63=false, 79=false}, 4={81=false}}", output.splitInfo().map().toString());
     }
@@ -155,7 +155,7 @@ public class TestBlockPrinter1 {
                     //this is a second comment
                     record Record() { }\s""";
         assertEquals(expect, output.string());
-        assertFalse(output.extraLines());
+        assertFalse(output.hasBeenSplit());
         assertEquals(139, output.endPos());
         assertEquals("{3={134=false}, 4={136=false}}", output.splitInfo().map().toString());
     }

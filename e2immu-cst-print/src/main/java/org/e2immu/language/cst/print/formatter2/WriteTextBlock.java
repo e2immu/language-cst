@@ -3,6 +3,10 @@ package org.e2immu.language.cst.print.formatter2;
 import org.e2immu.language.cst.api.output.element.TextBlockFormatting;
 
 public class WriteTextBlock {
+    /*
+    starts with """, ends with """, indents according to rules in TextBlockFormatting and given indentation in
+    number of spaces.
+     */
     public static String write(int indentIn, String string, TextBlockFormatting textBlockFormatting) {
         StringBuilder sb = new StringBuilder();
         sb.append("\"\"\"\n");
