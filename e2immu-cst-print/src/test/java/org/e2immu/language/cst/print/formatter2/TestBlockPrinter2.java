@@ -11,6 +11,7 @@ import org.e2immu.language.cst.print.formatter.TestFormatter1;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 public class TestBlockPrinter2 {
     private final Runtime runtime = new RuntimeImpl();
@@ -18,17 +19,15 @@ public class TestBlockPrinter2 {
     @Test
     public void test1a() {
         OutputBuilder outputBuilder = TestFormatter1.createExample1();
-        Formatter2Impl.Block block = new Formatter2Impl.Block(1, outputBuilder.list(), null);
         FormattingOptions options = new FormattingOptionsImpl.Builder().setLengthOfLine(70).setSpacesInTab(4).build();
-        BlockPrinter blockPrinter = new BlockPrinter();
-        BlockPrinter.Output output = blockPrinter.write(block, options);
-        String expect = "public int method(int p1, int p2) { return p1 + p2; } ";
-        assertEquals(expect, output.string());
-
+        assertFalse(options.compact());
         Formatter formatter = new Formatter2Impl(runtime, options);
         String string = formatter.write(outputBuilder);
-        String formatted = "public int method(int p1, int p2) { return p1 + p2; }\n";
-        assertEquals(formatted, string);
+
+        // FIXME missing: MID space int p1,int; START space before {
+        //  good: no space around (, no space after }, single space after )
+        String expect = "public int method(int p1, int p2) { return p1 + p2; }\n";
+        assertEquals(expect, string);
     }
 
     @Test

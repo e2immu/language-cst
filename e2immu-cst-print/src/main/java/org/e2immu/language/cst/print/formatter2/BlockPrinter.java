@@ -2,6 +2,7 @@ package org.e2immu.language.cst.print.formatter2;
 
 import org.e2immu.language.cst.api.output.FormattingOptions;
 import org.e2immu.language.cst.api.output.OutputElement;
+import org.e2immu.language.cst.api.output.element.Guide;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -103,6 +104,7 @@ public class BlockPrinter {
         boolean protectSpaces = false;
         boolean symmetricalSplit = false;
         for (OutputElement element : block.elements()) {
+            assert !(element instanceof Guide) : "Should have been filtered out";
             if (element instanceof Formatter2Impl.Block sub) {
                 boolean blockHasBeenSplit = handleBlock(line, options, sub);
                 hasBeenSplit |= blockHasBeenSplit;
@@ -135,10 +137,6 @@ public class BlockPrinter {
         if (output.hasBeenSplit || output.endPos() > line.available()) {
             splitOutputOfBlock(line, output, indent);
             return true;
-        }
-        // no newline, within bounds -> no splitting required. we simply append
-        if (line.isNotEmptyDoesNotEndInNewLine()) {
-            line.appendNoNewLine(" ".repeat(indent));
         }
         line.appendNoNewLine(output.string);
         return false;
