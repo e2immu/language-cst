@@ -69,7 +69,10 @@ class Line {
             appendNewLine(indent);
             return true;
         }
-        appendNoNewLine(" ");
+        // important: we never write a separator space on a new line
+        if (!stringBuilder.isEmpty() && lastCharacter() != '\n') {
+            appendNoNewLine(" ");
+        }
         return false;
     }
 

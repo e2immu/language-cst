@@ -37,12 +37,36 @@ public class Test5 {
         String expect = """
                 /*
                     line 1 is much longer than in the previous example, we want to force everything
-                    on multiple lines. So therefore, line 2 is also rather long*/
+                    on multiple lines. So therefore, line 2 is also rather long
+                    */
                     @ImmutableContainer /*IMPLIED*/
                     @NotNull /*OK*/
                 """;
         assertEquals(expect, string);
     }
+
+    @Language("java")
+    static final String EXPECT_2 = """
+            package org.e2immu.analyser.parser.conditional.testexample;
+            import org.e2immu.annotation.ImmutableContainer;
+            import org.e2immu.annotation.NotNull;
+            @ImmutableContainer
+            public class SwitchExpression_1 {
+                /*
+                should raise a warning that the condition is always false, plus that b is never used
+                as a consequence, default always returns "c" so we have @NotNull
+                */
+                @ImmutableContainer /*IMPLIED*/
+                @NotNull /*OK*/
+                public static String method(char c, String b) {
+                    return switch(c) {
+                        a -> "a";
+                        b -> "b";
+                        default -> c == 'a' || c == 'b' ? b : "c";
+                    }; /*inline conditional evaluates to constant*/
+                }
+            }
+            """;
 
     @Test
     public void test2() {
@@ -50,20 +74,7 @@ public class Test5 {
         FormattingOptions options = new FormattingOptionsImpl.Builder().setLengthOfLine(120).setSpacesInTab(4).build();
         Formatter formatter = new Formatter2Impl(runtime, options);
         String string = formatter.write(outputBuilder);
-        // TODO we'd rather have the space between } and ; gone
-        @Language("java")
-        String expect = """
-                /*
-                should raise a warning that the condition is always false, plus that b is never used
-                as a consequence, default always returns "c" so we have @NotNull*/
-                @ImmutableContainer /*IMPLIED*/
-                @NotNull /*OK*/
-                public static String method(char c, String b) {
-                    return switch(c) { a -> "a"; b -> "b"; default -> c == 'a' || c == 'b' ? b : "c";
-                    } ; /*inline conditional evaluates to constant*/
-                }
-                """;
-        assertEquals(expect, string);
+        assertEquals(EXPECT_2, string);
     }
 
     @Test
@@ -72,28 +83,6 @@ public class Test5 {
         FormattingOptions options = new FormattingOptionsImpl.Builder().setLengthOfLine(70).setSpacesInTab(4).build();
         Formatter formatter = new Formatter2Impl(runtime, options);
         String string = formatter.write(outputBuilder);
-        @Language("java")
-        String expect = """
-                package org.e2immu.analyser.parser.conditional.testexample;
-                import org.e2immu.annotation.ImmutableContainer;
-                import org.e2immu.annotation.NotNull;
-                @ImmutableContainer
-                public class SwitchExpression_1 {
-                
-                    /*
-                    should raise a warning that the condition is always false, plus that b is never used
-                    as a consequence, default always returns "c" so we have @NotNull*/
-                    @ImmutableContainer /*IMPLIED*/
-                    @NotNull /*OK*/
-                    public static String method(char c, String b) {
-                        return switch(c) {
-                            a -> "a";
-                            b -> "b";
-                            default -> c == 'a' || c == 'b' ? b : "c";
-                        } ; /*inline conditional evaluates to constant*/
-                    }
-                }
-                """;
-        assertEquals(expect, string);
+        assertEquals(EXPECT_2, string);
     }
 }
