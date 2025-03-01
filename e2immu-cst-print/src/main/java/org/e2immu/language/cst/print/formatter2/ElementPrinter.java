@@ -71,7 +71,7 @@ public class ElementPrinter {
         if (!lastElement && !space.split().isNever()) {
             addSplitPoint(splitInfo, line.length(), space);
         }
-        return space.isNewLine();
+        return false; // even if the space is a newline, it has not been written out yet, simply set
     }
 
     private static Line.SpaceLevel computeSpaceLevel(FormattingOptions options, Space space, Symbol symbol, boolean left) {

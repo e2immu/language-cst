@@ -113,10 +113,6 @@ class Line {
         return stringBuilder.length();
     }
 
-    public void newAvailable(int writtenAfterNewline) {
-        available = maxAvailable - writtenAfterNewline;
-    }
-
     @Override
     public String toString() {
         return stringBuilder.toString();

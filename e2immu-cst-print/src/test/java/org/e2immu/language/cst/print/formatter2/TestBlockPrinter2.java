@@ -144,7 +144,6 @@ public class TestBlockPrinter2 {
                 package a.b.c;
                 import java.util.Set;
                 import java.util.List;
-                
                 //this is a comment
                 //this is a second comment
                 /*block comment*/
@@ -223,4 +222,91 @@ public class TestBlockPrinter2 {
                 """;
         assertEquals(expect, out);
     }
+
+
+
+    private static OutputBuilder createExample3c() {
+        GuideImpl.GuideGenerator ggFile = GuideImpl.generatorForAnnotationList();
+        GuideImpl.GuideGenerator ggImport = GuideImpl.generatorForAnnotationList();
+        GuideImpl.GuideGenerator ggClass = GuideImpl.generatorForAnnotationList();
+
+        return new OutputBuilderImpl()
+                .add(ggFile.start())
+                .add(new TextImpl("package"))
+                .add(SpaceEnum.ONE)
+                .add(new TextImpl("a.b.c"))
+                .add(SymbolEnum.SEMICOLON)
+
+                .add(ggFile.mid())
+
+                .add(ggImport.start())
+                .add(new TextImpl("import"))
+                .add(SpaceEnum.ONE)
+                .add(new TextImpl("java.util.Set"))
+                .add(SymbolEnum.SEMICOLON)
+
+                .add(ggImport.mid())
+                .add(new TextImpl("import"))
+                .add(SpaceEnum.ONE)
+                .add(new TextImpl("java.util.List"))
+                .add(SymbolEnum.SEMICOLON)
+                .add(ggImport.end())
+
+                .add(ggFile.mid())
+
+                .add(ggClass.start())
+                .add(SymbolEnum.SINGLE_LINE_COMMENT)
+                .add(new TextImpl("this is a comment"))
+                .add(SpaceEnum.NEWLINE)
+
+                .add(ggClass.mid())
+                .add(SymbolEnum.SINGLE_LINE_COMMENT)
+                .add(new TextImpl("this is a second comment"))
+                .add(SpaceEnum.NEWLINE)
+
+                .add(ggClass.mid())
+                .add(SymbolEnum.LEFT_BLOCK_COMMENT)
+                .add(new TextImpl("block comment"))
+                .add(SymbolEnum.RIGHT_BLOCK_COMMENT)
+
+                .add(ggClass.mid())
+                .add(SymbolEnum.LEFT_BLOCK_COMMENT)
+                .add(new TextImpl("block comment"))
+                .add(SpaceEnum.NEWLINE)
+                .add(new TextImpl("   on a second line"))
+                .add(SymbolEnum.RIGHT_BLOCK_COMMENT)
+
+                .add(ggClass.mid())
+                .add(new TextImpl("record"))
+                .add(SpaceEnum.ONE)
+                .add(new TextImpl("Record"))
+                .add(SymbolEnum.OPEN_CLOSE_PARENTHESIS)
+                .add(SymbolEnum.LEFT_BRACE)
+                .add(SymbolEnum.RIGHT_BRACE)
+                .add(ggClass.end())
+                .add(ggFile.end());
+    }
+
+    @Test
+    public void test3c() {
+        OutputBuilder outputBuilder = createExample3c();
+        FormattingOptions options = new FormattingOptionsImpl.Builder().setLengthOfLine(15).setSpacesInTab(4).build();
+        Formatter formatter = new Formatter2Impl(runtime, options);
+        String out = formatter.write(outputBuilder);
+        String expect = """
+                package a.b.c;
+                import java.util.Set;
+                import java.util.List;
+                
+                //this is a comment
+                //this is a second comment
+                /*block comment*/
+                /*block comment
+                   on a second line*/
+                record Record() { }
+                """;
+        assertEquals(expect, out);
+    }
+
+
 }

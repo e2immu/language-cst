@@ -81,11 +81,15 @@ public class BlockPrinter {
         for (OutputElement element : block.elements()) {
             if (element instanceof Formatter2Impl.Block sub) {
                 Output output = write(sub, options);
-                SplitLevel doubleSplit = output.spaceLevel().isNoSpace()
-                        ? SplitLevel.NONE_IF_COMPACT
-                        : prevOutput != null && prevOutput.hasBeenSplit && output.hasBeenSplit
-                        ? SplitLevel.DOUBLE_NEWLINE : SplitLevel.SINGLE_NEWLINE;
-                guideSplits.put(sb.length(), doubleSplit);
+                SplitLevel splitLevel;
+                if (prevOutput != null && prevOutput.hasBeenSplit && output.hasBeenSplit) {
+                    splitLevel = SplitLevel.DOUBLE_NEWLINE;
+                } else if (output.spaceLevel().isNoSpace()) {
+                    splitLevel = SplitLevel.NONE_IF_COMPACT;
+                } else {
+                    splitLevel = SplitLevel.SINGLE_NEWLINE;
+                }
+                guideSplits.put(sb.length(), splitLevel);
                 sb.append(output.string);
                 hasBeenSplit |= output.hasBeenSplit;
                 prevOutput = output;
