@@ -97,7 +97,7 @@ public class Test6 {
                         MalformedURLException,
                         IOException {
                         final StringBuilder buff =
-                        new StringBuilder();
+                            new StringBuilder();
                         buff.append(baseURL);
                         if(queryString != null) {
                             buff.append("?");
@@ -105,10 +105,10 @@ public class Test6 {
                         }
                 
                         final URL url = new URL(buff
-                        .toString());
+                            .toString());
                 
                         return (HttpURLConnection)url
-                        .openConnection();
+                            .openConnection();
                     }
                 }
                 """;

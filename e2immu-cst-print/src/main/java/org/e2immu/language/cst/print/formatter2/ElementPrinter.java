@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
 
 public class ElementPrinter {
     private static final Logger LOGGER = LoggerFactory.getLogger(ElementPrinter.class);
@@ -81,7 +80,7 @@ public class ElementPrinter {
         than Formatter2Impl)
          */
         if (symbol != null && left && symbol.isAt()) {
-            return Line.SpaceLevel.NONE;
+            return Line.SpaceLevel.NO_SPACE;
         }
         /*
         end of hardcoded corrections
@@ -93,7 +92,7 @@ public class ElementPrinter {
             String minimal = space.minimal();
             String normal = space.write(options);
             if (normal.isEmpty()) {
-                spaceLevel = Line.SpaceLevel.NONE;
+                spaceLevel = Line.SpaceLevel.NO_SPACE;
             } else if (minimal.isEmpty()) {
                 spaceLevel = Line.SpaceLevel.SPACE_IS_NICE;
             } else {
@@ -136,14 +135,18 @@ public class ElementPrinter {
 
     private static int updateForSplit(BlockPrinter.SplitInfo splitInfo, int indent) {
         int pos = splitInfo.map().lastEntry().getValue().lastKey();
-        Iterator<Map.Entry<Integer, TreeMap<Integer, Boolean>>> iterator = splitInfo.map().entrySet().iterator();
+        Iterator<Map.Entry<Integer, TreeMap<Integer, BlockPrinter.SplitLevel>>> iterator = splitInfo.map().entrySet().iterator();
         while (iterator.hasNext()) {
-            Map.Entry<Integer, TreeMap<Integer, Boolean>> entry = iterator.next();
-            TreeMap<Integer, Boolean> map = entry.getValue();
-            TreeMap<Integer, Boolean> updated = map.keySet().stream()
-                    .map(i -> i - pos).filter(i -> i > 0)
-                    .map(i -> i + indent)
-                    .collect(Collectors.toMap(i -> i, i -> false, (b, c) -> b && c, TreeMap::new));
+            Map.Entry<Integer, TreeMap<Integer, BlockPrinter.SplitLevel>> entry = iterator.next();
+            TreeMap<Integer, BlockPrinter.SplitLevel> map = entry.getValue();
+            TreeMap<Integer, BlockPrinter.SplitLevel> updated = new TreeMap<>();
+            for (Map.Entry<Integer, BlockPrinter.SplitLevel> entry2 : map.entrySet()) {
+                int i = entry2.getKey() - pos;
+                if (i > 0) {
+                    int newPos = i + indent;
+                    updated.put(newPos, entry2.getValue());
+                }
+            }
             if (updated.isEmpty()) {
                 iterator.remove();
             } else {
@@ -156,6 +159,7 @@ public class ElementPrinter {
     static void addSplitPoint(BlockPrinter.SplitInfo splitInfo, int length, Space space) {
         LOGGER.debug("Adding split point in string builder at position {}", length);
         int rank = space.split().rank();
-        splitInfo.map().computeIfAbsent(rank, r -> new TreeMap<>()).put(length, false);
+        splitInfo.map().computeIfAbsent(rank, r -> new TreeMap<>())
+                .put(length, BlockPrinter.SplitLevel.SINGLE_NEWLINE);
     }
 }

@@ -3,14 +3,15 @@ package org.e2immu.language.cst.print.formatter2;
 class Line {
 
     enum SpaceLevel {
-        NONE, SPACE_IS_NICE, SPACE, NEWLINE,
+        EMPTY, NO_SPACE, SPACE_IS_NICE, SPACE, NEWLINE,
         ;
 
         public SpaceLevel max(SpaceLevel other) {
             if (this == NEWLINE || other == NEWLINE) return NEWLINE;
             if (this == SPACE || other == SPACE) return SPACE;
             if (this == SPACE_IS_NICE || other == SPACE_IS_NICE) return SPACE_IS_NICE;
-            return NONE;
+            if (this == NO_SPACE || other == NO_SPACE) return NO_SPACE;
+            return EMPTY;
         }
     }
 
@@ -23,7 +24,7 @@ class Line {
     private int available;
     // space level at the end of the string in the stringBuilder.
     // it is NOT counted in "available", and has not been added to the builder.
-    private SpaceLevel spaceLevel = SpaceLevel.NONE;
+    private SpaceLevel spaceLevel = SpaceLevel.NO_SPACE;
 
     Line(int maxAvailable, int indent) {
         this.maxAvailable = maxAvailable;
@@ -46,8 +47,8 @@ class Line {
 
     public boolean writeSpace(boolean compact, int indent) {
         SpaceLevel current = spaceLevel;
-        spaceLevel = SpaceLevel.NONE;
-        if (current == SpaceLevel.NONE) {
+        spaceLevel = SpaceLevel.EMPTY;
+        if (current == SpaceLevel.NO_SPACE) {
             return false;
         }
         if (compact && current == SpaceLevel.SPACE_IS_NICE) {
@@ -65,7 +66,7 @@ class Line {
         assert indent >= this.indent; // but could be more
         stringBuilder.append("\n").append(" ".repeat(indent));
         available = maxAvailable - (indent - this.indent);
-        spaceLevel = SpaceLevel.NONE;
+        spaceLevel = SpaceLevel.EMPTY;
     }
 
     public boolean computeAvailable() {

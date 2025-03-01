@@ -55,7 +55,36 @@ public class Test3 {
                 @E2Container
                 @ExtensionClass
                 public class Basics_5 {
+                    @NotModified
+                    @NotNull
+                    public static String add(@NotNull String input) {
+                        return Stream
+                            .of(input)
+                            .map(s -> { if(s == null) { return "null"; } return s + "something"; } )
+                            .findAny()
+                            .get();
+                    }
+                }
+                """;
+        assertEquals(expect, string);
+    }
 
+
+    @Test
+    public void test3() {
+        OutputBuilder outputBuilder = TestFormatter3.createExample0();
+        FormattingOptions options = new FormattingOptionsImpl.Builder().setLengthOfLine(60).setSpacesInTab(4).build();
+        Formatter formatter = new Formatter2Impl(runtime, options);
+        String string = formatter.write(outputBuilder);
+        @Language("java")
+        String expect = """
+                package org.e2immu.analyser.parser.failing.testexample;
+                import java.util.stream.Stream;
+                import org.e2immu.annotation.NotModified;
+                import org.e2immu.annotation.NotNull;
+                @E2Container
+                @ExtensionClass
+                public class Basics_5 {
                     @NotModified
                     @NotNull
                     public static String add(@NotNull String input) {

@@ -49,7 +49,6 @@ public class TestFormatter6 {
                 .add(new TextImpl("java.net.URL"))
                 .add(SymbolEnum.SEMICOLON)
                 .add(SpaceEnum.NEWLINE)
-                .add(SpaceEnum.ONE)
                 .add(KeywordImpl.CLASS)
                 .add(SpaceEnum.ONE)
                 .add(new TextImpl("X"))

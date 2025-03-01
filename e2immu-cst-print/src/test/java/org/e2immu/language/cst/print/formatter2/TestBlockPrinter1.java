@@ -51,7 +51,7 @@ public class TestBlockPrinter1 {
         assertFalse(output.hasBeenSplit());
         assertEquals(79, output.endPos());
         // 14, 36, 59 = space after ; 75 = space after ); 77 = space after {
-        assertEquals("{3={14=false, 36=false, 59=false, 75=false}, 4={77=false}}", output.splitInfo().map().toString());
+        assertEquals("{3={14=SINGLE_NEWLINE, 36=SINGLE_NEWLINE, 59=SINGLE_NEWLINE, 75=SINGLE_NEWLINE}, 4={77=SINGLE_NEWLINE}}", output.splitInfo().map().toString());
         Formatter2Impl formatter2 = new Formatter2Impl(runtime, options);
         assertEquals(expect + "\n", formatter2.write(outputBuilder));
     }
@@ -72,7 +72,7 @@ public class TestBlockPrinter1 {
         assertEquals(27, output.endPos());
         // the newline in expect is at position 59; indent = 4, so 'record' starts at 63
         // note that the space between record and Record is 'ONE', which does not allow a split
-        assertEquals("{3={83=false}, 4={85=false}}", output.splitInfo().map().toString());
+        assertEquals("{3={83=SINGLE_NEWLINE}, 4={85=SINGLE_NEWLINE}}", output.splitInfo().map().toString());
         Formatter2Impl formatter2 = new Formatter2Impl(runtime, options);
         @Language("java")
         String formatted = """
@@ -97,7 +97,7 @@ public class TestBlockPrinter1 {
         assertEquals(expect, output.string());
         assertTrue(output.hasBeenSplit());
         assertEquals(50, output.endPos());
-        assertEquals("{3={83=false}, 4={85=false}}", output.splitInfo().map().toString());
+        assertEquals("{3={83=SINGLE_NEWLINE}, 4={85=SINGLE_NEWLINE}}", output.splitInfo().map().toString());
     }
 
 
@@ -119,7 +119,7 @@ public class TestBlockPrinter1 {
         assertEquals(27, output.endPos());
         assertEquals(103, expect.length());
         // space before {, space before }
-        assertEquals("{3={99=false}, 4={101=false}}", output.splitInfo().map().toString());
+        assertEquals("{3={99=SINGLE_NEWLINE}, 4={101=SINGLE_NEWLINE}}", output.splitInfo().map().toString());
     }
 
 
@@ -166,7 +166,7 @@ public class TestBlockPrinter1 {
         assertEquals(expect, output.string());
         assertTrue(output.hasBeenSplit());
         assertEquals(23, output.endPos());
-        assertEquals("{3={134=false}, 4={136=false}}", output.splitInfo().map().toString());
+        assertEquals("{3={134=SINGLE_NEWLINE}, 4={136=SINGLE_NEWLINE}}", output.splitInfo().map().toString());
     }
 
 }

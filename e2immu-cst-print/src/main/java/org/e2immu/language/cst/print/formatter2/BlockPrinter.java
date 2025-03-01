@@ -12,9 +12,13 @@ public class BlockPrinter {
     private static final Logger LOGGER = LoggerFactory.getLogger(BlockPrinter.class);
     public static final int GUIDE_SPLIT = 10;
 
+    enum SplitLevel {
+        NONE_IF_COMPACT, SINGLE_NEWLINE, DOUBLE_NEWLINE;
+    }
+
     // split level (the higher the better) to position to 'doubleSplit'
     // single split = on new line; double split = leave line empty
-    record SplitInfo(TreeMap<Integer, TreeMap<Integer, Boolean>> map) {
+    record SplitInfo(TreeMap<Integer, TreeMap<Integer, SplitLevel>> map) {
     }
 
     /**
@@ -28,7 +32,7 @@ public class BlockPrinter {
      * @param splitInfo    even if it fits on one theoretical line, we may still want to split. this map returns
      *                     the best positions to split
      */
-    record Output(String string, boolean hasBeenSplit, SplitInfo splitInfo) {
+    record Output(String string, boolean hasBeenSplit, SplitInfo splitInfo, Line.SpaceLevel spaceLevel) {
         Output {
             assert !string.endsWith(" ") : "An output cannot end in a space";
         }
@@ -69,7 +73,7 @@ public class BlockPrinter {
      */
     Output handleGuideBlock(Formatter2Impl.Block block, FormattingOptions options) {
         SplitInfo splitInfo = new SplitInfo(new TreeMap<>());
-        TreeMap<Integer, Boolean> guideSplits = new TreeMap<>();
+        TreeMap<Integer, SplitLevel> guideSplits = new TreeMap<>();
         splitInfo.map.put(GUIDE_SPLIT, guideSplits);
         StringBuilder sb = new StringBuilder();
         boolean hasBeenSplit = false;
@@ -77,14 +81,18 @@ public class BlockPrinter {
         for (OutputElement element : block.elements()) {
             if (element instanceof Formatter2Impl.Block sub) {
                 Output output = write(sub, options);
-                boolean doubleSplit = prevOutput != null && prevOutput.hasBeenSplit && output.hasBeenSplit;
+                SplitLevel doubleSplit = output.spaceLevel() == Line.SpaceLevel.NO_SPACE
+                        ? SplitLevel.NONE_IF_COMPACT
+                        : prevOutput != null && prevOutput.hasBeenSplit && output.hasBeenSplit
+                        ? SplitLevel.DOUBLE_NEWLINE : SplitLevel.SINGLE_NEWLINE;
                 guideSplits.put(sb.length(), doubleSplit);
                 sb.append(output.string);
                 hasBeenSplit |= output.hasBeenSplit;
                 prevOutput = output;
             } else throw new UnsupportedOperationException();
         }
-        return new Output(sb.toString(), hasBeenSplit, splitInfo);
+        Line.SpaceLevel spaceLevel = hasBeenSplit ? Line.SpaceLevel.NEWLINE : Line.SpaceLevel.NO_SPACE;
+        return new Output(sb.toString(), hasBeenSplit, splitInfo, spaceLevel);
     }
 
     /*
@@ -122,7 +130,7 @@ public class BlockPrinter {
             ++i;
         }
         String string = line.toString();
-        return new Output(string, hasBeenSplit, splitInfo);
+        return new Output(string, hasBeenSplit, splitInfo, line.spaceLevel());
     }
 
     /*
@@ -135,7 +143,7 @@ public class BlockPrinter {
         Output output = write(sub, options);
         LOGGER.debug("Result of recursion: received output of block: {}", output);
 
-        TreeMap<Integer, Boolean> splits = output.splitInfo.map.getOrDefault(GUIDE_SPLIT, new TreeMap<>());
+        TreeMap<Integer, SplitLevel> splits = output.splitInfo.map.getOrDefault(GUIDE_SPLIT, new TreeMap<>());
         int indent = sub.tab() * options.spacesInTab();
         int addToLine = output.endPos() + splits.size();
         if (output.hasBeenSplit || addToLine > line.available()) {
@@ -143,16 +151,17 @@ public class BlockPrinter {
             return true;
         }
         Line.SpaceLevel spaceLevel = line.spaceLevel();
-        boolean doFirst = spaceLevel != Line.SpaceLevel.NONE;
-        appendAndInsertSpaceSplits(line, output, splits.keySet(), doFirst);
+        boolean doFirst = spaceLevel != Line.SpaceLevel.NO_SPACE;
+        appendAndInsertSpaceSplits(line, output, splits, doFirst);
         return false;
     }
 
-    private void appendAndInsertSpaceSplits(Line line, Output output, Set<Integer> splitPositions, boolean doFirst) {
+    private void appendAndInsertSpaceSplits(Line line, Output output, Map<Integer, SplitLevel> splits, boolean doFirst) {
         int start = line.length();
         line.appendNoNewLine(output.string);
-        for (int pos : splitPositions) {
-            if (doFirst || pos > 0) {
+        for (Map.Entry<Integer, SplitLevel> entry : splits.entrySet()) {
+            int pos = entry.getKey();
+            if ((doFirst || pos > 0) && entry.getValue() != SplitLevel.NONE_IF_COMPACT) {
                 boolean inserted = line.ensureSpace(start + pos);
                 if (inserted) ++start;
             }
@@ -160,19 +169,19 @@ public class BlockPrinter {
     }
 
 
-    private static void splitOutputOfBlock(Line line, Output output, int indent, TreeMap<Integer, Boolean> splits) {
+    private static void splitOutputOfBlock(Line line, Output output, int indent, TreeMap<Integer, SplitLevel> splits) {
         LOGGER.debug("We need to split, and we'll split along all '{}' splits: {}; each line will be indented {}",
                 GUIDE_SPLIT, splits, indent);
         boolean allowSplitAtPosition0 = line.isNotEmptyDoesNotEndInNewLine();
 
         int start = line.length();
         line.appendBeforeSplit(output.string);
-        for (Map.Entry<Integer, Boolean> entry : splits.entrySet()) {
+        for (Map.Entry<Integer, SplitLevel> entry : splits.entrySet()) {
             int relativePos = entry.getKey();
             int pos = relativePos + start;
             assert pos < line.length();
             if (allowSplitAtPosition0 || pos > 0) {
-                boolean doubleSplit = entry.getValue();
+                boolean doubleSplit = entry.getValue() == SplitLevel.DOUBLE_NEWLINE;
                 start += line.carryOutSplit(pos, indent, doubleSplit);
             } // else: we never split at the beginning of the line, there must be something already
         }

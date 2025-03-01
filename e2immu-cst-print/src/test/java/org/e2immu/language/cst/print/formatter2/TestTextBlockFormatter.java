@@ -116,7 +116,7 @@ public class TestTextBlockFormatter {
                             ""\";
 
                     @TestInfo("this is a simple test", v = "1:23")
-                    public static final String INPUT_2 = ""\"
+                        public static final String INPUT_2 = ""\"
                             abc
                             123
                                456""\";
