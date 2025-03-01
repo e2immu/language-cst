@@ -23,9 +23,6 @@ public class TestBlockPrinter2 {
         assertFalse(options.compact());
         Formatter formatter = new Formatter2Impl(runtime, options);
         String string = formatter.write(outputBuilder);
-
-        // FIXME missing: MID space int p1,int; START space before {
-        //  good: no space around (, no space after }, single space after )
         String expect = "public int method(int p1, int p2) { return p1 + p2; }\n";
         assertEquals(expect, string);
     }
@@ -34,6 +31,20 @@ public class TestBlockPrinter2 {
     public void test1b() {
         OutputBuilder outputBuilder = TestFormatter1.createExample1();
         FormattingOptions options = new FormattingOptionsImpl.Builder().setLengthOfLine(30).setSpacesInTab(4).build();
+        Formatter formatter = new Formatter2Impl(runtime, options);
+        String string = formatter.write(outputBuilder);
+        String expect = """
+                public int method(
+                    int p1,
+                    int p2) { return p1 + p2; }
+                """;
+        assertEquals(expect, string);
+    }
+
+    @Test
+    public void test1c() {
+        OutputBuilder outputBuilder = TestFormatter1.createExample1();
+        FormattingOptions options = new FormattingOptionsImpl.Builder().setLengthOfLine(25).setSpacesInTab(4).build();
         Formatter formatter = new Formatter2Impl(runtime, options);
         String string = formatter.write(outputBuilder);
         String expect = """

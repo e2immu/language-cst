@@ -133,17 +133,32 @@ public class BlockPrinter {
         Output output = write(sub, options);
         LOGGER.debug("Result of recursion: received output of block: {}", output);
 
+        TreeMap<Integer, Boolean> splits = output.splitInfo.map.getOrDefault(GUIDE_SPLIT, new TreeMap<>());
         int indent = sub.tab() * options.spacesInTab();
-        if (output.hasBeenSplit || output.endPos() > line.available()) {
-            splitOutputOfBlock(line, output, indent);
+        int addToLine = output.endPos() + splits.size();
+        if (output.hasBeenSplit || addToLine > line.available()) {
+            splitOutputOfBlock(line, output, indent, splits);
             return true;
         }
-        line.appendNoNewLine(output.string);
+        Line.SpaceLevel spaceLevel = line.spaceLevel();
+        boolean doFirst = spaceLevel != Line.SpaceLevel.NONE;
+        appendAndInsertSpaceSplits(line, output, splits.keySet(), doFirst);
         return false;
     }
 
-    private static void splitOutputOfBlock(Line line, Output output, int indent) {
-        TreeMap<Integer, Boolean> splits = output.splitInfo.map.getOrDefault(GUIDE_SPLIT, new TreeMap<>());
+    private void appendAndInsertSpaceSplits(Line line, Output output, Set<Integer> splitPositions, boolean doFirst) {
+        int start = line.length();
+        line.appendNoNewLine(output.string);
+        for (int pos : splitPositions) {
+            if (doFirst || pos > 0) {
+                boolean inserted = line.ensureSpace(start + pos);
+                if (inserted) ++start;
+            }
+        }
+    }
+
+
+    private static void splitOutputOfBlock(Line line, Output output, int indent, TreeMap<Integer, Boolean> splits) {
         LOGGER.debug("We need to split, and we'll split along all '{}' splits: {}; each line will be indented {}",
                 GUIDE_SPLIT, splits, indent);
         boolean allowSplitAtPosition0 = line.isNotEmptyDoesNotEndInNewLine();

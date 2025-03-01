@@ -46,7 +46,7 @@ public class ElementPrinter {
         if (!lastElement && !symbol.left().split().isNever()) {
             addSplitPoint(splitInfo, line.length(), symbol.left());
         }
-        Line.SpaceLevel left = computeSpaceLevel(options, symbol.left());
+        Line.SpaceLevel left = computeSpaceLevel(options, symbol.left(), symbol, true);
         line.mergeSpace(left);
         boolean newLine = line.writeSpace(options.compact(), block.tab() * options.spacesInTab());
         if (newLine && !splitInfo.map().isEmpty()) {
@@ -55,7 +55,7 @@ public class ElementPrinter {
         }
         String string = symbol.symbol();
         line.appendNoNewLine(string);
-        Line.SpaceLevel right = computeSpaceLevel(options, symbol.right());
+        Line.SpaceLevel right = computeSpaceLevel(options, symbol.right(), symbol, false);
         line.setSpace(right);
         if (!lastElement && !symbol.right().split().isNever()) {
             addSplitPoint(splitInfo, line.length(), symbol.right());
@@ -68,7 +68,7 @@ public class ElementPrinter {
                                        FormattingOptions options,
                                        Space space,
                                        boolean lastElement) {
-        Line.SpaceLevel spaceLevel = computeSpaceLevel(options, space);
+        Line.SpaceLevel spaceLevel = computeSpaceLevel(options, space, null, false);
         line.setSpace(spaceLevel);
         if (!lastElement && !space.split().isNever()) {
             addSplitPoint(splitInfo, line.length(), space);
@@ -76,7 +76,14 @@ public class ElementPrinter {
         return space.isNewLine();
     }
 
-    private static Line.SpaceLevel computeSpaceLevel(FormattingOptions options, Space space) {
+    private static Line.SpaceLevel computeSpaceLevel(FormattingOptions options, Space space, Symbol symbol, boolean left) {
+        /*
+        Hardcoded corrections, needed because of backwards compatibility with older formatter (FormatterImpl, rather
+        than Formatter2Impl)
+         */
+        if (symbol != null && left && symbol.isAt()) {
+            return Line.SpaceLevel.NONE;
+        }
         Line.SpaceLevel spaceLevel;
         if (space.isNewLine()) {
             spaceLevel = Line.SpaceLevel.NEWLINE;

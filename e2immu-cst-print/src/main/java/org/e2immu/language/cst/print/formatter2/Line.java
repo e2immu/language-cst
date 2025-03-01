@@ -138,4 +138,21 @@ class Line {
         stringBuilder.insert(pos, insert);
         return insert.length();
     }
+
+    public boolean ensureSpace(int pos) {
+        assert pos < stringBuilder.length() - 1;
+        char atPos = stringBuilder.charAt(pos);
+        if (atPos == '\n' || atPos == ' ') return false;
+        if (pos == 0) return false;
+        char oneEarlier = stringBuilder.charAt(pos - 1);
+        if (oneEarlier == '\n' || oneEarlier == ' ') return false;
+        stringBuilder.insert(pos, ' ');
+        return true;
+    }
+
+
+    public SpaceLevel spaceLevel() {
+        return spaceLevel;
+    }
+
 }

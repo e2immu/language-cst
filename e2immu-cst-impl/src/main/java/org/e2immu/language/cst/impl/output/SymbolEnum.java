@@ -133,4 +133,9 @@ public record SymbolEnum(String symbol, Space left, Space right, String constant
     public boolean isSingleLineComment() {
         return this == SINGLE_LINE_COMMENT;
     }
+
+    @Override
+    public boolean isAt() {
+        return this == AT;
+    }
 }

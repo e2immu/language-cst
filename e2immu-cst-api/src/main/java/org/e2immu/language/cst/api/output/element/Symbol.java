@@ -11,4 +11,7 @@ public interface Symbol extends OutputElement {
     Space right();
 
     String constant();
+
+    // for corrections to formatter2 -- remove at some point!
+    boolean isAt();
 }
