@@ -33,7 +33,7 @@ public class Test3 {
                     @NotModified
                     @NotNull
                     public static String add(@NotNull String input) {
-                        return Stream.of(input).map(s -> { if(s == null) { return "null"; } return s + "something"; } ).findAny().get();
+                        return Stream.of(input).map(s -> { if(s == null) { return "null"; } return s + "something"; }).findAny().get();
                     }
                 }
                 """;
@@ -60,7 +60,7 @@ public class Test3 {
                     public static String add(@NotNull String input) {
                         return Stream
                             .of(input)
-                            .map(s -> { if(s == null) { return "null"; } return s + "something"; } )
+                            .map(s -> { if(s == null) { return "null"; } return s + "something"; })
                             .findAny()
                             .get();
                     }
@@ -93,7 +93,7 @@ public class Test3 {
                             .map(s -> {
                                 if(s == null) { return "null"; }
                                 return s + "something";
-                            } )
+                            })
                             .findAny()
                             .get();
                     }

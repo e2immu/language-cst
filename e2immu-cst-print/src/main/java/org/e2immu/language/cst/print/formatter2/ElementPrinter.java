@@ -82,6 +82,9 @@ public class ElementPrinter {
         if (symbol != null && left && symbol.isAt()) {
             return Line.SpaceLevel.NO_SPACE;
         }
+        if(symbol != null && left && symbol.strongNoSpace()) {
+            return Line.SpaceLevel.STRONG_NO_SPACE;
+        }
         /*
         end of hardcoded corrections
          */

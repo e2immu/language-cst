@@ -14,4 +14,6 @@ public interface Symbol extends OutputElement {
 
     // for corrections to formatter2 -- remove at some point!
     boolean isAt();
+
+    boolean strongNoSpace();
 }

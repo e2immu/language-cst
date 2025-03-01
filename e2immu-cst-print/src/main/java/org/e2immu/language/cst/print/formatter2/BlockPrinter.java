@@ -81,7 +81,7 @@ public class BlockPrinter {
         for (OutputElement element : block.elements()) {
             if (element instanceof Formatter2Impl.Block sub) {
                 Output output = write(sub, options);
-                SplitLevel doubleSplit = output.spaceLevel() == Line.SpaceLevel.NO_SPACE
+                SplitLevel doubleSplit = output.spaceLevel().isNoSpace()
                         ? SplitLevel.NONE_IF_COMPACT
                         : prevOutput != null && prevOutput.hasBeenSplit && output.hasBeenSplit
                         ? SplitLevel.DOUBLE_NEWLINE : SplitLevel.SINGLE_NEWLINE;
@@ -151,7 +151,7 @@ public class BlockPrinter {
             return true;
         }
         Line.SpaceLevel spaceLevel = line.spaceLevel();
-        boolean doFirst = spaceLevel != Line.SpaceLevel.NO_SPACE;
+        boolean doFirst = !spaceLevel.isNoSpace();
         appendAndInsertSpaceSplits(line, output, splits, doFirst);
         return false;
     }

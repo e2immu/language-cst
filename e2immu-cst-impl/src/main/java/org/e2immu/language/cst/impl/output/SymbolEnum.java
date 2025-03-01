@@ -138,4 +138,9 @@ public record SymbolEnum(String symbol, Space left, Space right, String constant
     public boolean isAt() {
         return this == AT;
     }
+
+    @Override
+    public boolean strongNoSpace() {
+        return this == COMMA || this == SEMICOLON || this == RIGHT_ANGLE_BRACKET || this == RIGHT_PARENTHESIS;
+    }
 }

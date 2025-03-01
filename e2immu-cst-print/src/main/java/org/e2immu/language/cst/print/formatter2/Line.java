@@ -2,13 +2,24 @@ package org.e2immu.language.cst.print.formatter2;
 
 class Line {
 
+    /*
+    Empty means: no space has been set (e.g., after Text)
+
+    A strong "no_space" eats up the space in consecutive symbols, such as ">,".
+    We'd normally want a space after >, but not when this is followed by another symbol ('>', ',', ')' etc.)
+     */
     enum SpaceLevel {
-        EMPTY, NO_SPACE, SPACE_IS_NICE, SPACE, NEWLINE,
+        EMPTY, NO_SPACE, SPACE_IS_NICE, SPACE, STRONG_NO_SPACE, NEWLINE,
         ;
+
+        boolean isNoSpace() {
+            return this == NO_SPACE || this == STRONG_NO_SPACE;
+        }
 
         public SpaceLevel max(SpaceLevel other) {
             if (this == NEWLINE || other == NEWLINE) return NEWLINE;
             if (this == SPACE || other == SPACE) return SPACE;
+            if (this == STRONG_NO_SPACE || other == STRONG_NO_SPACE) return STRONG_NO_SPACE;
             if (this == SPACE_IS_NICE || other == SPACE_IS_NICE) return SPACE_IS_NICE;
             if (this == NO_SPACE || other == NO_SPACE) return NO_SPACE;
             return EMPTY;
@@ -48,7 +59,7 @@ class Line {
     public boolean writeSpace(boolean compact, int indent) {
         SpaceLevel current = spaceLevel;
         spaceLevel = SpaceLevel.EMPTY;
-        if (current == SpaceLevel.NO_SPACE) {
+        if (current.isNoSpace()) {
             return false;
         }
         if (compact && current == SpaceLevel.SPACE_IS_NICE) {
@@ -141,7 +152,6 @@ class Line {
     }
 
     public boolean ensureSpace(int pos) {
-        assert pos < stringBuilder.length() - 1;
         char atPos = stringBuilder.charAt(pos);
         if (atPos == '\n' || atPos == ' ') return false;
         if (pos == 0) return false;
