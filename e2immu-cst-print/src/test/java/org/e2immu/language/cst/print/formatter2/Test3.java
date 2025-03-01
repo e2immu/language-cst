@@ -18,7 +18,7 @@ public class Test3 {
     @Test
     public void test1() {
         OutputBuilder outputBuilder = TestFormatter3.createExample0();
-        FormattingOptions options = new FormattingOptionsImpl.Builder().setLengthOfLine(120).setSpacesInTab(4).build();
+        FormattingOptions options = new FormattingOptionsImpl.Builder().setLengthOfLine(130).setSpacesInTab(4).build();
         Formatter formatter = new Formatter2Impl(runtime, options);
         String string = formatter.write(outputBuilder);
         @Language("java")
@@ -30,7 +30,6 @@ public class Test3 {
                 @E2Container
                 @ExtensionClass
                 public class Basics_5 {
-
                     @NotModified
                     @NotNull
                     public static String add(@NotNull String input) {

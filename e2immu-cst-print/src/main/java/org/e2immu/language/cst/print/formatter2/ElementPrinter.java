@@ -25,8 +25,7 @@ public class ElementPrinter {
                                  FormattingOptions options,
                                  OutputElement element,
                                  boolean lastElement,
-                                 boolean protectSpaces,
-                                 boolean symmetricalSplit) {
+                                 boolean protectSpaces) {
 
         if (element instanceof Space space) {
             return handleSpace(line, splitInfo, options, space, lastElement);
@@ -84,6 +83,9 @@ public class ElementPrinter {
         if (symbol != null && left && symbol.isAt()) {
             return Line.SpaceLevel.NONE;
         }
+        /*
+        end of hardcoded corrections
+         */
         Line.SpaceLevel spaceLevel;
         if (space.isNewLine()) {
             spaceLevel = Line.SpaceLevel.NEWLINE;

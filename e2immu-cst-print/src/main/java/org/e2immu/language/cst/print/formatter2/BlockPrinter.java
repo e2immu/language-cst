@@ -102,20 +102,22 @@ public class BlockPrinter {
         int i = 0;
         int n = block.elements().size();
         boolean protectSpaces = false;
-        boolean symmetricalSplit = false;
         for (OutputElement element : block.elements()) {
             assert !(element instanceof Guide) : "Should have been filtered out";
             if (element instanceof Formatter2Impl.Block sub) {
                 boolean blockHasBeenSplit = handleBlock(line, options, sub);
                 hasBeenSplit |= blockHasBeenSplit;
-                symmetricalSplit = blockHasBeenSplit && sub.guide().endWithNewLine();
+                boolean symmetricalSplit = blockHasBeenSplit && sub.guide().endWithNewLine();
+                if (symmetricalSplit) {
+                    // this is mainly for the closing '}'
+                    line.setSpace(Line.SpaceLevel.NEWLINE);
+                }
             } else {
                 boolean lastElement = i == n - 1;
                 hasBeenSplit |= ElementPrinter.handleElement(line, splitInfo, block, options,
-                        element, lastElement, protectSpaces, symmetricalSplit);
+                        element, lastElement, protectSpaces);
                 if (element.isLeftBlockComment()) protectSpaces = true;
                 if (element.isRightBlockComment()) protectSpaces = false;
-                symmetricalSplit = false;
             }
             ++i;
         }
