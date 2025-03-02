@@ -11,7 +11,8 @@ public enum TypeNatureEnum implements TypeNature {
     ENUM(KeywordImpl.ENUM),
     INTERFACE(KeywordImpl.INTERFACE),
     PRIMITIVE(null),
-    RECORD(KeywordImpl.RECORD);
+    RECORD(KeywordImpl.RECORD),
+    STUB(null);
 
     private final Keyword keyword;
 
@@ -56,5 +57,10 @@ public enum TypeNatureEnum implements TypeNature {
     @Override
     public boolean isAnnotation() {
         return this == ANNOTATION;
+    }
+
+    @Override
+    public boolean isStub() {
+        return this == STUB;
     }
 }

@@ -15,5 +15,12 @@ public interface TypeNature {
 
     boolean isAnnotation();
 
+    /*
+    A stub type is created during parsing, because both source and byte code are missing.
+    The type's inspection data gets filled up as well as possible, so that we don't have to stop
+    parsing.
+     */
+    boolean isStub();
+
     Keyword keyword();
 }

@@ -178,6 +178,8 @@ public interface Factory {
 
     CompilationUnit.Builder newCompilationUnitBuilder();
 
+    CompilationUnit newCompilationUnitStub();
+
     Source newCompiledClassSource(CompilationUnit compilationUnit);
 
     MethodInfo newConstructor(TypeInfo owner);
@@ -468,6 +470,8 @@ public interface Factory {
     TypeNature typeNatureInterface();
 
     TypeNature typeNatureRecord();
+
+    TypeNature typeNatureStub();
 
     Wildcard wildcardExtends();
 

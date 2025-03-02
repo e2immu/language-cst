@@ -470,6 +470,11 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
+    public CompilationUnit newCompilationUnitStub() {
+        return new CompilationUnitStub();
+    }
+
+    @Override
     public Source newCompiledClassSource(CompilationUnit compilationUnit) {
         return SourceImpl.forCompiledClass(compilationUnit);
     }
@@ -1202,6 +1207,11 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     @Override
     public TypeNature typeNatureRecord() {
         return TypeNatureEnum.RECORD;
+    }
+
+    @Override
+    public TypeNature typeNatureStub() {
+        return TypeNatureEnum.STUB;
     }
 
     private ParameterizedType typeOfElements(ParameterizedType pt) {
