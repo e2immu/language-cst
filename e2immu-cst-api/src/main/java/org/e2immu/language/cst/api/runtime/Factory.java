@@ -1,6 +1,5 @@
 package org.e2immu.language.cst.api.runtime;
 
-import org.e2immu.language.cst.api.analysis.Codec;
 import org.e2immu.language.cst.api.element.*;
 import org.e2immu.language.cst.api.expression.*;
 import org.e2immu.language.cst.api.info.*;
@@ -17,7 +16,6 @@ import org.e2immu.language.cst.api.type.*;
 import org.e2immu.language.cst.api.variable.*;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collector;
 
 public interface Factory {
@@ -178,7 +176,7 @@ public interface Factory {
 
     CompilationUnit.Builder newCompilationUnitBuilder();
 
-    CompilationUnit newCompilationUnitStub();
+    CompilationUnit newCompilationUnitStub(String candidatePackageName);
 
     Source newCompiledClassSource(CompilationUnit compilationUnit);
 

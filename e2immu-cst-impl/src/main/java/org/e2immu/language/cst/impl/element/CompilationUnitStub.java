@@ -12,6 +12,17 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 public class CompilationUnitStub implements CompilationUnit {
+    private final String packageName;
+
+    public CompilationUnitStub(String candidatePackageName) {
+        packageName = candidatePackageName;
+    }
+
+    @Override
+    public String toString() {
+        return "CompilationUnitStub[packageName=" + packageName + "]";
+    }
+
     @Override
     public int complexity() {
         return 0;
@@ -69,7 +80,7 @@ public class CompilationUnitStub implements CompilationUnit {
 
     @Override
     public String packageName() {
-        return "";
+        return packageName;
     }
 
     @Override

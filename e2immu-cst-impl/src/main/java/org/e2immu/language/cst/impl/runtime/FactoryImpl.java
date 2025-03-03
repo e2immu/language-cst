@@ -470,8 +470,8 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
-    public CompilationUnit newCompilationUnitStub() {
-        return new CompilationUnitStub();
+    public CompilationUnit newCompilationUnitStub(String candidatePackageName) {
+        return new CompilationUnitStub(candidatePackageName);
     }
 
     @Override
