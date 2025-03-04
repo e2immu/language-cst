@@ -193,4 +193,23 @@ public class BlockImpl extends StatementImpl implements Block {
         }
         return new BlockImpl(comments(), source(), annotations(), label(), newList);
     }
+
+    @Override
+    public Statement findStatementByIndex(String index) {
+        return findStatementByIndex(index, 0);
+    }
+
+    private Statement findStatementByIndex(String index, int pos) {
+        int dot = index.indexOf('.', pos);
+        String sub = index.substring(pos, dot < 0 ? index.length() : dot);
+        Statement statement = statements.get(Integer.parseInt(sub));
+        if (dot < 0) {
+            return statement;
+        }
+        int dot2 = index.indexOf('.', dot + 1);
+        int blockIndex = Integer.parseInt(index.substring(dot + 1, dot2 < 0 ? index.length() : dot2));
+        Block block = blockIndex == 0 ? statement.block() : statement.subBlockStream().skip(blockIndex).findFirst().orElseThrow();
+        if (dot2 < 0) return block;
+        return ((BlockImpl) block).findStatementByIndex(index, dot2 + 1);
+    }
 }

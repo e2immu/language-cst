@@ -52,4 +52,7 @@ public interface Block extends Statement {
     default String name() {
         return NAME;
     }
+
+    Statement findStatementByIndex(String index);
+
 }
