@@ -237,9 +237,29 @@ public record IsAssignableFrom(Predefined runtime,
         }
         return ListUtil.joinLists(target.parameters(), from.parameters())
                 .mapToInt(p -> {
-                    Mode newMode = mode == Mode.INVARIANT ? Mode.INVARIANT : Mode.COVARIANT;
-                    return new IsAssignableFrom(runtime, p.k(), p.v()).execute(true, strictTypeParameterTargets, newMode);
+                    return compatibleTypeParameter(mode, strictTypeParameterTargets, p);
                 }).reduce(0, REDUCER);
+    }
+
+    private int compatibleTypeParameter(Mode mode,
+                                        boolean strictTypeParameterTargets,
+                                        ListUtil.Pair<ParameterizedType, ParameterizedType> p) {
+        // T extends Comparable<? super T>
+        // temp hack for an obvious recursion. FIXME we need to do this properly at some point
+        if (p.k().typeParameter() != null) {
+            List<ParameterizedType> typeBounds = p.k().typeParameter().typeBounds();
+            if (!typeBounds.isEmpty()) {
+                List<ParameterizedType> parametersOfTypeBound0 = typeBounds.get(0).parameters();
+                if (parametersOfTypeBound0.size() == 1
+                    && parametersOfTypeBound0.get(0).typeParameter() == p.k().typeParameter()
+                    && parametersOfTypeBound0.get(0).wildcard() == WildcardEnum.SUPER) {
+                    return new IsAssignableFrom(runtime, typeBounds.get(0).typeInfo().asSimpleParameterizedType(), p.v())
+                            .execute(false, false, Mode.COVARIANT);
+                }
+            }
+        }
+        Mode newMode = mode == Mode.INVARIANT ? Mode.INVARIANT : Mode.COVARIANT;
+        return new IsAssignableFrom(runtime, p.k(), p.v()).execute(true, strictTypeParameterTargets, newMode);
     }
 
     private int differentNonNullTypeInfo(Mode mode, boolean strictTypeParameterTargets) {
