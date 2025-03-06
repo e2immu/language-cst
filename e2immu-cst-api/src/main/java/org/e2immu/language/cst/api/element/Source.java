@@ -49,4 +49,13 @@ public interface Source extends Comparable<Source> {
     }
 
     Source withIndex(String newIndex);
+
+    default boolean isContainedIn(int line, int pos) {
+        if (line > beginLine() && line < endLine()) return true;
+        if (line < beginLine() || line > endLine()) return false;
+        if (line == beginLine() && line == endLine()) return beginPos() <= pos && pos <= endPos();
+        if (line == beginLine()) return beginPos() <= pos;
+        return pos <= endPos();
+    }
+
 }
