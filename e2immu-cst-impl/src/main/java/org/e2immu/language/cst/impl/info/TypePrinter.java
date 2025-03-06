@@ -25,7 +25,7 @@ public record TypePrinter(TypeInfo typeInfo, boolean formatter2) {
             insideType = res.qualification();
         } else {
             imports = Set.of();
-            insideType = typeInfo.hasBeenInspected() && qualification instanceof QualificationImpl
+            insideType = typeInfo.primaryType().hasBeenInspected() && qualification instanceof QualificationImpl
                     ? new QualificationImpl(false, qualification, qualification.typeNameRequired())
                     : qualification;
         }

@@ -319,7 +319,9 @@ public class FieldInfoImpl extends InfoImpl implements FieldInfo {
 
         if (tOwner != owner || tInit != init || tType != type || !analysis().isEmpty() && translationMap.isClearAnalysis()) {
             FieldInfoImpl newField = new FieldInfoImpl(name, isStatic, tType, tOwner);
-            newField.builder().setInitializer(tInit);
+            newField.builder()
+                    .setInitializer(tInit)
+                    .setSynthetic(isSynthetic());
             modifiers().forEach(newField.builder()::addFieldModifier);
             newField.builder().computeAccess();
             newField.builder().commit();
