@@ -115,6 +115,7 @@ public class SwitchExpressionImpl extends ExpressionImpl implements SwitchExpres
     @Override
     public Expression translate(TranslationMap translationMap) {
         Expression translated = translationMap.translateExpression(this);
+        if (translated == null) return this;
         if (translated != this) return translated;
 
         Expression trSelector = selector.translate(translationMap);
@@ -155,7 +156,7 @@ public class SwitchExpressionImpl extends ExpressionImpl implements SwitchExpres
                 i++;
             }
         }
-        visitor.beforeExpression(this);
+        visitor.afterExpression(this);
     }
 
     @Override
