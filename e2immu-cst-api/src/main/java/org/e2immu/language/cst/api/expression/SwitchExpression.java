@@ -14,6 +14,8 @@ public interface SwitchExpression extends Expression {
 
     List<SwitchEntry> entries();
 
+    SwitchExpression withSelector(Expression newSelector);
+
     interface Builder extends Element.Builder<Builder> {
 
         @Fluent

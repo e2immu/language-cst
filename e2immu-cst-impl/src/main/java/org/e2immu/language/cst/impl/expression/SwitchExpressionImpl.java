@@ -89,6 +89,11 @@ public class SwitchExpressionImpl extends ExpressionImpl implements SwitchExpres
     }
 
     @Override
+    public SwitchExpression withSelector(Expression newSelector) {
+        return new SwitchExpressionImpl(comments(), source(), newSelector, entries, parameterizedType);
+    }
+
+    @Override
     public ParameterizedType parameterizedType() {
         return parameterizedType;
     }
