@@ -215,12 +215,7 @@ public interface MethodInfo extends Info {
         @Fluent
         Builder setReturnType(ParameterizedType returnType);
 
-        default ParameterInfo addParameter(String name, ParameterizedType type) {
-            return addParameter(name, type, List.of(), null, List.of());
-        }
-
-        ParameterInfo addParameter(String name, ParameterizedType type,
-                                   List<Comment> comments, Source source, List<AnnotationExpression> annotations);
+        ParameterInfo addParameter(String name, ParameterizedType type);
 
         @Fluent
         Builder addTypeParameter(TypeParameter typeParameter);

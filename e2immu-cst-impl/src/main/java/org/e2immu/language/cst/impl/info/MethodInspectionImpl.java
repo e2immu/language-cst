@@ -195,11 +195,8 @@ public class MethodInspectionImpl extends InspectionImpl implements MethodInspec
         }
 
         @Override
-        public ParameterInfo addParameter(String name, ParameterizedType type,
-                                          List<Comment> comments, Source source,
-                                          List<AnnotationExpression> annotations) {
-            ParameterInfo pi = new ParameterInfoImpl(methodInfo, parameters.size(), name, type, comments, source,
-                    annotations);
+        public ParameterInfo addParameter(String name, ParameterizedType type) {
+            ParameterInfo pi = new ParameterInfoImpl(methodInfo, parameters.size(), name, type);
             parameters.add(pi);
             return pi;
         }
