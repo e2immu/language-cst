@@ -27,6 +27,7 @@ public class ExpressionCodec {
         map.put(EnclosedExpression.NAME, new EnclosedExpressionCodec());
         map.put(ConstructorCall.NAME, new ConstructorCallCodec());
         map.put(NullConstant.NAME, new NullConstantCodec());
+        map.put(StringConstant.NAME, new StringConstantCodec());
         map.put(Cast.NAME, new CastCodec());
         map.put(BooleanConstant.NAME, new BooleanConstantCodec());
     }
@@ -67,11 +68,11 @@ public class ExpressionCodec {
 
         @Override
         public Expression decode(List<Codec.EncodedValue> list) {
-            String source = codec.decodeString(context, list.get(1));
+            String compact2 = codec.decodeString(context, list.get(1));
             Variable variable = codec.decodeVariable(context, list.get(2));
             return runtime.newVariableExpressionBuilder()
                     .setVariable(variable)
-                    .setSource(runtime.parseSourceFromCompact2(source))
+                    .setSource(runtime.parseSourceFromCompact2(compact2))
                     .build();
         }
     }
@@ -85,10 +86,26 @@ public class ExpressionCodec {
 
         @Override
         public Expression decode(List<Codec.EncodedValue> list) {
-            String source = codec.decodeString(context, list.get(1));
+            String compact2 = codec.decodeString(context, list.get(1));
             Expression inner = decodeExpression(list.get(2));
-            return runtime.newEnclosedExpressionBuilder().setSource(runtime.parseSourceFromCompact2(source))
+            return runtime.newEnclosedExpressionBuilder().setSource(runtime.parseSourceFromCompact2(compact2))
                     .setExpression(inner).build();
+        }
+    }
+
+
+    class StringConstantCodec implements ECodec {
+
+        @Override
+        public List<Codec.EncodedValue> encode(Expression stringConstant) {
+            return List.of(codec.encodeString(context, ((StringConstant) stringConstant).constant()));
+        }
+
+        @Override
+        public Expression decode(List<Codec.EncodedValue> list) {
+            String compact2 = codec.decodeString(context, list.get(1));
+            String constant = codec.decodeString(context, list.get(2));
+            return runtime.newStringConstant(List.of(), runtime.parseSourceFromCompact2(compact2), constant);
         }
     }
 
