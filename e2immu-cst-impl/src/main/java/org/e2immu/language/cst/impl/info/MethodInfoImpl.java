@@ -487,7 +487,9 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
     public void rewirePhase3(InfoMap infoMap) {
         Block rewired = methodBody() == null ? null : methodBody().rewire(infoMap);
         MethodInfo rewiredMethod = infoMap.methodInfo(this);
-        rewiredMethod.builder().setMethodBody(rewired).commit();
+        rewiredMethod.builder()
+                .addOverrides(overrides().stream().map(infoMap::methodInfo).toList())
+                .setMethodBody(rewired).commit();
         // analysis?
     }
 

@@ -722,9 +722,6 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
         }
         TypeInfo rewiredType = infoMap.typeInfo(this);
         rewiredType.builder().commit();
-
-        // analysis
-        //rewiredType.analysis().setAll(analysis().rewire(infoMap));
     }
 
     @Override
