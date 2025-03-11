@@ -7,6 +7,7 @@ import org.e2immu.language.cst.api.element.Element;
 import org.e2immu.language.cst.api.element.Source;
 import org.e2immu.language.cst.api.element.Visitor;
 import org.e2immu.language.cst.api.expression.*;
+import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.info.MethodInfo;
 import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.output.OutputBuilder;
@@ -364,5 +365,13 @@ public class MethodCallImpl extends ExpressionImpl implements MethodCall {
     @Override
     public PropertyValueMap analysis() {
         return propertyValueMap;
+    }
+
+    @Override
+    public Expression rewire(InfoMap infoMap) {
+        List<Expression> rewiredParams = parameterExpressions.stream().map(e -> e.rewire(infoMap)).toList();
+        return new MethodCallImpl(comments(), source(), object.rewire(infoMap), objectIsImplicit,
+                infoMap.methodInfo(methodInfo), rewiredParams, concreteReturnType.rewire(infoMap), modificationTimes,
+                propertyValueMap.rewire(infoMap));
     }
 }

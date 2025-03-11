@@ -3,6 +3,7 @@ package org.e2immu.language.cst.impl.analysis;
 import org.e2immu.language.cst.api.analysis.Property;
 import org.e2immu.language.cst.api.analysis.PropertyValueMap;
 import org.e2immu.language.cst.api.analysis.Value;
+import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.support.SetOnceMap;
 
 import java.util.function.Supplier;
@@ -10,6 +11,13 @@ import java.util.stream.Stream;
 
 public class PropertyValueMapImpl implements PropertyValueMap {
     private final SetOnceMap<Property, Value> map = new SetOnceMap<>();
+
+    @Override
+    public PropertyValueMap rewire(InfoMap infoMap) {
+        PropertyValueMapImpl rewiredMap = new PropertyValueMapImpl();
+        map.stream().forEach(e -> rewiredMap.set(e.getKey(), e.getValue().rewire(infoMap)));
+        return rewiredMap;
+    }
 
     @Override
     public Stream<PropertyValue> propertyValueStream() {

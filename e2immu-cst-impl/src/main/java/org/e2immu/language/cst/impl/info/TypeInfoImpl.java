@@ -592,6 +592,107 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     }
 
     @Override
+    public TypeInfo rewirePhase1(InfoMap infoMap) {
+        assert infoMap.typeInfoNullIfAbsent(this) == null;
+        TypeInfo typeInfo;
+        if (compilationUnitOrEnclosingType.isLeft()) {
+            typeInfo = new TypeInfoImpl(compilationUnit(), simpleName);
+        } else {
+            typeInfo = new TypeInfoImpl(infoMap.typeInfoRecurse(compilationUnitOrEnclosingType.getRight()), simpleName);
+        }
+        infoMap.put(typeInfo);
+        TypeInfo.Builder builder = typeInfo.builder();
+        builder.setTypeNature(typeInfo.typeNature())
+                .setSource(source())
+                .addComments(comments())
+                .addAnnotations(annotations())
+                .setSynthetic(isSynthetic())
+                .setParentClass(parentClass().rewire(infoMap))
+                .setAccess(typeInfo.access());
+        typeModifiers().forEach(builder::addTypeModifier);
+        interfacesImplemented().forEach(pt -> builder.addInterfaceImplemented(pt.rewire(infoMap)));
+
+        // do not commit!
+        return typeInfo;
+    }
+
+    // all types are known; in phase 2 we do all methods, parameters, fields
+    @Override
+    public void rewirePhase2(InfoMap infoMap) {
+        TypeInfo rewiredType = infoMap.typeInfo(this);
+        TypeInfo.Builder builder = rewiredType.builder();
+
+        for (MethodInfo constructor : constructors()) {
+            MethodInfo rewiredConstructor = new MethodInfoImpl(constructor.methodType(), constructor.name(), rewiredType);
+            builder.addConstructor(rewiredConstructor);
+            handleMethodOrConstructor(constructor, rewiredConstructor, infoMap);
+        }
+        for (MethodInfo methodInfo : methods()) {
+            MethodInfo rewiredMethod = new MethodInfoImpl(methodInfo.methodType(), methodInfo.name(), rewiredType);
+            builder.addMethod(rewiredMethod);
+            handleMethodOrConstructor(methodInfo, rewiredMethod, infoMap);
+        }
+        for (FieldInfo fieldInfo : fields()) {
+            FieldInfo rewiredField = new FieldInfoImpl(fieldInfo.name(), fieldInfo.isStatic(),
+                    fieldInfo.type().rewire(infoMap), rewiredType);
+            rewiredField.builder().setSynthetic(fieldInfo.isSynthetic())
+                    .setSource(fieldInfo.source())
+                    .addComments(fieldInfo.comments())
+                    .addAnnotations(fieldInfo.annotations())
+                    .setAccess(fieldInfo.access());
+            fieldInfo.modifiers().forEach(rewiredField.builder()::addFieldModifier);
+            infoMap.put(rewiredField);
+        }
+        // do not commit!
+    }
+
+    private void handleMethodOrConstructor(MethodInfo methodInfo, MethodInfo rewiredMethod, InfoMap infoMap) {
+        rewireParameters(methodInfo, rewiredMethod, infoMap);
+        infoMap.put(rewiredMethod);
+        MethodInfo.Builder builder = rewiredMethod.builder();
+        methodInfo.methodModifiers().forEach(builder::addMethodModifier);
+        builder.addComments(methodInfo.comments())
+                .addAnnotations(methodInfo.annotations())
+                .setSource(methodInfo.source())
+                .setAccess(methodInfo.access())
+                .setSynthetic(methodInfo.isSynthetic())
+                .setMissingData(methodInfo.missingData());
+        methodInfo.exceptionTypes().forEach(pt -> builder.addExceptionType(pt.rewire(infoMap)));
+        methodInfo.typeParameters().forEach(tp -> builder.addTypeParameter(tp.rewire(infoMap)));
+    }
+
+    private void rewireParameters(MethodInfo methodInfo, MethodInfo rewiredMethod, InfoMap infoMap) {
+        for (ParameterInfo pi : methodInfo.parameters()) {
+            ParameterInfo rewiredPi = rewiredMethod.builder()
+                    .addParameter(pi.name(), pi.parameterizedType().rewire(infoMap));
+            rewiredPi.builder()
+                    .addComments(pi.comments())
+                    .setSource(pi.source())
+                    .addAnnotations(pi.annotations())
+                    .setIsFinal(pi.isFinal())
+                    .setVarArgs(pi.isVarArgs())
+                    .setSynthetic(pi.isSynthetic())
+                    .commit();
+            infoMap.put(rewiredPi);
+        }
+        rewiredMethod.builder().commitParameters();
+    }
+
+    @Override
+    public void rewirePhase3(InfoMap infoMap) {
+        TypeInfo rewired = infoMap.typeInfo(this);
+        TypeInfo.Builder builder = rewired.builder();
+
+        // method content, anonymous types, etc.
+
+        // end of inspection
+        builder.commit();
+
+        // analysis
+        rewired.analysis().setAll(analysis().rewire(infoMap));
+    }
+
+    @Override
     public TypeInfo translate(TranslationMap translationMapIn) {
         TypeInfo direct = translationMapIn.translateTypeInfo(this);
         if (direct != this) {

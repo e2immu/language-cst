@@ -1,11 +1,15 @@
 package org.e2immu.language.cst.api.analysis;
 
+import org.e2immu.language.cst.api.info.InfoMap;
+
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 public interface PropertyValueMap {
 
     boolean isEmpty();
+
+    PropertyValueMap rewire(InfoMap infoMap);
 
     record PropertyValue(Property property, Value value) {
 

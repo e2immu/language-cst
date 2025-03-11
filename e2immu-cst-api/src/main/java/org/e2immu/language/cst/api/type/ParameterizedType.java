@@ -1,6 +1,7 @@
 package org.e2immu.language.cst.api.type;
 
 import org.e2immu.language.cst.api.element.Element;
+import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
@@ -15,6 +16,8 @@ import java.util.stream.Stream;
 public interface ParameterizedType {
     ParameterizedType applyTranslation(PredefinedWithoutParameterizedType predefined,
                                        Map<NamedType, ParameterizedType> translate);
+
+    ParameterizedType rewire(InfoMap infoMap);
 
     int arrays();
 

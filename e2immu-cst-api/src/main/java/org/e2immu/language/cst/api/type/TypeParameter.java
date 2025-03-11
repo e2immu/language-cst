@@ -3,6 +3,7 @@ package org.e2immu.language.cst.api.type;
 import org.e2immu.annotation.Fluent;
 import org.e2immu.annotation.NotNull;
 import org.e2immu.language.cst.api.expression.AnnotationExpression;
+import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.info.MethodInfo;
 import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.output.OutputBuilder;
@@ -23,6 +24,8 @@ public interface TypeParameter extends NamedType {
     default boolean isMethodTypeParameter() {
         return getOwner().isRight();
     }
+
+    TypeParameter rewire(InfoMap infoMap);
 
     List<ParameterizedType> typeBounds();
 

@@ -7,6 +7,7 @@ import org.e2immu.language.cst.api.element.Visitor;
 import org.e2immu.language.cst.api.expression.And;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.expression.Precedence;
+import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.runtime.Predefined;
@@ -166,5 +167,11 @@ public class AndImpl extends ExpressionImpl implements And {
         public And build() {
             return new AndImpl(comments, source, booleanPt, List.copyOf(expressions));
         }
+    }
+
+    @Override
+    public Expression rewire(InfoMap infoMap) {
+        return new AndImpl(comments(), source(), booleanPt,
+                expressions.stream().map(e -> e.rewire(infoMap)).toList());
     }
 }

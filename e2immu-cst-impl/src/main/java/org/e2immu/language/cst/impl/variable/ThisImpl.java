@@ -2,6 +2,7 @@ package org.e2immu.language.cst.impl.variable;
 
 import org.e2immu.language.cst.api.element.Element;
 import org.e2immu.language.cst.api.element.Visitor;
+import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
@@ -92,5 +93,12 @@ public class ThisImpl extends VariableImpl implements This {
     @Override
     public Stream<TypeReference> typesReferenced() {
         return Stream.of(new ElementImpl.TypeReference(typeInfo(), explicitlyWriteType != null));
+    }
+
+    @Override
+    public Variable rewire(InfoMap infoMap) {
+        return new ThisImpl(parameterizedType().rewire(infoMap),
+                explicitlyWriteType == null ? null : infoMap.typeInfo(explicitlyWriteType),
+                writeSuper);
     }
 }

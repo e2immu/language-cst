@@ -1,10 +1,7 @@
 package org.e2immu.language.cst.api.analysis;
 
 import org.e2immu.language.cst.api.expression.Expression;
-import org.e2immu.language.cst.api.info.FieldInfo;
-import org.e2immu.language.cst.api.info.Info;
-import org.e2immu.language.cst.api.info.MethodInfo;
-import org.e2immu.language.cst.api.info.ParameterInfo;
+import org.e2immu.language.cst.api.info.*;
 import org.e2immu.language.cst.api.runtime.Runtime;
 import org.e2immu.language.cst.api.util.ParSeq;
 import org.e2immu.language.cst.api.variable.Variable;
@@ -26,6 +23,10 @@ public interface Value extends Comparable<Value> {
 
     default Value min(Value v) {
         return v == null || compareTo(v) <= 0 ? this : v;
+    }
+
+    default Value rewire(InfoMap infoMap) {
+        return this;
     }
 
     interface Bool extends Value {

@@ -7,6 +7,7 @@ import org.e2immu.language.cst.api.element.Visitor;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.expression.Or;
 import org.e2immu.language.cst.api.expression.Precedence;
+import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.runtime.Predefined;
@@ -25,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 
@@ -166,5 +168,11 @@ public class OrImpl extends ExpressionImpl implements Or {
         public Or build() {
             return new OrImpl(comments, source, booleanPt, List.copyOf(expressions));
         }
+    }
+
+    @Override
+    public Expression rewire(InfoMap infoMap) {
+        return new OrImpl(comments(), source(), booleanPt,
+                expressions.stream().map(e -> e.rewire(infoMap)).toList());
     }
 }

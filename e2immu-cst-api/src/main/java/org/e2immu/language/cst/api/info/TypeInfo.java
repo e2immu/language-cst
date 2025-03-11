@@ -261,6 +261,12 @@ public interface TypeInfo extends NamedType, Info {
 
     MethodInfo enclosingMethod();
 
+    TypeInfo rewirePhase1(InfoMap infoMap);
+
+    void rewirePhase2(InfoMap infoMap);
+
+    void rewirePhase3(InfoMap infoMap);
+
     default TypeInfo translate(TranslationMap translationMap) {
         return this;
     }

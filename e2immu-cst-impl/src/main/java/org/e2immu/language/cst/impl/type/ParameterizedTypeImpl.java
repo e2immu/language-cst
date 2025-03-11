@@ -1,6 +1,7 @@
 package org.e2immu.language.cst.impl.type;
 
 import org.e2immu.language.cst.api.element.Element;
+import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.info.MethodInfo;
 import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.output.OutputBuilder;
@@ -598,6 +599,21 @@ public class ParameterizedTypeImpl implements ParameterizedType {
             throw new UnsupportedOperationException("? input " + stablePt + " has no type");
         }
         return new ParameterizedTypeImpl(stablePt.typeInfo(), null, recursivelyMappedParameters, arrays, wildcard);
+    }
+
+    @Override
+    public ParameterizedType rewire(InfoMap infoMap) {
+        if (typeInfo != null) {
+            TypeInfo rewired = infoMap.typeInfoRecurse(typeInfo);
+            List<ParameterizedType> rewiredParameters = parameters.stream()
+                    .map(pt -> pt.rewire(infoMap)).toList();
+            return new ParameterizedTypeImpl(rewired, null, rewiredParameters, arrays, wildcard);
+        }
+        if (typeParameter != null) {
+            assert parameters.isEmpty();
+            return new ParameterizedTypeImpl(null, typeParameter.rewire(infoMap), List.of(), arrays, wildcard);
+        }
+        return this;
     }
 
     @Override

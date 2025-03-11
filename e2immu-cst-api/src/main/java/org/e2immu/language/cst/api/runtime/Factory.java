@@ -15,7 +15,9 @@ import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.type.*;
 import org.e2immu.language.cst.api.variable.*;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collector;
 
 public interface Factory {
@@ -426,6 +428,8 @@ public interface Factory {
     Qualification qualificationQualifyFromPrimaryType(Qualification.Decorator decorator);
 
     Qualification qualificationSimpleNames();
+
+    Set<TypeInfo> rewire(Collection<TypeInfo> types);
 
     void setGetSetField(MethodInfo getSetMethod, FieldInfo fieldInfo, boolean setter, int parameterIndexOfIndex);
 

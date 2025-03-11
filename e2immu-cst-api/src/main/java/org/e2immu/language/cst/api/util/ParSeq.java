@@ -1,5 +1,7 @@
 package org.e2immu.language.cst.api.util;
 
+import org.e2immu.language.cst.api.info.InfoMap;
+
 import java.util.Comparator;
 import java.util.List;
 
@@ -10,6 +12,8 @@ public interface ParSeq<T> {
      * @return false if the ParSeq is simply a sequence; true if it contains any parallel groups.
      */
     boolean containsParallels();
+
+    ParSeq<T> rewire(InfoMap infoMap);
 
     /**
      * Sort a list of items, of a completely unrelated type, according to the ParSeq.

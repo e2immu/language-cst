@@ -1,5 +1,7 @@
 package org.e2immu.language.cst.api.expression;
 
+import org.e2immu.language.cst.api.info.InfoMap;
+
 public interface ConstantExpression<T> extends Expression {
 
     @Override
@@ -8,4 +10,9 @@ public interface ConstantExpression<T> extends Expression {
     }
 
     T constant();
+
+    @Override
+    default Expression rewire(InfoMap infoMap) {
+        return this;
+    }
 }

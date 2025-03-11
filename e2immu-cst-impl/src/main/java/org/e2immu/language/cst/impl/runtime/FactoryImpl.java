@@ -29,10 +29,7 @@ import org.e2immu.language.cst.api.type.*;
 import org.e2immu.language.cst.api.variable.*;
 import org.e2immu.support.Either;
 
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collector;
@@ -1095,6 +1092,24 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     @Override
     public Qualification qualificationSimpleNames() {
         return QualificationImpl.SIMPLE_NAMES;
+    }
+
+    @Override
+    public Set<TypeInfo> rewire(Collection<TypeInfo> types) {
+        InfoMap infoMap = new InfoMapImpl();
+        Set<TypeInfo> rewired = new HashSet<>();
+        for (TypeInfo typeInfo : types) {
+            if (infoMap.typeInfoNullIfAbsent(typeInfo) == null) {
+                rewired.add(typeInfo.rewirePhase1(infoMap));
+            }
+        }
+        for (TypeInfo typeInfo : rewired) {
+            typeInfo.rewirePhase2(infoMap);
+        }
+        for (TypeInfo typeInfo : rewired) {
+            typeInfo.rewirePhase3(infoMap);
+        }
+        return Set.copyOf(rewired);
     }
 
     @Override

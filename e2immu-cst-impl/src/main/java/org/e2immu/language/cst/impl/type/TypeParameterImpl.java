@@ -1,6 +1,7 @@
 package org.e2immu.language.cst.impl.type;
 
 import org.e2immu.language.cst.api.expression.AnnotationExpression;
+import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.info.MethodInfo;
 import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.output.OutputBuilder;
@@ -49,6 +50,17 @@ public class TypeParameterImpl implements TypeParameter {
 
     private void commit(List<ParameterizedType> typeBounds) {
         this.typeBounds.set(typeBounds);
+    }
+
+    @Override
+    public TypeParameter rewire(InfoMap infoMap) {
+        Either<TypeInfo, MethodInfo> rewiredOwner = owner.isLeft()
+                ? Either.left(infoMap.typeInfo(owner.getLeft()))
+                : Either.right(infoMap.methodInfo(owner.getRight()));
+        TypeParameter rewired = new TypeParameterImpl(index, name, rewiredOwner, annotations);
+        typeBounds.get().forEach(pt -> rewired.builder().addTypeBound(pt.rewire(infoMap)));
+        rewired.builder().commit();
+        return rewired;
     }
 
     @Override

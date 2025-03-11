@@ -484,6 +484,11 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
     }
 
     @Override
+    public MethodInfo rewirePhase1(InfoMap infoMap) {
+
+    }
+
+    @Override
     public List<MethodInfo> translate(TranslationMap translationMap) {
         List<MethodInfo> direct = translationMap.translateMethod(this);
         if (direct.size() != 1 || direct.get(0) != this) {

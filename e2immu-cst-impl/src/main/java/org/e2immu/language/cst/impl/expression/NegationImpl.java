@@ -6,6 +6,7 @@ import org.e2immu.language.cst.api.expression.Equals;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.expression.Negation;
 import org.e2immu.language.cst.api.expression.Precedence;
+import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.info.MethodInfo;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
@@ -68,5 +69,10 @@ public class NegationImpl extends UnaryOperatorImpl implements Negation {
         }
         return new OutputBuilderImpl().add(expression.isNumeric() ? SymbolEnum.UNARY_MINUS : SymbolEnum.UNARY_BOOLEAN_NOT)
                 .add(outputInParenthesis(qualification, precedence(), expression));
+    }
+
+    @Override
+    public Expression rewire(InfoMap infoMap) {
+        return new NegationImpl(comments(), source(), operator, precedence, expression.rewire(infoMap));
     }
 }

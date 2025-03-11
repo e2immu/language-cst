@@ -2,6 +2,7 @@ package org.e2immu.language.cst.api.expression;
 
 import org.e2immu.language.cst.api.element.Element;
 import org.e2immu.language.cst.api.element.Source;
+import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 
@@ -64,6 +65,8 @@ public interface Expression extends Comparable<Expression>, Element {
     }
 
     Expression translate(TranslationMap translationMap);
+
+    Expression rewire(InfoMap infoMap);
 
     Expression withSource(Source source);
 }

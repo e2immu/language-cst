@@ -122,11 +122,21 @@ public abstract class ValueImpl implements Value {
             public <X> List<X> sortParallels(List<X> items, Comparator<X> comparator) {
                 return items;
             }
+
+            @Override
+            public ParSeq<ParameterInfo> rewire(InfoMap infoMap) {
+                return this;
+            }
         });
 
         @Override
         public Codec.EncodedValue encode(Codec codec, Codec.Context context) {
             throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public Value rewire(InfoMap infoMap) {
+            return new ParameterParSeqImpl(parSeq.rewire(infoMap));
         }
     }
 
@@ -456,6 +466,11 @@ public abstract class ValueImpl implements Value {
                     .build();
             return runtime.newDependentVariable(arrayExpression, indexOrNull);
         }
+
+        @Override
+        public Value rewire(InfoMap infoMap) {
+            return new GetSetValueImpl(infoMap.fieldInfo(field), setter, parameterIndexOfIndex);
+        }
     }
 
     static {
@@ -486,6 +501,12 @@ public abstract class ValueImpl implements Value {
         public String toString() {
             return map.entrySet().stream().map(e -> e.getKey() + "=" + e.getValue()).sorted()
                     .collect(Collectors.joining(", "));
+        }
+
+        @Override
+        public Value rewire(InfoMap infoMap) {
+            return new FieldBooleanMapImpl(map.entrySet().stream().collect(Collectors.toUnmodifiableMap(
+                    e -> infoMap.fieldInfo(e.getKey()), Map.Entry::getValue)));
         }
     }
 
@@ -520,6 +541,12 @@ public abstract class ValueImpl implements Value {
         public boolean isEmpty() {
             return map.isEmpty();
         }
+
+        @Override
+        public Value rewire(InfoMap infoMap) {
+            return new VariableBooleanMapImpl(map.entrySet().stream().collect(Collectors.toUnmodifiableMap(
+                    e -> e.getKey().rewire(infoMap), Map.Entry::getValue)));
+        }
     }
 
     static {
@@ -540,6 +567,12 @@ public abstract class ValueImpl implements Value {
             Set<Codec.EncodedValue> set = fields.stream().map(fi -> codec.encodeInfoInContext(context, fi,
                     "" + codec.fieldIndex(fi))).collect(Collectors.toUnmodifiableSet());
             return codec.encodeSet(context, set);
+        }
+
+        @Override
+        public Value rewire(InfoMap infoMap) {
+            return new AssignedToFieldImpl(fields.stream().map(infoMap::fieldInfo)
+                    .collect(Collectors.toUnmodifiableSet()));
         }
     }
 
@@ -563,6 +596,12 @@ public abstract class ValueImpl implements Value {
                             e -> codec.encodeExpression(context, e.getValue())));
             return codec.encodeMap(context, encodedMap);
         }
+
+        @Override
+        public Value rewire(InfoMap infoMap) {
+            return new PostConditionsImpl(byIndex.entrySet().stream().collect(Collectors
+                    .toUnmodifiableMap(Map.Entry::getKey, e -> e.getValue().rewire(infoMap))));
+        }
     }
 
     static {
@@ -581,6 +620,11 @@ public abstract class ValueImpl implements Value {
         @Override
         public Codec.EncodedValue encode(Codec codec, Codec.Context context) {
             return codec.encodeExpression(context, expression);
+        }
+
+        @Override
+        public Value rewire(InfoMap infoMap) {
+            return new PreconditionImpl(expression.rewire(infoMap));
         }
     }
 
@@ -621,6 +665,12 @@ public abstract class ValueImpl implements Value {
                     .collect(Collectors.toUnmodifiableSet());
             return codec.encodeList(context, List.of(codec.encodeSet(context, set),
                     codec.encodeInfoOutOfContext(context, methodWithoutParameters)));
+        }
+
+        @Override
+        public Value rewire(InfoMap infoMap) {
+            return new GetSetEquivalentImpl(convertToGetSet.stream().map(infoMap::parameterInfo)
+                    .collect(Collectors.toUnmodifiableSet()), infoMap.methodInfo(methodWithoutParameters));
         }
     }
 
@@ -736,6 +786,11 @@ public abstract class ValueImpl implements Value {
             Set<Info> set = encodedValues.stream().map(e -> codec.decodeInfoInContext(context, e))
                     .collect(Collectors.toUnmodifiableSet());
             return new SetOfInfoImpl(set);
+        }
+
+        @Override
+        public Value rewire(InfoMap infoMap) {
+            throw new UnsupportedOperationException("NYI");
         }
     }
 
