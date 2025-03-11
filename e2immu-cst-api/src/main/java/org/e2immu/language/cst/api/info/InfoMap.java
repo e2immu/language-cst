@@ -4,17 +4,19 @@ public interface InfoMap {
     // can only be done once for each typeInfo object
     void put(TypeInfo typeInfo);
 
-    void put(MethodInfo methodInfo);
+    void put(String fqn, MethodInfo methodInfo);
 
     void put(FieldInfo fieldInfo);
 
-    void put(ParameterInfo parameterInfo);
+    void put( String fqn, ParameterInfo parameterInfo);
 
 
     // do not recurse, error if absent
     TypeInfo typeInfo(TypeInfo typeInfo);
 
     TypeInfo typeInfoRecurse(TypeInfo typeInfo);
+
+    TypeInfo typeInfoRecurseAllPhases(TypeInfo typeInfo);
 
     TypeInfo typeInfoNullIfAbsent(TypeInfo typeInfo);
 

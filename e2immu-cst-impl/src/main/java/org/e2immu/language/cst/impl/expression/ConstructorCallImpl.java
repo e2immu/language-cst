@@ -56,6 +56,7 @@ public class ConstructorCallImpl extends ExpressionImpl implements ConstructorCa
         this.arrayInitializer = arrayInitializer;
         this.anonymousClass = anonymousClass;
         this.concreteReturnType = Objects.requireNonNull(concreteReturnType);
+        assert anonymousClass == null || anonymousClass.compilationUnitOrEnclosingType().isRight();
     }
 
     @Override
@@ -331,10 +332,12 @@ public class ConstructorCallImpl extends ExpressionImpl implements ConstructorCa
     @Override
     public Expression rewire(InfoMap infoMap) {
         List<Expression> rewiredArgs = parameterExpressions.stream().map(e -> e.rewire(infoMap)).toList();
-        return new ConstructorCallImpl(comments(), source(), infoMap.methodInfo(constructor), concreteReturnType.rewire(infoMap), diamond,
+        return new ConstructorCallImpl(comments(), source(),
+                constructor == null ? null: infoMap.methodInfo(constructor),
+                concreteReturnType.rewire(infoMap), diamond,
                 object == null ? null : object.rewire(infoMap),
                 rewiredArgs,
                 arrayInitializer == null ? null : (ArrayInitializer) arrayInitializer.rewire(infoMap),
-                anonymousClass == null ? null : infoMap.typeInfoRecurse(anonymousClass));
+                anonymousClass == null ? null : infoMap.typeInfoRecurseAllPhases(anonymousClass));
     }
 }

@@ -648,6 +648,12 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
             builder.addMethod(rewiredMethod);
             handleMethodOrConstructor(methodInfo, rewiredMethod, infoMap);
         }
+        if (enclosingMethod() != null) {
+            builder.setEnclosingMethod(infoMap.methodInfo(enclosingMethod()));
+        }
+        if (singleAbstractMethod() != null) {
+            builder.setSingleAbstractMethod(infoMap.methodInfo(singleAbstractMethod()));
+        }
         for (FieldInfo fieldInfo : fields()) {
             FieldInfo rewiredField = new FieldInfoImpl(fieldInfo.name(), fieldInfo.isStatic(),
                     fieldInfo.type().rewire(infoMap), rewiredType);
@@ -663,20 +669,22 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     }
 
     private void handleMethodOrConstructor(MethodInfo methodInfo, MethodInfo rewiredMethod, InfoMap infoMap) {
+        infoMap.put(methodInfo.fullyQualifiedName(), rewiredMethod);
+        MethodInfo.Builder builder = rewiredMethod.builder();
+
         methodInfo.typeParameters().forEach(tp -> {
             TypeParameter newTp = new TypeParameterImpl(tp.getIndex(), tp.simpleName(), Either.right(rewiredMethod),
                     tp.annotations().stream().map(ae -> (AnnotationExpression) ae.rewire(infoMap)).toList());
-            rewiredMethod.builder().addTypeParameter(newTp);
+            builder.addTypeParameter(newTp);
             tp.typeBounds().forEach(tb -> newTp.builder().addTypeBound(tb.rewire(infoMap)));
             newTp.builder().commit();
         });
         rewireParameters(methodInfo, rewiredMethod, infoMap);
-        infoMap.put(rewiredMethod);
-        MethodInfo.Builder builder = rewiredMethod.builder();
         methodInfo.methodModifiers().forEach(builder::addMethodModifier);
         builder.addComments(methodInfo.comments())
                 .addAnnotations(methodInfo.annotations())
                 .setSource(methodInfo.source())
+                .setReturnType(methodInfo.returnType().rewire(infoMap))
                 .setAccess(methodInfo.access())
                 .setSynthetic(methodInfo.isSynthetic())
                 .setMissingData(methodInfo.missingData());
@@ -695,9 +703,9 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
                     .setVarArgs(pi.isVarArgs())
                     .setSynthetic(pi.isSynthetic())
                     .commit();
+            infoMap.put(pi.fullyQualifiedName(), rewiredPi);
         }
         rewiredMethod.builder().commitParameters();
-        rewiredMethod.builder().parameters().forEach(infoMap::put);
     }
 
     @Override
@@ -716,7 +724,7 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
         rewiredType.builder().commit();
 
         // analysis
-        rewiredType.analysis().setAll(analysis().rewire(infoMap));
+        //rewiredType.analysis().setAll(analysis().rewire(infoMap));
     }
 
     @Override
@@ -776,10 +784,14 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
             change |= tMethod.size() != 1 || tMethod.get(0) != methodInfo;
         }
         List<MethodInfo> newMethods = new ArrayList<>(2 * methods().size());
+        MethodInfo translatedSam = null;
         for (MethodInfo methodInfo : methods()) {
             List<MethodInfo> tMethod = methodInfo.translate(translationMap);
             newMethods.addAll(tMethod);
             change |= tMethod.size() != 1 || tMethod.get(0) != methodInfo;
+            if (methodInfo == singleAbstractMethod()) {
+                translatedSam = tMethod.size() == 1 ? tMethod.get(0) : singleAbstractMethod();
+            }
         }
         List<TypeInfo> subTypeList = subTypes();
         List<TypeInfo> newSubTypes = subTypeList.stream().map(st -> st.translate(translationMap))
@@ -800,6 +812,7 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
             newFields.forEach(builder::addField);
             builder.addAnnotations(newAnnotations)
                     .setEnclosingMethod(this.enclosingMethod())
+                    .setSingleAbstractMethod(translatedSam)
                     .commit();
             if (!translationMap.isClearAnalysis()) {
                 typeInfo.analysis().setAll(analysis());

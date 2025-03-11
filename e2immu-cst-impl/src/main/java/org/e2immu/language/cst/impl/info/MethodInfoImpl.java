@@ -488,6 +488,7 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
         Block rewired = methodBody() == null ? null : methodBody().rewire(infoMap);
         MethodInfo rewiredMethod = infoMap.methodInfo(this);
         rewiredMethod.builder().setMethodBody(rewired).commit();
+        // analysis?
     }
 
     @Override

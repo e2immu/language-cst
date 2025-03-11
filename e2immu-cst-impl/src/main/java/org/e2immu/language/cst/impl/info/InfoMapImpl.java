@@ -1,11 +1,9 @@
 package org.e2immu.language.cst.impl.info;
 
 import org.e2immu.language.cst.api.info.*;
+import org.e2immu.language.cst.impl.statement.BlockImpl;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 public class InfoMapImpl implements InfoMap {
     private final Map<String, TypeInfo> typeInfoMap = new HashMap<>();
@@ -25,9 +23,9 @@ public class InfoMapImpl implements InfoMap {
     }
 
     @Override
-    public void put(MethodInfo methodInfo) {
-        MethodInfo previous = methodInfoMap.put(methodInfo.fullyQualifiedName(), methodInfo);
-        assert previous == null : "Already put in a method for FQN " + methodInfo.fullyQualifiedName();
+    public void put(String fqn, MethodInfo methodInfo) {
+        MethodInfo previous = methodInfoMap.put(fqn, methodInfo);
+        assert previous == null : "Already put in a method for FQN " + fqn;
     }
 
     @Override
@@ -37,9 +35,9 @@ public class InfoMapImpl implements InfoMap {
     }
 
     @Override
-    public void put(ParameterInfo parameterInfo) {
-        ParameterInfo previous = parameterInfoMap.put(parameterInfo.fullyQualifiedName(), parameterInfo);
-        assert previous == null : "Already put in a parameter for FQN " + parameterInfo.fullyQualifiedName();
+    public void put(String fqn, ParameterInfo parameterInfo) {
+        ParameterInfo previous = parameterInfoMap.put(fqn, parameterInfo);
+        assert previous == null : "Already put in a parameter for FQN " + fqn;
     }
 
     @Override
@@ -71,10 +69,43 @@ public class InfoMapImpl implements InfoMap {
     }
 
     @Override
+    public TypeInfo typeInfoRecurseAllPhases(TypeInfo typeInfo) {
+        String fqn = typeInfo.fullyQualifiedName();
+        TypeInfo inMap = typeInfoMap.get(fqn);
+        if (inMap != null) return inMap;
+        TypeInfo rewired = typeInfo.rewirePhase1(this);
+        assert rewired != null : "Rewiring of " + fqn + " returns null";
+        assert typeInfoMap.containsKey(fqn);
+        typeInfo.rewirePhase2(this);
+        typeInfo.rewirePhase3(this);
+        return rewired;
+    }
+
+    @Override
     public MethodInfo methodInfo(MethodInfo methodInfo) {
+        assert methodInfo != null;
+        if (methodInfo.isSyntheticArrayConstructor()) {
+            // the synthetic array constructor won't be in the map
+            MethodInfo mi = new MethodInfoImpl(MethodInfoImpl.MethodTypeEnum.SYNTHETIC_ARRAY_CONSTRUCTOR,
+                    "<init>", typeInfo(methodInfo.typeInfo()));
+            mi.builder()
+                    .setReturnType(methodInfo.returnType().rewire(this))
+                    .addMethodModifier(MethodModifierEnum.PUBLIC)
+                    .setMethodBody(new BlockImpl.Builder().build())
+                    .setMissingData(methodInfo.missingData())
+                    .computeAccess();
+            for (int i = 0; i < methodInfo.returnType().arrays(); i++) {
+                ParameterInfo pii = methodInfo.parameters().get(i);
+                mi.builder().addParameter(pii.name(), pii.parameterizedType());
+            }
+            mi.builder().commitParameters().commit();
+            // and we don't store it either
+            return mi;
+        }
         if (!setOfTypesToRewire.contains(methodInfo.typeInfo().primaryType())) return methodInfo;
         MethodInfo rewired = methodInfoMap.get(methodInfo.fullyQualifiedName());
-        return Objects.requireNonNull(rewired);
+        assert rewired != null;
+        return rewired;
     }
 
     @Override
