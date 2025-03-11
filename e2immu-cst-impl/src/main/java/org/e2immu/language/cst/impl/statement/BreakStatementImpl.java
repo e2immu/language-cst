@@ -3,6 +3,7 @@ package org.e2immu.language.cst.impl.statement;
 import org.e2immu.language.cst.api.element.Comment;
 import org.e2immu.language.cst.api.element.Source;
 import org.e2immu.language.cst.api.expression.AnnotationExpression;
+import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.statement.BreakStatement;
@@ -67,5 +68,10 @@ public class BreakStatementImpl extends BreakOrContinueStatementImpl implements 
     @Override
     public BreakStatement withSource(Source newSource) {
         return new BreakStatementImpl(comments(), newSource, annotations(), label(), goToLabel());
+    }
+
+    @Override
+    public Statement rewire(InfoMap infoMap) {
+        return new BreakStatementImpl(comments(), source(), rewireAnnotations(infoMap), label(), goToLabel());
     }
 }

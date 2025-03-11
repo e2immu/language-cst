@@ -1103,10 +1103,10 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
                 rewired.add(typeInfo.rewirePhase1(infoMap));
             }
         }
-        for (TypeInfo typeInfo : rewired) {
+        for (TypeInfo typeInfo : types) {
             typeInfo.rewirePhase2(infoMap);
         }
-        for (TypeInfo typeInfo : rewired) {
+        for (TypeInfo typeInfo : types) {
             typeInfo.rewirePhase3(infoMap);
         }
         return Set.copyOf(rewired);

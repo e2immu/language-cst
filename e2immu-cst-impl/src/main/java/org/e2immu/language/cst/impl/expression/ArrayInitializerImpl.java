@@ -7,6 +7,7 @@ import org.e2immu.language.cst.api.element.Visitor;
 import org.e2immu.language.cst.api.expression.ArrayInitializer;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.expression.Precedence;
+import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.translate.TranslationMap;
@@ -158,5 +159,11 @@ public class ArrayInitializerImpl extends ExpressionImpl implements ArrayInitial
         ParameterizedType translatedType = translationMap.translateType(commonType);
         if (translatedType == commonType && translatedExpressions == expressions) return this;
         return new ArrayInitializerImpl(comments(), source(), translatedExpressions, translatedType);
+    }
+
+    @Override
+    public Expression rewire(InfoMap infoMap) {
+        List<Expression> rewiredExpressions = expressions.stream().map(e -> e.rewire(infoMap)).toList();
+        return new ArrayInitializerImpl(comments(), source(), rewiredExpressions, commonType.rewire(infoMap));
     }
 }

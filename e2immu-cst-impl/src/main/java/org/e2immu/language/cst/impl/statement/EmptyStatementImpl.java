@@ -6,6 +6,7 @@ import org.e2immu.language.cst.api.element.Source;
 import org.e2immu.language.cst.api.element.Visitor;
 import org.e2immu.language.cst.api.expression.AnnotationExpression;
 import org.e2immu.language.cst.api.expression.Expression;
+import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.statement.Block;
@@ -93,5 +94,10 @@ public class EmptyStatementImpl extends StatementImpl implements EmptyStatement 
     @Override
     public Statement withBlocks(List<Block> tSubBlocks) {
         return this;// no blocks
+    }
+
+    @Override
+    public Statement rewire(InfoMap infoMap) {
+        return new EmptyStatementImpl(comments(), source(), rewireAnnotations(infoMap), label());
     }
 }

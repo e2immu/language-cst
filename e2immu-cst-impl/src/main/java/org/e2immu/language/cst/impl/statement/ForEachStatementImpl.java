@@ -6,6 +6,7 @@ import org.e2immu.language.cst.api.element.Source;
 import org.e2immu.language.cst.api.element.Visitor;
 import org.e2immu.language.cst.api.expression.AnnotationExpression;
 import org.e2immu.language.cst.api.expression.Expression;
+import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.statement.Block;
@@ -171,5 +172,11 @@ public class ForEachStatementImpl extends StatementImpl implements ForEachStatem
             return List.of(fs);
         }
         return List.of(this);
+    }
+
+    @Override
+    public Statement rewire(InfoMap infoMap) {
+        return new ForEachStatementImpl(comments(), source(), rewireAnnotations(infoMap), label(),
+                (LocalVariableCreation) initializer.rewire(infoMap), expression.rewire(infoMap), block.rewire(infoMap));
     }
 }

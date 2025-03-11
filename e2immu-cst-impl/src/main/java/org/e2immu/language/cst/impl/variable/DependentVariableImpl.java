@@ -6,6 +6,7 @@ import org.e2immu.language.cst.api.element.Element;
 import org.e2immu.language.cst.api.element.Source;
 import org.e2immu.language.cst.api.element.Visitor;
 import org.e2immu.language.cst.api.expression.*;
+import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.type.ParameterizedType;
@@ -187,5 +188,14 @@ public class DependentVariableImpl extends VariableImpl implements DependentVari
     @Override
     public Stream<Variable> variableStreamDescendIntoScope() {
         return Stream.concat(Stream.of(this), arrayVariable.variableStreamDescendIntoScope());
+    }
+
+    @Override
+    public Variable rewire(InfoMap infoMap) {
+        return new DependentVariableImpl(arrayExpression.rewire(infoMap),
+                arrayVariable == null ? null : arrayVariable.rewire(infoMap),
+                indexExpression.rewire(infoMap),
+                indexVariable == null ? null : indexVariable.rewire(infoMap),
+                parameterizedType().rewire(infoMap));
     }
 }

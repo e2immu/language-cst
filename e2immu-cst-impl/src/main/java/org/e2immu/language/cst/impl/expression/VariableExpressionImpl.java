@@ -8,6 +8,7 @@ import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.expression.Precedence;
 import org.e2immu.language.cst.api.expression.VariableExpression;
 import org.e2immu.language.cst.api.info.FieldInfo;
+import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
@@ -204,5 +205,10 @@ public class VariableExpressionImpl extends ExpressionImpl implements VariableEx
     @Override
     public VariableExpression withSource(Source newSource) {
         return new VariableExpressionImpl(comments(), newSource, variable, suffix);
+    }
+
+    @Override
+    public Expression rewire(InfoMap infoMap) {
+        return new VariableExpressionImpl(comments(), source(), variable.rewire(infoMap), suffix);
     }
 }

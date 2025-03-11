@@ -2,6 +2,7 @@ package org.e2immu.language.cst.api.expression;
 
 import org.e2immu.annotation.Fluent;
 import org.e2immu.language.cst.api.element.Element;
+import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
@@ -17,6 +18,8 @@ public interface AnnotationExpression extends Expression {
 
         /* in Java, that would be "value" */
         boolean keyIsDefault();
+
+        KV rewire(InfoMap infoMap);
 
         KV translate(TranslationMap translationMap);
 

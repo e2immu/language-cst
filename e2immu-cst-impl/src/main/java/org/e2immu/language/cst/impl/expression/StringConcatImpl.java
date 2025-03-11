@@ -5,6 +5,7 @@ import org.e2immu.language.cst.api.element.Source;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.expression.Precedence;
 import org.e2immu.language.cst.api.expression.StringConcat;
+import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.info.MethodInfo;
 import org.e2immu.language.cst.api.runtime.Factory;
 import org.e2immu.language.cst.api.runtime.Predefined;
@@ -28,5 +29,11 @@ public class StringConcatImpl extends BinaryOperatorImpl implements StringConcat
     @Override
     public Expression withSource(Source source) {
         return new StringConcatImpl(comments(), source, operator, precedence, lhs, rhs, parameterizedType);
+    }
+
+    @Override
+    public Expression rewire(InfoMap infoMap) {
+        return new StringConcatImpl(comments(), source(), operator, precedence, lhs.rewire(infoMap),
+                rhs.rewire(infoMap), parameterizedType);
     }
 }

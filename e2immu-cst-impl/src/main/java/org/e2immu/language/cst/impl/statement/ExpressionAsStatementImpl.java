@@ -6,6 +6,7 @@ import org.e2immu.language.cst.api.element.Source;
 import org.e2immu.language.cst.api.element.Visitor;
 import org.e2immu.language.cst.api.expression.AnnotationExpression;
 import org.e2immu.language.cst.api.expression.Expression;
+import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.statement.Block;
@@ -129,5 +130,11 @@ public class ExpressionAsStatementImpl extends StatementImpl implements Expressi
     @Override
     public ExpressionAsStatement withSource(Source newSource) {
         return new ExpressionAsStatementImpl(comments(), newSource, annotations(), label(), expression);
+    }
+
+    @Override
+    public Statement rewire(InfoMap infoMap) {
+        return new ExpressionAsStatementImpl(comments(), source(), rewireAnnotations(infoMap), label(),
+                expression.rewire(infoMap));
     }
 }

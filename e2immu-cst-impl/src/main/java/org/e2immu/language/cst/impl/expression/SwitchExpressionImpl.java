@@ -7,6 +7,7 @@ import org.e2immu.language.cst.api.element.Visitor;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.expression.Precedence;
 import org.e2immu.language.cst.api.expression.SwitchExpression;
+import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.statement.SwitchEntry;
@@ -191,5 +192,11 @@ public class SwitchExpressionImpl extends ExpressionImpl implements SwitchExpres
     @Override
     public Stream<Element.TypeReference> typesReferenced() {
         return Stream.concat(selector.typesReferenced(), entries.stream().flatMap(SwitchEntry::typesReferenced));
+    }
+
+    @Override
+    public Expression rewire(InfoMap infoMap) {
+        return new SwitchExpressionImpl(comments(), source(), selector.rewire(infoMap),
+                entries.stream().map(e -> e.rewire(infoMap)).toList(), parameterizedType.rewire(infoMap));
     }
 }

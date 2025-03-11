@@ -33,6 +33,8 @@ public interface FieldInfo extends Info {
 
     TypeInfo owner();
 
+    void rewirePhase3(InfoMap infoMap);
+
     List<FieldInfo> translate(TranslationMap translationMap);
 
     ParameterizedType type();

@@ -2,6 +2,7 @@ package org.e2immu.language.cst.impl.statement;
 
 import org.e2immu.language.cst.api.element.Element;
 import org.e2immu.language.cst.api.expression.Expression;
+import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.statement.Statement;
@@ -113,6 +114,13 @@ public class SwitchEntryImpl implements SwitchEntry {
         }
         if (tStatement == null) return null; // a way for the entry to disappear
         return new SwitchEntryImpl(tConditions, tPattern, tWhen, tStatement);
+    }
+
+    @Override
+    public SwitchEntry rewire(InfoMap infoMap) {
+        return new SwitchEntryImpl(conditions.stream().map(e -> e.rewire(infoMap)).toList(),
+                patternVariable == null ? null : (LocalVariable) patternVariable.rewire(infoMap),
+                whenExpression.rewire(infoMap), statement.rewire(infoMap));
     }
 
     @Override

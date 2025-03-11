@@ -3,7 +3,9 @@ package org.e2immu.language.cst.api.statement;
 import org.e2immu.annotation.Fluent;
 import org.e2immu.annotation.NotNull;
 import org.e2immu.language.cst.api.element.Element;
+import org.e2immu.language.cst.api.expression.AnnotationExpression;
 import org.e2immu.language.cst.api.expression.Expression;
+import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.translate.TranslationMap;
 
 import java.util.List;
@@ -58,5 +60,11 @@ public interface Statement extends Element {
     // from analysis
     default boolean alwaysEscapes() {
         return false;
+    }
+
+    Statement rewire(InfoMap infoMap);
+
+    default List<AnnotationExpression> rewireAnnotations(InfoMap infoMap) {
+        return annotations().stream().map(ae -> (AnnotationExpression) ae.rewire(infoMap)).toList();
     }
 }

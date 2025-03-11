@@ -5,6 +5,7 @@ import org.e2immu.language.cst.api.element.Element;
 import org.e2immu.language.cst.api.element.Source;
 import org.e2immu.language.cst.api.element.Visitor;
 import org.e2immu.language.cst.api.expression.*;
+import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
@@ -100,6 +101,11 @@ public class AnnotationExpressionImpl extends ExpressionImpl implements Annotati
             Expression tex = value.translate(translationMap);
             if (tex != value) return new KVI(key, tex);
             return this;
+        }
+
+        @Override
+        public KV rewire(InfoMap infoMap) {
+            return new KVI(key, value.rewire(infoMap));
         }
     }
 
@@ -208,5 +214,11 @@ public class AnnotationExpressionImpl extends ExpressionImpl implements Annotati
             return new AnnotationExpressionImpl(comments(), source(), tpt.typeInfo(), newKv);
         }
         return this;
+    }
+
+    @Override
+    public Expression rewire(InfoMap infoMap) {
+        return new AnnotationExpressionImpl(comments(), source(), infoMap.typeInfo(typeInfo),
+                keyValuePairs.stream().map(kv -> kv.rewire(infoMap)).toList());
     }
 }

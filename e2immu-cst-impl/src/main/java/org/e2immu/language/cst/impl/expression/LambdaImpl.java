@@ -7,6 +7,7 @@ import org.e2immu.language.cst.api.element.Visitor;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.expression.Lambda;
 import org.e2immu.language.cst.api.expression.Precedence;
+import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.info.MethodInfo;
 import org.e2immu.language.cst.api.info.ParameterInfo;
 import org.e2immu.language.cst.api.info.TypeInfo;
@@ -246,5 +247,11 @@ public class LambdaImpl extends ExpressionImpl implements Lambda {
             return new LambdaImpl(comments(), source(), implementationOfSam, outputVariants);
         }
         return this;
+    }
+
+    @Override
+    public Expression rewire(InfoMap infoMap) {
+        MethodInfo rewired = infoMap.typeInfoRecurse(methodInfo.typeInfo()).singleAbstractMethod();
+        return new LambdaImpl(comments(), source(), rewired, outputVariants);
     }
 }

@@ -680,16 +680,21 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
 
     @Override
     public void rewirePhase3(InfoMap infoMap) {
-        TypeInfo rewired = infoMap.typeInfo(this);
-        TypeInfo.Builder builder = rewired.builder();
-
         // method content, anonymous types, etc.
-
-        // end of inspection
-        builder.commit();
+        for (TypeInfo subType : subTypes()) {
+            subType.rewirePhase3(infoMap);
+        }
+        for (MethodInfo methodInfo : constructorsAndMethods()) {
+            methodInfo.rewirePhase3(infoMap);
+        }
+        for (FieldInfo fieldInfo : fields()) {
+            fieldInfo.rewirePhase3(infoMap);
+        }
+        TypeInfo rewiredType = infoMap.typeInfo(this);
+        rewiredType.builder().commit();
 
         // analysis
-        rewired.analysis().setAll(analysis().rewire(infoMap));
+        rewiredType.analysis().setAll(analysis().rewire(infoMap));
     }
 
     @Override
@@ -801,5 +806,10 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
         interfacesImplemented().forEach(b::addInterfaceImplemented);
         typeModifiers().forEach(b::addTypeModifier);
         return typeInfo;
+    }
+
+    @Override
+    public Element rewire(InfoMap infoMap) {
+        throw new UnsupportedOperationException("Must use one of the infoMap methods");
     }
 }

@@ -7,10 +7,7 @@ import org.e2immu.language.cst.api.element.Source;
 import org.e2immu.language.cst.api.element.Visitor;
 import org.e2immu.language.cst.api.expression.AnnotationExpression;
 import org.e2immu.language.cst.api.expression.Expression;
-import org.e2immu.language.cst.api.info.Access;
-import org.e2immu.language.cst.api.info.FieldInfo;
-import org.e2immu.language.cst.api.info.FieldModifier;
-import org.e2immu.language.cst.api.info.TypeInfo;
+import org.e2immu.language.cst.api.info.*;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.translate.TranslationMap;
@@ -343,5 +340,16 @@ public class FieldInfoImpl extends InfoImpl implements FieldInfo {
     @Override
     public boolean isModified() {
         return analysis().getOrDefault(PropertyImpl.MODIFIED_FIELD, ValueImpl.BoolImpl.FALSE).isTrue();
+    }
+
+    @Override
+    public void rewirePhase3(InfoMap infoMap) {
+        FieldInfo rewiredField = infoMap.fieldInfo(this);
+        rewiredField.builder().setInitializer(initializer().rewire(infoMap)).commit();
+    }
+
+    @Override
+    public Element rewire(InfoMap infoMap) {
+        throw new UnsupportedOperationException("Must use the infoMap.fieldInfo() method");
     }
 }

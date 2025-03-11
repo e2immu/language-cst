@@ -7,6 +7,7 @@ import org.e2immu.language.cst.api.element.Visitor;
 import org.e2immu.language.cst.api.expression.ArrayLength;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.expression.Precedence;
+import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.translate.TranslationMap;
@@ -140,5 +141,10 @@ public class ArrayLengthImpl extends ExpressionImpl implements ArrayLength {
         Expression translatedScope = scope.translate(translationMap);
         if (translatedScope == scope) return this;
         return new ArrayLengthImpl(comments(), source(), intPt, translatedScope);
+    }
+
+    @Override
+    public Expression rewire(InfoMap infoMap) {
+        return new ArrayLengthImpl(comments(), source(), intPt, scope.rewire(infoMap));
     }
 }

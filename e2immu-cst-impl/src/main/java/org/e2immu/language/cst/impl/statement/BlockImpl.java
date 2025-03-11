@@ -6,6 +6,7 @@ import org.e2immu.language.cst.api.element.Element;
 import org.e2immu.language.cst.api.element.Source;
 import org.e2immu.language.cst.api.element.Visitor;
 import org.e2immu.language.cst.api.expression.AnnotationExpression;
+import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.statement.Block;
@@ -211,5 +212,11 @@ public class BlockImpl extends StatementImpl implements Block {
         Block block = blockIndex == 0 ? statement.block() : statement.subBlockStream().skip(blockIndex).findFirst().orElseThrow();
         if (dot2 < 0) return block;
         return ((BlockImpl) block).findStatementByIndex(index, dot2 + 1);
+    }
+
+    @Override
+    public Block rewire(InfoMap infoMap) {
+        return new BlockImpl(comments(), source(), rewireAnnotations(infoMap), label(),
+                statements.stream().map(s -> s.rewire(infoMap)).toList());
     }
 }

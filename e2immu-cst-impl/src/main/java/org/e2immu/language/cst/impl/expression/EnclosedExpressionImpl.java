@@ -7,6 +7,7 @@ import org.e2immu.language.cst.api.element.Visitor;
 import org.e2immu.language.cst.api.expression.EnclosedExpression;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.expression.Precedence;
+import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.translate.TranslationMap;
@@ -138,5 +139,10 @@ public class EnclosedExpressionImpl extends ExpressionImpl implements EnclosedEx
         public EnclosedExpression build() {
             return new EnclosedExpressionImpl(comments, source, expression);
         }
+    }
+
+    @Override
+    public Expression rewire(InfoMap infoMap) {
+        return new EnclosedExpressionImpl(comments(), source(), inner.rewire(infoMap));
     }
 }

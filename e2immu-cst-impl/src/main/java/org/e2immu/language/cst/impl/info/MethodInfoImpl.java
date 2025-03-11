@@ -484,8 +484,10 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
     }
 
     @Override
-    public MethodInfo rewirePhase1(InfoMap infoMap) {
-
+    public void rewirePhase3(InfoMap infoMap) {
+        Block rewired = methodBody() == null ? null : methodBody().rewire(infoMap);
+        MethodInfo rewiredMethod = infoMap.methodInfo(this);
+        rewiredMethod.builder().setMethodBody(rewired).commit();
     }
 
     @Override
@@ -637,5 +639,10 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
     @Override
     public MissingData missingData() {
         return inspection.get().missingData();
+    }
+
+    @Override
+    public Element rewire(InfoMap infoMap) {
+        throw new UnsupportedOperationException("Must use the infoMap.methodInfo() method");
     }
 }

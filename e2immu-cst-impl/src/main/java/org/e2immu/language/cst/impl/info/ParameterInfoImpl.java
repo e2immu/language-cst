@@ -4,10 +4,7 @@ import org.e2immu.language.cst.api.analysis.PropertyValueMap;
 import org.e2immu.language.cst.api.analysis.Value;
 import org.e2immu.language.cst.api.element.*;
 import org.e2immu.language.cst.api.expression.AnnotationExpression;
-import org.e2immu.language.cst.api.info.Access;
-import org.e2immu.language.cst.api.info.MethodInfo;
-import org.e2immu.language.cst.api.info.ParameterInfo;
-import org.e2immu.language.cst.api.info.TypeInfo;
+import org.e2immu.language.cst.api.info.*;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.translate.TranslationMap;
@@ -231,5 +228,10 @@ public class ParameterInfoImpl implements ParameterInfo {
     @Override
     public List<ParameterInfo> translate(TranslationMap translationMap) {
         throw new UnsupportedOperationException("because of the back-link, translation takes place in MethodImpl");
+    }
+
+    @Override
+    public Variable rewire(InfoMap infoMap) {
+        return infoMap.parameterInfo(this);
     }
 }

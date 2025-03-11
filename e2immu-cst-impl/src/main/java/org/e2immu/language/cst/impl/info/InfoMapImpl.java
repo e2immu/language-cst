@@ -8,11 +8,32 @@ import java.util.Objects;
 
 public class InfoMapImpl implements InfoMap {
     private final Map<String, TypeInfo> typeInfoMap = new HashMap<>();
+    private final Map<String, MethodInfo> methodInfoMap = new HashMap<>();
+    private final Map<String, FieldInfo> fieldInfoMap = new HashMap<>();
+    private final Map<String, ParameterInfo> parameterInfoMap = new HashMap<>();
 
     @Override
     public void put(TypeInfo typeInfo) {
         TypeInfo previous = typeInfoMap.put(typeInfo.fullyQualifiedName(), typeInfo);
-        assert previous == null : "Already put an object in for FQN " + typeInfo.fullyQualifiedName();
+        assert previous == null : "Already put in a type for FQN " + typeInfo.fullyQualifiedName();
+    }
+
+    @Override
+    public void put(MethodInfo methodInfo) {
+        MethodInfo previous = methodInfoMap.put(methodInfo.fullyQualifiedName(), methodInfo);
+        assert previous == null : "Already put in a method for FQN " + methodInfo.fullyQualifiedName();
+    }
+
+    @Override
+    public void put(FieldInfo fieldInfo) {
+        FieldInfo previous = fieldInfoMap.put(fieldInfo.fullyQualifiedName(), fieldInfo);
+        assert previous == null : "Already put in a field for FQN " + fieldInfo.fullyQualifiedName();
+    }
+
+    @Override
+    public void put(ParameterInfo parameterInfo) {
+        ParameterInfo previous = parameterInfoMap.put(parameterInfo.fullyQualifiedName(), parameterInfo);
+        assert previous == null : "Already put in a parameter for FQN " + parameterInfo.fullyQualifiedName();
     }
 
     @Override
@@ -41,16 +62,16 @@ public class InfoMapImpl implements InfoMap {
 
     @Override
     public MethodInfo methodInfo(MethodInfo methodInfo) {
-        return null;
+        return Objects.requireNonNull(methodInfoMap.get(methodInfo.fullyQualifiedName()));
     }
 
     @Override
     public FieldInfo fieldInfo(FieldInfo fieldInfo) {
-        return null;
+        return Objects.requireNonNull(fieldInfoMap.get(fieldInfo.fullyQualifiedName()));
     }
 
     @Override
     public ParameterInfo parameterInfo(ParameterInfo parameterInfo) {
-        return null;
+        return Objects.requireNonNull(parameterInfoMap.get(parameterInfo.fullyQualifiedName()));
     }
 }

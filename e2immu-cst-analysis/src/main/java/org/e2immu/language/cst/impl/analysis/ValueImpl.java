@@ -122,21 +122,11 @@ public abstract class ValueImpl implements Value {
             public <X> List<X> sortParallels(List<X> items, Comparator<X> comparator) {
                 return items;
             }
-
-            @Override
-            public ParSeq<ParameterInfo> rewire(InfoMap infoMap) {
-                return this;
-            }
         });
 
         @Override
         public Codec.EncodedValue encode(Codec codec, Codec.Context context) {
             throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public Value rewire(InfoMap infoMap) {
-            return new ParameterParSeqImpl(parSeq.rewire(infoMap));
         }
     }
 

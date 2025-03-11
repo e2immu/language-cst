@@ -8,6 +8,7 @@ import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.expression.TypeExpression;
 import org.e2immu.language.cst.api.expression.VariableExpression;
 import org.e2immu.language.cst.api.info.FieldInfo;
+import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.output.element.TypeName;
@@ -238,5 +239,12 @@ public class FieldReferenceImpl extends VariableImpl implements FieldReference {
     @Override
     public Stream<Variable> variableStreamDescendIntoScope() {
         return Stream.concat(Stream.of(this), scopeVariable.variableStreamDescendIntoScope());
+    }
+
+    @Override
+    public Variable rewire(InfoMap infoMap) {
+        return new FieldReferenceImpl(infoMap.fieldInfo(fieldInfo), scope.rewire(infoMap),
+                scopeVariable == null ? null : scopeVariable.rewire(infoMap),
+                parameterizedType().rewire(infoMap));
     }
 }

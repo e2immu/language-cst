@@ -6,6 +6,7 @@ import org.e2immu.language.cst.api.element.Source;
 import org.e2immu.language.cst.api.element.Visitor;
 import org.e2immu.language.cst.api.expression.AnnotationExpression;
 import org.e2immu.language.cst.api.expression.Expression;
+import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.statement.Block;
@@ -112,6 +113,13 @@ public class SwitchStatementOldStyleImpl extends StatementImpl implements Switch
         @Override
         public SwitchLabel withStartPosition(int newStartPosition) {
             return new SwitchLabelImpl(literal, newStartPosition, patternVariable, whenExpression);
+        }
+
+        @Override
+        public SwitchLabel rewire(InfoMap infoMap) {
+            return new SwitchLabelImpl(literal.rewire(infoMap), startFromPosition,
+                    patternVariable == null ? null : (LocalVariable) patternVariable.rewire(infoMap),
+                    whenExpression.rewire(infoMap));
         }
     }
 
@@ -276,5 +284,12 @@ public class SwitchStatementOldStyleImpl extends StatementImpl implements Switch
     @Override
     public boolean hasSubBlocks() {
         return true;
+    }
+
+    @Override
+    public Statement rewire(InfoMap infoMap) {
+        return new SwitchStatementOldStyleImpl(comments(), source(), rewireAnnotations(infoMap), label(),
+                selector.rewire(infoMap), block.rewire(infoMap),
+                switchLabels.stream().map(sl -> sl.rewire(infoMap)).toList());
     }
 }

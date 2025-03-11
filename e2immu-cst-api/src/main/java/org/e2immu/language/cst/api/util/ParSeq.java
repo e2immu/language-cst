@@ -13,8 +13,6 @@ public interface ParSeq<T> {
      */
     boolean containsParallels();
 
-    ParSeq<T> rewire(InfoMap infoMap);
-
     /**
      * Sort a list of items, of a completely unrelated type, according to the ParSeq.
      * Inside parallel groups, use the comparator.

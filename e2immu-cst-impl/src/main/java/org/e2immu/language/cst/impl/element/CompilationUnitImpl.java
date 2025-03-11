@@ -1,6 +1,7 @@
 package org.e2immu.language.cst.impl.element;
 
 import org.e2immu.language.cst.api.element.*;
+import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.variable.DescendMode;
@@ -87,6 +88,12 @@ public class CompilationUnitImpl extends ElementImpl implements CompilationUnit 
     @Override
     public Stream<Element.TypeReference> typesReferenced() {
         throw new UnsupportedOperationException();
+    }
+
+
+    @Override
+    public Element rewire(InfoMap infoMap) {
+        return this;
     }
 
     public static class Builder extends ElementImpl.Builder<CompilationUnit.Builder> implements CompilationUnit.Builder {

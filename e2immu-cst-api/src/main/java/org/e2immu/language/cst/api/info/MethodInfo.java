@@ -62,7 +62,7 @@ public interface MethodInfo extends Info {
 
     List<MethodInfo> translate(TranslationMap translationMap);
 
-    MethodInfo rewirePhase1(InfoMap infoMap);
+    void rewirePhase3(InfoMap infoMap);
 
     ParameterizedType typeOfParameterHandleVarargs(int index);
 

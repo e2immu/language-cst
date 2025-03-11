@@ -7,6 +7,7 @@ import org.e2immu.language.cst.api.element.Visitor;
 import org.e2immu.language.cst.api.expression.Cast;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.expression.Precedence;
+import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.translate.TranslationMap;
@@ -146,5 +147,10 @@ public class CastImpl extends ExpressionImpl implements Cast {
         ParameterizedType translatedType = translationMap.translateType(this.parameterizedType);
         if (translatedExpression == this.expression && translatedType == this.parameterizedType) return this;
         return new CastImpl(comments(), source(), translatedType, translatedExpression);
+    }
+
+    @Override
+    public Expression rewire(InfoMap infoMap) {
+        return new CastImpl(comments(), source(), parameterizedType.rewire(infoMap), expression.rewire(infoMap));
     }
 }

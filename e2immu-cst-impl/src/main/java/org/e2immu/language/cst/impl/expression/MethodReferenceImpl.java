@@ -7,6 +7,7 @@ import org.e2immu.language.cst.api.element.Visitor;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.expression.MethodReference;
 import org.e2immu.language.cst.api.expression.Precedence;
+import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.info.MethodInfo;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
@@ -161,5 +162,11 @@ public class MethodReferenceImpl extends ExpressionImpl implements MethodReferen
     @Override
     public Stream<Element.TypeReference> typesReferenced() {
         return scope.typesReferenced();
+    }
+
+    @Override
+    public Expression rewire(InfoMap infoMap) {
+        return new MethodReferenceImpl(comments(), source(), parameterizedType.rewire(infoMap),
+                infoMap.methodInfo(methodInfo), scope.rewire(infoMap));
     }
 }

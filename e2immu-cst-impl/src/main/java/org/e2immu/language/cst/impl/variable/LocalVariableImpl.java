@@ -3,6 +3,7 @@ package org.e2immu.language.cst.impl.variable;
 import org.e2immu.language.cst.api.element.Element;
 import org.e2immu.language.cst.api.element.Visitor;
 import org.e2immu.language.cst.api.expression.Expression;
+import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.translate.TranslationMap;
@@ -95,5 +96,11 @@ public class LocalVariableImpl extends VariableImpl implements LocalVariable {
             return new LocalVariableImpl(name, type, tex);
         }
         return this;
+    }
+
+    @Override
+    public Variable rewire(InfoMap infoMap) {
+        return new LocalVariableImpl(name, parameterizedType().rewire(infoMap), assignmentExpression == null ? null
+                : assignmentExpression.rewire(infoMap));
     }
 }

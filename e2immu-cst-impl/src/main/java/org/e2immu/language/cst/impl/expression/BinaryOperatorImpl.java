@@ -8,6 +8,7 @@ import org.e2immu.language.cst.api.expression.BinaryOperator;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.expression.GreaterThanZero;
 import org.e2immu.language.cst.api.expression.Precedence;
+import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.info.MethodInfo;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
@@ -240,5 +241,11 @@ public class BinaryOperatorImpl extends ExpressionImpl implements BinaryOperator
     @Override
     public boolean isNumeric() {
         return parameterizedType().isNumeric();
+    }
+
+    @Override
+    public Expression rewire(InfoMap infoMap) {
+        return new BinaryOperatorImpl(comments(), source(), operator, precedence, lhs.rewire(infoMap),
+                rhs.rewire(infoMap), parameterizedType);
     }
 }

@@ -6,6 +6,7 @@ import org.e2immu.language.cst.api.element.Source;
 import org.e2immu.language.cst.api.element.Visitor;
 import org.e2immu.language.cst.api.expression.AnnotationExpression;
 import org.e2immu.language.cst.api.expression.Expression;
+import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.statement.Block;
@@ -146,6 +147,13 @@ public class SwitchStatementNewStyleImpl extends StatementImpl implements Switch
             return List.of(ssns);
         }
         return List.of(this);
+    }
+
+
+    @Override
+    public Statement rewire(InfoMap infoMap) {
+        return new SwitchStatementNewStyleImpl(comments(), source(), rewireAnnotations(infoMap), label(),
+                selector.rewire(infoMap), entries.stream().map(e -> e.rewire(infoMap)).toList());
     }
 
     public static class BuilderImpl extends StatementImpl.Builder<SwitchStatementNewStyle.Builder>

@@ -1,6 +1,7 @@
 package org.e2immu.language.cst.impl.element;
 
 import org.e2immu.language.cst.api.element.*;
+import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.variable.DescendMode;
@@ -86,5 +87,10 @@ public class CompilationUnitStub implements CompilationUnit {
     @Override
     public List<ImportStatement> importStatements() {
         return List.of();
+    }
+
+    @Override
+    public Element rewire(InfoMap infoMap) {
+        return this;
     }
 }

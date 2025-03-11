@@ -8,6 +8,7 @@ import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.expression.InstanceOf;
 import org.e2immu.language.cst.api.expression.Precedence;
 import org.e2immu.language.cst.api.expression.VariableExpression;
+import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.translate.TranslationMap;
@@ -203,5 +204,12 @@ public class InstanceOfImpl extends ExpressionImpl implements InstanceOf {
     public Stream<Element.TypeReference> typesReferenced() {
         return Stream.concat(Stream.of(new ElementImpl.TypeReference(testType.typeInfo(), true)),
                 expression.typesReferenced());
+    }
+
+    @Override
+    public Expression rewire(InfoMap infoMap) {
+        return new InstanceOfImpl(comments(), source(), expression.rewire(infoMap), testType.rewire(infoMap),
+                patternVariable == null ? null : (LocalVariable) patternVariable.rewire(infoMap),
+                booleanParameterizedType);
     }
 }

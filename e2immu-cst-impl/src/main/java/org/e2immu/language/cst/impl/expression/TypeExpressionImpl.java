@@ -7,6 +7,7 @@ import org.e2immu.language.cst.api.element.Visitor;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.expression.Precedence;
 import org.e2immu.language.cst.api.expression.TypeExpression;
+import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.translate.TranslationMap;
@@ -135,5 +136,10 @@ public class TypeExpressionImpl extends ExpressionImpl implements TypeExpression
         ParameterizedType translatedType = translationMap.translateType(parameterizedType);
         if (translatedType == parameterizedType) return this;
         return new TypeExpressionImpl(comments(), source(), translatedType, diamond);
+    }
+
+    @Override
+    public Expression rewire(InfoMap infoMap) {
+        return new TypeExpressionImpl(comments(), source(), parameterizedType.rewire(infoMap), diamond);
     }
 }

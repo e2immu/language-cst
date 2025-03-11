@@ -6,6 +6,7 @@ import org.e2immu.language.cst.api.element.Source;
 import org.e2immu.language.cst.api.element.Visitor;
 import org.e2immu.language.cst.api.expression.AnnotationExpression;
 import org.e2immu.language.cst.api.expression.Expression;
+import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.statement.Block;
@@ -142,5 +143,11 @@ public class SynchronizedStatementImpl extends StatementImpl implements Synchron
     @Override
     public boolean hasSubBlocks() {
         return true;
+    }
+
+    @Override
+    public Statement rewire(InfoMap infoMap) {
+        return new SynchronizedStatementImpl(comments(), source(), rewireAnnotations(infoMap), label(),
+                expression.rewire(infoMap), block.rewire(infoMap));
     }
 }

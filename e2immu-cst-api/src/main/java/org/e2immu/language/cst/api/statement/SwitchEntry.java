@@ -3,6 +3,7 @@ package org.e2immu.language.cst.api.statement;
 import org.e2immu.annotation.Fluent;
 import org.e2immu.language.cst.api.element.Element;
 import org.e2immu.language.cst.api.expression.Expression;
+import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.translate.TranslationMap;
@@ -23,6 +24,8 @@ public interface SwitchEntry extends Comparable<SwitchEntry> {
     // or null, when absent (Java 21)
 
     LocalVariable patternVariable();
+
+    SwitchEntry rewire(InfoMap infoMap);
 
     Stream<Element.TypeReference> typesReferenced();
 

@@ -7,6 +7,7 @@ import org.e2immu.language.cst.api.element.Source;
 import org.e2immu.language.cst.api.element.Visitor;
 import org.e2immu.language.cst.api.expression.AnnotationExpression;
 import org.e2immu.language.cst.api.expression.Expression;
+import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.statement.Block;
@@ -91,6 +92,14 @@ public class TryStatementImpl extends StatementImpl implements TryStatement {
         @Override
         public CatchClause withBlock(Block newBlock) {
             return new CatchClauseImpl(comments, source, annotations, exceptionTypes, isFinal, catchVariable, newBlock);
+        }
+
+        @Override
+        public CatchClause rewire(InfoMap infoMap) {
+            return new CatchClauseImpl(comments, source,
+                    annotations.stream().map(ae -> (AnnotationExpression) ae.rewire(infoMap)).toList(),
+                    exceptionTypes.stream().map(et -> et.rewire(infoMap)).toList(),
+                    isFinal, (LocalVariable) catchVariable.rewire(infoMap), block.rewire(infoMap));
         }
 
         public static class Builder extends ElementImpl.Builder<CatchClause.Builder> implements CatchClause.Builder {
@@ -183,7 +192,7 @@ public class TryStatementImpl extends StatementImpl implements TryStatement {
 
         @Override
         public void visit(Predicate<Element> predicate) {
-            if(predicate.test(this)) {
+            if (predicate.test(this)) {
                 block.visit(predicate);
             }
         }
@@ -416,5 +425,14 @@ public class TryStatementImpl extends StatementImpl implements TryStatement {
             return List.of(ts);
         }
         return List.of(this);
+    }
+
+    @Override
+    public Statement rewire(InfoMap infoMap) {
+        return new TryStatementImpl(comments(), source(), rewireAnnotations(infoMap), label(),
+                resources.stream().map(s -> s.rewire(infoMap)).toList(),
+                block.rewire(infoMap),
+                catchClauses.stream().map(cc -> cc.rewire(infoMap)).toList(),
+                finallyBlock.rewire(infoMap));
     }
 }

@@ -6,6 +6,7 @@ import org.e2immu.language.cst.api.element.Visitor;
 import org.e2immu.language.cst.api.expression.EmptyExpression;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.expression.Precedence;
+import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.runtime.Predefined;
@@ -128,5 +129,10 @@ public class EmptyExpressionImpl extends ExpressionImpl implements EmptyExpressi
     @Override
     public Expression translate(TranslationMap translationMap) {
         return translationMap.translateExpression(this);
+    }
+
+    @Override
+    public Expression rewire(InfoMap infoMap) {
+        return this;
     }
 }

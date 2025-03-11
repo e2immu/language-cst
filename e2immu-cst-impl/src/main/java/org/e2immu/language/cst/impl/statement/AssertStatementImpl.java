@@ -6,6 +6,7 @@ import org.e2immu.language.cst.api.element.Source;
 import org.e2immu.language.cst.api.element.Visitor;
 import org.e2immu.language.cst.api.expression.AnnotationExpression;
 import org.e2immu.language.cst.api.expression.Expression;
+import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.statement.AssertStatement;
@@ -125,7 +126,7 @@ public class AssertStatementImpl extends StatementImpl implements AssertStatemen
         Expression msg = message.translate(translationMap);
         if (tex != expression || msg != message || !analysis().isEmpty() && translationMap.isClearAnalysis()) {
             AssertStatement as = new AssertStatementImpl(comments(), source(), annotations(), label(), tex, msg);
-            if(!translationMap.isClearAnalysis()) as.analysis().setAll(analysis());
+            if (!translationMap.isClearAnalysis()) as.analysis().setAll(analysis());
             return List.of(as);
         }
         return List.of(this);
@@ -144,5 +145,11 @@ public class AssertStatementImpl extends StatementImpl implements AssertStatemen
     @Override
     public AssertStatement withSource(Source newSource) {
         return new AssertStatementImpl(comments(), newSource, annotations(), label(), expression, message);
+    }
+
+    @Override
+    public Statement rewire(InfoMap infoMap) {
+        return new AssertStatementImpl(comments(), source(), rewireAnnotations(infoMap), label(),
+                expression.rewire(infoMap), message.rewire(infoMap));
     }
 }
