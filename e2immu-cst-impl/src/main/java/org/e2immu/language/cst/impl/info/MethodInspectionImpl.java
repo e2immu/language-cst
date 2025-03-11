@@ -196,6 +196,8 @@ public class MethodInspectionImpl extends InspectionImpl implements MethodInspec
 
         @Override
         public ParameterInfo addParameter(String name, ParameterizedType type) {
+            assert name != null;
+            assert type != null;
             ParameterInfo pi = new ParameterInfoImpl(methodInfo, parameters.size(), name, type);
             parameters.add(pi);
             return pi;

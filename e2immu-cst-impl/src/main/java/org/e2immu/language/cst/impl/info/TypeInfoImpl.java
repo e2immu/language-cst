@@ -17,6 +17,7 @@ import org.e2immu.language.cst.impl.analysis.PropertyImpl;
 import org.e2immu.language.cst.impl.analysis.ValueImpl;
 import org.e2immu.language.cst.impl.translate.TranslationMapImpl;
 import org.e2immu.language.cst.impl.type.ParameterizedTypeImpl;
+import org.e2immu.language.cst.impl.type.TypeParameterImpl;
 import org.e2immu.support.Either;
 import org.e2immu.support.EventuallyFinalOnDemand;
 
@@ -601,13 +602,24 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
             typeInfo = new TypeInfoImpl(infoMap.typeInfoRecurse(compilationUnitOrEnclosingType.getRight()), simpleName);
         }
         infoMap.put(typeInfo);
+
+        for (TypeInfo subType : subTypes()) {
+            subType.rewirePhase1(infoMap);
+        }
+        typeParameters().forEach(tp -> {
+            TypeParameter newTp = new TypeParameterImpl(tp.getIndex(), tp.simpleName(), Either.left(typeInfo),
+                    tp.annotations().stream().map(ae -> (AnnotationExpression) ae.rewire(infoMap)).toList());
+            typeInfo.builder().addOrSetTypeParameter(newTp);
+            tp.typeBounds().forEach(tb -> newTp.builder().addTypeBound(tb.rewire(infoMap)));
+            newTp.builder().commit();
+        });
         TypeInfo.Builder builder = typeInfo.builder();
-        builder.setTypeNature(typeInfo.typeNature())
+        builder.setTypeNature(typeNature())
                 .setSource(source())
                 .addComments(comments())
                 .addAnnotations(annotations())
                 .setSynthetic(isSynthetic())
-                .setParentClass(parentClass().rewire(infoMap))
+                .setParentClass(parentClass() == null ? null : parentClass().rewire(infoMap))
                 .setAccess(typeInfo.access());
         typeModifiers().forEach(builder::addTypeModifier);
         interfacesImplemented().forEach(pt -> builder.addInterfaceImplemented(pt.rewire(infoMap)));
@@ -622,6 +634,10 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
         TypeInfo rewiredType = infoMap.typeInfo(this);
         TypeInfo.Builder builder = rewiredType.builder();
 
+
+        for (TypeInfo subType : subTypes()) {
+            subType.rewirePhase2(infoMap);
+        }
         for (MethodInfo constructor : constructors()) {
             MethodInfo rewiredConstructor = new MethodInfoImpl(constructor.methodType(), constructor.name(), rewiredType);
             builder.addConstructor(rewiredConstructor);
@@ -647,6 +663,13 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     }
 
     private void handleMethodOrConstructor(MethodInfo methodInfo, MethodInfo rewiredMethod, InfoMap infoMap) {
+        methodInfo.typeParameters().forEach(tp -> {
+            TypeParameter newTp = new TypeParameterImpl(tp.getIndex(), tp.simpleName(), Either.right(rewiredMethod),
+                    tp.annotations().stream().map(ae -> (AnnotationExpression) ae.rewire(infoMap)).toList());
+            rewiredMethod.builder().addTypeParameter(newTp);
+            tp.typeBounds().forEach(tb -> newTp.builder().addTypeBound(tb.rewire(infoMap)));
+            newTp.builder().commit();
+        });
         rewireParameters(methodInfo, rewiredMethod, infoMap);
         infoMap.put(rewiredMethod);
         MethodInfo.Builder builder = rewiredMethod.builder();
@@ -658,7 +681,6 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
                 .setSynthetic(methodInfo.isSynthetic())
                 .setMissingData(methodInfo.missingData());
         methodInfo.exceptionTypes().forEach(pt -> builder.addExceptionType(pt.rewire(infoMap)));
-        methodInfo.typeParameters().forEach(tp -> builder.addTypeParameter(tp.rewire(infoMap)));
     }
 
     private void rewireParameters(MethodInfo methodInfo, MethodInfo rewiredMethod, InfoMap infoMap) {
@@ -673,9 +695,9 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
                     .setVarArgs(pi.isVarArgs())
                     .setSynthetic(pi.isSynthetic())
                     .commit();
-            infoMap.put(rewiredPi);
         }
         rewiredMethod.builder().commitParameters();
+        rewiredMethod.builder().parameters().forEach(infoMap::put);
     }
 
     @Override

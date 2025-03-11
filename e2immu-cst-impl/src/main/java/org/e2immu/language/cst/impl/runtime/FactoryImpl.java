@@ -1095,8 +1095,8 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
-    public Set<TypeInfo> rewire(Collection<TypeInfo> types) {
-        InfoMap infoMap = new InfoMapImpl();
+    public Set<TypeInfo> rewire(Set<TypeInfo> types) {
+        InfoMap infoMap = new InfoMapImpl(types);
         Set<TypeInfo> rewired = new HashSet<>();
         for (TypeInfo typeInfo : types) {
             if (infoMap.typeInfoNullIfAbsent(typeInfo) == null) {

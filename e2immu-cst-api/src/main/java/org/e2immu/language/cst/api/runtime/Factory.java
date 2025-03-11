@@ -429,7 +429,7 @@ public interface Factory {
 
     Qualification qualificationSimpleNames();
 
-    Set<TypeInfo> rewire(Collection<TypeInfo> types);
+    Set<TypeInfo> rewire(Set<TypeInfo> types);
 
     void setGetSetField(MethodInfo getSetMethod, FieldInfo fieldInfo, boolean setter, int parameterIndexOfIndex);
 

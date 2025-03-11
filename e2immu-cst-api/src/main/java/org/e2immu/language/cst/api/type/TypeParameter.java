@@ -25,8 +25,6 @@ public interface TypeParameter extends NamedType {
         return getOwner().isRight();
     }
 
-    TypeParameter rewire(InfoMap infoMap);
-
     List<ParameterizedType> typeBounds();
 
     @NotNull
@@ -37,6 +35,8 @@ public interface TypeParameter extends NamedType {
     }
 
     Builder builder();
+
+    TypeParameter rewire(InfoMap infoMap);
 
     TypeParameter withOwnerVariableTypeBounds(MethodInfo methodInfo);
 
