@@ -23,6 +23,7 @@ public class TypeInspectionImpl extends InspectionImpl implements TypeInspection
     private final MethodInfo enclosingMethod;
     private final List<TypeInfo> permittedWhenSealed;
     private final Set<TypeInfo> superTypesExcludingJavaLangObject;
+    private final int anonymousTypes;
 
     public TypeInspectionImpl(Inspection inspection,
                               Set<TypeModifier> typeModifiers,
@@ -38,7 +39,8 @@ public class TypeInspectionImpl extends InspectionImpl implements TypeInspection
                               boolean fieldsAccessedInRestOfPrimaryType,
                               MethodInfo enclosingMethod,
                               List<TypeInfo> permittedWhenSealed,
-                              Set<TypeInfo> superTypesExcludingJavaLangObject) {
+                              Set<TypeInfo> superTypesExcludingJavaLangObject,
+                              int anonymousTypes) {
         super(inspection.access(), inspection.comments(), inspection.source(), inspection.isSynthetic(), inspection.annotations());
         this.typeModifiers = typeModifiers;
         this.methods = methods;
@@ -54,6 +56,7 @@ public class TypeInspectionImpl extends InspectionImpl implements TypeInspection
         this.enclosingMethod = enclosingMethod;
         this.permittedWhenSealed = permittedWhenSealed;
         this.superTypesExcludingJavaLangObject = superTypesExcludingJavaLangObject;
+        this.anonymousTypes = anonymousTypes;
     }
 
     @Override
@@ -64,6 +67,11 @@ public class TypeInspectionImpl extends InspectionImpl implements TypeInspection
     @Override
     public List<TypeInfo> permittedWhenSealed() {
         return permittedWhenSealed;
+    }
+
+    @Override
+    public int anonymousTypes() {
+        return anonymousTypes;
     }
 
     @Override
@@ -131,6 +139,7 @@ public class TypeInspectionImpl extends InspectionImpl implements TypeInspection
         private final List<TypeParameter> typeParameters = new ArrayList<>();
         private final List<TypeInfo> permittedWhenSealed = new ArrayList<>();
         private final Set<TypeInfo> superTypesExcludingJavaLangObject = new HashSet<>();
+        private int anonymousTypes;
 
         private ParameterizedType parentClass;
         private TypeNature typeNature;
@@ -256,7 +265,7 @@ public class TypeInspectionImpl extends InspectionImpl implements TypeInspection
                     List.copyOf(constructors), List.copyOf(fields), parentClass, typeNature, singleAbstractMethod,
                     List.copyOf(interfacesImplemented), List.copyOf(typeParameters), sortedSubTypes,
                     fieldsAccessedInRestOfPrimaryType, enclosingMethod, List.copyOf(permittedWhenSealed),
-                    Set.copyOf(superTypesExcludingJavaLangObject));
+                    Set.copyOf(superTypesExcludingJavaLangObject), anonymousTypes);
             typeInfo.commit(ti);
         }
 
@@ -341,6 +350,16 @@ public class TypeInspectionImpl extends InspectionImpl implements TypeInspection
         @Override
         public MethodInfo enclosingMethod() {
             return enclosingMethod;
+        }
+
+        @Override
+        public int getAndIncrementAnonymousTypes() {
+            return anonymousTypes++;
+        }
+
+        @Override
+        public int anonymousTypes() {
+            return anonymousTypes;
         }
     }
 

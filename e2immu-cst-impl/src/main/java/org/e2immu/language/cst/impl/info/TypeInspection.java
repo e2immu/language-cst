@@ -48,4 +48,6 @@ public interface TypeInspection extends Inspection {
     MethodInfo enclosingMethod();
 
     List<TypeInfo> permittedWhenSealed();
+
+    int anonymousTypes();
 }

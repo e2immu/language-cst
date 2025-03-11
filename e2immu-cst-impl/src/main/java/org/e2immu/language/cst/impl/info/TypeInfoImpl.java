@@ -456,6 +456,11 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     }
 
     @Override
+    public int anonymousTypes() {
+        return inspection.get().anonymousTypes();
+    }
+
+    @Override
     public int complexity() {
         throw new UnsupportedOperationException();
     }

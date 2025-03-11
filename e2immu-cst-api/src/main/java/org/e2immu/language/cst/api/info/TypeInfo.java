@@ -168,12 +168,16 @@ public interface TypeInfo extends NamedType, Info {
 
     TypeNature typeNature();
 
+    int anonymousTypes();
+
     interface Builder extends Info.Builder<Builder> {
         Builder addPermittedType(TypeInfo typeInfo);
 
         List<MethodInfo> constructors();
 
         List<FieldInfo> fields();
+
+        int getAndIncrementAnonymousTypes();
 
         boolean isAbstract();
 
