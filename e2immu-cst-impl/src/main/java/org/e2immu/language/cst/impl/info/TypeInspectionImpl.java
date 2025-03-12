@@ -358,6 +358,12 @@ public class TypeInspectionImpl extends InspectionImpl implements TypeInspection
         }
 
         @Override
+        public Builder setAnonymousTypes(int anonymousTypes) {
+            this.anonymousTypes = anonymousTypes;
+            return this;
+        }
+
+        @Override
         public int anonymousTypes() {
             return anonymousTypes;
         }

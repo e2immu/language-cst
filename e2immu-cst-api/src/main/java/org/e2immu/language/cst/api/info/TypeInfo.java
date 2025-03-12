@@ -184,6 +184,9 @@ public interface TypeInfo extends NamedType, Info {
         List<MethodInfo> methods();
 
         @Fluent
+        Builder setAnonymousTypes(int anonymousTypes);
+
+        @Fluent
         Builder setEnclosingMethod(MethodInfo methodInfo);
 
         @Fluent
