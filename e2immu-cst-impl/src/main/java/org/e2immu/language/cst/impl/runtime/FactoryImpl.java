@@ -425,6 +425,11 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
+    public ByteConstant newByte(List<Comment> comments, Source source, byte b) {
+        return new ByteConstantImpl(comments, source, byteParameterizedType(), b);
+    }
+
+    @Override
     public Cast newCast(Expression e, ParameterizedType parameterizedType) {
         return new CastImpl(List.of(), null, parameterizedType, e);
     }
@@ -773,6 +778,11 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
+    public ShortConstant newShort(List<Comment> comments, Source source, short s) {
+        return new ShortConstantImpl(comments, source, shortParameterizedType(), s);
+    }
+
+    @Override
     public Comment newSingleLineComment(String comment) {
         return new SingleLineComment(comment);
     }
@@ -943,6 +953,11 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
+    public Expression nullConstant(List<Comment> comments, Source source) {
+        return new NullConstantImpl(comments, source, parameterizedTypeNullConstant());
+    }
+
+    @Override
     public Expression nullValue(ParameterizedType parameterizedType) {
         if (parameterizedType.arrays() == 0) {
             TypeInfo typeInfo = parameterizedType.bestTypeInfo();
@@ -958,6 +973,24 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
             }
         }
         return nullConstant();
+    }
+
+    @Override
+    public Expression nullValue(ParameterizedType parameterizedType, Source source) {
+        if (parameterizedType.arrays() == 0) {
+            TypeInfo typeInfo = parameterizedType.bestTypeInfo();
+            if (typeInfo != null) {
+                if (typeInfo.isBoolean()) return newBoolean(List.of(), source, false);
+                if (typeInfo.isInt()) return newInt(List.of(), source, 0);
+                if (typeInfo.isLong()) return newLong(List.of(), source, 0L);
+                if (typeInfo.isShort()) return newShort(List.of(), source, (short) 0);
+                if (typeInfo.isByte()) return newByte(List.of(), source, (byte) 0);
+                if (typeInfo.isFloat()) return newFloat(List.of(), source, 0);
+                if (typeInfo.isDouble()) return newDouble(List.of(), source, 0);
+                if (typeInfo.isChar()) return newChar(List.of(), source, '\0');
+            }
+        }
+        return nullConstant(List.of(), source);
     }
 
     @Override

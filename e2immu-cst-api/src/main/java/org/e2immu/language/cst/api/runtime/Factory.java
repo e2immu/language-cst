@@ -162,6 +162,8 @@ public interface Factory {
 
     ByteConstant newByte(byte b);
 
+    ByteConstant newByte(List<Comment> comments, Source source, byte b);
+
     Cast newCast(Expression e, ParameterizedType parameterizedType);
 
     Cast.Builder newCastBuilder();
@@ -300,6 +302,8 @@ public interface Factory {
 
     ShortConstant newShort(short s);
 
+    ShortConstant newShort(List<Comment> comments, Source source, short s);
+
     Comment newSingleLineComment(String comment);
 
     SwitchEntry newStatementsSwitchEntry(VariableExpression selector,
@@ -377,7 +381,11 @@ public interface Factory {
 
     Expression nullConstant();
 
+    Expression nullConstant(List<Comment> comments, Source source);
+
     Expression nullValue(ParameterizedType parameterizedType);
+
+    Expression nullValue(ParameterizedType parameterizedType, Source source);
 
     Collector<OutputBuilder, OutputBuilder, OutputBuilder> outputBuilderJoining(OutputElement outputElement);
 
