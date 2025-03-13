@@ -608,8 +608,9 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
         }
         infoMap.put(typeInfo);
 
+        TypeInfo.Builder builder = typeInfo.builder();
         for (TypeInfo subType : subTypes()) {
-            subType.rewirePhase1(infoMap);
+            builder.addSubType(subType.rewirePhase1(infoMap));
         }
         typeParameters().forEach(tp -> {
             TypeParameter newTp = new TypeParameterImpl(tp.getIndex(), tp.simpleName(), Either.left(typeInfo),
@@ -618,7 +619,6 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
             tp.typeBounds().forEach(tb -> newTp.builder().addTypeBound(tb.rewire(infoMap)));
             newTp.builder().commit();
         });
-        TypeInfo.Builder builder = typeInfo.builder();
         builder.setTypeNature(typeNature())
                 .setSource(source())
                 .addComments(comments())
@@ -669,6 +669,7 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
                     .setAccess(fieldInfo.access());
             fieldInfo.modifiers().forEach(rewiredField.builder()::addFieldModifier);
             infoMap.put(rewiredField);
+            builder.addField(rewiredField);
         }
         // do not commit!
     }

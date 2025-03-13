@@ -39,12 +39,16 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     private final IntConstant zero;
     private final IntConstant one;
     private final IntConstant minusOne;
+    private final BooleanConstant constantTrue;
+    private final BooleanConstant constantFalse;
     private final Map<MethodInfo, Precedence> precedenceMap = new HashMap<>();
 
     public FactoryImpl() {
-        zero = new IntConstantImpl(this, 0);
-        one = new IntConstantImpl(this, 1);
-        minusOne = new IntConstantImpl(this, -1);
+        zero = new IntConstantImpl(List.of(), noSource(), intParameterizedType(), 0);
+        one = new IntConstantImpl(List.of(), noSource(), intParameterizedType(), 1);
+        minusOne = new IntConstantImpl(List.of(), noSource(), intParameterizedType(), -1);
+        constantFalse = new BooleanConstantImpl(List.of(), noSource(), booleanParameterizedType(), false);
+        constantTrue = new BooleanConstantImpl(List.of(), noSource(), booleanParameterizedType(), true);
 
         precedenceMap.put(plusOperatorInt(), PrecedenceEnum.ADDITIVE);
         precedenceMap.put(minusOperatorInt(), PrecedenceEnum.ADDITIVE);
@@ -98,6 +102,16 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     @Override
     public ParameterizedType commonType(ParameterizedType pt1, ParameterizedType pt2) {
         return new CommonType(this).commonType(pt1, pt2);
+    }
+
+    @Override
+    public BooleanConstant constantFalse() {
+        return constantFalse;
+    }
+
+    @Override
+    public BooleanConstant constantTrue() {
+        return constantTrue;
     }
 
     @Override
@@ -195,11 +209,11 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
         if (IntUtil.isMathematicalInteger(v)) {
             long l = Math.round(v);
             if (l > Integer.MAX_VALUE || l < Integer.MIN_VALUE) {
-                return newLong(l);
+                return newLong(List.of(), noSource(), l);
             }
-            return newInt((int) l);
+            return newInt(List.of(), noSource(), (int) l);
         }
-        return newDouble(v);
+        return newDouble(List.of(), noSource(), v);
     }
 
     @Override
@@ -395,8 +409,8 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
-    public BitwiseNegation newBitwiseNegation(Expression value) {
-        return new BitwiseNegationImpl(bitWiseNotOperatorInt(), PrecedenceEnum.UNARY, value);
+    public BitwiseNegation newBitwiseNegation(List<Comment> comments, Source source, Expression value) {
+        return new BitwiseNegationImpl(comments, source, bitWiseNotOperatorInt(), PrecedenceEnum.UNARY, value);
     }
 
     @Override
@@ -901,8 +915,8 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
-    public UnaryOperator newUnaryOperator(MethodInfo operator, Expression e, Precedence precedence) {
-        return new UnaryOperatorImpl(operator, e, precedence);
+    public UnaryOperator newUnaryOperator(List<Comment> comments, Source source, MethodInfo operator, Expression e, Precedence precedence) {
+        return new UnaryOperatorImpl(comments, source, operator, e, precedence);
     }
 
     @Override
@@ -939,17 +953,18 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     @Override
     public Expression notNull(Expression expression) {
         return newBinaryOperatorBuilder()
-                .setLhs(nullConstant())
+                .setLhs(nullConstant(List.of(), noSource()))
                 .setOperator(notEqualsOperatorObject())
                 .setRhs(expression)
                 .setPrecedence(precedenceEquality())
                 .setParameterizedType(booleanParameterizedType())
+                .setSource(noSource())
                 .build();
     }
 
     @Override
     public Expression nullConstant() {
-        return new NullConstantImpl(List.of(), null, parameterizedTypeNullConstant());
+        return new NullConstantImpl(List.of(), noSource(), parameterizedTypeNullConstant());
     }
 
     @Override
@@ -959,20 +974,7 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
 
     @Override
     public Expression nullValue(ParameterizedType parameterizedType) {
-        if (parameterizedType.arrays() == 0) {
-            TypeInfo typeInfo = parameterizedType.bestTypeInfo();
-            if (typeInfo != null) {
-                if (typeInfo.isBoolean()) return newBoolean(false);
-                if (typeInfo.isInt()) return zero;
-                if (typeInfo.isLong()) return newLong(0L);
-                if (typeInfo.isShort()) return newShort((short) 0);
-                if (typeInfo.isByte()) return newByte((byte) 0);
-                if (typeInfo.isFloat()) return newFloat(0);
-                if (typeInfo.isDouble()) return newDouble(0);
-                if (typeInfo.isChar()) return newChar('\0');
-            }
-        }
-        return nullConstant();
+        return nullValue(parameterizedType, noSource());
     }
 
     @Override
@@ -1260,16 +1262,6 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     @Override
     public TypeNature typeNatureStub() {
         return TypeNatureEnum.STUB;
-    }
-
-    private ParameterizedType typeOfElements(ParameterizedType pt) {
-        if (pt.arrays() > 0) return pt.copyWithFewerArrays(1);
-        // we'll need to find the value of the first type parameter of List... non-trivial here
-        if ("java.util.List".equals(pt.bestTypeInfo().fullyQualifiedName())) {
-            if (pt.parameters().size() == 1) return pt.parameters().get(0);
-            return objectParameterizedType();
-        }
-        throw new UnsupportedOperationException("Not yet implemented");
     }
 
     @Override

@@ -13,10 +13,6 @@ import java.util.List;
 
 public class BitwiseNegationImpl extends UnaryOperatorImpl implements BitwiseNegation {
 
-    public BitwiseNegationImpl(MethodInfo operator, Precedence precedence, Expression expression) {
-        super(operator, expression, precedence);
-    }
-
     public BitwiseNegationImpl(List<Comment> comments, Source source, MethodInfo operator, Precedence precedence, Expression expression) {
         super(comments, source, operator, expression, precedence);
     }

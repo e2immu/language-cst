@@ -30,10 +30,6 @@ public class UnaryOperatorImpl extends ExpressionImpl implements UnaryOperator {
     public final Precedence precedence;
     public final MethodInfo operator;
 
-    public UnaryOperatorImpl(@NotNull MethodInfo operator, @NotNull Expression expression, Precedence precedence) {
-        this(List.of(), null, operator, expression, precedence);
-    }
-
     public UnaryOperatorImpl(List<Comment> comments, Source source, @NotNull MethodInfo operator, @NotNull Expression expression, Precedence precedence) {
         super(comments, source, 1 + expression.complexity());
         this.expression = Objects.requireNonNull(expression);

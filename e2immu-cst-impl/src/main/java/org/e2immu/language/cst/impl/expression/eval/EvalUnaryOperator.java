@@ -19,7 +19,7 @@ public class EvalUnaryOperator {
             return second.expression();
         }
         if (runtime.bitWiseNotOperatorInt() == operator) {
-            return runtime.newBitwiseNegation(value);
+            return runtime.newBitwiseNegation(unaryOperator.comments(), unaryOperator.source(), value);
         }
         if (runtime.unaryPlusOperatorInt() == operator) {
             return value;

@@ -32,13 +32,9 @@ public interface Factory {
 
     ParameterizedType commonType(ParameterizedType pt1, ParameterizedType pt2);
 
-    default BooleanConstant constantFalse() {
-        return newBoolean(false);
-    }
+    BooleanConstant constantFalse();
 
-    default BooleanConstant constantTrue() {
-        return newBoolean(true);
-    }
+    BooleanConstant constantTrue();
 
     DescendMode descendModeNo();
 
@@ -72,7 +68,9 @@ public interface Factory {
 
     IntConstant intMinusOne();
 
-    IntConstant intOne();
+    default IntConstant intOne() {
+        return intOne(noSource());
+    }
 
     IntConstant intOne(Source source);
 
@@ -150,7 +148,7 @@ public interface Factory {
 
     BinaryOperator.Builder newBinaryOperatorBuilder();
 
-    BitwiseNegation newBitwiseNegation(Expression value);
+    BitwiseNegation newBitwiseNegation(List<Comment> comments, Source source, Expression value);
 
     Block.Builder newBlockBuilder();
 
@@ -363,7 +361,8 @@ public interface Factory {
 
     TypeParameter newTypeParameter(int index, String simpleName, Info owner, List<AnnotationExpression> annotations);
 
-    UnaryOperator newUnaryOperator(MethodInfo operator, Expression e, Precedence precedence);
+    UnaryOperator newUnaryOperator(List<Comment> comments, Source source, MethodInfo operator, Expression e,
+                                   Precedence precedence);
 
     VariableExpression newVariableExpression(Variable variable);
 
