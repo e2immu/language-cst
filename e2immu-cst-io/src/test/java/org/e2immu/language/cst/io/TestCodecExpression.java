@@ -1,24 +1,11 @@
 package org.e2immu.language.cst.io;
 
-import org.e2immu.language.cst.api.analysis.Codec;
-import org.e2immu.language.cst.api.element.CompilationUnit;
 import org.e2immu.language.cst.api.expression.EnclosedExpression;
 import org.e2immu.language.cst.api.expression.VariableExpression;
-import org.e2immu.language.cst.api.info.FieldInfo;
-import org.e2immu.language.cst.api.info.TypeInfo;
-import org.e2immu.language.cst.api.runtime.Runtime;
-import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.variable.FieldReference;
 import org.e2immu.language.cst.api.variable.LocalVariable;
-import org.e2immu.language.cst.impl.analysis.PropertyProviderImpl;
-import org.e2immu.language.cst.impl.analysis.ValueImpl;
-import org.e2immu.language.cst.impl.runtime.RuntimeImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.parsers.json.JSONParser;
-import org.parsers.json.Node;
-
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

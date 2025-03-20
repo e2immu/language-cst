@@ -1,36 +1,12 @@
 package org.e2immu.language.cst.io;
 
-import org.e2immu.language.cst.api.analysis.Codec;
-import org.e2immu.language.cst.api.analysis.Property;
-import org.e2immu.language.cst.api.element.CompilationUnit;
-import org.e2immu.language.cst.api.expression.EnclosedExpression;
-import org.e2immu.language.cst.api.expression.VariableExpression;
-import org.e2immu.language.cst.api.info.FieldInfo;
-import org.e2immu.language.cst.api.info.TypeInfo;
-import org.e2immu.language.cst.api.runtime.Runtime;
 import org.e2immu.language.cst.api.type.ParameterizedType;
-import org.e2immu.language.cst.api.variable.FieldReference;
-import org.e2immu.language.cst.impl.analysis.PropertyImpl;
-import org.e2immu.language.cst.impl.analysis.PropertyProviderImpl;
-import org.e2immu.language.cst.impl.analysis.ValueImpl;
-import org.e2immu.language.cst.impl.runtime.RuntimeImpl;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.parsers.json.JSONLexer;
-import org.parsers.json.JSONParser;
-import org.parsers.json.Node;
-import org.parsers.json.Token;
-import org.parsers.json.ast.JSONObject;
-import org.parsers.json.ast.KeyValuePair;
-import org.parsers.json.ast.Root;
-import org.parsers.json.ast.StringLiteral;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 public class TestCodecType extends  CommonTest {
@@ -55,12 +31,14 @@ public class TestCodecType extends  CommonTest {
         assertEquals(type, codec.decodeType(context, d));
     }
 
-    @DisplayName("String<int, int>")
+    @DisplayName("String<String, String>")
     @Test
     public void test3() {
-        String encoded = "[\"Tjava.lang.String\",0,[\"Tint\",\"Tint\"]]";
+        String encoded = """
+                ["Tjava.lang.String",0,["Tjava.lang.String","Tjava.lang.String"]]\
+                """;
         ParameterizedType type = runtime.newParameterizedType(runtime.stringTypeInfo(),
-                List.of(runtime.intParameterizedType(), runtime.intParameterizedType()));
+                List.of(runtime.stringParameterizedType(), runtime.stringParameterizedType()));
         assertEquals(encoded, codec.encodeType(context, type).toString());
         CodecImpl.D d = makeD(encoded);
         assertEquals(type, codec.decodeType(context, d));

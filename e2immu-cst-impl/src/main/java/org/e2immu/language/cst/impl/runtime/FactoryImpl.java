@@ -471,7 +471,8 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     @Override
     public ClassExpression.Builder newClassExpressionBuilder(TypeInfo typeInfo) {
         ParameterizedType pt = newParameterizedType(typeInfo, 0);
-        ParameterizedType classPt = newParameterizedType(classTypeInfo(), List.of(pt));
+        // while int.class is legal, Class<int> is not, so we ensure boxed: Class<Integer>
+        ParameterizedType classPt = newParameterizedType(classTypeInfo(), List.of(pt.ensureBoxed(this)));
         return new ClassExpressionImpl.Builder().setParameterizedType(pt).setClassType(classPt);
     }
 

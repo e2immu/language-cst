@@ -72,7 +72,7 @@ public class ParameterizedTypeImpl implements ParameterizedType {
         this.arrays = arrays;
         this.wildcard = wildcard;
         this.parameters = parameters;
-        assert parameters.stream().noneMatch(Objects::isNull);
+        assert parameters.stream().noneMatch(ParameterizedType::isPrimitiveExcludingVoid);
     }
 
     @Override

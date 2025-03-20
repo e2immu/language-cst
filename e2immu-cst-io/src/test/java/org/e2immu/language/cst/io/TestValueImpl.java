@@ -2,7 +2,6 @@ package org.e2immu.language.cst.io;
 
 import org.e2immu.language.cst.api.analysis.Codec;
 import org.e2immu.language.cst.api.analysis.Value;
-import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.runtime.Runtime;
 import org.e2immu.language.cst.impl.analysis.PropertyProviderImpl;
 import org.e2immu.language.cst.impl.analysis.ValueImpl;
@@ -16,10 +15,8 @@ import org.parsers.json.ast.KeyValuePair;
 import org.parsers.json.ast.StringLiteral;
 
 import java.util.Map;
-import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.fail;
 
 public class TestValueImpl {
     Runtime runtime = new RuntimeImpl();
