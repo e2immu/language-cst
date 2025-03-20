@@ -172,7 +172,7 @@ public interface Factory {
 
     CharConstant newChar(List<Comment> comments, Source source, char c);
 
-    ClassExpression.Builder newClassExpressionBuilder(TypeInfo typeInfo);
+    ClassExpression.Builder newClassExpressionBuilder(ParameterizedType parameterizedType);
 
     CommaExpression.Builder newCommaBuilder();
 
