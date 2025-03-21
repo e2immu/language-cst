@@ -79,6 +79,7 @@ public interface TypeInfo extends NamedType, Info {
     default List<MethodInfo> methods() {
         return methodStream().toList();
     }
+
     Stream<MethodInfo> recursiveMethodStream();
 
     boolean isPrimitiveExcludingVoid();
@@ -255,12 +256,22 @@ public interface TypeInfo extends NamedType, Info {
         return Stream.concat(s1, Stream.concat(s2, s3));
     }
 
+    default Stream<TypeInfo> enclosingTypeStream() {
+        Stream<TypeInfo> enclosingStream;
+        if (compilationUnitOrEnclosingType().isRight()) {
+            TypeInfo right = compilationUnitOrEnclosingType().getRight();
+            enclosingStream = right.enclosingTypeStream();
+        } else {
+            enclosingStream = Stream.of();
+        }
+        return Stream.concat(Stream.of(this), enclosingStream);
+    }
 
     default Stream<MethodInfo> constructorAndMethodStream() {
         return Stream.concat(constructors().stream(), methodStream());
     }
 
-    default  Iterable<MethodInfo> constructorsAndMethods() {
+    default Iterable<MethodInfo> constructorsAndMethods() {
         return () -> constructorAndMethodStream().iterator();
     }
 
