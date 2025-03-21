@@ -119,6 +119,6 @@ public class SourceImpl implements Source {
 
     @Override
     public Source withIndex(String newIndex) {
-        return new SourceImpl(parent, newIndex, beginLine, beginPos, endLine, endPos);
+        return new SourceImpl(parent, newIndex, beginLine, beginPos, endLine, endPos, detailedSources);
     }
 }
