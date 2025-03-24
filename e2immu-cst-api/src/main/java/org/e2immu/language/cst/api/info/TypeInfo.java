@@ -291,4 +291,14 @@ public interface TypeInfo extends NamedType, Info {
     default TypeInfo translate(TranslationMap translationMap) {
         return this;
     }
+
+    default Stream<TypeInfo> innerClassEnclosingStream() {
+        if (!isStatic()) {
+            assert compilationUnitOrEnclosingType().isRight();
+            return Stream.concat(Stream.of(this),
+                    compilationUnitOrEnclosingType().getRight().innerClassEnclosingStream());
+        }
+        return Stream.of(this);
+    }
+
 }
