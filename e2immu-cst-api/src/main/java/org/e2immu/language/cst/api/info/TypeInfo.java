@@ -3,6 +3,7 @@ package org.e2immu.language.cst.api.info;
 
 import org.e2immu.annotation.Fluent;
 import org.e2immu.language.cst.api.element.CompilationUnit;
+import org.e2immu.language.cst.api.element.Source;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.translate.TranslationMap;
@@ -219,6 +220,8 @@ public interface TypeInfo extends NamedType, Info {
 
         @Fluent
         Builder setSingleAbstractMethod(MethodInfo singleAbstractMethod);
+
+        Source source();
 
         TypeNature typeNature();
     }

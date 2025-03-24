@@ -52,6 +52,14 @@ public class SourceImpl implements Source {
     }
 
     @Override
+    public Source mergeDetailedSources(DetailedSources detailedSources) {
+        DetailedSources newDetailedSources = this.detailedSources == null ? detailedSources
+                : detailedSources == null ? this.detailedSources
+                : this.detailedSources.merge(detailedSources);
+        return new SourceImpl(parent, index, beginLine, beginPos, endLine, endPos, newDetailedSources);
+    }
+
+    @Override
     public boolean isCompiledClass() {
         return beginLine == -1;
     }

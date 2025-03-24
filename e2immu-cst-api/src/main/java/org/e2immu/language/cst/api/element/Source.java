@@ -24,6 +24,8 @@ public interface Source extends Comparable<Source> {
 
     Source withDetailedSources(DetailedSources detailedSources);
 
+    Source mergeDetailedSources(DetailedSources detailedSources);
+
     // computations: override if you need to use these frequently
 
     default Info info() {

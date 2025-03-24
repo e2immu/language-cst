@@ -12,6 +12,8 @@ public interface DetailedSources {
     // use for types
     List<Source> details(Object object);
 
+    DetailedSources merge(DetailedSources other);
+
     interface Builder {
 
         Builder copy();

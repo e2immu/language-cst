@@ -55,4 +55,11 @@ public class DetailedSourcesImpl implements DetailedSources {
     public Source detail(Object object) {
         return (Source) identityHashMap.get(object);
     }
+
+    @Override
+    public DetailedSources merge(DetailedSources other) {
+        IdentityHashMap<Object, Object> copy = new IdentityHashMap<>(this.identityHashMap);
+        copy.putAll(((DetailedSourcesImpl) other).identityHashMap);
+        return new DetailedSourcesImpl(copy);
+    }
 }
