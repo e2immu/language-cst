@@ -21,14 +21,17 @@ public class CompilationUnitImpl extends ElementImpl implements CompilationUnit 
     private final String packageName;
     private final List<ImportStatement> importStatements;
     private final List<Comment> comments;
+    private final Source source;
 
     public CompilationUnitImpl(URI uri,
                                List<Comment> comments,
+                               Source source,
                                List<ImportStatement> importStatements,
                                String packageName) {
         this.uri = uri;
         this.packageName = packageName;
         this.comments = comments;
+        this.source = source;
         this.importStatements = importStatements;
     }
 
@@ -59,7 +62,7 @@ public class CompilationUnitImpl extends ElementImpl implements CompilationUnit 
 
     @Override
     public Source source() {
-        throw new UnsupportedOperationException();
+        return source;
     }
 
     @Override
@@ -132,7 +135,7 @@ public class CompilationUnitImpl extends ElementImpl implements CompilationUnit 
 
         @Override
         public CompilationUnit build() {
-            return new CompilationUnitImpl(uri, comments, List.copyOf(importStatements), packageName);
+            return new CompilationUnitImpl(uri, comments, source, List.copyOf(importStatements), packageName);
         }
     }
 }

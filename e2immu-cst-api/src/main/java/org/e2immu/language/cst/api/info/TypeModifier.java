@@ -20,4 +20,8 @@ public interface TypeModifier {
     boolean isNonSealed();
 
     Keyword keyword();
+
+    default boolean isAccessModifier() {
+        return isPrivate() || isProtected() || isPublic();
+    }
 }
