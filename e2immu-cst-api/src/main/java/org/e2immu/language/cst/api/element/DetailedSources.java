@@ -1,5 +1,7 @@
 package org.e2immu.language.cst.api.element;
 
+import org.e2immu.language.cst.api.type.ParameterizedType;
+
 import java.util.List;
 
 public interface DetailedSources {
@@ -14,6 +16,11 @@ public interface DetailedSources {
 
     DetailedSources merge(DetailedSources other);
 
+    // parameterized types use this as the copyWithoutArrays
+    // in this way, we can have the sources of the type without the []
+    // see ParseType
+    Object associatedObject(Object object);
+
     interface Builder {
 
         Builder copy();
@@ -21,5 +28,7 @@ public interface DetailedSources {
         Builder put(Object object, Source source);
 
         DetailedSources build();
+
+        Builder putAssociatedObject(ParameterizedType from, ParameterizedType to);
     }
 }
