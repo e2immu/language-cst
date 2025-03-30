@@ -32,6 +32,12 @@ public abstract class InspectionImpl implements Inspection {
         }
 
         @Override
+        public Access max(Access other) {
+            if (level < other.level()) return other;
+            return this;
+        }
+
+        @Override
         public boolean isPublic() {
             return this == PUBLIC;
         }

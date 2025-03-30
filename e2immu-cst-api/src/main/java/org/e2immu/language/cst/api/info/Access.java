@@ -6,6 +6,8 @@ public interface Access {
 
     Access combine(Access other);
 
+    Access max(Access other);
+
     default boolean le(Access other) {
         return level() <= other.level();
     }
