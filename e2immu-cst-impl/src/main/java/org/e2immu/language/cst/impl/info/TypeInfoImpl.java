@@ -22,7 +22,8 @@ import org.e2immu.support.Either;
 import org.e2immu.support.EventuallyFinalOnDemand;
 
 import java.util.*;
-import java.util.function.*;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -264,6 +265,8 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
 
     @Override
     public TypeInfo primaryType() {
+        MethodInfo methodInfo = enclosingMethod();
+        if (methodInfo != null) return methodInfo.primaryType();
         return compilationUnitOrEnclosingType.isLeft() ? this : compilationUnitOrEnclosingType.getRight().primaryType();
     }
 
