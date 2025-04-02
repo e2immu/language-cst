@@ -20,6 +20,9 @@ public interface FieldReference extends Variable {
 
     boolean scopeIsRecursivelyThis();
 
+    /**
+     * True when the source code does not contain a scope; the field is referenced directly without '.'
+     */
     boolean isDefaultScope();
 
     boolean scopeIsThis();

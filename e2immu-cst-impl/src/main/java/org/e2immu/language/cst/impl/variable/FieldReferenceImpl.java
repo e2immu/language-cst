@@ -55,26 +55,23 @@ public class FieldReferenceImpl extends VariableImpl implements FieldReference {
                               ParameterizedType parameterizedType) {
         super(parameterizedType);
         this.fieldInfo = Objects.requireNonNull(fieldInfo);
+        this.isDefaultScope = scope == null;
         // NOTE: for the sake of translations: if the scope is given, we take it, even if the result may not compile
         if (fieldInfo.isStatic()) {
             this.scope = scope == null
                     ? new TypeExpressionImpl(List.of(), SourceImpl.NO_SOURCE,
                     fieldInfo.owner().asSimpleParameterizedType(), DiamondEnum.NO)
                     : scope;
-            isDefaultScope = scope instanceof TypeExpression te && fieldInfo.owner() == te.parameterizedType().typeInfo();
             this.scopeVariable = null;
         } else if (scope == null) {
             scopeVariable = new ThisImpl(fieldInfo.owner().asParameterizedType());
             this.scope = new VariableExpressionImpl(List.of(), SourceImpl.NO_SOURCE, scopeVariable, null);
-            isDefaultScope = true;
         } else {
             this.scope = scope;
             if (scope instanceof VariableExpression ve) {
                 scopeVariable = ve.variable();
-                isDefaultScope = ve.variable() instanceof This thisVar && thisVar.typeInfo() == fieldInfo.owner();
             } else {
                 // the scope is not a variable, we must introduce a new scope variable
-                isDefaultScope = false;
                 scopeVariable = overrideScopeVariable;
             }
         }
