@@ -94,4 +94,14 @@ public class DetailedSourcesImpl implements DetailedSources {
         }
         return new DetailedSourcesImpl(copy, copyAssociation);
     }
+
+    @Override
+    public DetailedSources withSources(Object o, List<Source> sources) {
+        IdentityHashMap<Object, Object> copyAssociation = this.association == null ? null
+                : new IdentityHashMap<>(this.association);
+        IdentityHashMap<Object, Object> copy = new IdentityHashMap<>(identityHashMap.size());
+        copy.putAll(identityHashMap);
+        copy.put(o, sources);
+        return new DetailedSourcesImpl(copy, copyAssociation);
+    }
 }

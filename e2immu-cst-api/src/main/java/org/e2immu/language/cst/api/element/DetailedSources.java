@@ -21,6 +21,8 @@ public interface DetailedSources {
     // see ParseType
     Object associatedObject(Object object);
 
+    DetailedSources withSources(Object o, List<Source> sources);
+
     interface Builder {
 
         Builder copy();
