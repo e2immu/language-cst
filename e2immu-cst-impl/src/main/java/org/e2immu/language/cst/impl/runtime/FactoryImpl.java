@@ -772,8 +772,9 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
-    public Source newParserSource(Element parent, String index, int beginLine, int beginPos, int endLine, int endPos) {
-        return new SourceImpl(parent, index, beginLine, beginPos, endLine, endPos);
+    public Source newParserSource(Element parent, String index, int beginLine, int beginPos, int endLine, int endPos,
+                                  DetailedSources detailedSources) {
+        return new SourceImpl(parent, index, beginLine, beginPos, endLine, endPos, detailedSources);
     }
 
     @Override

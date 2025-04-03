@@ -292,7 +292,11 @@ public interface Factory {
 
     ParameterizedType newParameterizedType(TypeInfo typeInfo, int arrays, Wildcard wildCard, List<ParameterizedType> parameters);
 
-    Source newParserSource(Element parent, String index, int beginLine, int beginPos, int endLine, int endPos);
+   default  Source newParserSource(Element parent, String index, int beginLine, int beginPos, int endLine, int endPos) {
+       return newParserSource(parent, index, beginLine, beginPos, endLine, endPos, null);
+   }
+
+    Source newParserSource(Element parent, String index, int beginLine, int beginPos, int endLine, int endPos, DetailedSources detailedSources);
 
     ReturnStatement.Builder newReturnBuilder();
 
