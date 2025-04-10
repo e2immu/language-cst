@@ -88,6 +88,9 @@ public class ComputeMethodOverridesImpl implements ComputeMethodOverrides {
                                                    Map<NamedType, ParameterizedType> translationMap) {
         Set<MethodInfo> result = new HashSet<>();
         for (ParameterizedType superType : directSuperTypes(typeToSearch)) {
+            if (superType == null) {
+                throw new UnsupportedOperationException("Supertype of " + typeToSearch + " is null");
+            }
             Map<NamedType, ParameterizedType> translationMapOfSuperType = mapOfSuperType(superType);
             translationMapOfSuperType.putAll(translationMap);
             assert superType.typeInfo() != null;
@@ -223,6 +226,10 @@ public class ComputeMethodOverridesImpl implements ComputeMethodOverrides {
     public List<ParameterizedType> directSuperTypes(TypeInfo typeInfo) {
         if (typeInfo.isJavaLangObject()) return List.of();
         List<ParameterizedType> list = new ArrayList<>();
+        if (typeInfo.parentClass() == null) {
+            throw new UnsupportedOperationException("Only java.lang.Object can have null as the parentClass. Problem with: "
+                                                    + typeInfo.fullyQualifiedName());
+        }
         list.add(typeInfo.parentClass());
         list.addAll(typeInfo.interfacesImplemented());
         return list;

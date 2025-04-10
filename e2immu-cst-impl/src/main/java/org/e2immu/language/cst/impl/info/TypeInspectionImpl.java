@@ -266,6 +266,11 @@ public class TypeInspectionImpl extends InspectionImpl implements TypeInspection
                     List.copyOf(interfacesImplemented), List.copyOf(typeParameters), sortedSubTypes,
                     fieldsAccessedInRestOfPrimaryType, enclosingMethod, List.copyOf(permittedWhenSealed),
                     Set.copyOf(superTypesExcludingJavaLangObject), anonymousTypes);
+            if (ti.parentClass() == null
+                && !typeInfo.isJavaLangObject()
+                && typeNature != TypeNatureEnum.PRIMITIVE) {
+                throw new UnsupportedOperationException("Cannot commit. Type " + typeInfo + " has a null parent class, and it is not JLO. Its type nature is " + ti.typeNature());
+            }
             typeInfo.commit(ti);
         }
 
