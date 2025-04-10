@@ -11,8 +11,9 @@ import org.e2immu.language.cst.api.output.element.Split;
 import org.e2immu.language.cst.api.output.element.TextBlockFormatting;
 import org.e2immu.language.cst.api.runtime.Factory;
 import org.e2immu.language.cst.api.statement.*;
-import org.e2immu.language.cst.api.statement.SwitchEntry;
 import org.e2immu.language.cst.api.translate.TranslationMap;
+import org.e2immu.language.cst.api.type.*;
+import org.e2immu.language.cst.api.variable.*;
 import org.e2immu.language.cst.impl.analysis.PropertyImpl;
 import org.e2immu.language.cst.impl.analysis.ValueImpl;
 import org.e2immu.language.cst.impl.element.*;
@@ -23,11 +24,9 @@ import org.e2immu.language.cst.impl.output.*;
 import org.e2immu.language.cst.impl.statement.*;
 import org.e2immu.language.cst.impl.translate.TranslationMapImpl;
 import org.e2immu.language.cst.impl.type.*;
-import org.e2immu.util.internal.util.IntUtil;
 import org.e2immu.language.cst.impl.variable.*;
-import org.e2immu.language.cst.api.type.*;
-import org.e2immu.language.cst.api.variable.*;
 import org.e2immu.support.Either;
+import org.e2immu.util.internal.util.IntUtil;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -772,9 +771,9 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
-    public Source newParserSource(Element parent, String index, int beginLine, int beginPos, int endLine, int endPos,
+    public Source newParserSource(String index, int beginLine, int beginPos, int endLine, int endPos,
                                   DetailedSources detailedSources) {
-        return new SourceImpl(parent, index, beginLine, beginPos, endLine, endPos, detailedSources);
+        return new SourceImpl(index, beginLine, beginPos, endLine, endPos, detailedSources);
     }
 
     @Override
@@ -1022,7 +1021,7 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     public Source parseSourceFromCompact2(String compact2) {
         Matcher m = COMPACT2_PATTERN.matcher(compact2);
         if (m.matches()) {
-            return new SourceImpl(null, null, Integer.parseInt(m.group(1)), Integer.parseInt(m.group(2)),
+            return new SourceImpl(null, Integer.parseInt(m.group(1)), Integer.parseInt(m.group(2)),
                     Integer.parseInt(m.group(3)), Integer.parseInt(m.group(4)));
         }
         throw new UnsupportedOperationException("Illegal format: " + compact2);

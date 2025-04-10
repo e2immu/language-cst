@@ -2,7 +2,6 @@ package org.e2immu.language.cst.impl.element;
 
 import org.e2immu.language.cst.api.element.CompilationUnit;
 import org.e2immu.language.cst.api.element.DetailedSources;
-import org.e2immu.language.cst.api.element.Element;
 import org.e2immu.language.cst.api.element.Source;
 
 import java.util.Objects;
@@ -11,8 +10,7 @@ import java.util.Objects;
 we must be a bit memory-conscious: no unnecessary fields because there may be millions of elements
  */
 public class SourceImpl implements Source {
-    public static final Source NO_SOURCE = new SourceImpl(null, null, 0, 0, 0, 0);
-    private final Element parent;
+    public static final Source NO_SOURCE = new SourceImpl( null, 0, 0, 0, 0);
     private final String index;
     private final short beginLine;
     private final short beginPos;
@@ -20,13 +18,12 @@ public class SourceImpl implements Source {
     private final short endPos;
     private final DetailedSources detailedSources;
 
-    public SourceImpl(Element parent, String index, int beginLine, int beginPos, int endLine, int endPos) {
-        this(parent, index, beginLine, beginPos, endLine, endPos, null);
+    public SourceImpl(String index, int beginLine, int beginPos, int endLine, int endPos) {
+        this(index, beginLine, beginPos, endLine, endPos, null);
     }
 
-    public SourceImpl(Element parent, String index, int beginLine, int beginPos, int endLine, int endPos,
+    public SourceImpl(String index, int beginLine, int beginPos, int endLine, int endPos,
                       DetailedSources detailedSources) {
-        this.parent = parent;
         // we internalize, because there are many repeats here ("0", "1", ...)
         this.index = index == null ? null : index.intern();
         this.beginLine = (short) beginLine;
@@ -36,8 +33,13 @@ public class SourceImpl implements Source {
         this.detailedSources = detailedSources;
     }
 
+    @Override
+    public boolean isNoSource() {
+        return this == NO_SOURCE || beginLine == 0 || endLine == 0 || beginPos == 0 || endPos == 0;
+    }
+
     public static Source forCompiledClass(CompilationUnit compilationUnit) {
-        return new SourceImpl(compilationUnit, null, -1, -1, -1, -1, null);
+        return new SourceImpl(null, -1, -1, -1, -1, null);
     }
 
     @Override
@@ -48,7 +50,7 @@ public class SourceImpl implements Source {
     @Override
     public Source withDetailedSources(DetailedSources detailedSources) {
         if (Objects.equals(detailedSources, this.detailedSources)) return this;
-        return new SourceImpl(parent, index, beginLine, beginPos, endLine, endPos, detailedSources);
+        return new SourceImpl(index, beginLine, beginPos, endLine, endPos, detailedSources);
     }
 
     @Override
@@ -56,7 +58,7 @@ public class SourceImpl implements Source {
         DetailedSources newDetailedSources = this.detailedSources == null ? detailedSources
                 : detailedSources == null ? this.detailedSources
                 : this.detailedSources.merge(detailedSources);
-        return new SourceImpl(parent, index, beginLine, beginPos, endLine, endPos, newDetailedSources);
+        return new SourceImpl(index, beginLine, beginPos, endLine, endPos, newDetailedSources);
     }
 
     @Override
@@ -89,10 +91,6 @@ public class SourceImpl implements Source {
         } else throw new UnsupportedOperationException();
     }
 
-    @Override
-    public Element parent() {
-        return parent;
-    }
 
     @Override
     public int beginLine() {
@@ -121,12 +119,12 @@ public class SourceImpl implements Source {
 
     @Override
     public String toString() {
-        if (this == NO_SOURCE) return "NO_SOURCE";
+        if (isNoSource()) return "NO_SOURCE";
         return index + "@" + beginLine + ":" + beginPos + "-" + endLine + ":" + endPos;
     }
 
     @Override
     public Source withIndex(String newIndex) {
-        return new SourceImpl(parent, newIndex, beginLine, beginPos, endLine, endPos, detailedSources);
+        return new SourceImpl(newIndex, beginLine, beginPos, endLine, endPos, detailedSources);
     }
 }

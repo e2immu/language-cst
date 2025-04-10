@@ -10,12 +10,10 @@ import org.e2immu.language.cst.api.output.element.ElementarySpace;
 import org.e2immu.language.cst.api.output.element.Split;
 import org.e2immu.language.cst.api.output.element.TextBlockFormatting;
 import org.e2immu.language.cst.api.statement.*;
-import org.e2immu.language.cst.api.statement.SwitchEntry;
 import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.type.*;
 import org.e2immu.language.cst.api.variable.*;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collector;
@@ -290,13 +288,15 @@ public interface Factory {
 
     ParameterizedType newParameterizedType(TypeParameter typeParameter, int arrays, Wildcard wildCard);
 
-    ParameterizedType newParameterizedType(TypeInfo typeInfo, int arrays, Wildcard wildCard, List<ParameterizedType> parameters);
+    ParameterizedType newParameterizedType(TypeInfo typeInfo, int arrays, Wildcard wildCard,
+                                           List<ParameterizedType> parameters);
 
-   default  Source newParserSource(Element parent, String index, int beginLine, int beginPos, int endLine, int endPos) {
-       return newParserSource(parent, index, beginLine, beginPos, endLine, endPos, null);
-   }
+    default Source newParserSource(String index, int beginLine, int beginPos, int endLine, int endPos) {
+        return newParserSource(index, beginLine, beginPos, endLine, endPos, null);
+    }
 
-    Source newParserSource(Element parent, String index, int beginLine, int beginPos, int endLine, int endPos, DetailedSources detailedSources);
+    Source newParserSource(String index, int beginLine, int beginPos, int endLine, int endPos,
+                           DetailedSources detailedSources);
 
     ReturnStatement.Builder newReturnBuilder();
 
