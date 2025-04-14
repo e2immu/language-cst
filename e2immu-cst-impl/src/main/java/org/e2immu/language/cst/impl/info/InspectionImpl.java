@@ -61,10 +61,6 @@ public abstract class InspectionImpl implements Inspection {
         public int level() {
             return level;
         }
-
-        public boolean le(Access other) {
-            return level <= other.level();
-        }
     }
 
     public InspectionImpl(Access access,

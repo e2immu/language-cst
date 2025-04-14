@@ -8,6 +8,10 @@ public interface Access {
 
     Access max(Access other);
 
+    default boolean ge(Access other) {
+        return level() >= other.level();
+    }
+
     default boolean le(Access other) {
         return level() <= other.level();
     }
