@@ -301,4 +301,9 @@ public interface TypeInfo extends NamedType, Info {
         return Stream.of(this);
     }
 
+    default boolean isDescendantOf(TypeInfo ancestor) {
+        if (equals(ancestor)) return true;
+        if (parentClass() == null) return false;
+        return parentClass().typeInfo().isDescendantOf(ancestor);
+    }
 }

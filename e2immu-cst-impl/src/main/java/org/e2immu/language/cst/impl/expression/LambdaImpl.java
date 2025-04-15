@@ -13,8 +13,6 @@ import org.e2immu.language.cst.api.info.ParameterInfo;
 import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
-import org.e2immu.language.cst.api.statement.Block;
-import org.e2immu.language.cst.api.statement.ReturnStatement;
 import org.e2immu.language.cst.api.statement.Statement;
 import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.variable.DescendMode;
@@ -177,8 +175,8 @@ public class LambdaImpl extends ExpressionImpl implements Lambda {
 
     private Expression singleExpression() {
         List<Statement> statements = methodInfo.methodBody().statements();
-        if (statements.size() == 1 && statements.get(0) instanceof ReturnStatement rs) {
-            return rs.expression();
+        if (statements.size() == 1) {
+            return statements.get(0).expression();
         }
         return null;
     }
