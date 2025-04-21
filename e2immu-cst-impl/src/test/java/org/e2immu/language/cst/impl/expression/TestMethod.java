@@ -5,7 +5,8 @@ import org.e2immu.language.cst.api.info.MethodInfo;
 import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.runtime.Runtime;
 import org.e2immu.language.cst.impl.info.ImportComputerImpl;
-import org.e2immu.language.cst.impl.info.TypePrinter;
+import org.e2immu.language.cst.api.info.TypePrinter;
+import org.e2immu.language.cst.impl.info.TypePrinterImpl;
 import org.e2immu.language.cst.impl.runtime.RuntimeImpl;
 import org.junit.jupiter.api.Test;
 
@@ -28,7 +29,7 @@ public class TestMethod {
         ti.builder().addMethod(mi)
                 .setTypeNature(runtime.typeNatureClass())
                 .setParentClass(runtime.objectParameterizedType()).computeAccess().commit();
-        TypePrinter tp = new TypePrinter(ti, false);
+        TypePrinter tp = new TypePrinterImpl(ti, false);
         String src = """
                 package com.foo;
                 class Test{public String toString(){}}\

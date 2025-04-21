@@ -22,12 +22,13 @@ import java.util.stream.Stream;
 we allow for a different type when translating types, see TypePrinter, TypeInfoImpl.translate()... where
 method ownership is not changed correctly.
  */
-public record MethodPrinter(TypeInfo typeInfo, MethodInfo methodInfo, boolean formatter2) {
+public record MethodPrinterImpl(TypeInfo typeInfo, MethodInfo methodInfo, boolean formatter2) implements MethodPrinter {
 
-    public MethodPrinter(MethodInfo methodInfo) {
+    public MethodPrinterImpl(MethodInfo methodInfo) {
         this(methodInfo.typeInfo(), methodInfo, false);
     }
 
+    @Override
     public OutputBuilder print(Qualification qualification) {
         if (methodInfo.isStaticBlock()) {
             OutputBuilder result = new OutputBuilderImpl().add(KeywordImpl.STATIC);

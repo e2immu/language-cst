@@ -14,8 +14,10 @@ import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.type.*;
 import org.e2immu.language.cst.api.variable.*;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collector;
 
 public interface Factory {
@@ -238,6 +240,12 @@ public interface Factory {
 
     IfElseStatement.Builder newIfElseBuilder();
 
+    default ImportComputer newImportComputer(int minForAsterisk) {
+        return newImportComputer(minForAsterisk, null);
+    }
+
+    ImportComputer newImportComputer(int minForAsterisk,  Function<String, Collection<TypeInfo>> typesPerPackage);
+
     ImportStatement.Builder newImportStatementBuilder();
 
     InlineConditional newInlineConditional(Expression condition, Expression ifTrue, Expression ifFalse);
@@ -269,6 +277,8 @@ public interface Factory {
     MethodCall.Builder newMethodCallBuilder();
 
     MethodCall.Builder newMethodCallBuilder(MethodCall methodCall);
+
+    MethodPrinter newMethodPrinter(MethodInfo methodInfo);
 
     MethodReference.Builder newMethodReferenceBuilder();
 
@@ -364,6 +374,8 @@ public interface Factory {
     }
 
     TypeParameter newTypeParameter(int index, String simpleName, Info owner, List<AnnotationExpression> annotations);
+
+    TypePrinter newTypePrinter(TypeInfo typeInfo, boolean formatter2);
 
     UnaryOperator newUnaryOperator(List<Comment> comments, Source source, MethodInfo operator, Expression e,
                                    Precedence precedence);

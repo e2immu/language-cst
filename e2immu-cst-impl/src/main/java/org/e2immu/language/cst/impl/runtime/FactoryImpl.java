@@ -29,6 +29,7 @@ import org.e2immu.support.Either;
 import org.e2immu.util.internal.util.IntUtil;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collector;
@@ -635,6 +636,11 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
+    public ImportComputer newImportComputer(int minForAsterisk, Function<String, Collection<TypeInfo>> typesPerPackage) {
+        return new ImportComputerImpl(minForAsterisk, typesPerPackage);
+    }
+
+    @Override
     public ImportStatement.Builder newImportStatementBuilder() {
         return new ImportStatementImpl.Builder();
     }
@@ -715,6 +721,11 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     @Override
     public MethodCall.Builder newMethodCallBuilder(MethodCall methodCall) {
         return new MethodCallImpl.Builder(methodCall);
+    }
+
+    @Override
+    public MethodPrinter newMethodPrinter(MethodInfo methodInfo) {
+        return new MethodPrinterImpl(methodInfo);
     }
 
     @Override
@@ -912,6 +923,11 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
         } else if (owner instanceof MethodInfo methodInfo) {
             return new TypeParameterImpl(index, simpleName, Either.right(methodInfo), annotations);
         } else throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public TypePrinter newTypePrinter(TypeInfo typeInfo, boolean formatter2) {
+        return new TypePrinterImpl(typeInfo, formatter2);
     }
 
     @Override

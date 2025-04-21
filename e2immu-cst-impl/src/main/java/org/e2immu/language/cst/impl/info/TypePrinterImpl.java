@@ -14,8 +14,9 @@ import org.e2immu.language.cst.impl.variable.ThisImpl;
 import java.util.*;
 import java.util.stream.Stream;
 
-public record TypePrinter(TypeInfo typeInfo, boolean formatter2) {
+public record TypePrinterImpl(TypeInfo typeInfo, boolean formatter2) implements TypePrinter {
 
+    @Override
     public OutputBuilder print(ImportComputer importComputer, Qualification qualification, boolean doTypeDeclaration) {
         Set<String> imports;
         Qualification insideType;
@@ -108,10 +109,10 @@ public record TypePrinter(TypeInfo typeInfo, boolean formatter2) {
                                                 .map(ti -> ti.print(insideType))),
                                 typeInfo.constructors().stream()
                                         .filter(c -> !c.isSynthetic())
-                                        .map(c -> new MethodPrinter(typeInfo, c, formatter2).print(insideType))),
+                                        .map(c -> new MethodPrinterImpl(typeInfo, c, formatter2).print(insideType))),
                         typeInfo.methods().stream()
                                 .filter(m -> !m.isSynthetic())
-                                .map(m -> new MethodPrinter(typeInfo, m, formatter2).print(insideType)))
+                                .map(m -> new MethodPrinterImpl(typeInfo, m, formatter2).print(insideType)))
                 .collect(OutputBuilderImpl.joining(SpaceEnum.NONE, SymbolEnum.LEFT_BRACE, SymbolEnum.RIGHT_BRACE,
                         GuideImpl.generatorForBlock()));
         afterAnnotations.add(main);
@@ -136,7 +137,8 @@ public record TypePrinter(TypeInfo typeInfo, boolean formatter2) {
                         GuideImpl.generatorForAnnotationList())));
     }
 
-    public static List<TypeModifier> minimalModifiers(TypeInfo typeInfo) {
+    @Override
+    public List<TypeModifier> minimalModifiers(TypeInfo typeInfo) {
         Set<TypeModifier> modifiers = typeInfo.typeModifiers();
         List<TypeModifier> list = new ArrayList<>();
 
