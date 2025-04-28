@@ -90,6 +90,16 @@ public class CompilationUnitStub implements CompilationUnit {
     }
 
     @Override
+    public SourceSet sourceSet() {
+        return null;
+    }
+
+    @Override
+    public FingerPrint fingerPrint() {
+        return null;
+    }
+
+    @Override
     public Element rewire(InfoMap infoMap) {
         return this;
     }

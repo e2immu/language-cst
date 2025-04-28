@@ -13,6 +13,10 @@ public interface CompilationUnit extends Element {
 
     List<ImportStatement> importStatements();
 
+    SourceSet sourceSet();
+
+    FingerPrint fingerPrint();
+
     interface Builder extends Element.Builder<Builder> {
 
         @Fluent
@@ -27,6 +31,12 @@ public interface CompilationUnit extends Element {
 
         @Fluent
         Builder setPackageName(String packageName);
+
+        @Fluent
+        Builder setSourceSet(SourceSet sourceSet);
+
+        @Fluent
+        Builder setFingerPrint(FingerPrint fingerPrint);
 
         CompilationUnit build();
     }

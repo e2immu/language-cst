@@ -22,17 +22,28 @@ public class CompilationUnitImpl extends ElementImpl implements CompilationUnit 
     private final List<ImportStatement> importStatements;
     private final List<Comment> comments;
     private final Source source;
+    private final SourceSet sourceSet;
+    private final FingerPrint fingerPrint;
 
-    public CompilationUnitImpl(URI uri,
+    public CompilationUnitImpl(SourceSet sourceSet,
+                               URI uri,
                                List<Comment> comments,
                                Source source,
                                List<ImportStatement> importStatements,
-                               String packageName) {
+                               String packageName,
+                               FingerPrint fingerPrint) {
+        this.sourceSet = sourceSet;
         this.uri = uri;
         this.packageName = packageName;
         this.comments = comments;
         this.source = source;
         this.importStatements = importStatements;
+        this.fingerPrint = fingerPrint;
+    }
+
+    @Override
+    public FingerPrint fingerPrint() {
+        return fingerPrint;
     }
 
     @Override
@@ -66,6 +77,11 @@ public class CompilationUnitImpl extends ElementImpl implements CompilationUnit 
     }
 
     @Override
+    public SourceSet sourceSet() {
+        return sourceSet;
+    }
+
+    @Override
     public void visit(Predicate<Element> predicate) {
         importStatements.forEach(predicate::test);
     }
@@ -93,7 +109,6 @@ public class CompilationUnitImpl extends ElementImpl implements CompilationUnit 
         throw new UnsupportedOperationException();
     }
 
-
     @Override
     public Element rewire(InfoMap infoMap) {
         return this;
@@ -103,6 +118,20 @@ public class CompilationUnitImpl extends ElementImpl implements CompilationUnit 
         private String packageName;
         private URI uri;
         private final List<ImportStatement> importStatements = new LinkedList<>();
+        private SourceSet sourceSet;
+        private FingerPrint fingerPrint;
+
+        @Override
+        public Builder setFingerPrint(FingerPrint fingerPrint) {
+            this.fingerPrint = fingerPrint;
+            return this;
+        }
+
+        @Override
+        public Builder setSourceSet(SourceSet sourceSet) {
+            this.sourceSet = sourceSet;
+            return this;
+        }
 
         @Override
         public CompilationUnit.Builder addImportStatement(ImportStatement importStatement) {
@@ -135,7 +164,8 @@ public class CompilationUnitImpl extends ElementImpl implements CompilationUnit 
 
         @Override
         public CompilationUnit build() {
-            return new CompilationUnitImpl(uri, comments, source, List.copyOf(importStatements), packageName);
+            return new CompilationUnitImpl(sourceSet, uri, comments, source, List.copyOf(importStatements), packageName,
+                    fingerPrint);
         }
     }
 }
