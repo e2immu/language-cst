@@ -8,6 +8,7 @@ import org.e2immu.language.cst.api.variable.DescendMode;
 import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.language.cst.impl.output.OutputBuilderImpl;
 import org.e2immu.language.cst.impl.output.TextImpl;
+import org.e2immu.support.SetOnce;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -23,7 +24,7 @@ public class CompilationUnitImpl extends ElementImpl implements CompilationUnit 
     private final List<Comment> comments;
     private final Source source;
     private final SourceSet sourceSet;
-    private final FingerPrint fingerPrint;
+    private final SetOnce<FingerPrint> fingerPrint = new SetOnce<>();
 
     public CompilationUnitImpl(SourceSet sourceSet,
                                URI uri,
@@ -38,12 +39,19 @@ public class CompilationUnitImpl extends ElementImpl implements CompilationUnit 
         this.comments = comments;
         this.source = source;
         this.importStatements = importStatements;
-        this.fingerPrint = fingerPrint;
+        if (fingerPrint != null) {
+            this.fingerPrint.set(fingerPrint);
+        }
     }
 
     @Override
-    public FingerPrint fingerPrint() {
-        return fingerPrint;
+    public FingerPrint fingerPrintOrNull() {
+        return fingerPrint.getOrDefaultNull();
+    }
+
+    @Override
+    public void setFingerPrint(FingerPrint fingerPrint) {
+        this.fingerPrint.set(fingerPrint);
     }
 
     @Override

@@ -15,7 +15,13 @@ public interface CompilationUnit extends Element {
 
     SourceSet sourceSet();
 
-    FingerPrint fingerPrint();
+    FingerPrint fingerPrintOrNull();
+
+    /**
+     * Can be set only once! If set during building phase, this method may not be called.
+     * @param fingerPrint the fingerprint to be set
+     */
+    void setFingerPrint(FingerPrint fingerPrint);
 
     interface Builder extends Element.Builder<Builder> {
 

@@ -45,6 +45,11 @@ public class CompilationUnitStub implements CompilationUnit {
     }
 
     @Override
+    public void setFingerPrint(FingerPrint fingerPrint) {
+
+    }
+
+    @Override
     public void visit(Visitor visitor) {
 
     }
@@ -95,7 +100,7 @@ public class CompilationUnitStub implements CompilationUnit {
     }
 
     @Override
-    public FingerPrint fingerPrint() {
+    public FingerPrint fingerPrintOrNull() {
         return null;
     }
 

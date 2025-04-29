@@ -10,6 +10,16 @@ public interface SourceSet {
 
     String name();
 
+    /**
+     * If this source set represents sources, this path points to a directory structure that contain the sources.
+     * In the case of Java, the directory structure must be compatible with the package of the compilation unit.
+     * <p>
+     * If this source set represents an external library, this path is either <code>null</code>, or points to
+     * the directory where sources have been expanded or computed using a decompiler.
+     * The location of the library (jar) will be part of extensions of this object (<code>ClassPathPart</code>).
+     * <p>
+     * @return a path representing a directory containing source files
+     */
     Path path();
 
     boolean test();
@@ -20,7 +30,7 @@ public interface SourceSet {
 
     boolean partOfJdk();
 
-    Set<String> excludePackages();
+    Set<String> restrictToPackages();
 
     // which sourceSets must be present for this source set to compile/run/resolve?
     Set<SourceSet> dependencies();
@@ -28,6 +38,8 @@ public interface SourceSet {
     /**
      * Used to determine whether the source of any of the types in this source set has changed.
      * Throws an error when not yet set.
+     * <p>
+     * The value may be computed from the sources in the <code>path</code>, or from any jar file that is their origin.
      */
     FingerPrint fingerPrint();
 
@@ -47,4 +59,8 @@ public interface SourceSet {
     FingerPrint analysisFingerPrintOrNull();
 
     void setAnalysisFingerPrint(FingerPrint fingerPrint);
+
+    // helper methods
+
+    boolean acceptSource(String packageName, String typeName);
 }
