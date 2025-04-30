@@ -76,7 +76,7 @@ public interface SourceSet {
      * <p>
      * The value may be computed from the sources in the <code>path</code>, or from any jar file that is their origin.
      */
-    FingerPrint fingerPrint();
+    FingerPrint fingerPrintOrNull();
 
     /**
      * can be set only once.
