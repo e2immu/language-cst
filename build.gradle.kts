@@ -9,5 +9,9 @@ tasks.register("clean") {
     dependsOn(gradle.includedBuilds.map { it.task(":clean") })
 }
 tasks.register("publish") {
-    dependsOn(gradle.includedBuilds.map { it.task(":publish") })
+    dependsOn(gradle.includedBuild("e2immu-cst-api").task(":publish"))
+    dependsOn(gradle.includedBuild("e2immu-cst-io").task(":publish"))
+    dependsOn(gradle.includedBuild("e2immu-cst-impl").task(":publish"))
+    dependsOn(gradle.includedBuild("e2immu-cst-print").task(":publish"))
+    dependsOn(gradle.includedBuild("e2immu-cst-analysis").task(":publish"))
 }
