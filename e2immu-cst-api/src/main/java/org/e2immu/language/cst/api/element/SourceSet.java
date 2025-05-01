@@ -3,6 +3,7 @@ package org.e2immu.language.cst.api.element;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -29,7 +30,7 @@ public interface SourceSet {
      *
      * @return a path representing a directory containing source files
      */
-    Path sourceDirectory();
+    List<Path> sourceDirectories();
 
     /**
      * Valid URI with a non-null scheme.
@@ -98,6 +99,8 @@ public interface SourceSet {
     // helper methods
 
     boolean acceptSource(String packageName, String typeName);
+
+    SourceSet withDependencies(Set<SourceSet> dependencies);
 
     SourceSet withPath(Path path);
 
