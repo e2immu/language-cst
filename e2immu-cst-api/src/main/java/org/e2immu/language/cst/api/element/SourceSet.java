@@ -102,7 +102,7 @@ public interface SourceSet {
 
     SourceSet withDependencies(Set<SourceSet> dependencies);
 
-    SourceSet withPath(Path path);
+    SourceSet withSourceDirectoriesUri(List<Path> sourceDirectories, URI uri);
 
-    SourceSet withPathUri(Path path, URI uri);
+    SourceSet withSourceDirectories(List<Path> sourceDirectories);
 }
