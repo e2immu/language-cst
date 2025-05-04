@@ -139,17 +139,22 @@ public class ComputeMethodOverridesImpl implements ComputeMethodOverrides {
     public boolean sameParameters(List<ParameterInfo> parametersOfMyMethod,
                                   List<ParameterInfo> parametersOfTarget,
                                   Map<NamedType, ParameterizedType> translationMap) {
-        if (parametersOfMyMethod.size() != parametersOfTarget.size()) return false;
-        int i = 0;
-        for (ParameterInfo parameterInfo : parametersOfMyMethod) {
-            ParameterInfo p2 = parametersOfTarget.get(i);
-            if (differentType(parameterInfo.parameterizedType(), p2.parameterizedType(), translationMap,
-                    0)) {
-                return false;
+        try {
+            if (parametersOfMyMethod.size() != parametersOfTarget.size()) return false;
+            int i = 0;
+            for (ParameterInfo parameterInfo : parametersOfMyMethod) {
+                ParameterInfo p2 = parametersOfTarget.get(i);
+                if (differentType(parameterInfo.parameterizedType(), p2.parameterizedType(), translationMap,
+                        0)) {
+                    return false;
+                }
+                i++;
             }
-            i++;
+            return true;
+        } catch (RuntimeException re) {
+            LOGGER.error("Caught exception in sameParameters:\n{}\nvs\n{}", parametersOfMyMethod, parametersOfTarget, re);
+            throw re;
         }
-        return true;
     }
 
     /**
@@ -172,7 +177,10 @@ public class ComputeMethodOverridesImpl implements ComputeMethodOverrides {
             ParameterizedType inSubType,
             Map<NamedType, ParameterizedType> translationMap,
             int infiniteLoopDetector) {
-        assert infiniteLoopDetector < 20;
+        if (infiniteLoopDetector >= 20) {
+            throw new UnsupportedOperationException("Caught infinite loop: " + inSuperType + " vs "
+                                                    + inSubType + "; tm " + translationMap);
+        }
         Objects.requireNonNull(inSuperType);
         Objects.requireNonNull(inSubType);
         if (inSuperType.isReturnTypeOfConstructor() && inSubType == inSuperType) return false;
