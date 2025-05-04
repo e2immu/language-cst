@@ -358,6 +358,11 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
+    public AnnotationExpression.KV newAnnotationExpressionKeyValuePair(String key, Expression value) {
+        return new AnnotationExpressionImpl.KVI(key, value);
+    }
+
+    @Override
     public TypeInfo newAnonymousType(TypeInfo enclosingType, int index) {
         return new TypeInfoImpl(enclosingType, index);
     }

@@ -3,6 +3,7 @@ package org.e2immu.language.cst.api.info;
 import org.e2immu.annotation.Fluent;
 import org.e2immu.language.cst.api.element.CompilationUnit;
 import org.e2immu.language.cst.api.element.Element;
+import org.e2immu.language.cst.api.expression.AnnotationExpression;
 
 public interface Info extends Element {
 
@@ -27,13 +28,16 @@ public interface Info extends Element {
         B setAccess(Access access);
 
         @Fluent
+        B setAnnotationExpression(int index, AnnotationExpression annotationExpression);
+
+        @Fluent
         B setSynthetic(boolean synthetic);
 
         boolean hasBeenCommitted();
 
         // once all the modifiers have been set
         @Fluent
-        Builder computeAccess();
+        B computeAccess();
 
         void commit();
     }

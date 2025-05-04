@@ -111,13 +111,18 @@ public class AnnotationExpressionImpl extends ExpressionImpl implements Annotati
 
     public static class Builder extends ElementImpl.Builder<AnnotationExpression.Builder> implements AnnotationExpression.Builder {
         private TypeInfo typeInfo;
-
-        private final List<KV> keyValuePairs = new ArrayList<>();
-
+        private List<KV> keyValuePairs;
 
         @Override
         public AnnotationExpression.Builder addKeyValuePair(String key, Expression value) {
+            if (keyValuePairs == null) keyValuePairs = new ArrayList<>();
             keyValuePairs.add(new KVI(key, value));
+            return this;
+        }
+
+        @Override
+        public AnnotationExpression.Builder setKeyValuesPairs(List<KV> kvs) {
+            this.keyValuePairs = kvs;
             return this;
         }
 
@@ -129,7 +134,8 @@ public class AnnotationExpressionImpl extends ExpressionImpl implements Annotati
 
         @Override
         public AnnotationExpression build() {
-            return new AnnotationExpressionImpl(comments, source, typeInfo, List.copyOf(keyValuePairs));
+            return new AnnotationExpressionImpl(comments, source, typeInfo,
+                    keyValuePairs == null ? List.of() : List.copyOf(keyValuePairs));
         }
     }
 

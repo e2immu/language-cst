@@ -114,6 +114,12 @@ public abstract class InspectionImpl implements Inspection {
             return (B) this;
         }
 
+        @Override
+        public B setAnnotationExpression(int index, AnnotationExpression annotationExpression) {
+            annotations.set(index, annotationExpression);
+            return (B) this;
+        }
+
         @Fluent
         public B setAnnotations(List<AnnotationExpression> annotations) {
             this.annotations = annotations;

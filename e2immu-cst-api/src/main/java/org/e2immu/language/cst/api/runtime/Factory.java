@@ -132,6 +132,8 @@ public interface Factory {
 
     AnnotationExpression.Builder newAnnotationExpressionBuilder();
 
+    AnnotationExpression.KV newAnnotationExpressionKeyValuePair(String key, Expression value);
+
     TypeInfo newAnonymousType(TypeInfo enclosingType, int index);
 
     MethodInfo newArrayCreationConstructor(ParameterizedType returnType);

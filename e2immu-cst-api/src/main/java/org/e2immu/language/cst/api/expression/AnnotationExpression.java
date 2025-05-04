@@ -35,6 +35,9 @@ public interface AnnotationExpression extends Expression {
         Builder addKeyValuePair(String key, Expression value);
 
         @Fluent
+        Builder setKeyValuesPairs(List<KV> kvs);
+
+        @Fluent
         Builder setTypeInfo(TypeInfo typeInfo);
 
         AnnotationExpression build();
