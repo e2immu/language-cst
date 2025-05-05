@@ -9,9 +9,9 @@ import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.runtime.Predefined;
 import org.e2immu.language.cst.api.runtime.PredefinedWithoutParameterizedType;
 import org.e2immu.language.cst.api.translate.TranslationMap;
+import org.e2immu.language.cst.api.type.*;
 import org.e2immu.language.cst.impl.element.ElementImpl;
 import org.e2immu.language.cst.impl.output.QualificationImpl;
-import org.e2immu.language.cst.api.type.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -728,5 +728,25 @@ public class ParameterizedTypeImpl implements ParameterizedType {
         return bestType != null
                && ("java.util.List".equals(bestType.fullyQualifiedName()) || bestType.superTypesExcludingJavaLangObject().stream()
                 .anyMatch(ti -> "java.util.List".equals(ti.fullyQualifiedName())));
+    }
+
+    @Override
+    public Map<NamedType, ParameterizedType> formalToConcrete(ParameterizedType concrete) {
+        Map<NamedType, ParameterizedType> res = new HashMap<>();
+        formalToConcrete(this, concrete, res);
+        return res;
+    }
+
+    private static void formalToConcrete(ParameterizedType formal, ParameterizedType concrete, Map<NamedType, ParameterizedType> res) {
+        if (formal.typeParameter() != null && !formal.equals(concrete)) {
+            res.put(formal.typeParameter(), concrete);
+        } else {
+            int i = 0;
+            for (ParameterizedType parameter : formal.parameters()) {
+                if (i >= concrete.parameters().size()) break;
+                formalToConcrete(parameter, concrete.parameters().get(i), res);
+                ++i;
+            }
+        }
     }
 }

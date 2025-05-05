@@ -15,3 +15,10 @@ tasks.register("publish") {
     dependsOn(gradle.includedBuild("e2immu-cst-print").task(":publish"))
     dependsOn(gradle.includedBuild("e2immu-cst-analysis").task(":publish"))
 }
+tasks.register("publishToMavenLocal") {
+    dependsOn(gradle.includedBuild("e2immu-cst-api").task(":publishToMavenLocal"))
+    dependsOn(gradle.includedBuild("e2immu-cst-io").task(":publishToMavenLocal"))
+    dependsOn(gradle.includedBuild("e2immu-cst-impl").task(":publishToMavenLocal"))
+    dependsOn(gradle.includedBuild("e2immu-cst-print").task(":publishToMavenLocal"))
+    dependsOn(gradle.includedBuild("e2immu-cst-analysis").task(":publishToMavenLocal"))
+}

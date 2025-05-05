@@ -181,4 +181,7 @@ public interface ParameterizedType {
     boolean hasTypeParameters();
 
     ParameterizedType replaceTypeParameter(TypeParameter oldTp, TypeParameter newPt);
+
+    Map<NamedType, ParameterizedType> formalToConcrete(ParameterizedType forwardedReturnType);
+
 }
