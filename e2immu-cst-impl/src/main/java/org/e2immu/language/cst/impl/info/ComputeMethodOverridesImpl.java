@@ -145,7 +145,7 @@ public class ComputeMethodOverridesImpl implements ComputeMethodOverrides {
             for (ParameterInfo parameterInfo : parametersOfMyMethod) {
                 ParameterInfo p2 = parametersOfTarget.get(i);
                 if (differentType(parameterInfo.parameterizedType(), p2.parameterizedType(), translationMap,
-                        0)) {
+                        null, 0)) {
                     return false;
                 }
                 i++;
@@ -176,6 +176,7 @@ public class ComputeMethodOverridesImpl implements ComputeMethodOverrides {
             ParameterizedType inSuperType,
             ParameterizedType inSubType,
             Map<NamedType, ParameterizedType> translationMap,
+            Set<TypeParameter> visitedTypeParameters,
             int infiniteLoopDetector) {
         if (infiniteLoopDetector >= 20) {
             throw new UnsupportedOperationException("Caught infinite loop: " + inSuperType + " vs "
@@ -191,7 +192,7 @@ public class ComputeMethodOverridesImpl implements ComputeMethodOverrides {
             int i = 0;
             for (ParameterizedType param1 : inSuperType.parameters()) {
                 ParameterizedType param2 = inSubType.parameters().get(i);
-                if (differentType(param1, param2, translationMap,
+                if (differentType(param1, param2, translationMap, visitedTypeParameters,
                         infiniteLoopDetector + 1))
                     return true;
                 i++;
@@ -204,7 +205,7 @@ public class ComputeMethodOverridesImpl implements ComputeMethodOverrides {
             ParameterizedType inMap = translationMap.get(superTp);
             if (inMap == null) return true;
             if (inMap.typeParameter() != superTp) {
-                return differentType(inMap, inSubType, translationMap,
+                return differentType(inMap, inSubType, translationMap, visitedTypeParameters,
                         infiniteLoopDetector + 1);
             } // else: the map doesn't point us to some other place
         }
@@ -220,9 +221,14 @@ public class ComputeMethodOverridesImpl implements ComputeMethodOverrides {
         List<ParameterizedType> inSubTypeBounds = subTp.typeBounds();
         List<ParameterizedType> inSuperTypeBounds = superTp.typeBounds();
         if (inSubTypeBounds.size() != inSuperTypeBounds.size()) return true;
+        if (visitedTypeParameters == null) visitedTypeParameters = new HashSet<>();
+        if (!visitedTypeParameters.add(subTp) && !
+                visitedTypeParameters.add(superTp)) {
+            return false; // no more recursing, both are presen
+        }
         int i = 0;
         for (ParameterizedType typeBound : subTp.typeBounds()) {
-            boolean different = differentType(typeBound, inSuperTypeBounds.get(i), translationMap,
+            boolean different = differentType(typeBound, inSuperTypeBounds.get(i), translationMap, visitedTypeParameters,
                     infiniteLoopDetector + 1);
             if (different) return true;
             i++;
