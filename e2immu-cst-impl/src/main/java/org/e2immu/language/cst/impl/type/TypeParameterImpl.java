@@ -172,6 +172,11 @@ public class TypeParameterImpl implements TypeParameter {
     }
 
     @Override
+    public String toStringWithTypeBounds() {
+        return this + " " + typeBounds.get();
+    }
+
+    @Override
     public List<AnnotationExpression> annotations() {
         return annotations;
     }

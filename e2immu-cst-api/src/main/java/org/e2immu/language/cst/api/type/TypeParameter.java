@@ -30,6 +30,8 @@ public interface TypeParameter extends NamedType {
     @NotNull
     OutputBuilder print(Qualification qualification, Set<TypeParameter> visitedTypeParameters);
 
+    String toStringWithTypeBounds();
+
     default TypeInfo primaryType() {
         return getOwner().isLeft() ? getOwner().getLeft().primaryType() : getOwner().getRight().primaryType();
     }

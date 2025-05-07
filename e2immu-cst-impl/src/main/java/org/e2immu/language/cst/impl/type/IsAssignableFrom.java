@@ -9,32 +9,41 @@ import org.e2immu.language.cst.api.type.TypeParameter;
 import org.e2immu.language.cst.api.type.Wildcard;
 import org.e2immu.util.internal.util.ListUtil;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.IntBinaryOperator;
 
-/**
- * @param runtime is necessary for boxing/unboxing
- * @param target
- * @param from
- */
-public record IsAssignableFrom(Predefined runtime,
-                               ParameterizedType target,
-                               ParameterizedType from) {
+public class IsAssignableFrom {
+    private final Predefined runtime;
+    private final ParameterizedType target;
+    private final ParameterizedType from;
+    private final Map<String, Integer> cache;
 
-    public IsAssignableFrom {
-        Objects.requireNonNull(target);
-        Objects.requireNonNull(from);
+    public IsAssignableFrom(Predefined runtime,
+                            ParameterizedType target,
+                            ParameterizedType from) {
+        this(runtime, target, from, new HashMap<>());
     }
 
-    public static final int NOT_ASSIGNABLE = -1;
+    private IsAssignableFrom(Predefined runtime,
+                             ParameterizedType target,
+                             ParameterizedType from,
+                             Map<String, Integer> cache) {
+        this.runtime = Objects.requireNonNull(runtime);
+        this.target = Objects.requireNonNull(target);
+        this.from = Objects.requireNonNull(from);
+        this.cache = cache;
+    }
 
     public boolean execute() {
         return execute(false, false, Mode.COVARIANT) != NOT_ASSIGNABLE;
     }
 
-    private static final IntBinaryOperator REDUCER = (a, b) -> a == NOT_ASSIGNABLE || b == NOT_ASSIGNABLE ? NOT_ASSIGNABLE : a + b;
-
+    // value not yet known, but we're not trying again!
+    private static final int IN_RECURSION = -2;
+    public static final int NOT_ASSIGNABLE = -1;
     public static final int EQUALS = 0;
     private static final int ASSIGN_TO_NULL = 0;
     public static final int SAME_UNDERLYING_TYPE = 1;
@@ -44,7 +53,11 @@ public record IsAssignableFrom(Predefined runtime,
     public static final int TYPE_BOUND = 5;
     public static final int IN_HIERARCHY = 10;
     private static final int UNBOUND_WILDCARD = 100;
-    private static final int ARRAY_PENALTY = 100;
+    private static final int ARRAY_PENALTY = 1000;
+
+    public static final int MAX = 10_000;
+
+    private static final IntBinaryOperator REDUCER = (a, b) -> a == NOT_ASSIGNABLE || b == NOT_ASSIGNABLE ? NOT_ASSIGNABLE : a + b;
 
     public enum Mode {
         INVARIANT, // everything has to be identical, there is no leeway with respect to hierarchy
@@ -63,6 +76,17 @@ public record IsAssignableFrom(Predefined runtime,
      */
 
     public int execute(boolean ignoreArrays, boolean strictTypeParameterTargets, Mode mode) {
+        String visitedString = from + "|" + target + "|" + mode + "|" + ignoreArrays + "|" + strictTypeParameterTargets;
+        Integer cachedValue = cache.get(visitedString);
+        if (cachedValue != null) return cachedValue;
+        cache.put(visitedString, IN_RECURSION);
+        int value = internalExecute(ignoreArrays, strictTypeParameterTargets, mode);
+        assert value != IN_RECURSION;
+        cache.put(visitedString, value);
+        return value >= MAX ? MAX - 1 : value;
+    }
+
+    private int internalExecute(boolean ignoreArrays, boolean strictTypeParameterTargets, Mode mode) {
         if (target == from || target.equals(from) || ignoreArrays && target.equalsIgnoreArrays(from)) return EQUALS;
 
         // NULL
@@ -100,6 +124,7 @@ public record IsAssignableFrom(Predefined runtime,
                 }
                 if (target.arrays() > 0) {
                     // recurse without the arrays; target and from remain the same
+                    // this changes the cache key
                     return execute(true, strictTypeParameterTargets, Mode.COVARIANT);
                 }
             }
@@ -138,8 +163,10 @@ public record IsAssignableFrom(Predefined runtime,
                 }
                 return IN_HIERARCHY + pathToJLO;
             }
-            return otherTypeBounds.stream().mapToInt(bound -> new IsAssignableFrom(runtime, target, bound)
+            return otherTypeBounds.stream()
+                    .mapToInt(bound -> new IsAssignableFrom(runtime, target, bound, cache)
                             .execute(true, strictTypeParameterTargets, mode))
+                    .map(i -> i == IN_RECURSION ? EQUALS : i)
                     .min().orElseThrow();
         }
 
@@ -159,7 +186,7 @@ public record IsAssignableFrom(Predefined runtime,
             return NOT_ASSIGNABLE;
         }
         if (target.arrays() > 0 && from.arrays() < target.arrays()) {
-            if (strictTypeParameterTargets) {
+            if (strictTypeParameterTargets || from.isPrimitiveExcludingVoid()) {
                 return NOT_ASSIGNABLE;
             }
             return ARRAY_PENALTY * (target.arrays() - from.arrays());
@@ -172,7 +199,7 @@ public record IsAssignableFrom(Predefined runtime,
             if (strictTypeParameterTargets) {
                 return NOT_ASSIGNABLE; // only when they are exactly the same, which was tested earlier
             }
-            return TYPE_BOUND + IN_HIERARCHY * arrayDiff;
+            return UNBOUND_WILDCARD + IN_HIERARCHY * arrayDiff;
         }
         if (target.arrays() > 0 && from.arrays() != target.arrays()) {
             return NOT_ASSIGNABLE;
@@ -181,8 +208,11 @@ public record IsAssignableFrom(Predefined runtime,
         if (from.typeInfo() != null) {
             int best = NOT_ASSIGNABLE;
             for (ParameterizedType typeBound : targetTypeBounds) {
-                int score = new IsAssignableFrom(runtime, typeBound, from).execute(true,
-                        strictTypeParameterTargets, mode);
+                int score = new IsAssignableFrom(runtime, typeBound, from, cache)
+                        .execute(true, strictTypeParameterTargets, mode);
+                if (score == IN_RECURSION) {
+                    score = EQUALS;
+                }
                 if (score >= 0 && (best == NOT_ASSIGNABLE || best > score)) {
                     best = score;
                 }
@@ -203,8 +233,11 @@ public record IsAssignableFrom(Predefined runtime,
             int best = NOT_ASSIGNABLE;
             for (ParameterizedType myBound : targetTypeBounds) {
                 for (ParameterizedType otherBound : fromTypeBounds) {
-                    int score = new IsAssignableFrom(runtime, myBound, otherBound)
+                    int score = new IsAssignableFrom(runtime, myBound, otherBound, cache)
                             .execute(true, strictTypeParameterTargets, mode);
+                    if (score == IN_RECURSION) {
+                        score = EQUALS;
+                    }
                     if (score >= 0 && (best == NOT_ASSIGNABLE || best > score)) {
                         best = score;
                     }
@@ -244,22 +277,13 @@ public record IsAssignableFrom(Predefined runtime,
     private int compatibleTypeParameter(Mode mode,
                                         boolean strictTypeParameterTargets,
                                         ListUtil.Pair<ParameterizedType, ParameterizedType> p) {
-        // T extends Comparable<? super T>
-        // temp hack for an obvious recursion. FIXME we need to do this properly at some point
-        if (p.k().typeParameter() != null) {
-            List<ParameterizedType> typeBounds = p.k().typeParameter().typeBounds();
-            if (!typeBounds.isEmpty()) {
-                List<ParameterizedType> parametersOfTypeBound0 = typeBounds.get(0).parameters();
-                if (parametersOfTypeBound0.size() == 1
-                    && parametersOfTypeBound0.get(0).typeParameter() == p.k().typeParameter()
-                    && parametersOfTypeBound0.get(0).wildcard() == WildcardEnum.SUPER) {
-                    return new IsAssignableFrom(runtime, typeBounds.get(0).typeInfo().asSimpleParameterizedType(), p.v())
-                            .execute(false, false, Mode.COVARIANT);
-                }
-            }
-        }
         Mode newMode = mode == Mode.INVARIANT ? Mode.INVARIANT : Mode.COVARIANT;
-        return new IsAssignableFrom(runtime, p.k(), p.v()).execute(true, strictTypeParameterTargets, newMode);
+        int value = new IsAssignableFrom(runtime, p.k(), p.v(), cache)
+                .execute(true, strictTypeParameterTargets, newMode);
+        if (value == IN_RECURSION) {
+            return EQUALS;
+        }
+        return value;
     }
 
     private int differentNonNullTypeInfo(Mode mode, boolean strictTypeParameterTargets) {
@@ -323,14 +347,14 @@ public record IsAssignableFrom(Predefined runtime,
         TypeInfo other = from.typeInfo();
         for (ParameterizedType interfaceImplemented : other.interfacesImplemented()) {
             ParameterizedType concreteType = from.concreteDirectSuperType(interfaceImplemented);
-            int scoreInterface = new IsAssignableFrom(runtime, target, concreteType)
+            int scoreInterface = new IsAssignableFrom(runtime, target, concreteType, cache)
                     .execute(true, strictTypeParameterTargets, mode);
             if (scoreInterface != NOT_ASSIGNABLE) return IN_HIERARCHY + scoreInterface;
         }
         ParameterizedType parentClass = other.parentClass();
         if (parentClass != null && !parentClass.isJavaLangObject()) {
             ParameterizedType concreteType = from.concreteDirectSuperType(parentClass);
-            int scoreParent = new IsAssignableFrom(runtime, target, concreteType)
+            int scoreParent = new IsAssignableFrom(runtime, target, concreteType, cache)
                     .execute(true, strictTypeParameterTargets, mode);
             if (scoreParent != NOT_ASSIGNABLE) return IN_HIERARCHY + scoreParent;
         }
