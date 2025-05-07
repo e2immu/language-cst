@@ -5,7 +5,7 @@
  */
 
 plugins {
-    java
+    `java-library`
     `maven-publish`
 }
 
@@ -28,17 +28,23 @@ java {
     targetCompatibility = JavaVersion.VERSION_21
 }
 
+val slf4jVersion = project.findProperty("slf4jVersion") as String
+val jupiterApiVersion = project.findProperty("jupiterApiVersion") as String
+val jupiterEngineVersion = project.findProperty("jupiterEngineVersion") as String
+val logbackClassicVersion = project.findProperty("logbackClassicVersion") as String
+
 dependencies {
-    implementation("org.e2immu:e2immu-cst-api:${version}")
-    implementation("org.e2immu:e2immu-external-support:${version}")
+    api("org.e2immu:e2immu-cst-api:$version")
+    api("org.e2immu:e2immu-external-support:$version")
 
-    implementation("org.slf4j:slf4j-api:2.0.7")
+    implementation("org.slf4j:slf4j-api:$slf4jVersion")
 
-    testImplementation("org.e2immu:e2immu-cst-impl:${version}")
+    testImplementation("org.e2immu:e2immu-cst-impl:$version")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:$jupiterApiVersion")
 
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.9.3")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.3")
-    testRuntimeOnly("ch.qos.logback:logback-classic:1.5.8")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$jupiterEngineVersion")
+    testRuntimeOnly("ch.qos.logback:logback-classic:$logbackClassicVersion")
+
 }
 
 tasks.test {

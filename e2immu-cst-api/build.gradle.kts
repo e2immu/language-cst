@@ -5,7 +5,7 @@
  */
 
 plugins {
-    java
+    `java-library`
     `maven-publish`
 }
 
@@ -28,7 +28,7 @@ java {
 }
 
 dependencies {
-    implementation("org.e2immu:e2immu-external-support:${version}")
+    implementation("org.e2immu:e2immu-external-support:$version")
 }
 
 

@@ -2,7 +2,10 @@ package org.e2immu.language.cst.api.analysis;
 
 import org.e2immu.annotation.Modified;
 import org.e2immu.language.cst.api.expression.Expression;
-import org.e2immu.language.cst.api.info.*;
+import org.e2immu.language.cst.api.info.FieldInfo;
+import org.e2immu.language.cst.api.info.Info;
+import org.e2immu.language.cst.api.info.MethodInfo;
+import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.variable.Variable;
 
@@ -142,6 +145,12 @@ public interface Codec {
     }
 
     record PropertyValue(Property property, Value value) {
+    }
+
+    class DecoderException extends RuntimeException {
+        public DecoderException(String msg) {
+            super(msg);
+        }
     }
 }
 

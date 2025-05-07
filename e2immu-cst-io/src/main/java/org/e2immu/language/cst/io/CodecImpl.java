@@ -16,6 +16,8 @@ import org.e2immu.language.cst.api.variable.*;
 import org.e2immu.language.cst.impl.analysis.PropertyImpl;
 import org.parsers.json.Node;
 import org.parsers.json.ast.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.StringWriter;
@@ -28,6 +30,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class CodecImpl implements Codec {
+    private static final Logger LOGGER = LoggerFactory.getLogger(CodecImpl.class);
+
     private static final Pattern NAME_INDEX_PATTERN = Pattern.compile("(.+)\\((\\d+)\\)");
     private static final Pattern METHOD_PATTERN = Pattern.compile("(.+)\\.(\\w+)\\((\\d+)\\)");
     private static final Pattern NUM_PATTERN = Pattern.compile("-?\\.?[0-9]+");
@@ -243,6 +247,11 @@ public class CodecImpl implements Codec {
         Matcher m = NAME_INDEX_PATTERN.matcher(nameIndex);
         if (m.matches()) {
             int index = Integer.parseInt(m.group(2));
+            if (index >= methodInfo.parameters().size()) {
+                LOGGER.error("Method {} has {} parameters, looking for index {}",
+                        methodInfo, methodInfo.parameters().size(), index);
+                throw new DecoderException("parameter " + index + " of " + methodInfo + " does not exist");
+            }
             return methodInfo.parameters().get(index);
         } else throw new UnsupportedOperationException();
     }
