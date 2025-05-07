@@ -325,7 +325,14 @@ public class TypeInspectionImpl extends InspectionImpl implements TypeInspection
             if (typeInfo.compilationUnitOrEnclosingType().isLeft()) {
                 setAccess(fromModifiers);
             } else {
-                Access fromEnclosing = typeInfo.compilationUnitOrEnclosingType().getRight().access();
+                TypeInfo enclosingType = typeInfo.compilationUnitOrEnclosingType().getRight();
+                Access fromEnclosing = enclosingType.access();
+                if (fromEnclosing == null) {
+                    throw new UnsupportedOperationException("Trying to compute access of " + typeInfo
+                                                            + " (from modifiers: " + fromModifiers
+                                                            + "), but access of enclosing type "
+                                                            + enclosingType + " not yet set.");
+                }
                 Access combined = fromEnclosing.combine(fromModifiers);
                 setAccess(combined);
             }
