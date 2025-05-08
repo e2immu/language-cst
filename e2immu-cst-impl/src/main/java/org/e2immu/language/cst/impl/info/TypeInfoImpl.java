@@ -853,4 +853,15 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     public Element rewire(InfoMap infoMap) {
         throw new UnsupportedOperationException("Must use one of the infoMap methods");
     }
+
+    @Override
+    public boolean hasImplicitParent() {
+        if (typeNature().isClass()) {
+            DetailedSources detailedSources = source() == null ? null : source().detailedSources();
+            if (detailedSources != null) return detailedSources.detail(DetailedSources.EXTENDS) == null;
+            // fallback, we're assuming that you don't write "extends Object"...
+            return parentClass() != null && parentClass().isJavaLangObject();
+        }
+        return true;
+    }
 }

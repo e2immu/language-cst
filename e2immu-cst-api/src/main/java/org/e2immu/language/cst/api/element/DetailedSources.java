@@ -8,6 +8,8 @@ public interface DetailedSources {
     // used to grab the closing parenthesis of the record field list,
     // the closing parenthesis of any method declaration's form parameter list
     Object END_OF_PARAMETER_LIST = new Object();
+    // marker for the "extends" keyword, see TypeInfo.hasImplicitParent()
+    Object EXTENDS = new Object();
 
     Source detail(Object object);
 
