@@ -14,6 +14,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -42,6 +43,17 @@ public class CompilationUnitImpl extends ElementImpl implements CompilationUnit 
         if (fingerPrint != null) {
             this.fingerPrint.set(fingerPrint);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof CompilationUnitImpl that)) return false;
+        return Objects.equals(uri, that.uri) && Objects.equals(sourceSet, that.sourceSet);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(uri, sourceSet);
     }
 
     @Override
