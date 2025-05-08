@@ -306,4 +306,9 @@ public interface TypeInfo extends NamedType, Info {
         if (parentClass() == null) return false;
         return parentClass().typeInfo().isDescendantOf(ancestor);
     }
+
+    // TODO implement properly, extends Object is allowed, and then it is not implicit
+    default boolean hasImplicitParent() {
+        return parentClass() != null && parentClass().isJavaLangObject();
+    }
 }
