@@ -19,6 +19,7 @@ public interface CompilationUnit extends Element {
 
     /**
      * Can be set only once! If set during building phase, this method may not be called.
+     *
      * @param fingerPrint the fingerprint to be set
      */
     void setFingerPrint(FingerPrint fingerPrint);
@@ -45,5 +46,11 @@ public interface CompilationUnit extends Element {
         Builder setFingerPrint(FingerPrint fingerPrint);
 
         CompilationUnit build();
+    }
+
+    // helper method here, set==null for primitives
+    default boolean partOfJdk() {
+        SourceSet set = sourceSet();
+        return set == null || set.partOfJdk();
     }
 }
