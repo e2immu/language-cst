@@ -10,7 +10,6 @@ import org.e2immu.language.cst.impl.output.TypeNameImpl;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class ImportComputerImpl implements ImportComputer {
     private final int minStar;
@@ -64,7 +63,7 @@ public class ImportComputerImpl implements ImportComputer {
                     imports.add(ti.fullyQualifiedName());
                 }
             } else {
-                imports.add(perPackage.types.get(0).packageName() + ".*");
+                imports.add(perPackage.types.getFirst().packageName() + ".*");
             }
         }
         return new Result(imports, qualification);
