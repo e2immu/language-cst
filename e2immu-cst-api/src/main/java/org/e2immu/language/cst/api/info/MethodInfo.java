@@ -236,6 +236,8 @@ public interface MethodInfo extends Info {
         Builder setMissingData(MissingData missingData);
 
         List<ParameterInfo> parameters();
+
+        List<TypeParameter> typeParameters();
     }
 
     default boolean isVarargs() {
