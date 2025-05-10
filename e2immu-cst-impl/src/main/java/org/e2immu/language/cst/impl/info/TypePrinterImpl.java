@@ -7,6 +7,7 @@ import org.e2immu.language.cst.api.info.*;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.type.ParameterizedType;
+import org.e2immu.language.cst.api.type.TypeParameter;
 import org.e2immu.language.cst.impl.output.*;
 import org.e2immu.language.cst.impl.type.DiamondEnum;
 import org.e2immu.language.cst.impl.variable.ThisImpl;
@@ -71,8 +72,9 @@ public record TypePrinterImpl(TypeInfo typeInfo, boolean formatter2) implements 
 
             if (!typeInfo.typeParameters().isEmpty()) {
                 afterAnnotations.add(SymbolEnum.LEFT_ANGLE_BRACKET);
+                Set<TypeParameter> done = new HashSet<>();
                 afterAnnotations.add(typeInfo.typeParameters().stream().map(tp ->
-                                tp.print(insideType, new HashSet<>()))
+                                tp.print(insideType, done))
                         .collect(OutputBuilderImpl.joining(SymbolEnum.COMMA)));
                 afterAnnotations.add(SymbolEnum.RIGHT_ANGLE_BRACKET);
             }

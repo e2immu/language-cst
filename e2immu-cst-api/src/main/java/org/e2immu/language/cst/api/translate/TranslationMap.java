@@ -7,9 +7,9 @@ import org.e2immu.language.cst.api.expression.MethodCall;
 import org.e2immu.language.cst.api.info.FieldInfo;
 import org.e2immu.language.cst.api.info.MethodInfo;
 import org.e2immu.language.cst.api.info.TypeInfo;
-import org.e2immu.language.cst.api.runtime.Runtime;
 import org.e2immu.language.cst.api.statement.Statement;
 import org.e2immu.language.cst.api.type.ParameterizedType;
+import org.e2immu.language.cst.api.type.TypeParameter;
 import org.e2immu.language.cst.api.variable.*;
 
 import java.util.*;
@@ -296,6 +296,8 @@ public interface TranslationMap {
 
         @Fluent
         Builder setTranslateAgain(boolean translateAgain);
+
+        Builder put(TypeParameter template, TypeParameter actual);
 
         Builder put(Statement template, Statement actual);
 

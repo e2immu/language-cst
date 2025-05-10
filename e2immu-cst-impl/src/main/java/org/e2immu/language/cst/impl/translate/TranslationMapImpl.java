@@ -9,13 +9,17 @@ import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.statement.Statement;
 import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.type.ParameterizedType;
+import org.e2immu.language.cst.api.type.TypeParameter;
 import org.e2immu.language.cst.api.variable.*;
 import org.e2immu.language.cst.impl.type.ParameterizedTypeImpl;
 import org.e2immu.language.cst.impl.variable.DependentVariableImpl;
 import org.e2immu.language.cst.impl.variable.FieldReferenceImpl;
 import org.e2immu.language.cst.impl.variable.ThisImpl;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class TranslationMapImpl implements TranslationMap {
@@ -28,6 +32,8 @@ public class TranslationMapImpl implements TranslationMap {
     private final Map<LocalVariable, LocalVariable> localVariables;
     private final Map<? extends Variable, ? extends Expression> variableExpressions;
     private final Map<FieldInfo, FieldInfo> fieldInfoMap;
+    private final Map<TypeParameter, TypeParameter> typeParameterMap;
+
     private final boolean expandDelayedWrappedExpressions;
     private final boolean yieldIntoReturn;
     private final boolean translateAgain;
@@ -42,6 +48,7 @@ public class TranslationMapImpl implements TranslationMap {
                                Map<MethodInfo, List<MethodInfo>> methods,
                                Map<ParameterizedType, ParameterizedType> types,
                                Map<FieldInfo, FieldInfo> fieldInfoMap,
+                               Map<TypeParameter, TypeParameter> typeParameterMap,
                                ModificationTimesHandler modificationTimesHandler,
                                boolean expandDelayedWrappedExpressions,
                                boolean yieldIntoReturn,
@@ -55,6 +62,7 @@ public class TranslationMapImpl implements TranslationMap {
         this.methods = methods;
         this.types = types;//checkForCycles(types);
         this.fieldInfoMap = fieldInfoMap;
+        this.typeParameterMap = typeParameterMap;
         this.yieldIntoReturn = yieldIntoReturn;
         localVariables = variables.entrySet().stream()
                 .filter(e -> e.getKey() instanceof LocalVariable && e.getValue() instanceof LocalVariable)
@@ -75,6 +83,7 @@ public class TranslationMapImpl implements TranslationMap {
         private final Map<Statement, List<Statement>> statements = new HashMap<>();
         private final Map<ParameterizedType, ParameterizedType> types = new HashMap<>();
         private final Map<FieldInfo, FieldInfo> fieldInfoMap = new HashMap<>();
+        private final Map<TypeParameter, TypeParameter> typeParameterMap = new HashMap<>();
         private ModificationTimesHandler modificationTimesHandler;
         private boolean expandDelayedWrappedExpressions;
         private boolean doNotRecurseIntoScopeVariables;
@@ -105,7 +114,7 @@ public class TranslationMapImpl implements TranslationMap {
         @Override
         public TranslationMap build() {
             return new TranslationMapImpl(statements, expressions, variableExpressions, variables, methods, types,
-                    Map.copyOf(fieldInfoMap), modificationTimesHandler,
+                    Map.copyOf(fieldInfoMap), Map.copyOf(typeParameterMap), modificationTimesHandler,
                     expandDelayedWrappedExpressions, yieldIntoReturn, translateAgain, clearAnalysis, delegate);
         }
 
@@ -121,8 +130,15 @@ public class TranslationMapImpl implements TranslationMap {
             return this;
         }
 
+        @Override
         public Builder put(FieldInfo template, FieldInfo actual) {
             fieldInfoMap.put(template, actual);
+            return this;
+        }
+
+        @Override
+        public Builder put(TypeParameter template, TypeParameter actual) {
+            typeParameterMap.put(template, actual);
             return this;
         }
 
@@ -243,7 +259,7 @@ public class TranslationMapImpl implements TranslationMap {
 
     private TranslationMap withoutDelegate() {
         return new TranslationMapImpl(statements, expressions, variableExpressions, variables, methods, types,
-                fieldInfoMap, modificationTimesHandler, expandDelayedWrappedExpressions,
+                fieldInfoMap, typeParameterMap, modificationTimesHandler, expandDelayedWrappedExpressions,
                 yieldIntoReturn, translateAgain, clearAnalysis, null);
     }
 
@@ -307,6 +323,13 @@ public class TranslationMapImpl implements TranslationMap {
     private ParameterizedType internalTranslateType(ParameterizedType parameterizedType) {
         ParameterizedType inMap = types.get(parameterizedType);
         if (inMap != null) return inMap;
+        TypeParameter typeParameter = parameterizedType.typeParameter();
+        if (typeParameter != null) {
+            TypeParameter tTypeParameter = typeParameterMap.get(typeParameter);
+            if (tTypeParameter != null) {
+                return new ParameterizedTypeImpl(null, tTypeParameter, List.of(), parameterizedType.arrays(), parameterizedType.wildcard());
+            }
+        }
         List<ParameterizedType> params = parameterizedType.parameters();
         List<ParameterizedType> translatedTypes = params.isEmpty() ? params :
                 params.stream().map(this::translateType).collect(toList(params));
