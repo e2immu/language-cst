@@ -47,7 +47,7 @@ public interface TypeParameter extends NamedType {
     TypeParameter withOwnerVariableTypeBounds(TypeInfo typeInfo);
 
     @NotNull
-    Stream<Element.TypeReference> typesReferenced(boolean explicit);
+    Stream<Element.TypeReference> typesReferenced(boolean explicit, Set<TypeParameter> visited);
 
     interface Builder {
         List<ParameterizedType> getTypeBounds();

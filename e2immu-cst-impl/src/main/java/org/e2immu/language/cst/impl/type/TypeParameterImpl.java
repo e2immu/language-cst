@@ -9,7 +9,6 @@ import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.type.TypeParameter;
-import org.e2immu.language.cst.impl.element.ElementImpl;
 import org.e2immu.language.cst.impl.output.*;
 import org.e2immu.support.Either;
 import org.e2immu.support.FirstThen;
@@ -17,6 +16,7 @@ import org.e2immu.support.FirstThen;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Stream;
 
 public class TypeParameterImpl implements TypeParameter {
@@ -182,10 +182,10 @@ public class TypeParameterImpl implements TypeParameter {
     }
 
     @Override
-    public Stream<Element.TypeReference> typesReferenced(boolean explicit) {
-        return typeBounds().stream().flatMap(pt -> {
-            if (pt.typeInfo() != null) return Stream.of(new ElementImpl.TypeReference(pt.typeInfo(), true));
-            return Stream.of(); // to avoid infinite loop
-        });
+    public Stream<Element.TypeReference> typesReferenced(boolean explicit, Set<TypeParameter> visited) {
+        if (visited.add(this)) {
+            return typeBounds().stream().flatMap(pt -> pt.typesReferenced(explicit, visited));
+        }
+        return Stream.of();
     }
 }

@@ -170,6 +170,8 @@ public interface ParameterizedType {
 
     Stream<Element.TypeReference> typesReferenced();
 
+    Stream< Element.TypeReference> typesReferenced(boolean explicit, Set<TypeParameter> visited);
+
     Stream<Element.TypeReference> typesReferencedMadeExplicit();
 
     Wildcard wildcard();

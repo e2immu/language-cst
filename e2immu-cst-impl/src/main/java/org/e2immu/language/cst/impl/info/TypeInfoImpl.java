@@ -506,7 +506,7 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
         Stream<TypeReference> fromFields = fields().stream().flatMap(FieldInfo::typesReferenced);
         Stream<TypeReference> fromSubTypes = subTypes().stream().flatMap(TypeInfo::typesReferenced);
         Stream<TypeReference> fromTypeParameters = typeParameters().stream()
-                .flatMap(tp -> tp.typesReferenced(true));
+                .flatMap(tp -> tp.typesReferenced(true, new HashSet<>()));
         return Stream.concat(fromParent,
                 Stream.concat(fromInterfaces, Stream.concat(fromAnnotations, Stream.concat(fromMethods,
                         Stream.concat(fromConstructors, Stream.concat(fromFields,

@@ -138,7 +138,20 @@ public class ParameterizedTypeImpl implements ParameterizedType {
             return Stream.concat(s1, parameters.stream().flatMap(ParameterizedType::typesReferenced));
         }
         if (typeParameter != null) {
-            return typeParameter.typesReferenced(false);
+            return typeParameter.typesReferenced(false, new HashSet<>());
+        }
+        return Stream.of();
+    }
+
+    @Override
+    public Stream<Element.TypeReference> typesReferenced(boolean explicit, Set<TypeParameter> visited) {
+        if (typeInfo != null) {
+            Stream<Element.TypeReference> s1 = Stream.of(new ElementImpl.TypeReference(typeInfo, false));
+            return Stream.concat(s1, parameters.stream()
+                    .flatMap(pt -> pt.typesReferenced(explicit, visited)));
+        }
+        if (typeParameter != null) {
+            return typeParameter.typesReferenced(false, visited);
         }
         return Stream.of();
     }
