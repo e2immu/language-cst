@@ -2,6 +2,7 @@ package org.e2immu.language.cst.api.type;
 
 import org.e2immu.annotation.Fluent;
 import org.e2immu.annotation.NotNull;
+import org.e2immu.language.cst.api.element.Element;
 import org.e2immu.language.cst.api.expression.AnnotationExpression;
 import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.info.MethodInfo;
@@ -12,6 +13,7 @@ import org.e2immu.support.Either;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 public interface TypeParameter extends NamedType {
 
@@ -28,7 +30,7 @@ public interface TypeParameter extends NamedType {
     List<ParameterizedType> typeBounds();
 
     @NotNull
-    OutputBuilder print(Qualification qualification, Set<TypeParameter> visitedTypeParameters);
+    OutputBuilder print(Qualification qualification, boolean printExtends);
 
     String toStringWithTypeBounds();
 
@@ -43,6 +45,9 @@ public interface TypeParameter extends NamedType {
     TypeParameter withOwnerVariableTypeBounds(MethodInfo methodInfo);
 
     TypeParameter withOwnerVariableTypeBounds(TypeInfo typeInfo);
+
+    @NotNull
+    Stream<Element.TypeReference> typesReferenced(boolean explicit);
 
     interface Builder {
         List<ParameterizedType> getTypeBounds();

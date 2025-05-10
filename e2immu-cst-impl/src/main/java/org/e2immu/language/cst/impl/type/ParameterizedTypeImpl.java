@@ -133,10 +133,14 @@ public class ParameterizedTypeImpl implements ParameterizedType {
 
     @Override
     public Stream<Element.TypeReference> typesReferenced() {
-        TypeInfo bestType = bestTypeInfo();
-        Stream<ElementImpl.TypeReference> s1 = bestType == null ? Stream.empty()
-                : Stream.of(new ElementImpl.TypeReference(bestType, false));
-        return Stream.concat(s1, parameters.stream().flatMap(ParameterizedType::typesReferenced));
+        if (typeInfo != null) {
+            Stream<Element.TypeReference> s1 = Stream.of(new ElementImpl.TypeReference(typeInfo, false));
+            return Stream.concat(s1, parameters.stream().flatMap(ParameterizedType::typesReferenced));
+        }
+        if (typeParameter != null) {
+            return typeParameter.typesReferenced(false);
+        }
+        return Stream.of();
     }
 
     @Override
@@ -347,7 +351,7 @@ public class ParameterizedTypeImpl implements ParameterizedType {
     @Override
     public String printForMethodFQN(boolean varArgs, Diamond diamond) {
         return ParameterizedTypePrinter.print(QualificationImpl.FULLY_QUALIFIED_NAMES,
-                this, varArgs, diamond, false, new HashSet<>()).toString();
+                this, varArgs, diamond, false, true).toString();
     }
 
     @Override

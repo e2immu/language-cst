@@ -72,7 +72,7 @@ public record MethodPrinterImpl(TypeInfo typeInfo, MethodInfo methodInfo, boolea
         if (!methodInfo.typeParameters().isEmpty()) {
             builder.add(SymbolEnum.LEFT_ANGLE_BRACKET);
             builder.add(methodInfo.typeParameters().stream()
-                    .map(tp -> tp.print(qualification, new HashSet<>()))
+                    .map(tp -> tp.print(qualification, true))
                     .collect(OutputBuilderImpl.joining(SymbolEnum.COMMA)));
             builder.add(SymbolEnum.RIGHT_ANGLE_BRACKET).add(SpaceEnum.ONE);
         }

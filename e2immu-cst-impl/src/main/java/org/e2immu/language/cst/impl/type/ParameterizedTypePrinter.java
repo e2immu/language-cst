@@ -23,12 +23,10 @@ import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.type.TypeParameter;
 import org.e2immu.language.cst.api.type.Wildcard;
 import org.e2immu.language.cst.impl.output.*;
-import org.e2immu.language.cst.impl.output.*;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 public class ParameterizedTypePrinter {
 
@@ -48,16 +46,16 @@ public class ParameterizedTypePrinter {
                                       boolean varargs,
                                       Diamond diamond,
                                       boolean withoutArrays) {
-        return print(qualification, parameterizedType, varargs, diamond, withoutArrays, null);
+        return print(qualification, parameterizedType, varargs, diamond, withoutArrays, false);
     }
 
     /**
-     * @param qualification         fully qualified, partially, simple...?
-     * @param parameterizedType     the type to print
-     * @param varargs               print, or don't print ...
-     * @param diamond               print, or don't print the diamond operator < ... >
-     * @param withoutArrays         don't print or print []
-     * @param visitedTypeParameters when not null, allow for one definition of a type parameter
+     * @param qualification     fully qualified, partially, simple...?
+     * @param parameterizedType the type to print
+     * @param varargs           print, or don't print ...
+     * @param diamond           print, or don't print the diamond operator < ... >
+     * @param withoutArrays     don't print or print []
+     * @param printTypeBounds   print "extends ..."
      * @return printed result
      */
     public static OutputBuilder print(Qualification qualification,
@@ -65,7 +63,7 @@ public class ParameterizedTypePrinter {
                                       boolean varargs,
                                       Diamond diamond,
                                       boolean withoutArrays,
-                                      Set<TypeParameter> visitedTypeParameters) {
+                                      boolean printTypeBounds) {
         OutputBuilder outputBuilder = new OutputBuilderImpl();
         Wildcard w = parameterizedType.wildcard();
         if (w != null) {
@@ -79,7 +77,7 @@ public class ParameterizedTypePrinter {
         }
         TypeParameter tp = parameterizedType.typeParameter();
         if (tp != null) {
-            outputBuilder.add(tp.print(qualification, visitedTypeParameters));
+            outputBuilder.add(tp.print(qualification, printTypeBounds));
         } else if (parameterizedType.typeInfo() != null) {
             if (parameterizedType.parameters().isEmpty()) {
                 outputBuilder.add(TypeNameImpl.typeName(parameterizedType.typeInfo(),
@@ -91,10 +89,10 @@ public class ParameterizedTypePrinter {
                 OutputBuilder sub;
                 if (parameterizedType.typeInfo().isPrimaryType() || parameterizedType.typeInfo().isStatic()) { // shortcut
                     sub = singleType(qualification, parameterizedType.typeInfo(), diamond, false,
-                            parameterizedType.parameters(), visitedTypeParameters);
+                            parameterizedType.parameters(), printTypeBounds);
                 } else {
                     sub = distributeTypeParameters(qualification, parameterizedType,
-                            visitedTypeParameters, diamond);
+                            printTypeBounds, diamond);
                 }
                 outputBuilder.add(sub);
             }
@@ -116,7 +114,7 @@ public class ParameterizedTypePrinter {
     // we should write them there
     private static OutputBuilder distributeTypeParameters(Qualification qualification,
                                                           ParameterizedType parameterizedType,
-                                                          Set<TypeParameter> visitedTypeParameters,
+                                                          boolean printTypeBounds,
                                                           Diamond diamond) {
         TypeInfo typeInfo = parameterizedType.typeInfo();
         assert typeInfo != null;
@@ -143,7 +141,7 @@ public class ParameterizedTypePrinter {
             typeInfo = next;
         }
         return taps.stream().map(tap -> singleType(qualification,
-                        tap.typeInfo, diamond, !tap.isPrimaryType, tap.typeParameters, visitedTypeParameters))
+                        tap.typeInfo, diamond, !tap.isPrimaryType, tap.typeParameters, printTypeBounds))
                 .collect(OutputBuilderImpl.joining(SymbolEnum.DOT));
     }
 
@@ -155,7 +153,7 @@ public class ParameterizedTypePrinter {
                                             Diamond diamond,
                                             boolean forceSimple, // when constructing an qualified with distributed type parameters
                                             List<ParameterizedType> typeParameters,
-                                            Set<TypeParameter> visitedTypeParameters) {
+                                            boolean printTypeBounds) {
         OutputBuilder outputBuilder = new OutputBuilderImpl();
         if (forceSimple) {
             outputBuilder.add(new TextImpl(typeInfo.simpleName()));
@@ -166,7 +164,7 @@ public class ParameterizedTypePrinter {
             outputBuilder.add(SymbolEnum.LEFT_ANGLE_BRACKET);
             if (diamond == DiamondEnum.SHOW_ALL) {
                 outputBuilder.add(typeParameters.stream().map(tp -> print(qualification,
-                                tp, false, DiamondEnum.SHOW_ALL, false, visitedTypeParameters))
+                                tp, false, DiamondEnum.SHOW_ALL, false, printTypeBounds))
                         .collect(OutputBuilderImpl.joining(SymbolEnum.COMMA)));
             }
             outputBuilder.add(SymbolEnum.RIGHT_ANGLE_BRACKET);

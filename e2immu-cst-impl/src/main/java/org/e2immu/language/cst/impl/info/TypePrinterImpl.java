@@ -72,9 +72,8 @@ public record TypePrinterImpl(TypeInfo typeInfo, boolean formatter2) implements 
 
             if (!typeInfo.typeParameters().isEmpty()) {
                 afterAnnotations.add(SymbolEnum.LEFT_ANGLE_BRACKET);
-                Set<TypeParameter> done = new HashSet<>();
                 afterAnnotations.add(typeInfo.typeParameters().stream().map(tp ->
-                                tp.print(insideType, done))
+                                tp.print(insideType, true))
                         .collect(OutputBuilderImpl.joining(SymbolEnum.COMMA)));
                 afterAnnotations.add(SymbolEnum.RIGHT_ANGLE_BRACKET);
             }

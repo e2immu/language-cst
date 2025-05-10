@@ -1,5 +1,6 @@
 package org.e2immu.language.cst.impl.type;
 
+import org.e2immu.language.cst.api.element.Element;
 import org.e2immu.language.cst.api.expression.AnnotationExpression;
 import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.info.MethodInfo;
@@ -8,6 +9,7 @@ import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.type.TypeParameter;
+import org.e2immu.language.cst.impl.element.ElementImpl;
 import org.e2immu.language.cst.impl.output.*;
 import org.e2immu.support.Either;
 import org.e2immu.support.FirstThen;
@@ -15,7 +17,7 @@ import org.e2immu.support.FirstThen;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
+import java.util.stream.Stream;
 
 public class TypeParameterImpl implements TypeParameter {
     private final int index;
@@ -144,16 +146,14 @@ public class TypeParameterImpl implements TypeParameter {
     }
 
     @Override
-    public OutputBuilder print(Qualification qualification, Set<TypeParameter> visitedTypeParameters) {
+    public OutputBuilder print(Qualification qualification, boolean printTypeBounds) {
         OutputBuilder outputBuilder = new OutputBuilderImpl().add(new TextImpl(name));
-        if (typeBounds.isSet() && !typeBounds.get().isEmpty()
-            && visitedTypeParameters != null && !visitedTypeParameters.contains(this)) {
-            visitedTypeParameters.add(this);
+        if (typeBounds.isSet() && !typeBounds.get().isEmpty() && printTypeBounds) {
             outputBuilder.add(SpaceEnum.ONE).add(KeywordImpl.EXTENDS).add(SpaceEnum.ONE);
             outputBuilder.add(typeBounds.get()
                     .stream()
                     .map(pt -> ParameterizedTypePrinter.print(qualification, pt, false,
-                            DiamondEnum.SHOW_ALL, false, visitedTypeParameters))
+                            DiamondEnum.SHOW_ALL, false, false))
                     .collect(OutputBuilderImpl.joining(SymbolEnum.AND_TYPES)));
         }
         return outputBuilder;
@@ -179,5 +179,13 @@ public class TypeParameterImpl implements TypeParameter {
     @Override
     public List<AnnotationExpression> annotations() {
         return annotations;
+    }
+
+    @Override
+    public Stream<Element.TypeReference> typesReferenced(boolean explicit) {
+        return typeBounds().stream().flatMap(pt -> {
+            if (pt.typeInfo() != null) return Stream.of(new ElementImpl.TypeReference(pt.typeInfo(), true));
+            return Stream.of(); // to avoid infinite loop
+        });
     }
 }
