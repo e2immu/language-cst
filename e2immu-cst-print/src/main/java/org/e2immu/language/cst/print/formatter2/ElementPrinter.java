@@ -82,7 +82,7 @@ public class ElementPrinter {
         if (symbol != null && left && symbol.isAt()) {
             return Line.SpaceLevel.NO_SPACE;
         }
-        if(symbol != null && left && symbol.strongNoSpace()) {
+        if (symbol != null && left && symbol.strongNoSpace()) {
             return Line.SpaceLevel.STRONG_NO_SPACE;
         }
         /*
@@ -117,7 +117,13 @@ public class ElementPrinter {
         if (line.available() < 0 && !splitInfo.map().isEmpty()) {
             int indent = block.tab() * options.spacesInTab();
             int pos = updateForSplit(splitInfo, indent);
-            line.carryOutSplit(pos, indent + options.spacesInTab(), false);
+            int increment;
+
+            // TODO this is a hack, works in concert with BlockPrinter.handleBlock if-statement (line.appendNewLine(...))
+            if (line.stringBuilder.substring(0, 2).equals("//")) increment = 0;
+            else increment = options.spacesInTab();
+
+            line.carryOutSplit(pos, indent + increment, false);
             line.computeAvailable();
             return true;
         }

@@ -6,7 +6,8 @@ import org.e2immu.language.cst.api.output.element.Guide;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class BlockPrinter {
     private static final Logger LOGGER = LoggerFactory.getLogger(BlockPrinter.class);
@@ -155,6 +156,10 @@ public class BlockPrinter {
             return true;
         }
         Line.SpaceLevel spaceLevel = line.spaceLevel();
+
+        // TODO is this a hack? see ElementPrinter.handleNonSpaceNonSymbol TODO
+        if (spaceLevel == Line.SpaceLevel.SPACE) line.appendNoNewLine(" ");
+        else if(spaceLevel == Line.SpaceLevel.NEWLINE) line.appendNewLine(line.indent);
         boolean doFirst = !spaceLevel.isNoSpace();
         appendAndInsertSpaceSplits(line, output, splits, doFirst);
         return false;
