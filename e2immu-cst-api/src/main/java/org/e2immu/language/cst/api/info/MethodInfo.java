@@ -2,10 +2,7 @@ package org.e2immu.language.cst.api.info;
 
 import org.e2immu.annotation.Fluent;
 import org.e2immu.language.cst.api.analysis.Value;
-import org.e2immu.language.cst.api.element.Comment;
 import org.e2immu.language.cst.api.element.CompilationUnit;
-import org.e2immu.language.cst.api.element.Source;
-import org.e2immu.language.cst.api.expression.AnnotationExpression;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.statement.Block;
 import org.e2immu.language.cst.api.translate.TranslationMap;
@@ -136,7 +133,9 @@ public interface MethodInfo extends Info {
 
     // from analysis
 
-    boolean isModifying();
+    default boolean isModifying() { return !isNonModifying(); }
+
+    boolean isNonModifying();
 
     boolean isFluent();
 

@@ -29,9 +29,10 @@ public interface ParameterInfo extends Variable, Info {
         Builder setVarArgs(boolean varArgs);
     }
 
-    // from analysis
+    default boolean isModified() { return !isUnmodified(); }
 
-    boolean isModified();
+    // result of analysis
+    boolean isUnmodified();
 
     boolean isIgnoreModifications();
 

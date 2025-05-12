@@ -40,7 +40,7 @@ public class TestCodec {
         TypeInfo typeInfo = runtime.newTypeInfo(cu, "C");
 
         typeInfo.analysis().set(PropertyImpl.IMMUTABLE_TYPE, ValueImpl.ImmutableImpl.IMMUTABLE);
-        typeInfo.analysis().set(PropertyImpl.SHALLOW_ANALYZER, ValueImpl.BoolImpl.TRUE);
+        typeInfo.analysis().set(PropertyImpl.DEFAULTS_ANALYZER, ValueImpl.BoolImpl.TRUE);
         typeInfo.analysis().set(PropertyImpl.COMMUTABLE_METHODS,
                 new ValueImpl.CommutableDataImpl("p1", "p2,p3", "p4"));
 
@@ -49,7 +49,7 @@ public class TestCodec {
                 decoderProvider, fqn -> runtime.getFullyQualified(fqn, true));
         List<Property> properties = List.of(
                 PropertyImpl.IMMUTABLE_TYPE,
-                PropertyImpl.SHALLOW_ANALYZER,
+                PropertyImpl.DEFAULTS_ANALYZER,
                 PropertyImpl.COMMUTABLE_METHODS);
         Codec.Context context = new CodecImpl.ContextImpl();
         Stream<Codec.EncodedPropertyValue> epvStream = properties.stream().map(p ->

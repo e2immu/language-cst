@@ -191,8 +191,8 @@ public class ParameterInfoImpl implements ParameterInfo {
     }
 
     @Override
-    public boolean isModified() {
-        return analysis.getOrDefault(PropertyImpl.MODIFIED_PARAMETER, ValueImpl.BoolImpl.FALSE).isTrue();
+    public boolean isUnmodified() {
+        return analysis.getOrDefault(PropertyImpl.UNMODIFIED_PARAMETER, ValueImpl.BoolImpl.FALSE).isTrue();
     }
 
     @Override
@@ -213,7 +213,6 @@ public class ParameterInfoImpl implements ParameterInfo {
     public boolean isSynthetic() {
         return inspection.get().isSynthetic();
     }
-
 
     @Override
     public MethodInfo methodInfo() {

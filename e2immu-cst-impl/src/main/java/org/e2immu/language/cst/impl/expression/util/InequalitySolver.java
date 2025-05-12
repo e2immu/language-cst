@@ -69,7 +69,7 @@ public class InequalitySolver {
         e.visit(element -> {
             MethodCall methodCall;
             if ((methodCall = element.asInstanceOf(MethodCall.class)) != null) {
-                if (methodCall.parameterizedType().isNumeric() && methodCall.methodInfo().isModifying()) {
+                if (methodCall.parameterizedType().isNumeric() && !methodCall.methodInfo().isNonModifying()) {
                     oneVariables.add(methodCall);
                 } else {
                     invalid.set(true);

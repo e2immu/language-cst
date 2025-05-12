@@ -349,8 +349,8 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
     }
 
     @Override
-    public boolean isModifying() {
-        return analysis().getOrDefault(PropertyImpl.MODIFIED_METHOD, ValueImpl.BoolImpl.FALSE).isTrue();
+    public boolean isNonModifying() {
+        return analysis().getOrDefault(PropertyImpl.NON_MODIFYING_METHOD, ValueImpl.BoolImpl.FALSE).isTrue();
     }
 
     @Override
@@ -467,11 +467,8 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
     @Override
     public boolean explicitlyEmptyMethod() {
         if (!methodBody().statements().isEmpty() || isStatic() && isSynthetic()) return false;
-        boolean shallowAnalyzer = typeInfo.analysis()
-                .getOrDefault(PropertyImpl.SHALLOW_ANALYZER, ValueImpl.BoolImpl.FALSE).isTrue();
-        boolean empty = !shallowAnalyzer && !isAbstract();
-        assert !empty || noReturnValue();
-        return empty;
+        // we know it's empty if we're not in an external library.
+        return !typeInfo.compilationUnit().sourceSet().externalLibrary();
     }
 
     @Override
