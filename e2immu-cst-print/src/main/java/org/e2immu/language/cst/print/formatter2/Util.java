@@ -9,7 +9,9 @@ public class Util {
 
     public static int charactersUntilAndExcludingLastNewline(String string) {
         int nl = string.lastIndexOf('\n');
-        if (nl < 0) throw new UnsupportedOperationException();
+        if (nl < 0) {
+            return string.length();
+        }
         return string.length() - (nl + 1);
     }
 

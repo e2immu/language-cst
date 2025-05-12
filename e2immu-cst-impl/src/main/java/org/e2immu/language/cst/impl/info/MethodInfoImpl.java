@@ -1,10 +1,7 @@
 package org.e2immu.language.cst.impl.info;
 
 import org.e2immu.language.cst.api.analysis.Value;
-import org.e2immu.language.cst.api.element.Comment;
-import org.e2immu.language.cst.api.element.Element;
-import org.e2immu.language.cst.api.element.Source;
-import org.e2immu.language.cst.api.element.Visitor;
+import org.e2immu.language.cst.api.element.*;
 import org.e2immu.language.cst.api.expression.AnnotationExpression;
 import org.e2immu.language.cst.api.info.*;
 import org.e2immu.language.cst.api.output.OutputBuilder;
@@ -468,7 +465,8 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
     public boolean explicitlyEmptyMethod() {
         if (!methodBody().statements().isEmpty() || isStatic() && isSynthetic()) return false;
         // we know it's empty if we're not in an external library.
-        return !typeInfo.compilationUnit().sourceSet().externalLibrary();
+        CompilationUnit cu = typeInfo.compilationUnit();
+        return  cu.sourceSet() != null && !cu.sourceSet().externalLibrary();
     }
 
     @Override
