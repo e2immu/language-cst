@@ -16,11 +16,8 @@ import org.e2immu.language.cst.api.variable.DescendMode;
 import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.language.cst.impl.analysis.PropertyImpl;
 import org.e2immu.language.cst.impl.analysis.ValueImpl;
-import org.e2immu.language.cst.impl.output.*;
-import org.e2immu.language.cst.impl.type.DiamondEnum;
 import org.e2immu.support.EventuallyFinal;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -171,81 +168,7 @@ public class FieldInfoImpl extends InfoImpl implements FieldInfo {
 
     @Override
     public OutputBuilder print(Qualification qualification, boolean asParameter) {
-        Stream<OutputBuilder> annotationStream = Stream.concat(annotations().stream(),
-                        qualification.decorator() == null ? Stream.of()
-                                : qualification.decorator().annotations(this).stream())
-                .map(ae -> ae.print(qualification));
-
-        OutputBuilder outputBuilder = new OutputBuilderImpl();
-        if (hasBeenCommitted() && !asParameter) {
-            List<FieldModifier> fieldModifiers = minimalModifiers();
-            outputBuilder.add(fieldModifiers.stream()
-                    .map(mod -> new OutputBuilderImpl().add(mod.keyword()))
-                    .collect(OutputBuilderImpl.joining(SpaceEnum.ONE)));
-            if (!fieldModifiers.isEmpty()) outputBuilder.add(SpaceEnum.ONE);
-        }
-        outputBuilder
-                .add(type.print(qualification, false, DiamondEnum.SHOW_ALL))
-                .add(SpaceEnum.ONE)
-                .add(new TextImpl(name));
-        if (!asParameter && initializer() != null && !initializer().isEmpty()) {
-            outputBuilder.add(SymbolEnum.assignment("=")).add(initializer().print(qualification));
-        }
-        if (!asParameter) {
-            outputBuilder.add(SymbolEnum.SEMICOLON);
-        }
-        Stream<Comment> commentStream;
-        if (qualification.decorator() != null) {
-            commentStream = Stream.concat(comments().stream(), qualification.decorator().comments(this).stream());
-        } else {
-            commentStream = comments().stream();
-        }
-        Stream<OutputBuilder> commentOBStream = commentStream.map(c -> c.print(qualification));
-        return Stream.concat(Stream.concat(commentOBStream, annotationStream), Stream.of(outputBuilder))
-                .collect(OutputBuilderImpl.joining(SpaceEnum.ONE_REQUIRED_EASY_SPLIT,
-                        GuideImpl.generatorForAnnotationList()));
-    }
-
-    private static FieldModifier toFieldModifier(Access access) {
-        if (access.isPublic()) return FieldModifierEnum.PUBLIC;
-        if (access.isPrivate()) return FieldModifierEnum.PRIVATE;
-        if (access.isProtected()) return FieldModifierEnum.PROTECTED;
-        throw new UnsupportedOperationException();
-    }
-
-
-    private List<FieldModifier> minimalModifiers() {
-        Set<FieldModifier> modifiers = modifiers();
-        List<FieldModifier> list = new ArrayList<>();
-        Access access = access();
-        Access ownerAccess = owner.access();
-
-        /*
-        if the owner access is private, we don't write any modifier
-         */
-        if (access.le(ownerAccess) && !access.isPackage() && !ownerAccess.isPrivate()) {
-            list.add(toFieldModifier(access));
-        }
-        // sorting... STATIC, FINAL, VOLATILE, TRANSIENT
-        boolean inInterface = owner.isInterface();
-        if (!inInterface) {
-            if (modifiers.contains(FieldModifierEnum.STATIC)) {
-                list.add(FieldModifierEnum.STATIC);
-            }
-            if (modifiers.contains(FieldModifierEnum.FINAL)) {
-                list.add(FieldModifierEnum.FINAL);
-            }
-        }
-        if (modifiers.contains(FieldModifierEnum.VOLATILE)) {
-            assert !inInterface;
-            list.add(FieldModifierEnum.VOLATILE);
-        }
-        if (modifiers.contains(FieldModifierEnum.TRANSIENT)) {
-            assert !inInterface;
-            list.add(FieldModifierEnum.TRANSIENT);
-        }
-
-        return list;
+        return new FieldPrinterImpl(this, false).print(qualification, asParameter);
     }
 
     @Override

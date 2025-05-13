@@ -12,6 +12,10 @@ class Line {
         EMPTY, NO_SPACE, SPACE_IS_NICE, SPACE, STRONG_NO_SPACE, NEWLINE,
         ;
 
+        public boolean isNewLine() {
+            return this == NEWLINE;
+        }
+
         boolean isNoSpace() {
             return this == NO_SPACE || this == STRONG_NO_SPACE;
         }

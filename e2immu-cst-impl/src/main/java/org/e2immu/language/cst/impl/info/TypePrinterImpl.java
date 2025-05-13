@@ -7,12 +7,13 @@ import org.e2immu.language.cst.api.info.*;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.type.ParameterizedType;
-import org.e2immu.language.cst.api.type.TypeParameter;
 import org.e2immu.language.cst.impl.output.*;
 import org.e2immu.language.cst.impl.type.DiamondEnum;
 import org.e2immu.language.cst.impl.variable.ThisImpl;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
 public record TypePrinterImpl(TypeInfo typeInfo, boolean formatter2) implements TypePrinter {
@@ -82,7 +83,7 @@ public record TypePrinterImpl(TypeInfo typeInfo, boolean formatter2) implements 
             }
             if (typeInfo.parentClass() != null && !typeInfo.parentClass().isJavaLangObject()
                 && (!typeInfo.typeNature().isEnum()
-                || !"java.lang.Enum".equals(typeInfo.parentClass().typeInfo().fullyQualifiedName()))) {
+                    || !"java.lang.Enum".equals(typeInfo.parentClass().typeInfo().fullyQualifiedName()))) {
                 afterAnnotations.add(SpaceEnum.ONE).add(KeywordImpl.EXTENDS).add(SpaceEnum.ONE)
                         .add(typeInfo.parentClass().print(insideType, false, DiamondEnum.SHOW_ALL));
             }
@@ -104,11 +105,12 @@ public record TypePrinterImpl(TypeInfo typeInfo, boolean formatter2) implements 
                                                 enumConstantStream(typeInfo, insideType),
                                                 typeInfo.fields().stream()
                                                         .filter(f -> !f.isSynthetic() && (!isRecord || f.isStatic()))
-                                                        .map(f -> f.print(insideType))),
+                                                        .map(f -> new FieldPrinterImpl(f, formatter2)
+                                                                .print(insideType, false))),
                                         typeInfo.subTypes().stream()
                                                 .filter(st -> !st.isSynthetic())
                                                 .map(ti -> new TypePrinterImpl(ti, formatter2)
-                                                        .print(importComputer, insideType,true))),
+                                                        .print(importComputer, insideType, true))),
                                 typeInfo.constructors().stream()
                                         .filter(c -> !c.isSynthetic())
                                         .map(c -> new MethodPrinterImpl(typeInfo, c, formatter2).print(insideType))),
