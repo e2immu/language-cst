@@ -12,7 +12,6 @@ import org.e2immu.language.cst.impl.output.*;
 import org.e2immu.language.cst.impl.type.DiamondEnum;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -166,6 +165,14 @@ public record MethodPrinterImpl(TypeInfo typeInfo, MethodInfo methodInfo, boolea
 
     private OutputBuilder outputDeclaration(ParameterInfo pi, Qualification qualification) {
         OutputBuilder outputBuilder = new OutputBuilderImpl();
+        for (Comment comment : pi.comments()) {
+            outputBuilder.add(comment.print(qualification));
+        }
+        if (qualification.decorator() != null) {
+            for (Comment comment : qualification.decorator().comments(pi)) {
+                outputBuilder.add(comment.print(qualification));
+            }
+        }
         for (AnnotationExpression annotation : pi.annotations()) {
             outputBuilder.add(annotation.print(qualification));
             outputBuilder.add(SpaceEnum.ONE);

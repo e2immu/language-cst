@@ -107,7 +107,8 @@ public record TypePrinterImpl(TypeInfo typeInfo, boolean formatter2) implements 
                                                         .map(f -> f.print(insideType))),
                                         typeInfo.subTypes().stream()
                                                 .filter(st -> !st.isSynthetic())
-                                                .map(ti -> ti.print(insideType))),
+                                                .map(ti -> new TypePrinterImpl(ti, formatter2)
+                                                        .print(importComputer, insideType,true))),
                                 typeInfo.constructors().stream()
                                         .filter(c -> !c.isSynthetic())
                                         .map(c -> new MethodPrinterImpl(typeInfo, c, formatter2).print(insideType))),
