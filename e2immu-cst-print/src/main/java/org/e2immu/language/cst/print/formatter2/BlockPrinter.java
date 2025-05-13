@@ -89,7 +89,7 @@ public class BlockPrinter {
                     splitLevel = SplitLevel.NONE_IF_COMPACT;
                 } else {
                     splitLevel = SplitLevel.SINGLE_NEWLINE;
-                    if(output.spaceLevel().isNewLine()) { // to ensure that the NEWLINE of '//' passes
+                    if(output.spaceLevel().isNewLine()) { // TODO is this a hack? to ensure that the NEWLINE of '//' passes
                         hasBeenSplit = true;
                     }
                 }
