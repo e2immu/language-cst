@@ -14,7 +14,7 @@ public class PropertyImpl implements Property {
             = new PropertyImpl("immutableTypeDeterminedByParameters");
 
     // method
-    public static final Property NON_MODIFYING_METHOD = new PropertyImpl("noModifyingMethod");
+    public static final Property NON_MODIFYING_METHOD = new PropertyImpl("nonModifyingMethod");
     public static final Property MODIFIED_COMPONENTS_METHOD = new PropertyImpl("modifiedComponentsMethod",
             ValueImpl.VariableBooleanMapImpl.EMPTY);
     public static final Property FLUENT_METHOD = new PropertyImpl("fluentMethod");
