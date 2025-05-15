@@ -340,7 +340,7 @@ public abstract class ValueImpl implements Value {
 
         @Override
         public boolean isDefault() {
-            return value == 0;
+            return value == 0 && linkToParametersReturnValue.isEmpty();
         }
 
         @Override
