@@ -46,6 +46,11 @@ public abstract class ValueImpl implements Value {
         }
 
         @Override
+        public boolean isDefault() {
+            return value == 0;
+        }
+
+        @Override
         public boolean isFalse() {
             return value == 0;
         }
@@ -100,6 +105,11 @@ public abstract class ValueImpl implements Value {
         public static final Message EMPTY = new MessageImpl("");
 
         @Override
+        public boolean isDefault() {
+            return message.isBlank();
+        }
+
+        @Override
         public Codec.EncodedValue encode(Codec codec, Codec.Context context) {
             if (message.isEmpty()) return null;
             return codec.encodeString(context, message);
@@ -123,6 +133,11 @@ public abstract class ValueImpl implements Value {
                 return items;
             }
         });
+
+        @Override
+        public boolean isDefault() {
+            return this == EMPTY;
+        }
 
         @Override
         public Codec.EncodedValue encode(Codec codec, Codec.Context context) {
@@ -178,6 +193,11 @@ public abstract class ValueImpl implements Value {
                 case 3 -> IMMUTABLE;
                 default -> throw new UnsupportedOperationException();
             };
+        }
+
+        @Override
+        public boolean isDefault() {
+            return value == 0;
         }
 
         @Override
@@ -319,6 +339,11 @@ public abstract class ValueImpl implements Value {
         }
 
         @Override
+        public boolean isDefault() {
+            return value == 0;
+        }
+
+        @Override
         public boolean isAtLeastIndependentHc() {
             return value > 0;
         }
@@ -360,6 +385,7 @@ public abstract class ValueImpl implements Value {
 
         @Override
         public Independent min(Independent other) {
+            if (other == null) return this;
             int otherValue = ((IndependentImpl) other).value;
             return value <= otherValue ? this : other;
         }
@@ -431,6 +457,11 @@ public abstract class ValueImpl implements Value {
         public static final FieldValue EMPTY = new GetSetValueImpl(null, false, -1);
 
         @Override
+        public boolean isDefault() {
+            return equals(EMPTY);
+        }
+
+        @Override
         public Codec.EncodedValue encode(Codec codec, Codec.Context context) {
             List<Codec.EncodedValue> list = new ArrayList<>();
             list.add(codec.encodeInfoInContext(context, field, "" + codec.fieldIndex(field)));
@@ -479,6 +510,11 @@ public abstract class ValueImpl implements Value {
         public static final FieldBooleanMap EMPTY = new FieldBooleanMapImpl(Map.of());
 
         @Override
+        public boolean isDefault() {
+            return map.isEmpty();
+        }
+
+        @Override
         public Codec.EncodedValue encode(Codec codec, Codec.Context context) {
             Map<Codec.EncodedValue, Codec.EncodedValue> encodedMap = map.entrySet().stream()
                     .collect(Collectors.toUnmodifiableMap(
@@ -512,6 +548,21 @@ public abstract class ValueImpl implements Value {
 
     public record VariableBooleanMapImpl(Map<Variable, Boolean> map) implements VariableBooleanMap {
         public static final VariableBooleanMap EMPTY = new VariableBooleanMapImpl(Map.of());
+
+        @Override
+        public boolean isDefault() {
+            return map.isEmpty();
+        }
+
+        // we allow the removal of elements, or the change from true to false
+        @Override
+        public boolean overwriteAllowed(Value newValue) {
+            VariableBooleanMap other = (VariableBooleanMap) newValue;
+            return map.entrySet().stream().allMatch(e -> {
+                Boolean newB = other.map().get(e.getKey());
+                return newB == null || !newB || e.getValue();
+            });
+        }
 
         @Override
         public Codec.EncodedValue encode(Codec codec, Codec.Context context) {
@@ -553,6 +604,11 @@ public abstract class ValueImpl implements Value {
         public static final AssignedToField EMPTY = new AssignedToFieldImpl(Set.of());
 
         @Override
+        public boolean isDefault() {
+            return fields.isEmpty();
+        }
+
+        @Override
         public Codec.EncodedValue encode(Codec codec, Codec.Context context) {
             Set<Codec.EncodedValue> set = fields.stream().map(fi -> codec.encodeInfoInContext(context, fi,
                     "" + codec.fieldIndex(fi))).collect(Collectors.toUnmodifiableSet());
@@ -577,6 +633,11 @@ public abstract class ValueImpl implements Value {
 
     public record PostConditionsImpl(Map<String, Expression> byIndex) implements PostConditions {
         public static final PostConditions EMPTY = new PostConditionsImpl(Map.of());
+
+        @Override
+        public boolean isDefault() {
+            return byIndex.isEmpty();
+        }
 
         @Override
         public Codec.EncodedValue encode(Codec codec, Codec.Context context) {
@@ -608,6 +669,11 @@ public abstract class ValueImpl implements Value {
         public static final Precondition EMPTY = new PreconditionImpl(null);
 
         @Override
+        public boolean isDefault() {
+            return expression == null;
+        }
+
+        @Override
         public Codec.EncodedValue encode(Codec codec, Codec.Context context) {
             return codec.encodeExpression(context, expression);
         }
@@ -625,6 +691,11 @@ public abstract class ValueImpl implements Value {
 
     public record IndicesOfEscapesImpl(Set<String> indices) implements IndicesOfEscapes {
         public static final IndicesOfEscapes EMPTY = new IndicesOfEscapesImpl(Set.of());
+
+        @Override
+        public boolean isDefault() {
+            return indices.isEmpty();
+        }
 
         @Override
         public Codec.EncodedValue encode(Codec codec, Codec.Context context) {
@@ -647,6 +718,11 @@ public abstract class ValueImpl implements Value {
     public record GetSetEquivalentImpl(Set<ParameterInfo> convertToGetSet,
                                        MethodInfo methodWithoutParameters) implements GetSetEquivalent {
         public static final GetSetEquivalent EMPTY = new GetSetEquivalentImpl(Set.of(), null);
+
+        @Override
+        public boolean isDefault() {
+            return equals(EMPTY);
+        }
 
         @Override
         public Codec.EncodedValue encode(Codec codec, Codec.Context context) {
@@ -692,6 +768,11 @@ public abstract class ValueImpl implements Value {
         }
 
         @Override
+        public boolean isDefault() {
+            return value == 0;
+        }
+
+        @Override
         public boolean isAtLeastNotNull() {
             return value >= 1;
         }
@@ -709,8 +790,8 @@ public abstract class ValueImpl implements Value {
 
         @Override
         public int compareTo(Value o) {
-            if (o instanceof NotNullImpl i) {
-                return value - i.value;
+            if (o instanceof NotNullImpl(int value1)) {
+                return value - value1;
             }
             throw new UnsupportedOperationException();
         }
@@ -729,6 +810,11 @@ public abstract class ValueImpl implements Value {
 
     public record SetOfStringsImpl(Set<String> set) implements SetOfStrings {
         public static final SetOfStrings EMPTY_SET = new SetOfStringsImpl(Set.of());
+
+        @Override
+        public boolean isDefault() {
+            return set.isEmpty();
+        }
 
         @Override
         public Codec.EncodedValue encode(Codec codec, Codec.Context context) {
@@ -750,6 +836,11 @@ public abstract class ValueImpl implements Value {
     }
 
     public record SetOfInfoImpl(Set<? extends Info> infoSet) implements SetOfInfo {
+
+        @Override
+        public boolean isDefault() {
+            return infoSet.isEmpty();
+        }
 
         @Override
         public Codec.EncodedValue encode(Codec codec, Codec.Context context) {
@@ -786,5 +877,38 @@ public abstract class ValueImpl implements Value {
 
     static {
         decoderMap.put(SetOfInfoImpl.class, (di, ev) -> SetOfInfoImpl.from(di.codec(), di.context(), ev));
+    }
+
+    public record SetOfTypeInfoImpl(Set<TypeInfo> typeInfoSet) implements SetOfTypeInfo {
+        public static final SetOfTypeInfo EMPTY = new SetOfTypeInfoImpl(Set.of());
+
+        @Override
+        public boolean isDefault() {
+            return typeInfoSet.isEmpty();
+        }
+
+        @Override
+        public Codec.EncodedValue encode(Codec codec, Codec.Context context) {
+            List<Codec.EncodedValue> encodedValues = typeInfoSet.stream()
+                    .sorted(Comparator.comparing(TypeInfo::fullyQualifiedName))
+                    .map(info -> codec.encodeInfoInContext(context, info, "")).toList();
+            return codec.encodeList(context, encodedValues);
+        }
+
+        public static SetOfTypeInfo from(Codec codec, Codec.Context context, Codec.EncodedValue encodedList) {
+            List<Codec.EncodedValue> encodedValues = codec.decodeList(context, encodedList);
+            Set<TypeInfo> set = encodedValues.stream().map(e -> (TypeInfo) codec.decodeInfoInContext(context, e))
+                    .collect(Collectors.toUnmodifiableSet());
+            return new SetOfTypeInfoImpl(set);
+        }
+
+        @Override
+        public Value rewire(InfoMap infoMap) {
+            throw new UnsupportedOperationException("NYI");
+        }
+    }
+
+    static {
+        decoderMap.put(SetOfTypeInfoImpl.class, (di, ev) -> SetOfTypeInfoImpl.from(di.codec(), di.context(), ev));
     }
 }

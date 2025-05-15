@@ -17,6 +17,8 @@ public interface Value extends Comparable<Value> {
         throw new UnsupportedOperationException();
     }
 
+    boolean isDefault();
+
     default boolean lt(Value other) {
         return compareTo(other) < 0;
     }
@@ -27,6 +29,10 @@ public interface Value extends Comparable<Value> {
 
     default Value rewire(InfoMap infoMap) {
         return this;
+    }
+
+    default boolean overwriteAllowed(Value newValue) {
+        return false;
     }
 
     interface Bool extends Value {
@@ -142,6 +148,7 @@ public interface Value extends Comparable<Value> {
     }
 
     interface VariableBooleanMap extends Value {
+
         boolean isEmpty();
 
         Map<Variable, Boolean> map();
@@ -180,6 +187,10 @@ public interface Value extends Comparable<Value> {
     // general
     interface SetOfInfo extends Value {
         Set<? extends Info> infoSet();
+    }
+
+    interface SetOfTypeInfo extends Value {
+        Set<TypeInfo> typeInfoSet();
     }
 
     interface SetOfStrings extends Value {

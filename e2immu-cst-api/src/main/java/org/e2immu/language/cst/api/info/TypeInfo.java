@@ -259,6 +259,20 @@ public interface TypeInfo extends NamedType, Info {
         return Stream.concat(s1, Stream.concat(s2, s3));
     }
 
+    default Stream<TypeInfo> typeHierarchyExcludingJLOStream() {
+        Stream<TypeInfo> s2;
+        if (parentClass() != null && !parentClass().typeInfo().isJavaLangObject()) {
+            TypeInfo parent = parentClass().bestTypeInfo();
+            s2 = Stream.concat(Stream.of(parent), parent.recursiveSuperTypeStream());
+        } else {
+            s2 = Stream.of();
+        }
+        Stream<TypeInfo> s3 = interfacesImplemented().stream().map(ParameterizedType::bestTypeInfo)
+                .filter(Objects::nonNull)
+                .flatMap(ti -> Stream.concat(Stream.of(ti), ti.recursiveSuperTypeStream()));
+        return Stream.concat(s2, s3);
+    }
+
     default Stream<TypeInfo> enclosingTypeStream() {
         Stream<TypeInfo> enclosingStream;
         if (compilationUnitOrEnclosingType().isRight()) {
