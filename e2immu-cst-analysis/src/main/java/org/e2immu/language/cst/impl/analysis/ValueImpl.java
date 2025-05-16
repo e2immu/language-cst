@@ -302,6 +302,9 @@ public abstract class ValueImpl implements Value {
             this.linkToParametersReturnValue = linkToParametersReturnValue;
         }
 
+        /*
+        The map is a summary of all that happens at this parameter.
+         */
         public static Map<Integer, Integer> makeMap(int[] dependentParameters,
                                                     int[] hcParameters,
                                                     Boolean dependentReturnValue,

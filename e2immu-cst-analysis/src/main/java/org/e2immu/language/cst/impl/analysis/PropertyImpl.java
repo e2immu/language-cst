@@ -13,6 +13,7 @@ public class PropertyImpl implements Property {
     public static final Property IMMUTABLE_TYPE_DETERMINED_BY_PARAMETERS
             = new PropertyImpl("immutableTypeDeterminedByParameters");
     public static final Property FINAL_TYPE = new PropertyImpl("finalType");
+    public static final Property UTILITY_CLASS = new PropertyImpl("utilityClass");
 
     // method
     public static final Property NON_MODIFYING_METHOD = new PropertyImpl("nonModifyingMethod");
