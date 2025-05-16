@@ -54,7 +54,7 @@ public class PropertyProviderImpl {
                 DEFAULTS_ANALYZER,
                 ANNOTATED_API,
                 ANALYZER_ERROR,
-                STATIC_SIDE_EFFECTS_METHOD,
+                IGNORE_MODIFICATION_METHOD,
                 MODIFIED_FI_COMPONENTS_PARAMETER,
                 MODIFIED_COMPONENTS_METHOD,
                 MODIFIED_COMPONENTS_PARAMETER

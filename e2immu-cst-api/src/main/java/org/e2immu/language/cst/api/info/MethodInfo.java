@@ -141,7 +141,7 @@ public interface MethodInfo extends Info {
 
     boolean isIdentity();
 
-    boolean isStaticSideEffects();
+    boolean isIgnoreModification();
 
     MissingData missingData();
 

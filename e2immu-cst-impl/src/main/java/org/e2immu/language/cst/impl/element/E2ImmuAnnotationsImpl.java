@@ -9,7 +9,6 @@ import org.e2immu.annotation.method.GetSet;
 import org.e2immu.annotation.rare.AllowsInterrupt;
 import org.e2immu.annotation.rare.Finalizer;
 import org.e2immu.annotation.rare.IgnoreModifications;
-import org.e2immu.annotation.rare.StaticSideEffects;
 import org.e2immu.annotation.type.ExtensionClass;
 import org.e2immu.annotation.type.Singleton;
 import org.e2immu.annotation.type.UtilityClass;
@@ -62,7 +61,6 @@ public class E2ImmuAnnotationsImpl {
     public final AnnotationExpression nullable = create(Nullable.class);
     public final AnnotationExpression only = create(Only.class);
     public final AnnotationExpression singleton = create(Singleton.class);
-    public final AnnotationExpression staticSideEffects = create(StaticSideEffects.class);
     public final AnnotationExpression testMark = create(TestMark.class);
     public final AnnotationExpression utilityClass = create(UtilityClass.class);
 
@@ -74,8 +72,7 @@ public class E2ImmuAnnotationsImpl {
         add(builder, allowsInterrupt, beforeMark, commutable, container, independent,
                 immutableContainer, extensionClass, finalFields, getSet, immutable,
                 effectivelyFinal, fluent, finalizer, identity, ignoreModifications, mark, modified);
-        add(builder, notModified, notNull, nullable, only, singleton, staticSideEffects, testMark,
-                utilityClass);
+        add(builder, notModified, notNull, nullable, only, singleton, testMark, utilityClass);
         annotationTypes = Map.copyOf(builder);
     }
 

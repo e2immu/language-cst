@@ -22,7 +22,7 @@ public class PropertyImpl implements Property {
     public static final Property FLUENT_METHOD = new PropertyImpl("fluentMethod");
     public static final Property IDENTITY_METHOD = new PropertyImpl("identityMethod");
     public static final Property NOT_NULL_METHOD = new PropertyImpl("notNullMethod", ValueImpl.NotNullImpl.NULLABLE);
-    public static final Property STATIC_SIDE_EFFECTS_METHOD = new PropertyImpl("sseMethod");
+    public static final Property IGNORE_MODIFICATION_METHOD = new PropertyImpl("ignoreModMethod");
     public static final Property POST_CONDITIONS_METHOD = new PropertyImpl("postConditionsMethod",
             ValueImpl.PostConditionsImpl.EMPTY);
     public static final Property PRECONDITION_METHOD = new PropertyImpl("preconditionMethod",

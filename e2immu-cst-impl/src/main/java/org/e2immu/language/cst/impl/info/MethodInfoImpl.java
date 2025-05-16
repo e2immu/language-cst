@@ -411,8 +411,8 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
     }
 
     @Override
-    public boolean isStaticSideEffects() {
-        return analysis().getOrDefault(PropertyImpl.STATIC_SIDE_EFFECTS_METHOD, ValueImpl.BoolImpl.FALSE).isTrue();
+    public boolean isIgnoreModification() {
+        return analysis().getOrDefault(PropertyImpl.IGNORE_MODIFICATION_METHOD, ValueImpl.BoolImpl.FALSE).isTrue();
     }
 
     @Override
