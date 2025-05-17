@@ -16,17 +16,23 @@ public class PropertyProviderImpl {
     static {
         Collections.addAll(properties,
                 ALWAYS_ESCAPES,
+                ANALYZER_ERROR,
+                ANNOTATED_API,
                 COMMUTABLE_METHODS,
                 CONTAINER_FIELD,
                 CONTAINER_METHOD,
                 CONTAINER_PARAMETER,
                 CONTAINER_TYPE,
+                DEFAULTS_ANALYZER,
                 FINAL_FIELD,
+                FINAL_TYPE,
+                FINALIZER_METHOD,
                 FLUENT_METHOD,
                 GET_SET_EQUIVALENT,
                 GET_SET_FIELD,
                 IDENTITY_METHOD,
                 IGNORE_MODIFICATIONS_FIELD,
+                IGNORE_MODIFICATION_METHOD,
                 IGNORE_MODIFICATIONS_PARAMETER,
                 IMMUTABLE_FIELD,
                 IMMUTABLE_METHOD,
@@ -40,9 +46,10 @@ public class PropertyProviderImpl {
                 INDICES_OF_ESCAPE_METHOD);
         Collections.addAll(properties,
                 METHOD_ALLOWS_INTERRUPTS,
+                MODIFIED_FI_COMPONENTS_PARAMETER,
+                MODIFIED_COMPONENTS_METHOD,
+                MODIFIED_COMPONENTS_PARAMETER,
                 NON_MODIFYING_METHOD,
-                UNMODIFIED_FIELD,
-                UNMODIFIED_PARAMETER,
                 NOT_NULL_FIELD,
                 NOT_NULL_METHOD,
                 NOT_NULL_PARAMETER,
@@ -51,13 +58,9 @@ public class PropertyProviderImpl {
                 PARAMETER_ASSIGNED_TO_FIELD,
                 POST_CONDITIONS_METHOD,
                 PRECONDITION_METHOD,
-                DEFAULTS_ANALYZER,
-                ANNOTATED_API,
-                ANALYZER_ERROR,
-                IGNORE_MODIFICATION_METHOD,
-                MODIFIED_FI_COMPONENTS_PARAMETER,
-                MODIFIED_COMPONENTS_METHOD,
-                MODIFIED_COMPONENTS_PARAMETER
+                UNMODIFIED_FIELD,
+                UNMODIFIED_PARAMETER,
+                UTILITY_CLASS
         );
         properties.forEach(p -> propertyMap.put(p.key(), p));
     }

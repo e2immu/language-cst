@@ -34,6 +34,7 @@ public class PropertyImpl implements Property {
             ValueImpl.FieldBooleanMapImpl.EMPTY);
     public static final Property INDEPENDENT_METHOD = new PropertyImpl("independentMethod",
             ValueImpl.IndependentImpl.DEPENDENT);
+    public static final Property FINALIZER_METHOD = new PropertyImpl("finalizerMethod");
     // dynamic return type
     public static final Property IMMUTABLE_METHOD = new PropertyImpl("immutableMethod"
             , ValueImpl.ImmutableImpl.MUTABLE);
