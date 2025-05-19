@@ -102,7 +102,8 @@ public interface Value extends Comparable<Value> {
     at least two methods should have the same label, of the same kind (seq, par, multi).
      */
     interface CommutableData extends Value {
-        default boolean isDefault() {
+        // different from isDefault, which is a generic method to determine absence of annotation
+        default boolean isBlankMultiParSeq() {
             return !isNone() && par().isBlank() && seq().isBlank() && multi().isBlank();
         }
 

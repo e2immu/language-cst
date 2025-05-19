@@ -159,6 +159,11 @@ public abstract class ValueImpl implements Value {
         public boolean isNone() {
             return NONE == this;
         }
+
+        @Override
+        public boolean isDefault() {
+            return NONE.equals(this);
+        }
     }
 
     static {
