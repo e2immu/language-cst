@@ -33,7 +33,7 @@ public interface PropertyValueMap {
 
     <V extends Value> void set(Property property, V value);
 
-    <V extends Value> void setAllowControlledOverwrite(Property property, V value);
+    <V extends Value> boolean setAllowControlledOverwrite(Property property, V value);
 
     void setAll(PropertyValueMap analysis);
 }

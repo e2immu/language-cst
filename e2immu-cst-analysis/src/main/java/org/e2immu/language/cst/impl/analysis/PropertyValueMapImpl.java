@@ -66,18 +66,21 @@ public class PropertyValueMapImpl implements PropertyValueMap {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <V extends Value> void setAllowControlledOverwrite(Property property, V value) {
+    public <V extends Value> boolean setAllowControlledOverwrite(Property property, V value) {
         V current = (V) map.get(property);
         if (current == null) {
             map.put(property, value);
-        } else if (!current.equals(value)) {
+            return true;
+        }
+        if (!current.equals(value)) {
             if (current.overwriteAllowed(value)) {
                 map.put(property, value);
-            } else {
-                throw new IllegalArgumentException("Trying to overwrite " + current + " with " + value
-                                                   + " for property " + property);
+                return true;
             }
+            throw new IllegalArgumentException("Trying to overwrite " + current + " with " + value
+                                               + " for property " + property);
         }
+        return false;
     }
 
     @Override

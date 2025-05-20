@@ -95,6 +95,11 @@ public abstract class ValueImpl implements Value {
                 default -> throw new UnsupportedOperationException();
             };
         }
+
+        @Override
+        public boolean overwriteAllowed(Value newValue) {
+            return value < ((BoolImpl) newValue).value;
+        }
     }
 
     static {
@@ -283,6 +288,11 @@ public abstract class ValueImpl implements Value {
                 default -> throw new UnsupportedOperationException();
             };
         }
+
+        @Override
+        public boolean overwriteAllowed(Value newValue) {
+            return value < ((ImmutableImpl) newValue).value;
+        }
     }
 
     static {
@@ -441,6 +451,11 @@ public abstract class ValueImpl implements Value {
                 list.add("hcParameters={" + String.join(", ", hcList) + "}");
             }
             return String.join(", ", list);
+        }
+
+        @Override
+        public boolean overwriteAllowed(Value newValue) {
+            return value < ((IndependentImpl) newValue).value;
         }
     }
 
