@@ -53,4 +53,10 @@ public interface CompilationUnit extends Element {
         SourceSet set = sourceSet();
         return set == null || set.partOfJdk();
     }
+
+    // helper method here, set==null for primitives;  partOfJdk() implies externalLibrary()
+    default boolean externalLibrary() {
+        SourceSet set = sourceSet();
+        return set == null || set.externalLibrary();
+    }
 }
