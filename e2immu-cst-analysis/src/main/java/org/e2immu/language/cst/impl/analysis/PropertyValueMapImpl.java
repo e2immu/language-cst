@@ -68,7 +68,16 @@ public class PropertyValueMapImpl implements PropertyValueMap {
     @Override
     public <V extends Value> void setAllowControlledOverwrite(Property property, V value) {
         V current = (V) map.get(property);
-        if (current == null || current.overwriteAllowed(value)) map.put(property, value);
+        if (current == null) {
+            map.put(property, value);
+        } else if (!current.equals(value)) {
+            if (current.overwriteAllowed(value)) {
+                map.put(property, value);
+            } else {
+                throw new IllegalArgumentException("Trying to overwrite " + current + " with " + value
+                                                   + " for property " + property);
+            }
+        }
     }
 
     @Override
