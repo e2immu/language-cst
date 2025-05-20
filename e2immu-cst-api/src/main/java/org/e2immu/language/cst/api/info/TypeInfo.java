@@ -52,6 +52,12 @@ public interface TypeInfo extends NamedType, Info {
 
     Either<CompilationUnit, TypeInfo> compilationUnitOrEnclosingType();
 
+    default Iterable<ParameterizedType> parentAndInterfacesImplemented() {
+        Stream<ParameterizedType> stream = Stream.concat(Stream.ofNullable(parentClass()),
+                interfacesImplemented().stream());
+        return stream::iterator;
+    }
+
     // from inspection
     Set<TypeInfo> superTypesExcludingJavaLangObject();
 
