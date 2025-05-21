@@ -32,6 +32,7 @@ import java.util.stream.Stream;
 public class CodecImpl implements Codec {
     private static final Logger LOGGER = LoggerFactory.getLogger(CodecImpl.class);
 
+    private static final Pattern FIELD_NAME_PATTERN = Pattern.compile("(.+)\\.([^.]+)");
     private static final Pattern NAME_INDEX_PATTERN = Pattern.compile("(.+)\\((\\d+)\\)");
     private static final Pattern METHOD_PATTERN = Pattern.compile("(.+)\\.(\\w+)\\((\\d+)\\)");
     private static final Pattern NUM_PATTERN = Pattern.compile("-?\\.?[0-9]+");
@@ -134,7 +135,15 @@ public class CodecImpl implements Codec {
             FieldInfo fieldInfo = typeInfo.fields().get(index);
             assert fieldInfo.name().equals(m.group(1));
             return fieldInfo;
-        } else throw new UnsupportedOperationException();
+        } else {
+            Matcher m2 = FIELD_NAME_PATTERN.matcher(nameIndex);
+            if (m2.matches()) {
+                TypeInfo owner = runtime.getFullyQualified(m2.group(1), true);
+                return owner.getFieldByName(m2.group(2), true);
+            } else {
+                throw new UnsupportedOperationException();
+            }
+        }
     }
 
     private Info decodeInfo(Info current, char type, String name) {
@@ -466,8 +475,10 @@ public class CodecImpl implements Codec {
             return "M" + methodInfo.name() + "(" + index + ")";
         }
         if (info instanceof FieldInfo fieldInfo) {
-            assert context.currentType() == fieldInfo.owner();
-            return "F" + fieldInfo.name() + "(" + index + ")";
+            if (context.currentType() == fieldInfo.owner()) {
+                return "F" + fieldInfo.name() + "(" + index + ")";
+            }
+            return "F" + fieldInfo.fullyQualifiedName();
         }
         if (info instanceof ParameterInfo pi) {
             assert context.currentMethod() == pi.methodInfo();
