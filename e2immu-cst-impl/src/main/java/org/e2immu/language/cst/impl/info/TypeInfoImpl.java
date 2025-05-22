@@ -112,7 +112,7 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
                                              + "', with " + numberOfParameters + " parameters, in type "
                                              + fullyQualifiedName);
         }
-        return list.get(0);
+        return list.getFirst();
     }
 
     @Override
@@ -124,34 +124,34 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
             throw new NoSuchElementException("Found " + list.size() + " constructors with "
                                              + numberOfParameters + " parameters");
         }
-        return list.get(0);
+        return list.getFirst();
     }
 
     @Override
     public MethodInfo findConstructor(TypeInfo typeOfFirstParameter) {
         List<MethodInfo> list = constructors().stream()
                 .filter(constructor -> !constructor.parameters().isEmpty()
-                                       && typeOfFirstParameter.equals(constructor.parameters().get(0).parameterizedType().typeInfo()))
+                                       && typeOfFirstParameter.equals(constructor.parameters().getFirst().parameterizedType().typeInfo()))
                 .toList();
         if (list.size() != 1) {
             throw new NoSuchElementException("Found " + list.size() + " constructors with "
                                              + typeOfFirstParameter + " as type of the first parameter");
         }
-        return list.get(0);
+        return list.getFirst();
     }
 
     @Override
     public TypeInfo findSubType(String simpleName) {
         List<TypeInfo> subTypes = subTypes().stream().filter(st -> simpleName.equals(st.simpleName())).toList();
         if (subTypes.size() != 1) throw new NoSuchElementException();
-        return subTypes.get(0);
+        return subTypes.getFirst();
     }
 
     @Override
     public TypeInfo findSubType(String simpleName, boolean complain) {
         List<TypeInfo> subTypes = subTypes().stream().filter(st -> simpleName.equals(st.simpleName())).toList();
         if (subTypes.size() != 1 && complain) throw new NoSuchElementException();
-        return subTypes.isEmpty() ? null : subTypes.get(0);
+        return subTypes.isEmpty() ? null : subTypes.getFirst();
     }
 
     @Override
@@ -165,10 +165,10 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
         List<MethodInfo> list = methods().stream()
                 .filter(mi -> name.equals(mi.name())
                               && !mi.parameters().isEmpty()
-                              && typeInfoOfFirstParameter.equals(mi.parameters().get(0).parameterizedType().typeInfo()))
+                              && typeInfoOfFirstParameter.equals(mi.parameters().getFirst().parameterizedType().typeInfo()))
                 .toList();
         if (list.size() != 1) throw new NoSuchElementException();
-        return list.get(0);
+        return list.getFirst();
     }
 
     @Override
@@ -790,7 +790,7 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
         for (MethodInfo methodInfo : constructors()) {
             List<MethodInfo> tMethod = methodInfo.translate(translationMap);
             newConstructors.addAll(tMethod);
-            change |= tMethod.size() != 1 || tMethod.get(0) != methodInfo;
+            change |= tMethod.size() != 1 || tMethod.getFirst() != methodInfo;
         }
         List<MethodInfo> newMethods = new ArrayList<>(2 * methods().size());
         MethodInfo translatedSam = null;

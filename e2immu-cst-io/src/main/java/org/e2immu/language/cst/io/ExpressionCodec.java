@@ -54,7 +54,7 @@ public class ExpressionCodec {
     public Expression decodeExpression(Codec.EncodedValue encodedValue) {
         List<Codec.EncodedValue> list = codec.decodeList(context, encodedValue);
         if (list.isEmpty()) return null;
-        String name = codec.decodeString(context, list.get(0));
+        String name = codec.decodeString(context, list.getFirst());
         ECodec eCodec = map.get(name);
         return eCodec.decode(list);
     }

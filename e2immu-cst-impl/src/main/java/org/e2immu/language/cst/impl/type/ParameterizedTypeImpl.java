@@ -325,7 +325,7 @@ public class ParameterizedTypeImpl implements ParameterizedType {
         return arrays == 0
                && typeParameter != null
                && (typeParameter.typeBounds().isEmpty()
-                   || typeParameter.typeBounds().size() == 1 && typeParameter.typeBounds().get(0).isJavaLangObject());
+                   || typeParameter.typeBounds().size() == 1 && typeParameter.typeBounds().getFirst().isJavaLangObject());
     }
 
     @Override
@@ -465,7 +465,7 @@ public class ParameterizedTypeImpl implements ParameterizedType {
                 if (pt != null && pt.isUnboundWildcard() && !parameter.typeParameter().typeBounds().isEmpty()) {
                     // replace '?' by '? extends X', with 'X' the first type bound, see TypeParameter_3
                     // but never do this for JLO (see e.g. issues described in MethodCall_73)
-                    TypeInfo bound = parameter.typeParameter().typeBounds().get(0).typeInfo();
+                    TypeInfo bound = parameter.typeParameter().typeBounds().getFirst().typeInfo();
                     if (bound.isJavaLangObject()) {
                         recursive = WILDCARD_PARAMETERIZED_TYPE;
                     } else {
@@ -498,7 +498,7 @@ public class ParameterizedTypeImpl implements ParameterizedType {
         if (typeInfo != null) return typeInfo;
         if (typeParameter != null) {
             if (wildcard != null && wildcard.isExtends() && parameters.size() == 1) {
-                return parameters.get(0).bestTypeInfo();
+                return parameters.getFirst().bestTypeInfo();
             }
             TypeParameter definition;
             if (typeParameter.getOwner() != null) {
@@ -511,7 +511,7 @@ public class ParameterizedTypeImpl implements ParameterizedType {
                 }
                 if (!definition.typeBounds().isEmpty()) {
                     // IMPROVE should be a joint type
-                    return definition.typeBounds().get(0).typeInfo();
+                    return definition.typeBounds().getFirst().typeInfo();
                 }
             } // else: in JFocus, we can temporarily have no owner during type generalization
         }

@@ -51,7 +51,7 @@ public class Lookahead {
                 }
                 if (!startOfGuides.isEmpty()) {
                     // then to the first of the guides
-                    currentForwardInfo.set(startOfGuides.get(0).forwardInfo);
+                    currentForwardInfo.set(startOfGuides.getFirst().forwardInfo);
                     return true;
                 }
                 if (!forwardInfo.symbol() && !forwardInfo.isGuide()) {

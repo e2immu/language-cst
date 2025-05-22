@@ -696,7 +696,7 @@ public class JSONParser {
             while (ns.parentScope != null) {
                 ns = ns.parentScope;
             }
-            return ns.isEmpty() ? null : ns.get(0);
+            return ns.isEmpty() ? null : ns.getFirst();
         }
 
         Node peek() {

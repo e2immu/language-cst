@@ -220,7 +220,7 @@ public class CodecImpl implements Codec {
             // kv pairs, starting with 1 unless empty
             for (int i = 1; i < jo.size(); i += 2) {
                 if (jo.get(i) instanceof KeyValuePair kvp) {
-                    map.put(new D(kvp.get(0)), new D(kvp.get(2)));
+                    map.put(new D(kvp.getFirst()), new D(kvp.get(2)));
                 } else throw new UnsupportedOperationException();
             }
         }
@@ -330,7 +330,7 @@ public class CodecImpl implements Codec {
         // list index 0: named type
         int i = 1;
         NamedType nt;
-        if (list.get(0) instanceof D d0 && d0.s instanceof StringLiteral sl) {
+        if (list.getFirst() instanceof D d0 && d0.s instanceof StringLiteral sl) {
             String fqn = unquote(sl.getSource());
             char first = fqn.charAt(0);
             if ('T' == first) {

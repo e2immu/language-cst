@@ -174,7 +174,7 @@ public abstract class ValueImpl implements Value {
     static {
         decoderMap.put(CommutableDataImpl.class, (di, encodedValue) -> {
             List<Codec.EncodedValue> list = di.codec().decodeList(di.context(), encodedValue);
-            return new CommutableDataImpl(di.codec().decodeString(di.context(), list.get(0)),
+            return new CommutableDataImpl(di.codec().decodeString(di.context(), list.getFirst()),
                     di.codec().decodeString(di.context(), list.get(1)),
                     di.codec().decodeString(di.context(), list.get(2)));
         });
@@ -462,7 +462,7 @@ public abstract class ValueImpl implements Value {
     public static Independent decodeIndependentImpl(Codec codec, Codec.Context context, Codec.EncodedValue encodedValue) {
         if (codec.isList(encodedValue)) {
             List<Codec.EncodedValue> encodedList = codec.decodeList(context, encodedValue);
-            int value = codec.decodeInt(context, encodedList.get(0));
+            int value = codec.decodeInt(context, encodedList.getFirst());
             Map<Codec.EncodedValue, Codec.EncodedValue> encodedMap = codec.decodeMap(context, encodedList.get(1));
             Map<Integer, Integer> map = encodedMap.entrySet().stream().collect(Collectors.toUnmodifiableMap(
                     e -> Integer.parseInt(codec.decodeString(context, e.getKey())),
@@ -522,7 +522,7 @@ public abstract class ValueImpl implements Value {
             Codec codec = di.codec();
             Codec.Context context = di.context();
             List<Codec.EncodedValue> list = codec.decodeList(context, encodedValue);
-            FieldInfo field = codec.decodeFieldInfo(context.currentType(), list.get(0));
+            FieldInfo field = codec.decodeFieldInfo(context.currentType(), list.getFirst());
             boolean setter = codec.decodeBoolean(context, list.get(1));
             int index = list.size() == 2 ? -1 : codec.decodeInt(context, list.get(2));
             return new GetSetValueImpl(field, setter, index);
@@ -766,7 +766,7 @@ public abstract class ValueImpl implements Value {
     static {
         decoderMap.put(GetSetEquivalentImpl.class, (di, encodedValue) -> {
             List<Codec.EncodedValue> list = di.codec().decodeList(di.context(), encodedValue);
-            Set<ParameterInfo> set = di.codec().decodeSet(di.context(), list.get(0)).stream()
+            Set<ParameterInfo> set = di.codec().decodeSet(di.context(), list.getFirst()).stream()
                     .map(e -> (ParameterInfo) di.codec().decodeVariable(di.context(), e))
                     .collect(Collectors.toUnmodifiableSet());
             return new GetSetEquivalentImpl(set, (MethodInfo) di.codec().decodeInfoOutOfContext(di.context(), list.get(1)));
