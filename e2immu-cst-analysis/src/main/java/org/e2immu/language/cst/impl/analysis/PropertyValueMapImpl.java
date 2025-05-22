@@ -58,6 +58,8 @@ public class PropertyValueMapImpl implements PropertyValueMap {
 
     @Override
     public void set(Property property, Value value) {
+        assert value != null : "Not allowed to write null";
+
         assert property.classOfValue().isAssignableFrom(value.getClass());
         if (map.put(property, value) != null) {
             throw new IllegalArgumentException("Trying to overwrite a value for property " + property);
@@ -67,6 +69,7 @@ public class PropertyValueMapImpl implements PropertyValueMap {
     @SuppressWarnings("unchecked")
     @Override
     public <V extends Value> boolean setAllowControlledOverwrite(Property property, V value) {
+        assert value != null : "Not allowed to write null";
         V current = (V) map.get(property);
         if (current == null) {
             map.put(property, value);
