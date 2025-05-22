@@ -56,7 +56,7 @@ public class TestCodec {
                 codec.encode(context, p, typeInfo.analysis().getOrDefault(p, p.defaultValue())));
         String s = ((CodecImpl.E) codec.encode(context, typeInfo, "", epvStream, List.of())).s();
         assertEquals("""
-                "name": "Ta.b.C", "data":{"commutableMethods":["p1","p2,p3","p4"],"immutableType":3,"shallowAnalyzer":1}\
+                "name": "Ta.b.C", "data":{"commutableMethods":["p1","p2,p3","p4"],"defaultsAnalyzer":1,"immutableType":3}\
                 """, s);
         JSONParser parser = new JSONParser("{" + s + "}");
         parser.Root();
@@ -65,7 +65,7 @@ public class TestCodec {
 
         TypeInfo typeInfo2 = runtime.newTypeInfo(cu, "D");
 
-        if (root.get(0) instanceof JSONObject jo) {
+        if (root.getFirst() instanceof JSONObject jo) {
             if (jo.get(1) instanceof KeyValuePair kvp) {
                 if (kvp.get(0) instanceof StringLiteral sl) {
                     assertEquals("\"name\"", sl.getSource());
