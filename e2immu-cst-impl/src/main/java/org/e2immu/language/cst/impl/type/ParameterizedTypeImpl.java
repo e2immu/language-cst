@@ -628,7 +628,8 @@ public class ParameterizedTypeImpl implements ParameterizedType {
         }
         if (typeParameter != null) {
             assert parameters.isEmpty();
-            return new ParameterizedTypeImpl(null, typeParameter.rewire(infoMap), List.of(), arrays, wildcard);
+            return new ParameterizedTypeImpl(null, (TypeParameter) typeParameter.rewire(infoMap),
+                    List.of(), arrays, wildcard);
         }
         return this;
     }

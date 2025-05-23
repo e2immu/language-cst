@@ -619,8 +619,10 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
             builder.addSubType(subType.rewirePhase1(infoMap));
         }
         typeParameters().forEach(tp -> {
-            TypeParameter newTp = new TypeParameterImpl(tp.getIndex(), tp.simpleName(), Either.left(typeInfo),
-                    tp.annotations().stream().map(ae -> (AnnotationExpression) ae.rewire(infoMap)).toList());
+            List<AnnotationExpression> rewiredAnnotations = tp.annotations().stream()
+                    .map(ae -> (AnnotationExpression) ae.rewire(infoMap)).toList();
+            TypeParameter newTp = new TypeParameterImpl(tp.comments(), tp.source(), rewiredAnnotations,
+                    tp.getIndex(), tp.simpleName(), Either.left(typeInfo));
             typeInfo.builder().addOrSetTypeParameter(newTp);
             tp.typeBounds().forEach(tb -> newTp.builder().addTypeBound(tb.rewire(infoMap)));
             newTp.builder().commit();
@@ -685,8 +687,10 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
         MethodInfo.Builder builder = rewiredMethod.builder();
 
         methodInfo.typeParameters().forEach(tp -> {
-            TypeParameter newTp = new TypeParameterImpl(tp.getIndex(), tp.simpleName(), Either.right(rewiredMethod),
-                    tp.annotations().stream().map(ae -> (AnnotationExpression) ae.rewire(infoMap)).toList());
+            List<AnnotationExpression> rewiredAnnotations = tp.annotations().stream()
+                    .map(ae -> (AnnotationExpression) ae.rewire(infoMap)).toList();
+            TypeParameter newTp = new TypeParameterImpl(tp.comments(), tp.source(), rewiredAnnotations,
+                    tp.getIndex(), tp.simpleName(), Either.right(rewiredMethod));
             builder.addTypeParameter(newTp);
             tp.typeBounds().forEach(tb -> newTp.builder().addTypeBound(tb.rewire(infoMap)));
             newTp.builder().commit();

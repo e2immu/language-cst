@@ -922,11 +922,13 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
-    public TypeParameter newTypeParameter(int index, String simpleName, Info owner, List<AnnotationExpression> annotations) {
+    public TypeParameter newTypeParameter(List<Comment> comments,
+                                          Source source, List<AnnotationExpression> annotations,
+                                          int index, String simpleName, Info owner) {
         if (owner instanceof TypeInfo typeInfo) {
-            return new TypeParameterImpl(index, simpleName, Either.left(typeInfo), annotations);
+            return new TypeParameterImpl(comments, source, annotations, index, simpleName, Either.left(typeInfo));
         } else if (owner instanceof MethodInfo methodInfo) {
-            return new TypeParameterImpl(index, simpleName, Either.right(methodInfo), annotations);
+            return new TypeParameterImpl(comments, source, annotations, index, simpleName, Either.right(methodInfo));
         } else throw new UnsupportedOperationException();
     }
 

@@ -87,6 +87,9 @@ public class PropertyImpl implements Property {
     public static final Property ANNOTATED_API = new PropertyImpl("annotatedApi");
     public static final Property ANALYZER_ERROR = new PropertyImpl("analyzerError", ValueImpl.MessageImpl.EMPTY);
 
+    // type parameter
+    public static final Property INDEPENDENT_TYPE_PARAMETER = new PropertyImpl("independentTypeParameter",
+            ValueImpl.IndependentImpl.DEPENDENT);
 
     private final String key;
     private final Value defaultValue;

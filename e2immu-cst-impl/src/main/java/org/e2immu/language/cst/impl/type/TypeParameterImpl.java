@@ -1,6 +1,10 @@
 package org.e2immu.language.cst.impl.type;
 
+import org.e2immu.language.cst.api.analysis.PropertyValueMap;
+import org.e2immu.language.cst.api.element.Comment;
 import org.e2immu.language.cst.api.element.Element;
+import org.e2immu.language.cst.api.element.Source;
+import org.e2immu.language.cst.api.element.Visitor;
 import org.e2immu.language.cst.api.expression.AnnotationExpression;
 import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.info.MethodInfo;
@@ -9,30 +13,36 @@ import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.type.TypeParameter;
+import org.e2immu.language.cst.api.variable.DescendMode;
+import org.e2immu.language.cst.api.variable.Variable;
+import org.e2immu.language.cst.impl.analysis.PropertyValueMapImpl;
+import org.e2immu.language.cst.impl.element.ElementImpl;
 import org.e2immu.language.cst.impl.output.*;
 import org.e2immu.support.Either;
 import org.e2immu.support.FirstThen;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
-public class TypeParameterImpl implements TypeParameter {
+public class TypeParameterImpl extends ElementImpl implements TypeParameter {
     private final int index;
     private final String name;
     private final Either<TypeInfo, MethodInfo> owner;
     private final FirstThen<Builder, List<ParameterizedType>> typeBounds;
     private final List<AnnotationExpression> annotations;
+    private final List<Comment> comments;
+    private final Source source;
+    private final PropertyValueMap analysis = new PropertyValueMapImpl();
 
-    public TypeParameterImpl(int index, String name,
-                             Either<TypeInfo, MethodInfo> owner,
-                             List<AnnotationExpression> annotations) {
+    public TypeParameterImpl(List<Comment> comments, Source source, List<AnnotationExpression> annotations,
+                             int index, String name, Either<TypeInfo, MethodInfo> owner) {
         this.index = index;
         this.name = name;
         this.owner = owner;
         this.typeBounds = new FirstThen<>(new Builder(this));
+        this.comments = comments;
+        this.source = source;
         this.annotations = annotations;
     }
 
@@ -53,14 +63,46 @@ public class TypeParameterImpl implements TypeParameter {
     }
 
     @Override
+    public int complexity() {
+        return 0;
+    }
+
+    @Override
+    public List<Comment> comments() {
+        return comments;
+    }
+
+    @Override
     public TypeParameter rewire(InfoMap infoMap) {
         Either<TypeInfo, MethodInfo> rewiredOwner = owner.isLeft()
                 ? Either.left(infoMap.typeInfo(owner.getLeft()))
                 : Either.right(infoMap.methodInfo(owner.getRight()));
-        TypeParameter rewired = new TypeParameterImpl(index, name, rewiredOwner, annotations);
+        List<AnnotationExpression> rewiredAnnotations = annotations.stream()
+                .map(ae -> (AnnotationExpression) ae.rewire(infoMap)).toList();
+        TypeParameter rewired = new TypeParameterImpl(comments, source, rewiredAnnotations, index, name, rewiredOwner);
         typeBounds.get().forEach(pt -> rewired.builder().addTypeBound(pt.rewire(infoMap)));
         rewired.builder().commit();
         return rewired;
+    }
+
+    @Override
+    public Source source() {
+        return source;
+    }
+
+    @Override
+    public void visit(Predicate<Element> predicate) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void visit(Visitor visitor) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Stream<Variable> variables(DescendMode descendMode) {
+        return Stream.empty();
     }
 
     @Override
@@ -74,7 +116,7 @@ public class TypeParameterImpl implements TypeParameter {
     }
 
     private TypeParameter withOwner(Either<TypeInfo, MethodInfo> owner) {
-        TypeParameterImpl tpi = new TypeParameterImpl(getIndex(), simpleName(), owner, annotations());
+        TypeParameterImpl tpi = new TypeParameterImpl(comments, source, annotations, getIndex(), simpleName(), owner);
         List<ParameterizedType> newBounds = typeBounds().stream()
                 .map(pt -> pt.replaceTypeParameter(this, tpi)).toList();
         tpi.builder().setTypeBounds(newBounds);
@@ -146,8 +188,23 @@ public class TypeParameterImpl implements TypeParameter {
     }
 
     @Override
+    public OutputBuilder print(Qualification qualification) {
+        return print(qualification, true);
+    }
+
+    @Override
     public OutputBuilder print(Qualification qualification, boolean printTypeBounds) {
-        OutputBuilder outputBuilder = new OutputBuilderImpl().add(new TextImpl(name));
+        OutputBuilder outputBuilder = new OutputBuilderImpl();
+        List<AnnotationExpression> allAnnotations = Stream.concat(annotations.stream(),
+                        qualification.decorator() == null ? Stream.of()
+                                : qualification.decorator().annotations(this).stream())
+                .toList();
+        if (!allAnnotations.isEmpty()) {
+            OutputBuilder ob = allAnnotations.stream().map(ae -> ae.print(qualification))
+                    .collect(OutputBuilderImpl.joining(SpaceEnum.ONE));
+            outputBuilder.add(ob).add(SpaceEnum.ONE);
+        }
+        outputBuilder.add(new TextImpl(name));
         if (typeBounds.isSet() && !typeBounds.get().isEmpty() && printTypeBounds) {
             outputBuilder.add(SpaceEnum.ONE).add(KeywordImpl.EXTENDS).add(SpaceEnum.ONE);
             outputBuilder.add(typeBounds.get()
@@ -184,8 +241,20 @@ public class TypeParameterImpl implements TypeParameter {
     @Override
     public Stream<Element.TypeReference> typesReferenced(boolean explicit, Set<TypeParameter> visited) {
         if (visited.add(this)) {
-            return typeBounds().stream().flatMap(pt -> pt.typesReferenced(explicit, visited));
+            Stream<Element.TypeReference> s1 = annotations().stream().flatMap(Element::typesReferenced);
+            Stream<Element.TypeReference> s2 = typeBounds().stream().flatMap(pt -> pt.typesReferenced(explicit, visited));
+            return Stream.concat(s1, s2);
         }
         return Stream.of();
+    }
+
+    @Override
+    public Stream<Element.TypeReference> typesReferenced() {
+        return typesReferenced(true, new HashSet<>());
+    }
+
+    @Override
+    public PropertyValueMap analysis() {
+        return analysis;
     }
 }

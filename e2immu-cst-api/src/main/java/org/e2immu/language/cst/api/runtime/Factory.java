@@ -246,7 +246,7 @@ public interface Factory {
         return newImportComputer(minForAsterisk, null);
     }
 
-    ImportComputer newImportComputer(int minForAsterisk,  Function<String, Collection<TypeInfo>> typesPerPackage);
+    ImportComputer newImportComputer(int minForAsterisk, Function<String, Collection<TypeInfo>> typesPerPackage);
 
     ImportStatement.Builder newImportStatementBuilder();
 
@@ -372,10 +372,12 @@ public interface Factory {
     TypeInfo newTypeInfo(CompilationUnit cu, String simpleName);
 
     default TypeParameter newTypeParameter(int index, String simpleName, Info owner) {
-        return newTypeParameter(index, simpleName, owner, List.of());
+        return newTypeParameter(List.of(), noSource(), List.of(), index, simpleName, owner);
     }
 
-    TypeParameter newTypeParameter(int index, String simpleName, Info owner, List<AnnotationExpression> annotations);
+    TypeParameter newTypeParameter(List<Comment> comments,
+                                   Source source, List<AnnotationExpression> annotations,
+                                   int index, String simpleName, Info owner);
 
     TypePrinter newTypePrinter(TypeInfo typeInfo, boolean formatter2);
 

@@ -2,6 +2,8 @@ package org.e2immu.language.cst.api.type;
 
 import org.e2immu.annotation.Fluent;
 import org.e2immu.annotation.NotNull;
+import org.e2immu.language.cst.api.analysis.PropertyValueMap;
+import org.e2immu.language.cst.api.element.Comment;
 import org.e2immu.language.cst.api.element.Element;
 import org.e2immu.language.cst.api.expression.AnnotationExpression;
 import org.e2immu.language.cst.api.info.InfoMap;
@@ -15,13 +17,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
-public interface TypeParameter extends NamedType {
+public interface TypeParameter extends NamedType, Element {
 
     int getIndex();
 
     Either<TypeInfo, MethodInfo> getOwner();
-
-    List<AnnotationExpression> annotations();
 
     default boolean isMethodTypeParameter() {
         return getOwner().isRight();
@@ -39,8 +39,6 @@ public interface TypeParameter extends NamedType {
     }
 
     Builder builder();
-
-    TypeParameter rewire(InfoMap infoMap);
 
     TypeParameter withOwnerVariableTypeBounds(MethodInfo methodInfo);
 
