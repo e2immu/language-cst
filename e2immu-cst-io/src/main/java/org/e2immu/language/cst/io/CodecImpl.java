@@ -132,6 +132,10 @@ public class CodecImpl implements Codec {
         Matcher m = NAME_INDEX_PATTERN.matcher(nameIndex);
         if (m.matches()) {
             int index = Integer.parseInt(m.group(2));
+            if (index >= typeInfo.fields().size()) {
+                throw new UnsupportedOperationException("Index " + index
+                                                        + " greater than the number of fields in " + typeInfo);
+            }
             FieldInfo fieldInfo = typeInfo.fields().get(index);
             assert fieldInfo.name().equals(m.group(1));
             return fieldInfo;
