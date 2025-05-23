@@ -38,7 +38,7 @@ public class PropertyProviderImpl {
                 IMMUTABLE_METHOD,
                 IMMUTABLE_PARAMETER,
                 IMMUTABLE_TYPE,
-                IMMUTABLE_TYPE_DETERMINED_BY_PARAMETERS,
+                IMMUTABLE_TYPE_INDEPENDENT_OF_TYPE_PARAMETERS,
                 INDEPENDENT_FIELD,
                 INDEPENDENT_METHOD,
                 INDEPENDENT_PARAMETER,

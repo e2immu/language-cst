@@ -10,7 +10,7 @@ public class PropertyImpl implements Property {
     public static final Property CONTAINER_TYPE = new PropertyImpl("containerType");
     public static final Property INDEPENDENT_TYPE = new PropertyImpl("independentType",
             ValueImpl.IndependentImpl.DEPENDENT);
-    public static final Property IMMUTABLE_TYPE_DETERMINED_BY_PARAMETERS
+    public static final Property IMMUTABLE_TYPE_INDEPENDENT_OF_TYPE_PARAMETERS
             = new PropertyImpl("immutableTypeDeterminedByParameters");
     public static final Property FINAL_TYPE = new PropertyImpl("finalType");
     public static final Property UTILITY_CLASS = new PropertyImpl("utilityClass");
