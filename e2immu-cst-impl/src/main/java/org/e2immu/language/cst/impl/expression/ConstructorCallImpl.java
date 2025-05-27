@@ -1,5 +1,6 @@
 package org.e2immu.language.cst.impl.expression;
 
+import org.e2immu.language.cst.api.analysis.PropertyValueMap;
 import org.e2immu.language.cst.api.element.Comment;
 import org.e2immu.language.cst.api.element.Element;
 import org.e2immu.language.cst.api.element.Source;
@@ -18,6 +19,7 @@ import org.e2immu.language.cst.api.type.Diamond;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.variable.DescendMode;
 import org.e2immu.language.cst.api.variable.Variable;
+import org.e2immu.language.cst.impl.analysis.PropertyValueMapImpl;
 import org.e2immu.language.cst.impl.element.ElementImpl;
 import org.e2immu.language.cst.impl.expression.util.ExpressionComparator;
 import org.e2immu.language.cst.impl.expression.util.InternalCompareToException;
@@ -41,11 +43,19 @@ public class ConstructorCallImpl extends ExpressionImpl implements ConstructorCa
     private final ArrayInitializer arrayInitializer;
     private final TypeInfo anonymousClass;
     private final ParameterizedType concreteReturnType;
+    private final PropertyValueMap analysis;
 
     public ConstructorCallImpl(List<Comment> comments, Source source, MethodInfo constructor,
                                ParameterizedType concreteReturnType,
                                Diamond diamond, Expression object, List<Expression> expressions,
                                ArrayInitializer arrayInitializer, TypeInfo anonymousClass) {
+        this(comments, source, constructor, concreteReturnType, diamond, object, expressions, arrayInitializer,
+                anonymousClass, new PropertyValueMapImpl());
+    }
+    public ConstructorCallImpl(List<Comment> comments, Source source, MethodInfo constructor,
+                               ParameterizedType concreteReturnType,
+                               Diamond diamond, Expression object, List<Expression> expressions,
+                               ArrayInitializer arrayInitializer, TypeInfo anonymousClass, PropertyValueMap analysis) {
         super(comments, source, 1 + (object == null ? 0 : object.complexity())
                                 + expressions.stream().mapToInt(Expression::complexity).sum());
         assert constructor != null || anonymousClass != null;
@@ -57,12 +67,13 @@ public class ConstructorCallImpl extends ExpressionImpl implements ConstructorCa
         this.anonymousClass = anonymousClass;
         this.concreteReturnType = Objects.requireNonNull(concreteReturnType);
         assert anonymousClass == null || anonymousClass.compilationUnitOrEnclosingType().isRight();
+        this.analysis = analysis;
     }
 
     @Override
     public Expression withSource(Source source) {
         return new ConstructorCallImpl(comments(), source, constructor, concreteReturnType, diamond, object,
-                parameterExpressions, arrayInitializer, anonymousClass);
+                parameterExpressions, arrayInitializer, anonymousClass, analysis);
     }
 
     public static class Builder extends ElementImpl.Builder<ConstructorCall.Builder> implements ConstructorCall.Builder {
@@ -138,7 +149,8 @@ public class ConstructorCallImpl extends ExpressionImpl implements ConstructorCa
 
     @Override
     public int hashCode() {
-        return Objects.hash(source(), constructor, concreteReturnType, object, parameterExpressions, arrayInitializer, anonymousClass);
+        return Objects.hash(source(), constructor, concreteReturnType, object, parameterExpressions, arrayInitializer,
+                anonymousClass);
     }
 
     @Override
@@ -316,7 +328,8 @@ public class ConstructorCallImpl extends ExpressionImpl implements ConstructorCa
             && translatedType == this.parameterizedType()
             && translatedParameterExpressions == this.parameterExpressions
             && translatedInitializer == arrayInitializer
-            && tAnonymous == anonymousClass) {
+            && tAnonymous == anonymousClass
+            && (analysis.isEmpty() || !translationMap.isClearAnalysis())) {
             return this;
         }
         return new ConstructorCallImpl(comments(), source(),
@@ -338,6 +351,12 @@ public class ConstructorCallImpl extends ExpressionImpl implements ConstructorCa
                 object == null ? null : object.rewire(infoMap),
                 rewiredArgs,
                 arrayInitializer == null ? null : (ArrayInitializer) arrayInitializer.rewire(infoMap),
-                anonymousClass == null ? null : infoMap.typeInfoRecurseAllPhases(anonymousClass));
+                anonymousClass == null ? null : infoMap.typeInfoRecurseAllPhases(anonymousClass),
+                analysis.rewire(infoMap));
+    }
+
+    @Override
+    public PropertyValueMap analysis() {
+        return analysis;
     }
 }
