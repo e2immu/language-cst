@@ -138,7 +138,6 @@ public class TypeInspectionImpl extends InspectionImpl implements TypeInspection
         private final List<TypeInfo> subTypes = new ArrayList<>();
         private final List<TypeParameter> typeParameters = new ArrayList<>();
         private final List<TypeInfo> permittedWhenSealed = new ArrayList<>();
-        private final Set<TypeInfo> superTypesExcludingJavaLangObject = new HashSet<>();
         private int anonymousTypes;
 
         private ParameterizedType parentClass;
@@ -150,7 +149,25 @@ public class TypeInspectionImpl extends InspectionImpl implements TypeInspection
 
         @Override
         public Set<TypeInfo> superTypesExcludingJavaLangObject() {
-            return superTypesExcludingJavaLangObject;
+            Set<TypeInfo> set = new HashSet<>();
+            recursivelyComputeSuperTypesExcludingJLO(typeInfo, set);
+            return set;
+        }
+
+        private void recursivelyComputeSuperTypesExcludingJLO(TypeInfo type, Set<TypeInfo> superTypes) {
+            ParameterizedType parentPt = type.parentClass();
+            if (parentPt != null) {
+                TypeInfo parent = parentPt.typeInfo();
+                if (!parent.isJavaLangObject() && superTypes.add(parent)) {
+                    recursivelyComputeSuperTypesExcludingJLO(parent, superTypes);
+                }
+            }
+            for (ParameterizedType interfaceImplemented : type.interfacesImplemented()) {
+                TypeInfo i = interfaceImplemented.typeInfo();
+                if (superTypes.add(i)) {
+                    recursivelyComputeSuperTypesExcludingJLO(i, superTypes);
+                }
+            }
         }
 
         @Override
@@ -227,18 +244,12 @@ public class TypeInspectionImpl extends InspectionImpl implements TypeInspection
         @Override
         public TypeInfo.Builder setParentClass(ParameterizedType parentClass) {
             this.parentClass = parentClass;
-            if (parentClass != null && !parentClass.isJavaLangObject()) {
-                this.superTypesExcludingJavaLangObject.add(parentClass.typeInfo());
-                this.superTypesExcludingJavaLangObject.addAll(parentClass.typeInfo().superTypesExcludingJavaLangObject());
-            }
             return this;
         }
 
         @Override
         public TypeInfo.Builder addInterfaceImplemented(ParameterizedType interfaceImplemented) {
             this.interfacesImplemented.add(interfaceImplemented);
-            this.superTypesExcludingJavaLangObject.add(interfaceImplemented.typeInfo());
-            this.superTypesExcludingJavaLangObject.addAll(interfaceImplemented.typeInfo().superTypesExcludingJavaLangObject());
             return this;
         }
 
@@ -265,7 +276,7 @@ public class TypeInspectionImpl extends InspectionImpl implements TypeInspection
                     List.copyOf(constructors), List.copyOf(fields), parentClass, typeNature, singleAbstractMethod,
                     List.copyOf(interfacesImplemented), List.copyOf(typeParameters), sortedSubTypes,
                     fieldsAccessedInRestOfPrimaryType, enclosingMethod, List.copyOf(permittedWhenSealed),
-                    Set.copyOf(superTypesExcludingJavaLangObject), anonymousTypes);
+                    superTypesExcludingJavaLangObject(), anonymousTypes);
             if (ti.parentClass() == null
                 && !typeInfo.isJavaLangObject()
                 && typeNature != TypeNatureEnum.PRIMITIVE) {
