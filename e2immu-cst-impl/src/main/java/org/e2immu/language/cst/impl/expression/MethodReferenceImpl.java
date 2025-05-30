@@ -23,6 +23,7 @@ import org.e2immu.language.cst.impl.output.OutputBuilderImpl;
 import org.e2immu.language.cst.impl.output.SymbolEnum;
 import org.e2immu.language.cst.impl.output.TextImpl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
@@ -32,18 +33,25 @@ public class MethodReferenceImpl extends ExpressionImpl implements MethodReferen
     private final ParameterizedType parameterizedType;
     private final MethodInfo methodInfo;
     private final Expression scope;
+    private final List<ParameterizedType> concreteParameterTypes;
+    private final ParameterizedType concreteReturnType;
 
     public MethodReferenceImpl(List<Comment> comments, Source source,
-                               ParameterizedType parameterizedType, MethodInfo methodInfo, Expression scope) {
+                               ParameterizedType parameterizedType, MethodInfo methodInfo, Expression scope,
+                               List<ParameterizedType> concreteParameterTypes,
+                               ParameterizedType concreteReturnType) {
         super(comments, source, 1 + scope.complexity());
         this.parameterizedType = parameterizedType;
         this.methodInfo = methodInfo;
         this.scope = scope;
+        this.concreteParameterTypes = concreteParameterTypes;
+        this.concreteReturnType = concreteReturnType;
     }
 
     @Override
     public Expression withSource(Source source) {
-        return new MethodReferenceImpl(comments(), source, parameterizedType, methodInfo, scope);
+        return new MethodReferenceImpl(comments(), source, parameterizedType, methodInfo, scope, concreteParameterTypes,
+                concreteReturnType);
     }
 
     @Override
@@ -62,6 +70,8 @@ public class MethodReferenceImpl extends ExpressionImpl implements MethodReferen
         private ParameterizedType parameterizedType;
         private MethodInfo methodInfo;
         private Expression scope;
+        private List<ParameterizedType> concreteParameterTypes = new ArrayList<>();
+        private ParameterizedType concreteReturnType;
 
         @Override
         public Builder setScope(Expression expression) {
@@ -76,15 +86,39 @@ public class MethodReferenceImpl extends ExpressionImpl implements MethodReferen
         }
 
         @Override
-        public Builder setConcreteReturnType(ParameterizedType parameterizedType) {
+        public Builder setConcreteFunctionalType(ParameterizedType parameterizedType) {
             this.parameterizedType = parameterizedType;
             return this;
         }
 
         @Override
-        public MethodReference build() {
-            return new MethodReferenceImpl(comments, source, parameterizedType, methodInfo, scope);
+        public Builder setConcreteParameterTypes(List<ParameterizedType> concreteParameterTypes) {
+            this.concreteParameterTypes = concreteParameterTypes;
+            return this;
         }
+
+        @Override
+        public Builder setConcreteReturnType(ParameterizedType concreteReturnType) {
+            this.concreteReturnType = concreteReturnType;
+            return this;
+        }
+
+        @Override
+        public MethodReference build() {
+            return new MethodReferenceImpl(comments, source, parameterizedType, methodInfo, scope,
+                    List.copyOf(concreteParameterTypes),
+                    concreteReturnType);
+        }
+    }
+
+    @Override
+    public List<ParameterizedType> concreteParameterTypes() {
+        return concreteParameterTypes;
+    }
+
+    @Override
+    public ParameterizedType concreteReturnType() {
+        return concreteReturnType;
     }
 
     @Override
@@ -151,7 +185,9 @@ public class MethodReferenceImpl extends ExpressionImpl implements MethodReferen
         Expression translatedScope = scope.translate(translationMap);
         ParameterizedType transType = translationMap.translateType(parameterizedType);
         if (translatedScope == scope && transType == parameterizedType) return this;
-        return new MethodReferenceImpl(comments(), source(), transType, methodInfo, translatedScope);
+        return new MethodReferenceImpl(comments(), source(), transType, methodInfo, translatedScope,
+                concreteParameterTypes.stream().map(translationMap::translateType).toList(),
+                translationMap.translateType(concreteReturnType));
     }
 
     @Override
@@ -167,6 +203,8 @@ public class MethodReferenceImpl extends ExpressionImpl implements MethodReferen
     @Override
     public Expression rewire(InfoMap infoMap) {
         return new MethodReferenceImpl(comments(), source(), parameterizedType.rewire(infoMap),
-                infoMap.methodInfo(methodInfo), scope.rewire(infoMap));
+                infoMap.methodInfo(methodInfo), scope.rewire(infoMap),
+                concreteParameterTypes.stream().map(pt -> pt.rewire(infoMap)).toList(),
+                concreteReturnType.rewire(infoMap));
     }
 }
