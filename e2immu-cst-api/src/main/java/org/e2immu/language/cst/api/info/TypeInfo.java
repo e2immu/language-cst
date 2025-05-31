@@ -33,6 +33,8 @@ public interface TypeInfo extends NamedType, Info {
 
     boolean isAnnotation();
 
+    boolean isAnonymous();
+
     boolean isEnclosedIn(TypeInfo typeInfo);
 
     default boolean isPrimaryType() {

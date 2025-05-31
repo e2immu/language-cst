@@ -563,6 +563,11 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     }
 
     @Override
+    public boolean isAnonymous() {
+        return simpleName.startsWith("$");
+    }
+
+    @Override
     public boolean isEnclosedIn(TypeInfo typeInfo) {
         if (typeInfo == this) return true;
         if (compilationUnitOrEnclosingType.isLeft()) return false;

@@ -464,7 +464,7 @@ public class CodecImpl implements Codec {
             if (typeInfo.isPrimaryType()) {
                 return "T" + typeInfo.fullyQualifiedName();
             }
-            if (typeInfo.simpleName().startsWith("$")) {
+            if (typeInfo.isAnonymous()) {
                 assert context.currentMethod() != null;
                 return "A" + typeInfo.enclosingMethod() + "(" + index + ")";
             }
@@ -499,31 +499,35 @@ public class CodecImpl implements Codec {
     Stream<EncodedValue> encodeInfoOutOfContextStream(Context context, Info info) {
         String s;
         Stream<EncodedValue> prev;
-        if (info instanceof TypeInfo typeInfo) {
-            if (typeInfo.isPrimaryType()) {
-                s = "T" + typeInfo.fullyQualifiedName();
-                prev = Stream.of();
-            } else {
-                assert !typeInfo.simpleName().startsWith("$");
-                int index = subTypeIndex(typeInfo);
-                s = "S" + typeInfo.simpleName() + "(" + index + ")";
-                prev = encodeInfoOutOfContextStream(context, typeInfo.compilationUnitOrEnclosingType().getRight());
+        switch (info) {
+            case TypeInfo typeInfo -> {
+                if (typeInfo.isPrimaryType()) {
+                    s = "T" + typeInfo.fullyQualifiedName();
+                    prev = Stream.of();
+                } else {
+                    assert !typeInfo.isAnonymous();
+                    int index = subTypeIndex(typeInfo);
+                    s = "S" + typeInfo.simpleName() + "(" + index + ")";
+                    prev = encodeInfoOutOfContextStream(context, typeInfo.compilationUnitOrEnclosingType().getRight());
+                }
             }
-        } else if (info instanceof MethodInfo methodInfo) {
-            prev = encodeInfoOutOfContextStream(context, methodInfo.typeInfo());
-            if (methodInfo.isConstructor()) {
-                s = "C<init>(" + constructorIndex(methodInfo) + ")";
-            } else {
-                s = "M" + methodInfo.name() + "(" + methodIndex(methodInfo) + ")";
+            case MethodInfo methodInfo -> {
+                prev = encodeInfoOutOfContextStream(context, methodInfo.typeInfo());
+                if (methodInfo.isConstructor()) {
+                    s = "C<init>(" + constructorIndex(methodInfo) + ")";
+                } else {
+                    s = "M" + methodInfo.name() + "(" + methodIndex(methodInfo) + ")";
+                }
             }
-        } else if (info instanceof FieldInfo fieldInfo) {
-            prev = encodeInfoOutOfContextStream(context, fieldInfo.owner());
-            s = "F" + fieldInfo.name() + "(" + fieldIndex(fieldInfo) + ")";
-        } else if (info instanceof ParameterInfo pi) {
-            prev = encodeInfoOutOfContextStream(context, pi.methodInfo());
-            s = "P" + pi.name() + "(" + pi.index() + ")";
-        } else {
-            throw new UnsupportedOperationException();
+            case FieldInfo fieldInfo -> {
+                prev = encodeInfoOutOfContextStream(context, fieldInfo.owner());
+                s = "F" + fieldInfo.name() + "(" + fieldIndex(fieldInfo) + ")";
+            }
+            case ParameterInfo pi -> {
+                prev = encodeInfoOutOfContextStream(context, pi.methodInfo());
+                s = "P" + pi.name() + "(" + pi.index() + ")";
+            }
+            case null, default -> throw new UnsupportedOperationException();
         }
         return Stream.concat(prev, Stream.of(encodeString(context, s)));
     }
