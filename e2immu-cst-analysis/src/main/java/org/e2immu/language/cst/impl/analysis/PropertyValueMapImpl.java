@@ -4,6 +4,8 @@ import org.e2immu.language.cst.api.analysis.Property;
 import org.e2immu.language.cst.api.analysis.PropertyValueMap;
 import org.e2immu.language.cst.api.analysis.Value;
 import org.e2immu.language.cst.api.info.InfoMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,6 +16,7 @@ import java.util.stream.Stream;
 Does not use SetOnceMap<> because of controlled overwrites.
  */
 public class PropertyValueMapImpl implements PropertyValueMap {
+    private static final Logger LOGGER = LoggerFactory.getLogger(PropertyValueMapImpl.class);
     private final Map<Property, Value> map = new HashMap<>();
 
     @Override
@@ -80,8 +83,8 @@ public class PropertyValueMapImpl implements PropertyValueMap {
                 map.put(property, value);
                 return true;
             }
-            throw new IllegalArgumentException("Trying to overwrite " + current + " with " + value
-                                               + " for property " + property);
+            // FIXME-DEMO this should be an exception thrown
+            LOGGER.warn("Trying to overwrite {} with {} for property {}", current, value, property);
         }
         return false;
     }
