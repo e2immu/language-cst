@@ -27,6 +27,8 @@ public interface DetailedSources {
 
     interface Builder {
 
+        Builder addAll(DetailedSources detailedSources);
+
         Builder copy();
 
         Builder put(Object object, Source source);

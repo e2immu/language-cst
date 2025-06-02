@@ -4,7 +4,9 @@ import org.e2immu.language.cst.api.element.DetailedSources;
 import org.e2immu.language.cst.api.element.Source;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.IdentityHashMap;
+import java.util.List;
 
 public class DetailedSourcesImpl implements DetailedSources {
     private final IdentityHashMap<Object, Object> identityHashMap;
@@ -21,7 +23,15 @@ public class DetailedSourcesImpl implements DetailedSources {
         private IdentityHashMap<Object, Object> association;
 
         @Override
+        public Builder addAll(DetailedSources detailedSources) {
+            identityHashMap.putAll(((DetailedSourcesImpl) detailedSources).identityHashMap);
+            if(association != null) {
+                association.putAll(((DetailedSourcesImpl) detailedSources).association);
+            }
+            return this;
+        }
 
+        @Override
         public Builder copy() {
             BuilderImpl copy = new BuilderImpl();
             copy.identityHashMap.putAll(identityHashMap);
