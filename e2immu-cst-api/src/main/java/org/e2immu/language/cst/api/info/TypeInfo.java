@@ -304,6 +304,11 @@ public interface TypeInfo extends NamedType, Info {
 
     MethodInfo enclosingMethod();
 
+    default TypeInfo owningTypeStartFromAnonymous() {
+        if (enclosingMethod() != null) return enclosingMethod().typeInfo().owningTypeStartFromAnonymous();
+        return this;
+    }
+
     TypeInfo rewirePhase1(InfoMap infoMap);
 
     void rewirePhase2(InfoMap infoMap);
