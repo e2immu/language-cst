@@ -463,10 +463,10 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
 
     @Override
     public boolean explicitlyEmptyMethod() {
-        if (!methodBody().statements().isEmpty() || isStatic() && isSynthetic()) return false;
+        if (isAbstract() || !methodBody().statements().isEmpty() || isStatic() && isSynthetic()) return false;
         // we know it's empty if we're not in an external library.
         CompilationUnit cu = typeInfo.compilationUnit();
-        return  cu.sourceSet() != null && !cu.sourceSet().externalLibrary();
+        return cu.sourceSet() != null && !cu.sourceSet().externalLibrary();
     }
 
     @Override
