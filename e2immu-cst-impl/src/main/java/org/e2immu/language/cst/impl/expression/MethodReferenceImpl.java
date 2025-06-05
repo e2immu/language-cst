@@ -41,11 +41,11 @@ public class MethodReferenceImpl extends ExpressionImpl implements MethodReferen
                                List<ParameterizedType> concreteParameterTypes,
                                ParameterizedType concreteReturnType) {
         super(comments, source, 1 + scope.complexity());
-        this.parameterizedType = parameterizedType;
+        this.parameterizedType = Objects.requireNonNull(parameterizedType);
         this.methodInfo = methodInfo;
         this.scope = scope;
-        this.concreteParameterTypes = concreteParameterTypes;
-        this.concreteReturnType = concreteReturnType;
+        this.concreteParameterTypes = Objects.requireNonNull(concreteParameterTypes);
+        this.concreteReturnType = Objects.requireNonNull(concreteReturnType);
     }
 
     @Override

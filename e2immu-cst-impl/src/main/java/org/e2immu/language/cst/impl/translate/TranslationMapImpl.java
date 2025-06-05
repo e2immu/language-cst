@@ -321,6 +321,7 @@ public class TranslationMapImpl implements TranslationMap {
     }
 
     private ParameterizedType internalTranslateType(ParameterizedType parameterizedType) {
+        assert parameterizedType != null;
         ParameterizedType inMap = types.get(parameterizedType);
         if (inMap != null) return inMap;
         TypeParameter typeParameter = parameterizedType.typeParameter();
