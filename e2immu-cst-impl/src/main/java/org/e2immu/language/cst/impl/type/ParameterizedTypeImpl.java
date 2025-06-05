@@ -758,6 +758,8 @@ public class ParameterizedTypeImpl implements ParameterizedType {
     private static void formalToConcrete(ParameterizedType formal, ParameterizedType concrete, Map<NamedType, ParameterizedType> res) {
         if (formal.typeParameter() != null && !formal.equals(concrete)) {
             // see TestMethodCall7,7, method2 for an example where both are present, and bestDefined needs to intervene
+            assert formal.typeParameter() != null;
+            assert concrete != null;
             res.merge(formal.typeParameter(), concrete, ParameterizedType::bestDefined);
         } else {
             int i = 0;
