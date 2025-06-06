@@ -7,4 +7,6 @@ public interface Comment {
     OutputBuilder print(Qualification qualification);
 
     String comment();
+
+    Source source();
 }

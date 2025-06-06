@@ -1,6 +1,7 @@
 package org.e2immu.language.cst.impl.element;
 
 import org.e2immu.language.cst.api.element.Comment;
+import org.e2immu.language.cst.api.element.Source;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.impl.output.OutputBuilderImpl;
@@ -10,9 +11,11 @@ import org.e2immu.language.cst.impl.output.TextImpl;
 
 public class SingleLineComment implements Comment {
     private final String comment;
+    private final Source source;
 
-    public SingleLineComment(String comment) {
+    public SingleLineComment(Source source, String comment) {
         this.comment = strip(comment.trim());
+        this.source = source;
     }
 
     private static String strip(String s) {
@@ -31,5 +34,10 @@ public class SingleLineComment implements Comment {
     @Override
     public String comment() {
         return comment;
+    }
+
+    @Override
+    public Source source() {
+        return source;
     }
 }

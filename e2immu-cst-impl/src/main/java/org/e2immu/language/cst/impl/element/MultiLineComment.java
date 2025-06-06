@@ -1,18 +1,20 @@
 package org.e2immu.language.cst.impl.element;
 
 import org.e2immu.language.cst.api.element.Comment;
+import org.e2immu.language.cst.api.element.Source;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
-import org.e2immu.language.cst.impl.output.*;
 import org.e2immu.language.cst.impl.output.*;
 
 import java.util.Arrays;
 
 public class MultiLineComment implements Comment {
     private final String comment;
+    private final Source source;
 
-    public MultiLineComment(String comment) {
+    public MultiLineComment(Source source, String comment) {
         this.comment = strip(comment.trim());
+        this.source = source;
     }
 
     private static String strip(String s) {
@@ -40,5 +42,10 @@ public class MultiLineComment implements Comment {
     @Override
     public String comment() {
         return comment;
+    }
+
+    @Override
+    public Source source() {
+        return source;
     }
 }
