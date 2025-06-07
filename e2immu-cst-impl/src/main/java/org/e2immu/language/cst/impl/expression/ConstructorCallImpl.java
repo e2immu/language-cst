@@ -323,7 +323,7 @@ public class ConstructorCallImpl extends ExpressionImpl implements ConstructorCa
                 .collect(translationMap.toList(parameterExpressions));
         ArrayInitializer translatedInitializer = arrayInitializer == null ? null :
                 (ArrayInitializer) arrayInitializer.translate(translationMap);
-        TypeInfo tAnonymous = anonymousClass == null ? null : anonymousClass.translate(translationMap);
+        TypeInfo tAnonymous = anonymousClass == null ? null : anonymousClass.translate(translationMap).getFirst();
         if (translatedObject == object
             && translatedType == this.parameterizedType()
             && translatedParameterExpressions == this.parameterExpressions

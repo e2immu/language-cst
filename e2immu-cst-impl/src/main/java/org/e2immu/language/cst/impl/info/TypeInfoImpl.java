@@ -751,10 +751,10 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     }
 
     @Override
-    public TypeInfo translate(TranslationMap translationMapIn) {
+    public List<TypeInfo> translate(TranslationMap translationMapIn) {
         TypeInfo direct = translationMapIn.translateTypeInfo(this);
         if (direct != this) {
-            return direct;
+            return List.of(direct);
         }
 
         // if there is any change, this will be the new typeInfo.
@@ -817,7 +817,7 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
             }
         }
         List<TypeInfo> subTypeList = subTypes();
-        List<TypeInfo> newSubTypes = subTypeList.stream().map(st -> st.translate(translationMap))
+        List<TypeInfo> newSubTypes = subTypeList.stream().map(st -> st.translate(translationMap).getFirst())
                 .collect(translationMap.toList(subTypeList));
         change |= newSubTypes != subTypeList;
         List<AnnotationExpression> newAnnotations = new ArrayList<>(2 * annotations().size());
@@ -840,9 +840,9 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
             if (!translationMap.isClearAnalysis()) {
                 typeInfo.analysis().setAll(analysis());
             }
-            return typeInfo;
+            return List.of(typeInfo);
         }
-        return this;
+        return List.of(this);
     }
 
     private TypeInfo copyAllButConstructorsMethodsFieldsSubTypesAnnotations(TranslationMap translationMap) {

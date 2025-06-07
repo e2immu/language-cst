@@ -5,6 +5,9 @@ import org.e2immu.language.cst.api.element.CompilationUnit;
 import org.e2immu.language.cst.api.element.Element;
 import org.e2immu.language.cst.api.element.JavaDoc;
 import org.e2immu.language.cst.api.expression.AnnotationExpression;
+import org.e2immu.language.cst.api.translate.TranslationMap;
+
+import java.util.List;
 
 public interface Info extends Element {
 
@@ -25,6 +28,8 @@ public interface Info extends Element {
     boolean hasBeenAnalyzed();
 
     JavaDoc javaDoc();
+
+    List<? extends Info> translate(TranslationMap translationMap);
 
     interface Builder<B extends Builder<?>> extends Element.Builder<B> {
         @Fluent

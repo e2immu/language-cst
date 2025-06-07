@@ -37,4 +37,12 @@ public interface Visitor {
     default void afterVariable(Variable variable) {
         // do nothing
     }
+
+    default boolean beforeJavaDoc(JavaDoc javaDoc) {
+        return true;
+    }
+
+    default void afterJavaDoc(JavaDoc javaDoc) {
+        // do nothing
+    }
 }

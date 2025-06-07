@@ -315,8 +315,8 @@ public interface TypeInfo extends NamedType, Info {
 
     void rewirePhase3(InfoMap infoMap);
 
-    default TypeInfo translate(TranslationMap translationMap) {
-        return this;
+    default List<TypeInfo> translate(TranslationMap translationMap) {
+        return List.of(this);
     }
 
     default Stream<TypeInfo> innerClassEnclosingStream() {
