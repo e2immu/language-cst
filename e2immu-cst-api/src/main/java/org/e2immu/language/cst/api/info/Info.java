@@ -3,6 +3,7 @@ package org.e2immu.language.cst.api.info;
 import org.e2immu.annotation.Fluent;
 import org.e2immu.language.cst.api.element.CompilationUnit;
 import org.e2immu.language.cst.api.element.Element;
+import org.e2immu.language.cst.api.element.JavaDoc;
 import org.e2immu.language.cst.api.expression.AnnotationExpression;
 
 public interface Info extends Element {
@@ -23,6 +24,8 @@ public interface Info extends Element {
 
     boolean hasBeenAnalyzed();
 
+    JavaDoc javaDoc();
+
     interface Builder<B extends Builder<?>> extends Element.Builder<B> {
         @Fluent
         B setAccess(Access access);
@@ -38,6 +41,9 @@ public interface Info extends Element {
         // once all the modifiers have been set
         @Fluent
         B computeAccess();
+
+        @Fluent
+        B setJavaDoc(JavaDoc javaDoc);
 
         void commit();
     }

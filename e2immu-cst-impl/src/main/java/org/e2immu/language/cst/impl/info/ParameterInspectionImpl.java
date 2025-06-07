@@ -2,6 +2,7 @@ package org.e2immu.language.cst.impl.info;
 
 
 import org.e2immu.annotation.Fluent;
+import org.e2immu.language.cst.api.element.JavaDoc;
 import org.e2immu.language.cst.api.info.ParameterInfo;
 
 public class ParameterInspectionImpl extends InspectionImpl implements ParameterInspection {
@@ -11,7 +12,7 @@ public class ParameterInspectionImpl extends InspectionImpl implements Parameter
 
     public ParameterInspectionImpl(Inspection inspection, boolean isFinal, boolean varArgs) {
         super(inspection.access(), inspection.comments(), inspection.source(), inspection.isSynthetic(),
-                inspection.annotations());
+                inspection.annotations(), null);
         this.varArgs = varArgs;
         this.isFinal = isFinal;
     }

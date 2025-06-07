@@ -429,6 +429,11 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     }
 
     @Override
+    public JavaDoc javaDoc() {
+        return inspection.get().javaDoc();
+    }
+
+    @Override
     public boolean isPublic() {
         return inspection.get().isPublic();
     }

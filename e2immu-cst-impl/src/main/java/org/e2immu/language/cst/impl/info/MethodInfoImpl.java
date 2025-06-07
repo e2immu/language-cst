@@ -128,6 +128,11 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
     }
 
     @Override
+    public JavaDoc javaDoc() {
+        return inspection.get().javaDoc();
+    }
+
+    @Override
     public boolean isPropertyNullable() {
         return analysis().getOrDefault(PropertyImpl.NOT_NULL_METHOD, ValueImpl.NotNullImpl.NULLABLE).isNullable();
     }

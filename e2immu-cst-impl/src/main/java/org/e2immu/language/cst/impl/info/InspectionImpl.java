@@ -2,6 +2,7 @@ package org.e2immu.language.cst.impl.info;
 
 import org.e2immu.annotation.Fluent;
 import org.e2immu.language.cst.api.element.Comment;
+import org.e2immu.language.cst.api.element.JavaDoc;
 import org.e2immu.language.cst.api.element.Source;
 import org.e2immu.language.cst.api.expression.AnnotationExpression;
 import org.e2immu.language.cst.api.info.Access;
@@ -16,6 +17,7 @@ public abstract class InspectionImpl implements Inspection {
     private final Source source;
     private final boolean synthetic;
     private final List<AnnotationExpression> annotations;
+    private final JavaDoc javaDoc;
 
     public enum AccessEnum implements Access {
         PRIVATE(0), PACKAGE(1), PROTECTED(2), PUBLIC(3);
@@ -67,12 +69,14 @@ public abstract class InspectionImpl implements Inspection {
                           List<Comment> comments,
                           Source source,
                           boolean synthetic,
-                          List<AnnotationExpression> annotations) {
+                          List<AnnotationExpression> annotations,
+                          JavaDoc javaDoc) {
         this.access = access;
         this.comments = comments;
         this.source = source;
         this.synthetic = synthetic;
         this.annotations = annotations;
+        this.javaDoc = javaDoc;
     }
 
     @Override
@@ -100,6 +104,11 @@ public abstract class InspectionImpl implements Inspection {
         return annotations;
     }
 
+    @Override
+    public JavaDoc javaDoc() {
+        return javaDoc;
+    }
+
     @SuppressWarnings("unchecked")
     public static abstract class Builder<B extends Info.Builder<?>> implements Inspection, Info.Builder<B> {
         private Access access;
@@ -107,6 +116,7 @@ public abstract class InspectionImpl implements Inspection {
         private Source source;
         private boolean synthetic;
         private List<AnnotationExpression> annotations = new ArrayList<>();
+        private JavaDoc javaDoc;
 
         @Fluent
         public B setAccess(Access access) {
@@ -169,6 +179,12 @@ public abstract class InspectionImpl implements Inspection {
         }
 
         @Override
+        public B setJavaDoc(JavaDoc javaDoc) {
+            this.javaDoc = javaDoc;
+            return (B) this;
+        }
+
+        @Override
         public Access access() {
             return access;
         }
@@ -191,6 +207,11 @@ public abstract class InspectionImpl implements Inspection {
         @Override
         public List<AnnotationExpression> annotations() {
             return annotations;
+        }
+
+        @Override
+        public JavaDoc javaDoc() {
+            return javaDoc;
         }
     }
 }

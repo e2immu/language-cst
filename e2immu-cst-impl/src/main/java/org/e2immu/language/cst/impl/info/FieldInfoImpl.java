@@ -1,10 +1,7 @@
 package org.e2immu.language.cst.impl.info;
 
 import org.e2immu.language.cst.api.analysis.PropertyValueMap;
-import org.e2immu.language.cst.api.element.Comment;
-import org.e2immu.language.cst.api.element.Element;
-import org.e2immu.language.cst.api.element.Source;
-import org.e2immu.language.cst.api.element.Visitor;
+import org.e2immu.language.cst.api.element.*;
 import org.e2immu.language.cst.api.expression.AnnotationExpression;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.info.*;
@@ -122,6 +119,11 @@ public class FieldInfoImpl extends InfoImpl implements FieldInfo {
     @Override
     public List<AnnotationExpression> annotations() {
         return inspection.get().annotations();
+    }
+
+    @Override
+    public JavaDoc javaDoc() {
+        return inspection.get().javaDoc();
     }
 
     @Override

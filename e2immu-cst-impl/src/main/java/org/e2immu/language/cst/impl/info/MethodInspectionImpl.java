@@ -77,7 +77,8 @@ public class MethodInspectionImpl extends InspectionImpl implements MethodInspec
                                 String fullyQualifiedName,
                                 Set<MethodInfo> overrides,
                                 MethodInfo.MissingData missingData) {
-        super(inspection.access(), inspection.comments(), inspection.source(), synthetic, inspection.annotations());
+        super(inspection.access(), inspection.comments(), inspection.source(), synthetic, inspection.annotations(),
+                inspection.javaDoc());
         this.returnType = returnType;
         this.operatorType = operatorType;
         this.parameters = parameters;

@@ -233,4 +233,9 @@ public class ParameterInfoImpl implements ParameterInfo {
     public Variable rewire(InfoMap infoMap) {
         return infoMap.parameterInfo(this);
     }
+
+    @Override
+    public JavaDoc javaDoc() {
+        return null; // parameters have no JavaDoc
+    }
 }

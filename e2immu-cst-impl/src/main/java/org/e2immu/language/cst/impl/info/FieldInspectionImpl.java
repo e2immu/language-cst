@@ -19,7 +19,7 @@ public class FieldInspectionImpl extends InspectionImpl implements FieldInspecti
 
     public FieldInspectionImpl(Inspection inspection, Set<FieldModifier> fieldModifiers, Expression initializer) {
         super(inspection.access(), inspection.comments(), inspection.source(), inspection.isSynthetic(),
-                inspection.annotations());
+                inspection.annotations(), inspection.javaDoc());
         this.fieldModifiers = fieldModifiers;
         assert initializer != null; // use empty expression if you want an absence of initializer.
         this.initializer = initializer;

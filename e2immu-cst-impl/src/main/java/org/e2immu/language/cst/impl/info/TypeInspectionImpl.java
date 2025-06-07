@@ -41,7 +41,8 @@ public class TypeInspectionImpl extends InspectionImpl implements TypeInspection
                               List<TypeInfo> permittedWhenSealed,
                               Set<TypeInfo> superTypesExcludingJavaLangObject,
                               int anonymousTypes) {
-        super(inspection.access(), inspection.comments(), inspection.source(), inspection.isSynthetic(), inspection.annotations());
+        super(inspection.access(), inspection.comments(), inspection.source(), inspection.isSynthetic(),
+                inspection.annotations(), inspection.javaDoc());
         this.typeModifiers = typeModifiers;
         this.methods = methods;
         this.constructors = constructors;
