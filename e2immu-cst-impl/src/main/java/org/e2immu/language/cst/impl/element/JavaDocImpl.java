@@ -21,11 +21,11 @@ public class JavaDocImpl extends MultiLineComment implements JavaDoc {
     public static class TagImpl implements Tag {
         private final TagIdentifier tagIdentifier;
         private final String content;
-        private final Info resolvedReference;
+        private final Element resolvedReference;
         private final Source source;
         private final boolean blockTag;
 
-        public TagImpl(TagIdentifier tagIdentifier, String content, Info resolvedReference, Source source, boolean blockTag) {
+        public TagImpl(TagIdentifier tagIdentifier, String content, Element resolvedReference, Source source, boolean blockTag) {
             this.tagIdentifier = tagIdentifier;
             this.content = content;
             this.resolvedReference = resolvedReference;
@@ -49,7 +49,7 @@ public class JavaDocImpl extends MultiLineComment implements JavaDoc {
         }
 
         @Override
-        public Info resolvedReference() {
+        public Element resolvedReference() {
             return resolvedReference;
         }
 
@@ -66,10 +66,11 @@ public class JavaDocImpl extends MultiLineComment implements JavaDoc {
 
         @Override
         public Tag translate(TranslationMap translationMap) {
-            if (resolvedReference == null) return this;
-            List<? extends Info> infos = resolvedReference.translate(translationMap);
-            if (infos.size() != 1 || infos.getFirst() != resolvedReference) {
-                return new TagImpl(tagIdentifier, content, infos.getFirst(), source, blockTag);
+            if (resolvedReference instanceof Info info) {
+                List<? extends Info> infos = info.translate(translationMap);
+                if (infos.size() != 1 || infos.getFirst() != info) {
+                    return new TagImpl(tagIdentifier, content, infos.getFirst(), source, blockTag);
+                }
             }
             return this;
         }
@@ -83,7 +84,7 @@ public class JavaDocImpl extends MultiLineComment implements JavaDoc {
         }
 
         @Override
-        public Tag withResolvedReference(Info resolvedReference) {
+        public Tag withResolvedReference(Element resolvedReference) {
             return new TagImpl(tagIdentifier, content, resolvedReference, source, blockTag);
         }
     }

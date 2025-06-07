@@ -21,7 +21,7 @@ public interface JavaDoc extends Element, Comment {
         INDEX("index"),
         INHERIT_DOC("inheritDoc"),
         LINK("link"),
-        LINK_PLAIN("linkPlain"),
+        LINK_PLAIN("linkplain"),
         LITERAL("literal"),
         PARAM("param"),
         PROVIDES("provides"),
@@ -47,11 +47,11 @@ public interface JavaDoc extends Element, Comment {
         }
 
         public boolean isReference() {
-            return this == SEE || this == LINK || this == LINK_PLAIN;
+            return this == SEE || this == LINK || this == LINK_PLAIN || this == THROWS;
         }
 
         public int argumentsAsBlockTag() {
-            if (this == PARAM) return 1;
+            if (this == PARAM || this == THROWS) return 1;
             return 0;
         }
     }
@@ -71,7 +71,7 @@ public interface JavaDoc extends Element, Comment {
 
         Source source();
 
-        Info resolvedReference();
+        Element resolvedReference();
 
         String content();
 
@@ -79,7 +79,7 @@ public interface JavaDoc extends Element, Comment {
 
         Tag translate(TranslationMap translationMap);
 
-        Tag withResolvedReference(Info resolvedReference);
+        Tag withResolvedReference(Element resolvedReference);
     }
 
     List<Tag> tags();
