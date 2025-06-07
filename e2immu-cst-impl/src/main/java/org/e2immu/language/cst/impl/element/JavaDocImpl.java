@@ -73,6 +73,14 @@ public class JavaDocImpl extends MultiLineComment implements JavaDoc {
             }
             return this;
         }
+
+        @Override
+        public String toString() {
+            if (blockTag) {
+                return tagIdentifier.identifier + (content.isEmpty() ? "" : " " + content);
+            }
+            return "{@" + tagIdentifier.identifier + " " + content + "}";
+        }
     }
 
     private final List<Tag> tags;
@@ -113,7 +121,7 @@ public class JavaDocImpl extends MultiLineComment implements JavaDoc {
 
     @Override
     public Element rewire(InfoMap infoMap) {
-        return new JavaDocImpl(source(), comment(), tags.stream().map(t -> t.rewire(infoMap)).toList());
+        return new JavaDocImpl(source(), super.comment(), tags.stream().map(t -> t.rewire(infoMap)).toList());
     }
 
     @Override
@@ -123,12 +131,12 @@ public class JavaDocImpl extends MultiLineComment implements JavaDoc {
         if (translatedTags == tags) {
             return this;
         }
-        return new JavaDocImpl(source(), comment(), translatedTags);
+        return new JavaDocImpl(source(), super.comment(), translatedTags);
     }
 
     @Override
     public JavaDoc withTags(List<Tag> newTags) {
-        return new JavaDocImpl(source(), comment(), tags);
+        return new JavaDocImpl(source(), super.comment(), tags);
     }
 
     @Override

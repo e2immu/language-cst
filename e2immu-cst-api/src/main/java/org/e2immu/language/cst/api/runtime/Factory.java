@@ -262,6 +262,9 @@ public interface Factory {
 
     JavaDoc newJavaDoc(Source source, String comment, List<JavaDoc.Tag> tags);
 
+    JavaDoc.Tag newJavaDocTag(JavaDoc.TagIdentifier tagIdentifier, String content,
+                              Info resolvedReference, Source source, boolean blockTag);
+
     Lambda.Builder newLambdaBuilder();
 
     LocalVariable newLocalVariable(String name, ParameterizedType parameterizedType);

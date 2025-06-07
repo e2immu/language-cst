@@ -4,7 +4,10 @@ import org.e2immu.language.cst.api.info.Info;
 import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.translate.TranslationMap;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public interface JavaDoc extends Element, Comment {
 
@@ -46,7 +49,20 @@ public interface JavaDoc extends Element, Comment {
         public boolean isReference() {
             return this == SEE || this == LINK || this == LINK_PLAIN;
         }
+
+        public int argumentsAsBlockTag() {
+            if (this == PARAM) return 1;
+            return 0;
+        }
     }
+
+    Map<String, TagIdentifier> TAG_IDENTIFIER_MAP = Arrays.stream(TagIdentifier.values())
+            .collect(Collectors.toUnmodifiableMap(v -> v.identifier, v -> v));
+
+    static TagIdentifier identifier(String string) {
+        return TAG_IDENTIFIER_MAP.get(string);
+    }
+
 
     interface Tag {
         TagIdentifier identifier();
