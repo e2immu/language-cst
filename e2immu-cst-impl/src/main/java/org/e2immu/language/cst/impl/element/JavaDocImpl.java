@@ -127,6 +127,11 @@ public class JavaDocImpl extends MultiLineComment implements JavaDoc {
     }
 
     @Override
+    public JavaDoc withTags(List<Tag> newTags) {
+        return new JavaDocImpl(source(), comment(), tags);
+    }
+
+    @Override
     public void visit(Predicate<Element> predicate) {
         predicate.test(this);
     }

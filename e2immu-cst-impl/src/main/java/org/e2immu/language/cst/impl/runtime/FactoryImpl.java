@@ -677,6 +677,11 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
+    public JavaDoc newJavaDoc(Source source, String comment, List<JavaDoc.Tag> tags) {
+        return new JavaDocImpl(source, comment, tags);
+    }
+
+    @Override
     public Lambda.Builder newLambdaBuilder() {
         return new LambdaImpl.Builder();
     }

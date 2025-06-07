@@ -6,7 +6,7 @@ import org.e2immu.language.cst.api.translate.TranslationMap;
 
 import java.util.List;
 
-public interface JavaDoc extends Element {
+public interface JavaDoc extends Element, Comment {
 
     enum TagIdentifier {
         AUTHOR("author"),
@@ -42,6 +42,10 @@ public interface JavaDoc extends Element {
         TagIdentifier(String identifier) {
             this.identifier = identifier;
         }
+
+        public boolean isReference() {
+            return this == SEE || this == LINK || this == LINK_PLAIN;
+        }
     }
 
     interface Tag {
@@ -63,4 +67,7 @@ public interface JavaDoc extends Element {
     List<Tag> tags();
 
     JavaDoc translate(TranslationMap translationMap);
+
+    JavaDoc withTags(List<Tag> newTags);
+
 }

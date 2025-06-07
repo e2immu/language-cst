@@ -260,6 +260,8 @@ public interface Factory {
 
     IntConstant newInt(int i);
 
+    JavaDoc newJavaDoc(Source source, String comment, List<JavaDoc.Tag> tags);
+
     Lambda.Builder newLambdaBuilder();
 
     LocalVariable newLocalVariable(String name, ParameterizedType parameterizedType);
