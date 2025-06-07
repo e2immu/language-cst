@@ -81,6 +81,11 @@ public class JavaDocImpl extends MultiLineComment implements JavaDoc {
             }
             return "{@" + tagIdentifier.identifier + " " + content + "}";
         }
+
+        @Override
+        public Tag withResolvedReference(Info resolvedReference) {
+            return new TagImpl(tagIdentifier, content, resolvedReference, source, blockTag);
+        }
     }
 
     private final List<Tag> tags;
@@ -136,7 +141,7 @@ public class JavaDocImpl extends MultiLineComment implements JavaDoc {
 
     @Override
     public JavaDoc withTags(List<Tag> newTags) {
-        return new JavaDocImpl(source(), super.comment(), tags);
+        return new JavaDocImpl(source(), super.comment(), newTags);
     }
 
     @Override

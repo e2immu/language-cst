@@ -78,6 +78,8 @@ public interface JavaDoc extends Element, Comment {
         Tag rewire(InfoMap infoMap);
 
         Tag translate(TranslationMap translationMap);
+
+        Tag withResolvedReference(Info resolvedReference);
     }
 
     List<Tag> tags();
