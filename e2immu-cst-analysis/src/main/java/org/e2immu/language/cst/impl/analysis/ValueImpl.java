@@ -589,6 +589,7 @@ public abstract class ValueImpl implements Value {
 
         @Override
         public Codec.EncodedValue encode(Codec codec, Codec.Context context) {
+            if(map.isEmpty()) return null;
             Map<Codec.EncodedValue, Codec.EncodedValue> encodedMap = map.entrySet().stream()
                     .collect(Collectors.toUnmodifiableMap(e -> codec.encodeVariable(context, e.getKey()),
                             e -> codec.encodeBoolean(context, e.getValue())));
