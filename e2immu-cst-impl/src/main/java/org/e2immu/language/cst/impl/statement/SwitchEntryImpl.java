@@ -1,6 +1,9 @@
 package org.e2immu.language.cst.impl.statement;
 
+import org.e2immu.language.cst.api.element.Comment;
 import org.e2immu.language.cst.api.element.Element;
+import org.e2immu.language.cst.api.element.Source;
+import org.e2immu.language.cst.api.element.Visitor;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.output.OutputBuilder;
@@ -11,12 +14,14 @@ import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.variable.DescendMode;
 import org.e2immu.language.cst.api.variable.LocalVariable;
 import org.e2immu.language.cst.api.variable.Variable;
+import org.e2immu.language.cst.impl.element.ElementImpl;
 import org.e2immu.language.cst.impl.output.*;
 import org.e2immu.util.internal.util.ListUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 public class SwitchEntryImpl implements SwitchEntry {
@@ -24,12 +29,21 @@ public class SwitchEntryImpl implements SwitchEntry {
     private final LocalVariable patternVariable;
     private final Expression whenExpression;
     private final Statement statement;
+    private final Source source;
+    private final List<Comment> comments;
 
-    public SwitchEntryImpl(List<Expression> conditions, LocalVariable patternVariable, Expression whenExpression, Statement statement) {
+    public SwitchEntryImpl(List<Comment> comments,
+                           Source source,
+                           List<Expression> conditions,
+                           LocalVariable patternVariable,
+                           Expression whenExpression,
+                           Statement statement) {
         this.conditions = conditions;
         this.patternVariable = patternVariable;
         this.whenExpression = whenExpression;
         this.statement = statement;
+        this.comments = comments;
+        this.source = source;
     }
 
     @Override
@@ -39,7 +53,7 @@ public class SwitchEntryImpl implements SwitchEntry {
 
     @Override
     public SwitchEntry withStatement(Statement statement) {
-        return new SwitchEntryImpl(conditions, patternVariable, whenExpression, statement);
+        return new SwitchEntryImpl(comments, source, conditions, patternVariable, whenExpression, statement);
     }
 
     @Override
@@ -47,6 +61,11 @@ public class SwitchEntryImpl implements SwitchEntry {
         return (patternVariable != null ? 1 : 0)
                + conditions.stream().mapToInt(Expression::complexity).sum()
                + whenExpression.complexity() + statement().complexity();
+    }
+
+    @Override
+    public List<Comment> comments() {
+        return comments;
     }
 
     @Override
@@ -107,25 +126,55 @@ public class SwitchEntryImpl implements SwitchEntry {
                 : (LocalVariable) translationMap.translateVariable(patternVariable);
         Expression tWhen = whenExpression == null ? null : whenExpression.translate(translationMap);
         List<Statement> tStatements = statement.translate(translationMap);
-        Statement tStatement = tStatements.isEmpty() ? null : tStatements.get(0);
+        Statement tStatement = tStatements.isEmpty() ? null : tStatements.getFirst();
         if (tConditions == conditions && tPattern == patternVariable && tWhen == whenExpression
             && tStatement == statement) {
             return this;
         }
         if (tStatement == null) return null; // a way for the entry to disappear
-        return new SwitchEntryImpl(tConditions, tPattern, tWhen, tStatement);
+        return new SwitchEntryImpl(comments, source, tConditions, tPattern, tWhen, tStatement);
     }
 
     @Override
     public SwitchEntry rewire(InfoMap infoMap) {
-        return new SwitchEntryImpl(conditions.stream().map(e -> e.rewire(infoMap)).toList(),
+        return new SwitchEntryImpl(comments, source,
+                conditions.stream().map(e -> e.rewire(infoMap)).toList(),
                 patternVariable == null ? null : (LocalVariable) patternVariable.rewire(infoMap),
                 whenExpression.rewire(infoMap), statement.rewire(infoMap));
     }
 
     @Override
+    public Source source() {
+        return source;
+    }
+
+    @Override
+    public void visit(Predicate<Element> predicate) {
+        if (predicate.test(this)) {
+            if (patternVariable != null) patternVariable.visit(predicate);
+            whenExpression.visit(predicate);
+        }
+    }
+
+    @Override
+    public void visit(Visitor visitor) {
+        // nothing a t m
+    }
+
+    @Override
     public Stream<Variable> variables(DescendMode descendMode) {
-        return Stream.concat(whenExpression.variables(descendMode), statement.variables(descendMode));
+        return descendMode.isYes() ? variableStreamDescend() : variableStreamDoNotDescend();
+    }
+
+    @Override
+    public Stream<Variable> variableStreamDoNotDescend() {
+        return Stream.ofNullable(patternVariable);
+    }
+
+    @Override
+    public Stream<Variable> variableStreamDescend() {
+        return Stream.concat(Stream.concat(Stream.ofNullable(patternVariable), whenExpression.variableStreamDescend()),
+                statement.variableStreamDescend());
     }
 
     @Override
@@ -133,7 +182,7 @@ public class SwitchEntryImpl implements SwitchEntry {
         return Stream.concat(whenExpression.typesReferenced(), statement.typesReferenced());
     }
 
-    public static class EntryBuilderImpl implements Builder {
+    public static class EntryBuilderImpl extends ElementImpl.Builder<Builder> implements Builder {
         private final List<Expression> conditions = new ArrayList<>();
         private LocalVariable patternVariable;
         private Expression whenExpression;
@@ -165,7 +214,8 @@ public class SwitchEntryImpl implements SwitchEntry {
 
         @Override
         public SwitchEntry build() {
-            return new SwitchEntryImpl(List.copyOf(conditions), patternVariable, whenExpression, statement);
+            return new SwitchEntryImpl(List.copyOf(comments), source,
+                    List.copyOf(conditions), patternVariable, whenExpression, statement);
         }
     }
 }

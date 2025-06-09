@@ -708,8 +708,10 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
         rewireParameters(methodInfo, rewiredMethod, infoMap);
         methodInfo.methodModifiers().forEach(builder::addMethodModifier);
         builder.addComments(methodInfo.comments())
-                .addAnnotations(methodInfo.annotations())
+                .addComments(methodInfo.comments().stream().map(c -> c.rewire(infoMap)).toList())
                 .setSource(methodInfo.source())
+                .addAnnotations(methodInfo.annotations().stream()
+                        .map(a -> (AnnotationExpression) a.rewire(infoMap)).toList())
                 .setReturnType(methodInfo.returnType().rewire(infoMap))
                 .setAccess(methodInfo.access())
                 .setSynthetic(methodInfo.isSynthetic())
@@ -722,9 +724,10 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
             ParameterInfo rewiredPi = rewiredMethod.builder()
                     .addParameter(pi.name(), pi.parameterizedType().rewire(infoMap));
             rewiredPi.builder()
-                    .addComments(pi.comments())
+                    .addComments(pi.comments().stream().map(c -> c.rewire(infoMap)).toList())
                     .setSource(pi.source())
-                    .addAnnotations(pi.annotations())
+                    .addAnnotations(pi.annotations().stream()
+                            .map(a -> (AnnotationExpression) a.rewire(infoMap)).toList())
                     .setIsFinal(pi.isFinal())
                     .setVarArgs(pi.isVarArgs())
                     .setSynthetic(pi.isSynthetic())

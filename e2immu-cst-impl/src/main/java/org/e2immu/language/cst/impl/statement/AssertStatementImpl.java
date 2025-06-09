@@ -124,8 +124,11 @@ public class AssertStatementImpl extends StatementImpl implements AssertStatemen
         if (hasBeenTranslated(direct, this)) return direct;
         Expression tex = expression.translate(translationMap);
         Expression msg = message.translate(translationMap);
-        if (tex != expression || msg != message || !analysis().isEmpty() && translationMap.isClearAnalysis()) {
-            AssertStatement as = new AssertStatementImpl(comments(), source(), annotations(), label(), tex, msg);
+        List<AnnotationExpression> tAnnotations = translateAnnotations(translationMap);
+        if (tex != expression || msg != message
+            || !analysis().isEmpty() && translationMap.isClearAnalysis()
+            || tAnnotations != annotations()) {
+            AssertStatement as = new AssertStatementImpl(comments(), source(), tAnnotations, label(), tex, msg);
             if (!translationMap.isClearAnalysis()) as.analysis().setAll(analysis());
             return List.of(as);
         }

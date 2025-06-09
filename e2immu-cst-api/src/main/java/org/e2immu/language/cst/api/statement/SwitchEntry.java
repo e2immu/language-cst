@@ -3,21 +3,13 @@ package org.e2immu.language.cst.api.statement;
 import org.e2immu.annotation.Fluent;
 import org.e2immu.language.cst.api.element.Element;
 import org.e2immu.language.cst.api.expression.Expression;
-import org.e2immu.language.cst.api.info.InfoMap;
-import org.e2immu.language.cst.api.output.OutputBuilder;
-import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.translate.TranslationMap;
-import org.e2immu.language.cst.api.variable.DescendMode;
 import org.e2immu.language.cst.api.variable.LocalVariable;
-import org.e2immu.language.cst.api.variable.Variable;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Stream;
 
-public interface SwitchEntry extends Comparable<SwitchEntry> {
-    int complexity();
-
+public interface SwitchEntry extends Comparable<SwitchEntry>, Element {
     // EmptyExpression for 'default', NullConstant for 'null'
 
     List<Expression> conditions();
@@ -25,24 +17,16 @@ public interface SwitchEntry extends Comparable<SwitchEntry> {
 
     LocalVariable patternVariable();
 
-    SwitchEntry rewire(InfoMap infoMap);
-
-    Stream<Element.TypeReference> typesReferenced();
-
     // EmptyExpression when absent (Java 21)
     Expression whenExpression();
 
     Statement statement();
 
-    OutputBuilder print(Qualification qualification);
-
     SwitchEntry translate(TranslationMap translationMap);
-
-    Stream<Variable> variables(DescendMode descendMode);
 
     SwitchEntry withStatement(Statement statement);
 
-    interface Builder {
+    interface Builder extends Element.Builder<Builder> {
         @Fluent
         Builder addConditions(Collection<Expression> expressions);
 

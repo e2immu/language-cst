@@ -80,11 +80,6 @@ public class MultiLineCommentImpl implements MultiLineComment {
     }
 
     @Override
-    public Element rewire(InfoMap infoMap) {
-        return this;
-    }
-
-    @Override
     public Source source() {
         return source;
     }

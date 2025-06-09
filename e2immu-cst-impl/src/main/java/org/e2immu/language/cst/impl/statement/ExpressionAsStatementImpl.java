@@ -112,10 +112,12 @@ public class ExpressionAsStatementImpl extends StatementImpl implements Expressi
         List<Statement> direct = translationMap.translateStatement(this);
         if (hasBeenTranslated(direct, this)) return direct;
         Expression tex = expression.translate(translationMap);
-        if (tex != expression || !analysis().isEmpty() && translationMap.isClearAnalysis()) {
+        List<AnnotationExpression> tAnnotations = translateAnnotations(translationMap);
+        if (tex != expression || !analysis().isEmpty() && translationMap.isClearAnalysis()
+            || tAnnotations != annotations()) {
             if (tex == null || tex.isEmpty()) return List.of();
             ExpressionAsStatement newEas
-                    = new ExpressionAsStatementImpl(comments(), source(), annotations(), label(), tex);
+                    = new ExpressionAsStatementImpl(comments(), source(), tAnnotations, label(), tex);
             if (!translationMap.isClearAnalysis()) newEas.analysis().setAll(analysis());
             return List.of(newEas);
         }

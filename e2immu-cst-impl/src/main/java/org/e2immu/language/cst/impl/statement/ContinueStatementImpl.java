@@ -59,8 +59,10 @@ public class ContinueStatementImpl extends BreakOrContinueStatementImpl implemen
     public List<Statement> translate(TranslationMap translationMap) {
         List<Statement> direct = translationMap.translateStatement(this);
         if (hasBeenTranslated(direct, this)) return direct;
-        if (!analysis().isEmpty() && translationMap.isClearAnalysis()) {
-            ContinueStatement cs = new ContinueStatementImpl(comments(), source(), annotations(), label(), goToLabel());
+        List<AnnotationExpression> tAnnotations = translateAnnotations(translationMap);
+        if (!analysis().isEmpty() && translationMap.isClearAnalysis() || tAnnotations != annotations()) {
+            ContinueStatement cs = new ContinueStatementImpl(comments(), source(), tAnnotations, label(),
+                    goToLabel());
             return List.of(cs);
         }
         return List.of(this);

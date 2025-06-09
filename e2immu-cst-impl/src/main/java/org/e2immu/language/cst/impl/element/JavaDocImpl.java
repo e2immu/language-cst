@@ -133,7 +133,7 @@ public class JavaDocImpl extends MultiLineCommentImpl implements JavaDoc {
     }
 
     @Override
-    public Element rewire(InfoMap infoMap) {
+    public JavaDoc rewire(InfoMap infoMap) {
         return new JavaDocImpl(source(), super.comment(), tags.stream().map(t -> t.rewire(infoMap)).toList());
     }
 

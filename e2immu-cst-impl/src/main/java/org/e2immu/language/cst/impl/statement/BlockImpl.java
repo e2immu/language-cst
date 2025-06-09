@@ -27,19 +27,23 @@ import java.util.stream.Stream;
 
 public class BlockImpl extends StatementImpl implements Block {
     private final List<Statement> statements;
+    private final List<Comment> trailingComments;
 
     public BlockImpl() {
         this.statements = List.of();
+        this.trailingComments = List.of();
     }
 
     public BlockImpl(List<Comment> comments,
                      Source source,
                      List<AnnotationExpression> annotations,
                      String label,
-                     List<Statement> statements) {
+                     List<Statement> statements,
+                     List<Comment> trailingComments) {
         super(comments, source, annotations,
                 1 + statements.stream().mapToInt(Statement::complexity).sum(), label);
         this.statements = statements;
+        this.trailingComments = trailingComments;
     }
 
     @Override
@@ -61,6 +65,11 @@ public class BlockImpl extends StatementImpl implements Block {
     }
 
     @Override
+    public List<Comment> trailingComments() {
+        return trailingComments;
+    }
+
+    @Override
     public void visit(Predicate<Element> predicate) {
         if (predicate.test(this)) {
             statements.forEach(statement -> statement.visit(predicate));
@@ -79,12 +88,16 @@ public class BlockImpl extends StatementImpl implements Block {
     public OutputBuilder print(Qualification qualification) {
         OutputBuilder outputBuilder = outputBuilder(qualification);
         outputBuilder.add(SymbolEnum.LEFT_BRACE);
-        if (!statements.isEmpty()) {
-            outputBuilder.add(statements.stream()
+        if (!statements.isEmpty() || !trailingComments.isEmpty()) {
+            Stream<OutputBuilder> stream1 = statements.stream()
                     .filter(s -> !s.isSynthetic())
-                    .map(s -> s.print(qualification))
+                    .map(s -> s.print(qualification));
+            Stream<OutputBuilder> stream2 = trailingComments.stream()
+                    .map(c -> c.print(qualification));
+            outputBuilder.add(Stream.concat(stream1, stream2)
                     .collect(OutputBuilderImpl.joining(SpaceEnum.NONE, GuideImpl.generatorForBlock())));
         }
+
         outputBuilder.add(SymbolEnum.RIGHT_BRACE);
         return outputBuilder;
     }
@@ -101,6 +114,13 @@ public class BlockImpl extends StatementImpl implements Block {
 
     public static class Builder extends StatementImpl.Builder<Block.Builder> implements Block.Builder {
         private final List<Statement> statements = new ArrayList<>();
+        private final List<Comment> trailingComments = new ArrayList<>();
+
+        @Override
+        public Builder addTrailingComments(List<Comment> trailingComments) {
+            this.trailingComments.addAll(trailingComments);
+            return this;
+        }
 
         @Override
         @Fluent
@@ -134,7 +154,8 @@ public class BlockImpl extends StatementImpl implements Block {
 
         @Override
         public Block build() {
-            return new BlockImpl(comments, source, annotations, label, List.copyOf(statements));
+            return new BlockImpl(comments, source, annotations, label,
+                    List.copyOf(statements), List.copyOf(trailingComments));
         }
 
         @Override
@@ -172,8 +193,10 @@ public class BlockImpl extends StatementImpl implements Block {
             tStatements.addAll(tStatement);
             change |= tStatement.size() != 1 || tStatement.get(0) != statement;
         }
+        List<AnnotationExpression> tAnnotations = translateAnnotations(translationMap);
+        change |= tAnnotations != annotations();
         if (change) {
-            Block newB = new BlockImpl(comments(), source(), annotations(), label(), tStatements);
+            Block newB = new BlockImpl(comments(), source(), tAnnotations, label(), tStatements, trailingComments);
             if (!translationMap.isClearAnalysis()) newB.analysis().setAll(analysis());
             return List.of(newB);
         }
@@ -192,7 +215,7 @@ public class BlockImpl extends StatementImpl implements Block {
                 }
             }
         }
-        return new BlockImpl(comments(), source(), annotations(), label(), newList);
+        return new BlockImpl(comments(), source(), annotations(), label(), newList, trailingComments);
     }
 
     @Override
@@ -209,7 +232,8 @@ public class BlockImpl extends StatementImpl implements Block {
         }
         int dot2 = index.indexOf('.', dot + 1);
         int blockIndex = Integer.parseInt(index.substring(dot + 1, dot2 < 0 ? index.length() : dot2));
-        Block block = blockIndex == 0 ? statement.block() : statement.subBlockStream().skip(blockIndex).findFirst().orElseThrow();
+        Block block = blockIndex == 0 ? statement.block()
+                : statement.subBlockStream().skip(blockIndex).findFirst().orElseThrow();
         if (dot2 < 0) return block;
         return ((BlockImpl) block).findStatementByIndex(index, dot2 + 1);
     }
@@ -217,6 +241,6 @@ public class BlockImpl extends StatementImpl implements Block {
     @Override
     public Block rewire(InfoMap infoMap) {
         return new BlockImpl(comments(), source(), rewireAnnotations(infoMap), label(),
-                statements.stream().map(s -> s.rewire(infoMap)).toList());
+                statements.stream().map(s -> s.rewire(infoMap)).toList(), trailingComments);
     }
 }

@@ -106,7 +106,10 @@ public class ThrowStatementImpl extends StatementImpl implements ThrowStatement 
         if (hasBeenTranslated(direct, this)) return direct;
 
         Expression tex = expression.translate(translationMap);
-        if (tex != expression || !analysis().isEmpty() && translationMap.isClearAnalysis()) {
+        List<AnnotationExpression> tAnnotations = translateAnnotations(translationMap);
+
+        if (tex != expression || !analysis().isEmpty() && translationMap.isClearAnalysis()
+            || tAnnotations != annotations()) {
             ThrowStatementImpl ts = new ThrowStatementImpl(comments(), source(), annotations(), label(), tex);
             if (!translationMap.isClearAnalysis()) ts.analysis().setAll(analysis());
             return List.of(ts);

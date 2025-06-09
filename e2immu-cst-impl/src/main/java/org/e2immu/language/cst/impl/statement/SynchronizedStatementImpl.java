@@ -128,10 +128,12 @@ public class SynchronizedStatementImpl extends StatementImpl implements Synchron
         // translations in order of appearance
         Expression tex = translationMap.translateExpression(expression);
         List<Statement> translatedBlock = block.translate(translationMap);
-        if (tex != expression || hasBeenTranslated(translatedBlock, block)) {
-            if (translatedBlock.size() == 1 && translatedBlock.get(0) instanceof Block b) {
-                SynchronizedStatementImpl sync = new SynchronizedStatementImpl(comments(), source(), annotations(),
-                        label(), tex, b);
+        List<AnnotationExpression> tAnnotations = translateAnnotations(translationMap);
+        if (tex != expression || hasBeenTranslated(translatedBlock, block)
+            || tAnnotations != annotations()) {
+            if (translatedBlock.size() == 1 && translatedBlock.getFirst() instanceof Block b) {
+                SynchronizedStatementImpl sync = new SynchronizedStatementImpl(comments(), source(),
+                        tAnnotations, label(), tex, b);
                 if (!translationMap.isClearAnalysis()) sync.analysis().setAll(analysis());
                 return List.of(sync);
             }

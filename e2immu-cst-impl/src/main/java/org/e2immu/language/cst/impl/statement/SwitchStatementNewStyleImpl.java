@@ -16,7 +16,9 @@ import org.e2immu.language.cst.api.statement.SwitchStatementNewStyle;
 import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.variable.DescendMode;
 import org.e2immu.language.cst.api.variable.Variable;
-import org.e2immu.language.cst.impl.output.*;
+import org.e2immu.language.cst.impl.output.GuideImpl;
+import org.e2immu.language.cst.impl.output.KeywordImpl;
+import org.e2immu.language.cst.impl.output.SymbolEnum;
 import org.e2immu.util.internal.util.ZipLists;
 
 import java.util.ArrayList;
@@ -66,7 +68,8 @@ public class SwitchStatementNewStyleImpl extends StatementImpl implements Switch
                 .map(statement -> {
                     if (statement instanceof Block b) return b;
                     // NOTE: using the statement's source is not correct index-wise, but it may be better than nothing
-                    return new BlockImpl(List.of(), statement.source(), List.of(), null, List.of(statement));
+                    return new BlockImpl(List.of(), statement.source(), List.of(), null, List.of(statement),
+                            List.of());
                 });
     }
 
@@ -140,9 +143,12 @@ public class SwitchStatementNewStyleImpl extends StatementImpl implements Switch
         List<SwitchEntry> tEntries = entries.stream().map(e -> e.translate(translationMap))
                 .filter(Objects::nonNull) // see translation of switch entry
                 .collect(translationMap.toList(entries));
-        if (tEntries != entries || tSelector != selector || !analysis().isEmpty() && translationMap.isClearAnalysis()) {
-            SwitchStatementNewStyleImpl ssns = new SwitchStatementNewStyleImpl(comments(), source(), annotations(),
-                    label(), tSelector, tEntries);
+        List<AnnotationExpression> tAnnotations = translateAnnotations(translationMap);
+        if (tEntries != entries || tSelector != selector
+            || tAnnotations != annotations()
+            || !analysis().isEmpty() && translationMap.isClearAnalysis()) {
+            SwitchStatementNewStyleImpl ssns = new SwitchStatementNewStyleImpl(comments(), source(),
+                    tAnnotations, label(), tSelector, tEntries);
             if (!translationMap.isClearAnalysis()) ssns.analysis().setAll(analysis());
             return List.of(ssns);
         }
@@ -153,7 +159,7 @@ public class SwitchStatementNewStyleImpl extends StatementImpl implements Switch
     @Override
     public Statement rewire(InfoMap infoMap) {
         return new SwitchStatementNewStyleImpl(comments(), source(), rewireAnnotations(infoMap), label(),
-                selector.rewire(infoMap), entries.stream().map(e -> e.rewire(infoMap)).toList());
+                selector.rewire(infoMap), entries.stream().map(e -> (SwitchEntry) e.rewire(infoMap)).toList());
     }
 
     public static class BuilderImpl extends StatementImpl.Builder<SwitchStatementNewStyle.Builder>

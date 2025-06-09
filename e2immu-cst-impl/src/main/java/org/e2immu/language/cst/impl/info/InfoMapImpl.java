@@ -1,9 +1,13 @@
 package org.e2immu.language.cst.impl.info;
 
+import org.e2immu.language.cst.api.expression.AnnotationExpression;
 import org.e2immu.language.cst.api.info.*;
 import org.e2immu.language.cst.impl.statement.BlockImpl;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 public class InfoMapImpl implements InfoMap {
     private final Map<String, TypeInfo> typeInfoMap = new HashMap<>();
@@ -89,6 +93,10 @@ public class InfoMapImpl implements InfoMap {
             MethodInfo mi = new MethodInfoImpl(MethodInfoImpl.MethodTypeEnum.SYNTHETIC_ARRAY_CONSTRUCTOR,
                     "<init>", typeInfo(methodInfo.typeInfo()));
             mi.builder()
+                    .addAnnotations(methodInfo.annotations().stream()
+                            .map(a -> (AnnotationExpression) a.rewire(this)).toList())
+                    .addComments(methodInfo.comments().stream().map(c -> c.rewire(this)).toList())
+                    .setSource(methodInfo.source())
                     .setReturnType(methodInfo.returnType().rewire(this))
                     .addMethodModifier(MethodModifierEnum.PUBLIC)
                     .setMethodBody(new BlockImpl.Builder().build())
@@ -96,7 +104,12 @@ public class InfoMapImpl implements InfoMap {
                     .computeAccess();
             for (int i = 0; i < methodInfo.returnType().arrays(); i++) {
                 ParameterInfo pii = methodInfo.parameters().get(i);
-                mi.builder().addParameter(pii.name(), pii.parameterizedType());
+                ParameterInfo pi = mi.builder().addParameter(pii.name(), pii.parameterizedType());
+                pi.builder()
+                        .addAnnotations(methodInfo.annotations().stream()
+                                .map(a -> (AnnotationExpression) a.rewire(this)).toList())
+                        .addComments(pii.comments().stream().map(c -> c.rewire(this)).toList())
+                        .setSource(pii.source());
             }
             mi.builder().commitParameters().commit();
             // and we don't store it either

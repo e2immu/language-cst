@@ -10,6 +10,7 @@ import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
+import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.variable.DescendMode;
 import org.e2immu.language.cst.api.variable.Variable;
 
@@ -43,6 +44,22 @@ public interface Element {
     List<Comment> comments();
 
     Element rewire(InfoMap infoMap);
+
+    default List<Comment> rewireComments(InfoMap infoMap) {
+        return comments().stream().map(c -> c.rewire(infoMap)).toList();
+    }
+
+    default List<Comment> translateComments(TranslationMap translationMap) {
+        List<Comment> comments = comments();
+        if (comments.isEmpty()) return comments;
+        return comments.stream().map(c -> c.translate(translationMap)).collect(translationMap.toList(comments));
+    }
+
+    default List<AnnotationExpression> translateAnnotations(TranslationMap translationMap) {
+        List<AnnotationExpression> annotations = annotations();
+        return annotations.stream().map(a -> (AnnotationExpression) a.translate(translationMap))
+                .collect(translationMap.toList(annotations));
+    }
 
     @NotNull
     Source source();

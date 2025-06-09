@@ -118,8 +118,10 @@ public class YieldStatementImpl extends StatementImpl implements YieldStatement 
         List<Statement> direct = translationMap.translateStatement(this);
         if (hasBeenTranslated(direct, this)) return direct;
         Expression tex = expression.translate(translationMap);
-        if (tex != expression || !analysis().isEmpty() && translationMap.isClearAnalysis()) {
-            YieldStatementImpl ys = new YieldStatementImpl(comments(), source(), annotations(), label(), tex);
+        List<AnnotationExpression> tAnnotations = translateAnnotations(translationMap);
+        if (tex != expression || !analysis().isEmpty() && translationMap.isClearAnalysis()
+            || tAnnotations != annotations()) {
+            YieldStatementImpl ys = new YieldStatementImpl(comments(), source(), tAnnotations, label(), tex);
             if (!translationMap.isClearAnalysis()) ys.analysis().setAll(analysis());
             return List.of(ys);
         }

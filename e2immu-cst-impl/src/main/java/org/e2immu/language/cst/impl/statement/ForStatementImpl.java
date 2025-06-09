@@ -193,7 +193,7 @@ public class ForStatementImpl extends StatementImpl implements ForStatement {
         // translations in order of appearance
         List<Element> initializers = initializers().stream()
                 .map(init -> init instanceof LocalVariableCreation lvc
-                        ? lvc.translate(translationMap).get(0)
+                        ? lvc.translate(translationMap).getFirst()
                         : init instanceof Expression e
                         ? e.translate(translationMap) : null)
                 .collect(Collectors.toList());
@@ -202,8 +202,8 @@ public class ForStatementImpl extends StatementImpl implements ForStatement {
                 .map(updater -> updater.translate(translationMap)).
                 collect(Collectors.toList());
         List<Statement> translatedBlock = block().translate(translationMap);
-
-        ForStatementImpl fs = new ForStatementImpl(comments(), source(), annotations(), label(), initializers,
+        List<AnnotationExpression> tAnnotations = translateAnnotations(translationMap);
+        ForStatementImpl fs = new ForStatementImpl(comments(), source(), tAnnotations, label(), initializers,
                 tex, updaters, ensureBlock(translatedBlock));
         if (!translationMap.isClearAnalysis()) fs.analysis().setAll(analysis());
         return List.of(fs);

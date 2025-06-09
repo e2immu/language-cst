@@ -270,7 +270,12 @@ public class FieldInfoImpl extends InfoImpl implements FieldInfo {
     @Override
     public void rewirePhase3(InfoMap infoMap) {
         FieldInfo rewiredField = infoMap.fieldInfo(this);
-        rewiredField.builder().setInitializer(initializer().rewire(infoMap)).commit();
+        rewiredField.builder()
+                .addAnnotations(annotations().stream()
+                        .map(a -> (AnnotationExpression) a.rewire(infoMap)).toList())
+                .addComments(comments().stream().map(c -> c.rewire(infoMap)).toList())
+                .setSource(source())
+                .setInitializer(initializer().rewire(infoMap)).commit();
     }
 
     @Override

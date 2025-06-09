@@ -6,7 +6,6 @@ import org.e2immu.language.cst.api.element.Element;
 import org.e2immu.language.cst.api.element.Source;
 import org.e2immu.language.cst.api.element.Visitor;
 import org.e2immu.language.cst.api.expression.AnnotationExpression;
-import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
@@ -20,7 +19,10 @@ import org.e2immu.language.cst.api.variable.LocalVariable;
 import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.language.cst.impl.analysis.PropertyValueMapImpl;
 import org.e2immu.language.cst.impl.element.ElementImpl;
-import org.e2immu.language.cst.impl.output.*;
+import org.e2immu.language.cst.impl.output.KeywordImpl;
+import org.e2immu.language.cst.impl.output.OutputBuilderImpl;
+import org.e2immu.language.cst.impl.output.SpaceEnum;
+import org.e2immu.language.cst.impl.output.SymbolEnum;
 import org.e2immu.language.cst.impl.type.DiamondEnum;
 import org.e2immu.util.internal.util.ZipLists;
 
@@ -417,9 +419,11 @@ public class TryStatementImpl extends StatementImpl implements TryStatement {
         List<CatchClause> tCatch = catchClauses.stream()
                 .map(cc -> cc.translate(translationMap))
                 .collect(translationMap.toList(catchClauses));
+        List<AnnotationExpression> tAnnotations = translateAnnotations(translationMap);
         if (tMain != block || tFinally != finallyBlock || tCatch != catchClauses
-            || tResources != resources || !analysis().isEmpty() && translationMap.isClearAnalysis()) {
-            TryStatementImpl ts = new TryStatementImpl(comments(), source(), annotations(), label(), tResources,
+            || tResources != resources || !analysis().isEmpty() && translationMap.isClearAnalysis()
+            || tAnnotations != annotations()) {
+            TryStatementImpl ts = new TryStatementImpl(comments(), source(), tAnnotations, label(), tResources,
                     tMain, tCatch, tFinally);
             if (!translationMap.isClearAnalysis()) ts.analysis().setAll(analysis());
             return List.of(ts);

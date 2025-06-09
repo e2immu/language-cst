@@ -73,11 +73,6 @@ public class SingleLineCommentImpl implements SingleLineComment {
     }
 
     @Override
-    public Element rewire(InfoMap infoMap) {
-        return this;
-    }
-
-    @Override
     public Source source() {
         return source;
     }

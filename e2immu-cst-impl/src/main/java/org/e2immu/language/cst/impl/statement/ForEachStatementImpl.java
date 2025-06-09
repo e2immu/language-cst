@@ -159,15 +159,17 @@ public class ForEachStatementImpl extends StatementImpl implements ForEachStatem
         if (hasBeenTranslated(direct, this)) return direct;
 
         // translations in order of appearance
-        LocalVariableCreation translatedLvc = (LocalVariableCreation) initializer.translate(translationMap).get(0);
+        LocalVariableCreation translatedLvc = (LocalVariableCreation) initializer.translate(translationMap).getFirst();
         Expression translated = expression.translate(translationMap);
         List<Statement> translatedBlock = block.translate(translationMap);
+        List<AnnotationExpression> tAnnotations = translateAnnotations(translationMap);
         if (translatedLvc != initializer
             || expression != translated
-            || translatedBlock.get(0) != block
-            || !analysis().isEmpty() && translationMap.isClearAnalysis()) {
-            ForEachStatementImpl fs = new ForEachStatementImpl(comments(), source(), annotations(), label(), translatedLvc, translated,
-                    ensureBlock(translatedBlock));
+            || translatedBlock.getFirst() != block
+            || !analysis().isEmpty() && translationMap.isClearAnalysis()
+            || tAnnotations != annotations()) {
+            ForEachStatementImpl fs = new ForEachStatementImpl(comments(), source(), tAnnotations, label(),
+                    translatedLvc, translated, ensureBlock(translatedBlock));
             if (!translationMap.isClearAnalysis()) fs.analysis().setAll(analysis());
             return List.of(fs);
         }

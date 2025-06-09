@@ -58,8 +58,9 @@ public class BreakStatementImpl extends BreakOrContinueStatementImpl implements 
     public List<Statement> translate(TranslationMap translationMap) {
         List<Statement> direct = translationMap.translateStatement(this);
         if (hasBeenTranslated(direct, this)) return direct;
-        if (!analysis().isEmpty() && translationMap.isClearAnalysis()) {
-            BreakStatement bs = new BreakStatementImpl(comments(), source(), annotations(), label(), goToLabel());
+        List<AnnotationExpression> tAnnotations = translateAnnotations(translationMap);
+        if (!analysis().isEmpty() && translationMap.isClearAnalysis() || tAnnotations != annotations()) {
+            BreakStatement bs = new BreakStatementImpl(comments(), source(), tAnnotations, label(), goToLabel());
             return List.of(bs);
         }
         return List.of(this);

@@ -1,6 +1,7 @@
 package org.e2immu.language.cst.api.statement;
 
 import org.e2immu.annotation.Fluent;
+import org.e2immu.language.cst.api.element.Comment;
 import org.e2immu.language.cst.api.info.InfoMap;
 
 import java.util.List;
@@ -18,7 +19,12 @@ public interface Block extends Statement {
 
     List<Statement> statements();
 
+    List<Comment> trailingComments();
+
     interface Builder extends Statement.Builder<Builder> {
+
+        @Fluent
+        Builder addTrailingComments(List<Comment> trailingComments);
 
         Block build();
 

@@ -235,8 +235,11 @@ public class LocalVariableCreationImpl extends StatementImpl implements LocalVar
         LocalVariable tlv = localVariable.translate(translationMap);
         List<LocalVariable> tList = otherLocalVariables.stream()
                 .map(lv -> lv.translate(translationMap)).collect(translationMap.toList(otherLocalVariables));
-        if (tlv != localVariable || tList != otherLocalVariables || translationMap.isClearAnalysis() && !analysis().isEmpty()) {
-            LocalVariableCreationImpl newLvc = new LocalVariableCreationImpl(comments(), source(), annotations(),
+        List<AnnotationExpression> tAnnotations = translateAnnotations(translationMap);
+        if (tlv != localVariable || tList != otherLocalVariables
+            || translationMap.isClearAnalysis() && !analysis().isEmpty()
+            || tAnnotations != annotations()) {
+            LocalVariableCreationImpl newLvc = new LocalVariableCreationImpl(comments(), source(), tAnnotations,
                     label(), tlv, tList, modifiers);
             if (!translationMap.isClearAnalysis()) newLvc.analysis().setAll(analysis());
             return List.of(newLvc);
@@ -257,7 +260,7 @@ public class LocalVariableCreationImpl extends StatementImpl implements LocalVar
 
     @Override
     public Statement rewire(InfoMap infoMap) {
-        return new LocalVariableCreationImpl(comments(), source(), rewireAnnotations(infoMap), label(),
+        return new LocalVariableCreationImpl(rewireComments(infoMap), source(), rewireAnnotations(infoMap), label(),
                 (LocalVariable) localVariable.rewire(infoMap),
                 otherLocalVariables.stream().map(lv -> (LocalVariable) lv.rewire(infoMap)).toList(),
                 modifiers);
