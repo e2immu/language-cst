@@ -1,6 +1,5 @@
 package org.e2immu.language.cst.api.element;
 
-import org.e2immu.language.cst.api.info.Info;
 import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.translate.TranslationMap;
 
@@ -9,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public interface JavaDoc extends Element, Comment {
+public interface JavaDoc extends MultiLineComment {
 
     enum TagIdentifier {
         AUTHOR("author"),

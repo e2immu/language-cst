@@ -21,9 +21,9 @@ import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 /**
- * Convention: the "comment" string in {@link MultiLineComment} has placeholders {\\d+}, one for each tag in this object.
+ * Convention: the "comment" string in {@link MultiLineCommentImpl} has placeholders {\\d+}, one for each tag in this object.
  */
-public class JavaDocImpl extends MultiLineComment implements JavaDoc {
+public class JavaDocImpl extends MultiLineCommentImpl implements JavaDoc {
 
     public static class TagImpl implements Tag {
         private final TagIdentifier tagIdentifier;

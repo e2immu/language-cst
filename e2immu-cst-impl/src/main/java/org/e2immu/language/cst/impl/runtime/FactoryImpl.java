@@ -755,8 +755,8 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
-    public Comment newMultilineComment(Source source, String comment) {
-        return new MultiLineComment(source, comment);
+    public MultiLineComment newMultilineComment(Source source, String comment) {
+        return new MultiLineCommentImpl(source, comment);
     }
 
     @Override
@@ -824,8 +824,8 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
-    public Comment newSingleLineComment(Source source, String comment) {
-        return new SingleLineComment(source, comment);
+    public SingleLineComment newSingleLineComment(Source source, String comment) {
+        return new SingleLineCommentImpl(source, comment);
     }
 
     @Override

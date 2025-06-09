@@ -291,7 +291,7 @@ public interface Factory {
 
     Expression newMultiExpressions(List<Expression> newExpressions);
 
-    Comment newMultilineComment(Source source, String comment);
+    MultiLineComment newMultilineComment(Source source, String comment);
 
     NullConstant newNullConstant(List<Comment> comments, Source source);
 
@@ -323,7 +323,7 @@ public interface Factory {
 
     ShortConstant newShort(List<Comment> comments, Source source, short s);
 
-    Comment newSingleLineComment(Source source, String comment);
+    SingleLineComment newSingleLineComment(Source source, String comment);
 
     SwitchEntry newStatementsSwitchEntry(VariableExpression selector,
                                          List<Expression> labels, List<Statement> statements);
