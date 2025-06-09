@@ -40,4 +40,9 @@ public class SingleLineComment implements Comment {
     public Source source() {
         return source;
     }
+
+    @Override
+    public String toString() {
+        return "singleLineComment@" + source.compact2();
+    }
 }

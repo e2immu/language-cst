@@ -73,4 +73,9 @@ public class StringConstantImpl extends ConstantExpressionImpl<String> implement
         String quoted = StringUtil.quote(constant);
         return new OutputBuilderImpl().add(new TextImpl(quoted));
     }
+
+    @Override
+    public String toString() {
+        return "stringConstant@" + source().compact2();
+    }
 }

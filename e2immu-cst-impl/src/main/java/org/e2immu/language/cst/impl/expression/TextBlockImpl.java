@@ -46,4 +46,9 @@ public class TextBlockImpl extends StringConstantImpl implements TextBlock {
     public OutputBuilder print(Qualification qualification) {
         return new OutputBuilderImpl().add(new TextImpl(constant(), textBlockFormatting));
     }
+
+    @Override
+    public String toString() {
+        return "textBlock@" + source().compact2();
+    }
 }

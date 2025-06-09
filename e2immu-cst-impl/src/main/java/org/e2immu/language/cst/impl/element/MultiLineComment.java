@@ -48,4 +48,9 @@ public class MultiLineComment implements Comment {
     public Source source() {
         return source;
     }
+
+    @Override
+    public String toString() {
+        return "multiLineComment@" + source.compact2();
+    }
 }
