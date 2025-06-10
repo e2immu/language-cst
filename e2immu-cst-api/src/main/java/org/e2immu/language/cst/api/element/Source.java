@@ -19,6 +19,8 @@ public interface Source extends Comparable<Source> {
 
     DetailedSources detailedSources();
 
+    Source withBeginPos(int beginPos);
+
     Source withDetailedSources(DetailedSources detailedSources);
 
     Source mergeDetailedSources(DetailedSources detailedSources);

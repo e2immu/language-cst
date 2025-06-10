@@ -10,7 +10,7 @@ import java.util.Objects;
 we must be a bit memory-conscious: no unnecessary fields because there may be millions of elements
  */
 public class SourceImpl implements Source {
-    public static final Source NO_SOURCE = new SourceImpl( null, 0, 0, 0, 0);
+    public static final Source NO_SOURCE = new SourceImpl(null, 0, 0, 0, 0);
     private final String index;
     private final short beginLine;
     private final short beginPos;
@@ -110,6 +110,11 @@ public class SourceImpl implements Source {
     @Override
     public int endPos() {
         return endPos;
+    }
+
+    @Override
+    public Source withBeginPos(int beginPos) {
+        return new SourceImpl(index, beginLine, beginPos, endLine, endPos);
     }
 
     @Override
