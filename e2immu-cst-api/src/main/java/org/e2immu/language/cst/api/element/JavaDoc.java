@@ -70,6 +70,8 @@ public interface JavaDoc extends MultiLineComment {
 
         Source source();
 
+        Source sourceOfReference();
+
         Element resolvedReference();
 
         String content();
@@ -86,5 +88,7 @@ public interface JavaDoc extends MultiLineComment {
     JavaDoc translate(TranslationMap translationMap);
 
     JavaDoc withTags(List<Tag> newTags);
+
+    String commentWithPlaceholders();
 
 }

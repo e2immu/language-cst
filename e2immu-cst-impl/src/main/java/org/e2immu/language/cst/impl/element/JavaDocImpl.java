@@ -30,13 +30,17 @@ public class JavaDocImpl extends MultiLineCommentImpl implements JavaDoc {
         private final String content;
         private final Element resolvedReference;
         private final Source source;
+        private final Source sourceOfReference;
         private final boolean blockTag;
 
-        public TagImpl(TagIdentifier tagIdentifier, String content, Element resolvedReference, Source source, boolean blockTag) {
+        public TagImpl(TagIdentifier tagIdentifier, String content, Element resolvedReference, Source source,
+                       Source sourceOfReference,
+                       boolean blockTag) {
             this.tagIdentifier = tagIdentifier;
             this.content = content;
             this.resolvedReference = resolvedReference;
             this.source = source;
+            this.sourceOfReference = sourceOfReference;
             this.blockTag = blockTag;
         }
 
@@ -56,6 +60,11 @@ public class JavaDocImpl extends MultiLineCommentImpl implements JavaDoc {
         }
 
         @Override
+        public Source sourceOfReference() {
+            return sourceOfReference;
+        }
+
+        @Override
         public Element resolvedReference() {
             return resolvedReference;
         }
@@ -68,7 +77,8 @@ public class JavaDocImpl extends MultiLineCommentImpl implements JavaDoc {
         @Override
         public Tag rewire(InfoMap infoMap) {
             if (resolvedReference == null) return this;
-            return new TagImpl(tagIdentifier, content, (Info) resolvedReference.rewire(infoMap), source, blockTag);
+            return new TagImpl(tagIdentifier, content, (Info) resolvedReference.rewire(infoMap), source,
+                    sourceOfReference, blockTag);
         }
 
         @Override
@@ -76,7 +86,7 @@ public class JavaDocImpl extends MultiLineCommentImpl implements JavaDoc {
             if (resolvedReference instanceof Info info) {
                 List<? extends Info> infos = info.translate(translationMap);
                 if (infos.size() != 1 || infos.getFirst() != info) {
-                    return new TagImpl(tagIdentifier, content, infos.getFirst(), source, blockTag);
+                    return new TagImpl(tagIdentifier, content, infos.getFirst(), source, sourceOfReference, blockTag);
                 }
             }
             return this;
@@ -92,7 +102,7 @@ public class JavaDocImpl extends MultiLineCommentImpl implements JavaDoc {
 
         @Override
         public Tag withResolvedReference(Element resolvedReference) {
-            return new TagImpl(tagIdentifier, content, resolvedReference, source, blockTag);
+            return new TagImpl(tagIdentifier, content, resolvedReference, source, sourceOfReference, blockTag);
         }
     }
 
@@ -106,6 +116,11 @@ public class JavaDocImpl extends MultiLineCommentImpl implements JavaDoc {
     @Override
     public List<Tag> tags() {
         return tags;
+    }
+
+    @Override
+    public String commentWithPlaceholders() {
+        return super.comment();
     }
 
     @Override
