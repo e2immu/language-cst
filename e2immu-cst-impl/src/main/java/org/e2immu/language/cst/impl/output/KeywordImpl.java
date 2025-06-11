@@ -67,4 +67,9 @@ public record KeywordImpl(String keyword) implements Keyword {
     public String generateJavaForDebugging() {
         return ".add(KeywordImpl." + keyword.toUpperCase() + ")";
     }
+
+    @Override
+    public String toString() {
+        return keyword;
+    }
 }
