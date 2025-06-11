@@ -58,6 +58,14 @@ public record TypePrinterImpl(TypeInfo typeInfo, boolean formatter2) implements 
                         .add(new TextImpl(i)).add(SymbolEnum.SEMICOLON).add(SpaceEnum.NEWLINE));
             }
 
+            // special case: the package-info.java file
+            if (typeInfo.typeNature().isPackageInfo()) {
+                OutputBuilder annotationStream = typeInfo.annotations().stream()
+                        .map(ae -> ae.print(qualification))
+                        .collect(OutputBuilderImpl.joining(SpaceEnum.NEWLINE));
+                return annotationStream.add(SpaceEnum.NEWLINE).add(packageAndImports);
+            }
+
             // the modifiers
             OutputBuilder minimalModifiers = minimalModifiers(typeInfo).stream()
                     .map(mod -> new OutputBuilderImpl().add(mod.keyword()))

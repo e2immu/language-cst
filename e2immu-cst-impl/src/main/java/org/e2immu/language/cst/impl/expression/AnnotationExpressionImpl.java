@@ -161,6 +161,15 @@ public class AnnotationExpressionImpl extends ExpressionImpl implements Annotati
     }
 
     @Override
+    public List<Float> extractFloatArray(String key) {
+        return keyValuePairs.stream()
+                .filter(kv -> key.equals(kv.key()))
+                .map(kv -> ((ArrayInitializer) kv.value()).expressions().stream()
+                        .map(e -> ((FloatConstant) e).constant()).toList())
+                .findFirst().orElse(null);
+    }
+
+    @Override
     public String[] extractStringArray(String key) {
         return keyValuePairs.stream()
                 .filter(kv -> key.equals(kv.key()))
@@ -175,6 +184,17 @@ public class AnnotationExpressionImpl extends ExpressionImpl implements Annotati
                 .filter(kv -> key.equals(kv.key()))
                 .map(kv -> ((StringConstant) kv.value()).constant())
                 .findFirst().orElse(defaultValue);
+    }
+
+
+
+    @Override
+    public TypeInfo extractTypeInfo(String key) {
+        return keyValuePairs.stream()
+                .filter(kv -> key.equals(kv.key()))
+                .map(kv -> ((ClassExpression) kv.value()).constant())
+                .findFirst()
+                .map(ce -> ((ClassExpression)ce).type().typeInfo()).orElse(null);
     }
 
     @Override

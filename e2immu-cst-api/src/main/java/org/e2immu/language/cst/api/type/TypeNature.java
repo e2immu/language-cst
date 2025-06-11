@@ -22,5 +22,7 @@ public interface TypeNature {
      */
     boolean isStub();
 
+    boolean isPackageInfo();
+
     Keyword keyword();
 }

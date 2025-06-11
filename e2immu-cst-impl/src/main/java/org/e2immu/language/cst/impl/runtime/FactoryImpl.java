@@ -1293,6 +1293,11 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
+    public TypeNature typeNaturePackageInfo() {
+        return TypeNatureEnum.PACKAGE_INFO;
+    }
+
+    @Override
     public TypeNature typeNatureRecord() {
         return TypeNatureEnum.RECORD;
     }

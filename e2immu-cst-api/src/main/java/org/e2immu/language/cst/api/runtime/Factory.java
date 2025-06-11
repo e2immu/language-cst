@@ -503,6 +503,8 @@ public interface Factory {
 
     TypeNature typeNatureInterface();
 
+    TypeNature typeNaturePackageInfo();
+
     TypeNature typeNatureRecord();
 
     TypeNature typeNatureStub();
