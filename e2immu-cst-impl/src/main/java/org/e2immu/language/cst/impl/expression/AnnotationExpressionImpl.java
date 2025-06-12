@@ -192,7 +192,7 @@ public class AnnotationExpressionImpl extends ExpressionImpl implements Annotati
     public TypeInfo extractTypeInfo(String key) {
         return keyValuePairs.stream()
                 .filter(kv -> key.equals(kv.key()))
-                .map(kv -> ((ClassExpression) kv.value()).constant().typeInfo())
+                .map(kv -> ((ClassExpression) kv.value()).type().typeInfo())
                 .findFirst().orElse(null);
     }
 
