@@ -59,7 +59,7 @@ public class AnnotationExpressionImpl extends ExpressionImpl implements Annotati
     @Override
     public void visit(Predicate<Element> predicate) {
         if (predicate.test(this)) {
-            keyValuePairs.forEach(kv -> predicate.test(kv.value()));
+            keyValuePairs.forEach(kv -> kv.value().visit(predicate));
         }
     }
 
