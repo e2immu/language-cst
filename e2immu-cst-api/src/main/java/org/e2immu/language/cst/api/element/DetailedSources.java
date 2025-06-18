@@ -1,5 +1,6 @@
 package org.e2immu.language.cst.api.element;
 
+import org.e2immu.annotation.NotNull;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 
 import java.util.List;
@@ -13,7 +14,9 @@ public interface DetailedSources {
 
     Source detail(Object object);
 
-    // use for types
+    // use for typeInfo objects when the detailed sources contain parameterized types, where the same typeInfo object
+    // can occur multiple times
+    @NotNull
     List<Source> details(Object object);
 
     DetailedSources merge(DetailedSources other);

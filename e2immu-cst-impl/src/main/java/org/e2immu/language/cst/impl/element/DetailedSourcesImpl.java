@@ -25,7 +25,7 @@ public class DetailedSourcesImpl implements DetailedSources {
         @Override
         public Builder addAll(DetailedSources detailedSources) {
             identityHashMap.putAll(((DetailedSourcesImpl) detailedSources).identityHashMap);
-            if(association != null) {
+            if (association != null) {
                 association.putAll(((DetailedSourcesImpl) detailedSources).association);
             }
             return this;
@@ -77,7 +77,12 @@ public class DetailedSourcesImpl implements DetailedSources {
     @SuppressWarnings("unchecked")
     @Override
     public List<Source> details(Object object) {
-        return (List<Source>) identityHashMap.get(object);
+        Object o = identityHashMap.get(object);
+        if (o == null) return List.of();
+        if (o instanceof List) {
+            return (List<Source>) o;
+        }
+        return List.of((Source) o);
     }
 
     public Source detail(Object object) {
