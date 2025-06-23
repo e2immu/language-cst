@@ -344,37 +344,9 @@ public interface TypeInfo extends NamedType, Info {
         SIMPLE, QUALIFIED, FULLY_QUALIFIED;
     }
 
-    record QualificationData(QualificationState state, TypeInfo qualifier) {
+    record QualificationData(QualificationState state, TypeInfo qualifier, String qualifiedName) {
     }
 
-    static QualificationData qualifyingTypeSimpleName(Source source, ParameterizedType pt) {
-        TypeInfo typeInfo = pt.typeInfo();
-        if (typeInfo == null) {
-            return new QualificationData(QualificationState.SIMPLE, null); // type parameter
-        }
-        Source s;
-        if (pt.parameters().isEmpty()) {
-            s = source.detailedSources().detail(pt);
-        } else {
-            s = source.detailedSources().detail(typeInfo);
-        }
-        int len = s.endPos() - s.beginPos() + 1;
-        int diff = len - typeInfo.simpleName().length();
-        if (diff == 0) return new QualificationData(QualificationState.SIMPLE, null);
-        return remainderQualification(diff - 1, typeInfo); // -1 to remove the dot
-    }
+    QualificationData qualificationData(Source source);
 
-    private static QualificationData remainderQualification(int diff, TypeInfo typeInfo) {
-        assert diff > 0;
-        if (typeInfo.compilationUnitOrEnclosingType().isLeft()) {
-            // the rest must be package
-            return new QualificationData(QualificationState.FULLY_QUALIFIED, null);
-        }
-        TypeInfo enclosing = typeInfo.compilationUnitOrEnclosingType().getRight();
-        int diff2 = diff - enclosing.simpleName().length();
-        if (diff2 == 0) {
-            return new QualificationData(QualificationState.QUALIFIED, enclosing);
-        }
-        return remainderQualification(diff2 - 1, enclosing);
-    }
 }

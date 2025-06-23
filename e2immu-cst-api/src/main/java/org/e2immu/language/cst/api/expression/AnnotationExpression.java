@@ -2,6 +2,7 @@ package org.e2immu.language.cst.api.expression;
 
 import org.e2immu.annotation.Fluent;
 import org.e2immu.language.cst.api.element.Element;
+import org.e2immu.language.cst.api.element.Source;
 import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.translate.TranslationMap;
@@ -9,7 +10,6 @@ import org.e2immu.language.cst.api.translate.TranslationMap;
 import java.util.List;
 
 public interface AnnotationExpression extends Expression {
-
 
     interface KV {
         String key();
@@ -54,4 +54,7 @@ public interface AnnotationExpression extends Expression {
     List<Float> extractFloatArray(String key);
 
     AnnotationExpression withKeyValuePair(String key, Expression value);
+
+    TypeInfo.QualificationData qualificationData();
+
 }

@@ -251,4 +251,10 @@ public class AnnotationExpressionImpl extends ExpressionImpl implements Annotati
         return new AnnotationExpressionImpl(comments(), source(), infoMap.typeInfo(typeInfo),
                 keyValuePairs.stream().map(kv -> kv.rewire(infoMap)).toList());
     }
+
+    @Override
+    public TypeInfo.QualificationData qualificationData() {
+        Source tiSource = source().detailedSources().detail(typeInfo);
+        return typeInfo.qualificationData(tiSource);
+    }
 }

@@ -1,6 +1,7 @@
 package org.e2immu.language.cst.impl.type;
 
 import org.e2immu.language.cst.api.element.Element;
+import org.e2immu.language.cst.api.element.Source;
 import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.info.MethodInfo;
 import org.e2immu.language.cst.api.info.TypeInfo;
@@ -769,5 +770,22 @@ public class ParameterizedTypeImpl implements ParameterizedType {
                 ++i;
             }
         }
+    }
+
+    @Override
+    public TypeInfo.QualificationData qualificationData(Source source) {
+        if (typeInfo == null) {
+            if (typeParameter == null) {
+                return new TypeInfo.QualificationData(TypeInfo.QualificationState.SIMPLE, null, "?");
+            }
+            return new TypeInfo.QualificationData(TypeInfo.QualificationState.SIMPLE, null, typeParameter.simpleName()); // type parameter
+        }
+        Source s;
+        if (parameters.isEmpty()) {
+            s = source.detailedSources().detail(this);
+        } else {
+            s = source.detailedSources().detail(typeInfo);
+        }
+        return typeInfo.qualificationData(s);
     }
 }
