@@ -5,4 +5,6 @@ module org.e2immu.language.cst.io {
     requires org.slf4j;
 
     exports org.e2immu.language.cst.io;
+    exports org.parsers.json;
+    exports org.parsers.json.ast;
 }
