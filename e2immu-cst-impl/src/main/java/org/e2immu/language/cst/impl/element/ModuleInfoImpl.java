@@ -2,13 +2,16 @@ package org.e2immu.language.cst.impl.element;
 
 import org.e2immu.language.cst.api.element.*;
 import org.e2immu.language.cst.api.info.InfoMap;
+import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.variable.DescendMode;
 import org.e2immu.language.cst.api.variable.Variable;
+import org.e2immu.support.SetOnce;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -37,6 +40,10 @@ public class ModuleInfoImpl extends ElementImpl implements ModuleInfo {
 
     private record RequiresImpl(Source source, List<Comment> comments, String name, boolean isStatic,
                                 boolean isTransitive) implements Requires {
+        RequiresImpl {
+            Objects.requireNonNull(name);
+        }
+
         @Override
         public int complexity() {
             return 0;
@@ -85,6 +92,10 @@ public class ModuleInfoImpl extends ElementImpl implements ModuleInfo {
 
     private record ExportsImpl(Source source, List<Comment> comments, String packageName,
                                String toPackageNameOrNull) implements Exports {
+        ExportsImpl {
+            Objects.requireNonNull(packageName);
+        }
+
         @Override
         public int complexity() {
             return 0;
@@ -133,6 +144,10 @@ public class ModuleInfoImpl extends ElementImpl implements ModuleInfo {
 
     private record OpensImpl(Source source, List<Comment> comments, String packageName,
                              String toPackageNameOrNull) implements Opens {
+        OpensImpl {
+            Objects.requireNonNull(packageName);
+        }
+
         @Override
         public int complexity() {
             return 0;
@@ -179,7 +194,43 @@ public class ModuleInfoImpl extends ElementImpl implements ModuleInfo {
         }
     }
 
-    private record UsesImpl(Source source, List<Comment> comments, String api) implements Uses {
+    private static class UsesImpl implements Uses {
+        private final Source source;
+        private final List<Comment> comments;
+        private final String api;
+        private final SetOnce<TypeInfo> apiResolved = new SetOnce<>();
+
+        UsesImpl(Source source, List<Comment> comments, String api) {
+            this.source = source;
+            this.comments = comments;
+            this.api = Objects.requireNonNull(api);
+        }
+
+        @Override
+        public Source source() {
+            return source;
+        }
+
+        @Override
+        public List<Comment> comments() {
+            return comments;
+        }
+
+        @Override
+        public String api() {
+            return api;
+        }
+
+        @Override
+        public TypeInfo apiResolved() {
+            return apiResolved.getOrDefaultNull();
+        }
+
+        @Override
+        public void setApiResolved(TypeInfo typeInfo) {
+            this.apiResolved.set(typeInfo);
+        }
+
         @Override
         public int complexity() {
             return 0;
@@ -222,12 +273,66 @@ public class ModuleInfoImpl extends ElementImpl implements ModuleInfo {
 
         @Override
         public Stream<TypeReference> typesReferenced() {
-            return Stream.empty();
+            TypeInfo resolved = apiResolved();
+            return resolved == null ? Stream.empty() : Stream.of(new ElementImpl.TypeReference(resolved, true));
         }
     }
 
-    private record ProvidesImpl(Source source, List<Comment> comments, String api,
-                                String implementation) implements Provides {
+    private static class ProvidesImpl implements Provides {
+        private final Source source;
+        private final List<Comment> comments;
+        private final String api;
+        private final String implementation;
+        private final SetOnce<TypeInfo> apiResolved = new SetOnce<>();
+        private final SetOnce<TypeInfo> implementationResolved = new SetOnce<>();
+
+        ProvidesImpl(Source source, List<Comment> comments, String api, String implementation) {
+            this.source = source;
+            this.comments = comments;
+            this.api = Objects.requireNonNull(api);
+            this.implementation = Objects.requireNonNull(implementation);
+        }
+
+        @Override
+        public Source source() {
+            return source;
+        }
+
+        @Override
+        public List<Comment> comments() {
+            return comments;
+        }
+
+        @Override
+        public String api() {
+            return api;
+        }
+
+        @Override
+        public String implementation() {
+            return implementation;
+        }
+
+        @Override
+        public void setApiResolved(TypeInfo typeInfo) {
+            this.apiResolved.set(typeInfo);
+        }
+
+        @Override
+        public TypeInfo apiResolved() {
+            return apiResolved.getOrDefaultNull();
+        }
+
+        @Override
+        public void setImplementationResolved(TypeInfo typeInfo) {
+            this.implementationResolved.set(typeInfo);
+        }
+
+        @Override
+        public TypeInfo implementationResolved() {
+            return implementationResolved.getOrDefaultNull();
+        }
+
         @Override
         public int complexity() {
             return 0;
@@ -270,7 +375,13 @@ public class ModuleInfoImpl extends ElementImpl implements ModuleInfo {
 
         @Override
         public Stream<TypeReference> typesReferenced() {
-            return Stream.empty();
+            TypeInfo a = apiResolved();
+            Stream<ElementImpl.TypeReference> s1 = a == null ? Stream.empty()
+                    : Stream.of(new ElementImpl.TypeReference(a, true));
+            TypeInfo i = implementationResolved();
+            Stream<ElementImpl.TypeReference> s2 = i == null ? Stream.empty()
+                    : Stream.of(new ElementImpl.TypeReference(i, true));
+            return Stream.concat(s1, s2);
         }
     }
 

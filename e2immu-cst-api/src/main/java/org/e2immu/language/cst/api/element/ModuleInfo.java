@@ -1,5 +1,7 @@
 package org.e2immu.language.cst.api.element;
 
+import org.e2immu.language.cst.api.info.TypeInfo;
+
 import java.util.List;
 
 public interface ModuleInfo extends Element {
@@ -53,12 +55,27 @@ public interface ModuleInfo extends Element {
     }
 
     interface Uses extends Element {
+        String api();
 
+        // set once
+        void setApiResolved(TypeInfo typeInfo);
+
+        TypeInfo apiResolved();
     }
 
     interface Provides extends Element {
         String api();
 
+        // set once
+        void setApiResolved(TypeInfo typeInfo);
+
+        TypeInfo apiResolved();
+
         String implementation();
+
+        // set once
+        void setImplementationResolved(TypeInfo typeInfo);
+
+        TypeInfo implementationResolved();
     }
 }
