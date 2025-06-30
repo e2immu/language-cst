@@ -289,6 +289,8 @@ public interface Factory {
 
     MethodReference.Builder newMethodReferenceBuilder();
 
+    ModuleInfo.Builder newModuleInfoBuilder();
+
     Expression newMultiExpressions(List<Expression> newExpressions);
 
     MultiLineComment newMultilineComment(Source source, String comment);

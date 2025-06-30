@@ -752,6 +752,11 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
+    public ModuleInfo.Builder newModuleInfoBuilder() {
+        return new ModuleInfoImpl.BuilderImpl();
+    }
+
+    @Override
     public Expression newMultiExpressions(List<Expression> expressions) {
         return new CommaExpressionImpl(List.of(), null, expressions);
     }

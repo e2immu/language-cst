@@ -105,4 +105,9 @@ public interface SourceSet {
     SourceSet withSourceDirectoriesUri(List<Path> sourceDirectories, URI uri);
 
     SourceSet withSourceDirectories(List<Path> sourceDirectories);
+
+    // this is a set-once!
+    void setModuleInfo(ModuleInfo moduleInfo);
+
+    ModuleInfo moduleInfo();
 }
