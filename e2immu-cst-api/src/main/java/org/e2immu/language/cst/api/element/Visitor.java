@@ -6,6 +6,14 @@ import org.e2immu.language.cst.api.variable.Variable;
 
 public interface Visitor {
 
+    default boolean beforeModule(ModuleInfo moduleInfo) {
+        return true; // go deeper;
+    }
+
+    default void afterModule() {
+        // do nothing
+    }
+
     default boolean beforeStatement(Statement statement) {
         return true; // go deeper
     }
