@@ -251,7 +251,7 @@ public class CodecImpl implements Codec {
             int index = Integer.parseInt(m.group(2));
             MethodInfo methodInfo = typeInfo.methods().get(index);
             assert !methodInfo.isConstructor();
-            assert methodInfo.name().equals(m.group(1));
+            assert methodInfo.name().equals(m.group(1)):"Method names do not agree: "+methodInfo+" vs "+m.group(1);
             return methodInfo;
         } else throw new UnsupportedOperationException();
     }
