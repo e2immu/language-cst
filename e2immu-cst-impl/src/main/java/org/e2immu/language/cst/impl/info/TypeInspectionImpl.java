@@ -391,6 +391,11 @@ public class TypeInspectionImpl extends InspectionImpl implements TypeInspection
         public int anonymousTypes() {
             return anonymousTypes;
         }
+
+        @Override
+        public String toString() {
+            return "TypeInspectionImpl.Builder of " + typeInfo;
+        }
     }
 
     @Override
