@@ -695,6 +695,11 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
+    public LocalTypeDeclaration.Builder newLocalTypeDeclarationBuilder() {
+        return new LocalTypeDeclarationImpl.Builder();
+    }
+
+    @Override
     public LocalVariable newLocalVariable(String name, ParameterizedType parameterizedType) {
         return new LocalVariableImpl(name, parameterizedType, null);
     }
@@ -932,6 +937,11 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     @Override
     public TypeInfo newTypeInfo(TypeInfo typeInfo, String capitalized) {
         return new TypeInfoImpl(typeInfo, capitalized);
+    }
+
+    @Override
+    public TypeInfo newTypeInfo(MethodInfo methodInfo, String simpleName) {
+        return new TypeInfoImpl(methodInfo, simpleName);
     }
 
     @Override

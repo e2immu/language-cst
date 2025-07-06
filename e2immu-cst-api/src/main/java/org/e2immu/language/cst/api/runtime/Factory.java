@@ -267,6 +267,8 @@ public interface Factory {
 
     Lambda.Builder newLambdaBuilder();
 
+    LocalTypeDeclaration.Builder newLocalTypeDeclarationBuilder();
+
     LocalVariable newLocalVariable(String name, ParameterizedType parameterizedType);
 
     LocalVariable newLocalVariable(String name, ParameterizedType parameterizedType, Expression assignmentExpression);
@@ -375,6 +377,8 @@ public interface Factory {
     TypeExpression.Builder newTypeExpressionBuilder();
 
     TypeInfo newTypeInfo(TypeInfo typeInfo, String simpleName);
+
+    TypeInfo newTypeInfo(MethodInfo methodInfo, String simpleName);
 
     TypeInfo newTypeInfo(CompilationUnit cu, String simpleName);
 
