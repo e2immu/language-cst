@@ -389,6 +389,10 @@ public class ParameterizedTypeImpl implements ParameterizedType {
     @Override
     public ParameterizedType concreteSuperType(ParameterizedType superType) {
         TypeInfo bestType = bestTypeInfo();
+        if (bestType == null) {
+            assert superType.isJavaLangObject();
+            return superType;
+        }
         if (bestType == superType.typeInfo()) {
             // if we start with Iterable<String>, and we're aiming for Iterable<E>, then
             // Iterable<String> is the right answer
