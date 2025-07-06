@@ -46,6 +46,11 @@ public class LocalTypeDeclarationImpl extends StatementImpl implements LocalType
     }
 
     @Override
+    public TypeInfo typeInfo() {
+        return typeInfo;
+    }
+
+    @Override
     public boolean hasSubBlocks() {
         return false;
     }

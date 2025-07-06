@@ -54,9 +54,10 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
         this(enclosingType, "$" + index);
     }
 
-    public TypeInfoImpl(MethodInfo enclosingMethod, String simpleName) {
+    public TypeInfoImpl(MethodInfo enclosingMethod, String simpleName, int index) {
         this.simpleName = simpleName;
-        fullyQualifiedName = enclosingMethod.typeInfo().fullyQualifiedName() + ".$" + enclosingMethod.name() + "$" + simpleName;
+        fullyQualifiedName = enclosingMethod.typeInfo().fullyQualifiedName() + "."
+                             + index + "$" + enclosingMethod.name() + "$" + simpleName;
         this.compilationUnitOrEnclosingType = Either.right(enclosingMethod.typeInfo());
         inspection.setVariable(new TypeInspectionImpl.Builder(this));
     }

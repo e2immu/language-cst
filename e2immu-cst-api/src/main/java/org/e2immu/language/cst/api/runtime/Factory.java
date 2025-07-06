@@ -378,7 +378,7 @@ public interface Factory {
 
     TypeInfo newTypeInfo(TypeInfo typeInfo, String simpleName);
 
-    TypeInfo newTypeInfo(MethodInfo methodInfo, String simpleName);
+    TypeInfo newTypeInfo(MethodInfo methodInfo, String simpleName, int index);
 
     TypeInfo newTypeInfo(CompilationUnit cu, String simpleName);
 

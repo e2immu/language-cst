@@ -940,8 +940,8 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
-    public TypeInfo newTypeInfo(MethodInfo methodInfo, String simpleName) {
-        return new TypeInfoImpl(methodInfo, simpleName);
+    public TypeInfo newTypeInfo(MethodInfo methodInfo, String simpleName, int index) {
+        return new TypeInfoImpl(methodInfo, simpleName, index);
     }
 
     @Override

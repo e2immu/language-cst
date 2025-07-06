@@ -6,6 +6,8 @@ import org.e2immu.language.cst.api.info.TypeInfo;
 
 public interface LocalTypeDeclaration extends Statement {
 
+    TypeInfo typeInfo();
+
     LocalTypeDeclaration withSource(Source newSource);
 
     interface Builder extends Statement.Builder<Builder> {
