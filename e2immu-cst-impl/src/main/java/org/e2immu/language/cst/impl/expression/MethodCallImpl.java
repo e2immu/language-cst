@@ -1,7 +1,6 @@
 package org.e2immu.language.cst.impl.expression;
 
 import org.e2immu.language.cst.api.analysis.PropertyValueMap;
-import org.e2immu.language.cst.api.analysis.Value;
 import org.e2immu.language.cst.api.element.Comment;
 import org.e2immu.language.cst.api.element.Element;
 import org.e2immu.language.cst.api.element.Source;
@@ -17,17 +16,14 @@ import org.e2immu.language.cst.api.output.element.TypeName;
 import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.variable.DescendMode;
-import org.e2immu.language.cst.api.variable.FieldReference;
 import org.e2immu.language.cst.api.variable.This;
 import org.e2immu.language.cst.api.variable.Variable;
-import org.e2immu.language.cst.impl.analysis.PropertyImpl;
 import org.e2immu.language.cst.impl.analysis.PropertyValueMapImpl;
-import org.e2immu.language.cst.impl.analysis.ValueImpl;
 import org.e2immu.language.cst.impl.element.ElementImpl;
 import org.e2immu.language.cst.impl.expression.util.ExpressionComparator;
 import org.e2immu.language.cst.impl.expression.util.PrecedenceEnum;
 import org.e2immu.language.cst.impl.output.*;
-import org.e2immu.language.cst.impl.variable.FieldReferenceImpl;
+import org.e2immu.language.cst.impl.type.DiamondEnum;
 
 import java.util.List;
 import java.util.Objects;
@@ -40,20 +36,22 @@ public class MethodCallImpl extends ExpressionImpl implements MethodCall {
     private final MethodInfo methodInfo;
     private final List<Expression> parameterExpressions;
     private final ParameterizedType concreteReturnType;
+    private final List<ParameterizedType> typeArguments;// X.<T1>someMethod(...)
     private final String modificationTimes;
     private final PropertyValueMap propertyValueMap;
 
     public MethodCallImpl(List<Comment> comments, Source source,
                           Expression object, boolean objectIsImplicit, MethodInfo methodInfo,
                           List<Expression> parameterExpressions, ParameterizedType concreteReturnType,
-                          String modificationTimes) {
+                          List<ParameterizedType> typeArguments, String modificationTimes) {
         this(comments, source, object, objectIsImplicit, methodInfo, parameterExpressions, concreteReturnType,
-                modificationTimes, new PropertyValueMapImpl());
+                typeArguments, modificationTimes, new PropertyValueMapImpl());
     }
 
     private MethodCallImpl(List<Comment> comments, Source source,
                            Expression object, boolean objectIsImplicit, MethodInfo methodInfo,
                            List<Expression> parameterExpressions, ParameterizedType concreteReturnType,
+                           List<ParameterizedType> typeArguments,
                            String modificationTimes, PropertyValueMap propertyValueMap) {
         super(comments, source, object.complexity()
                                 + parameterExpressions.stream().mapToInt(Expression::complexity).sum());
@@ -61,6 +59,7 @@ public class MethodCallImpl extends ExpressionImpl implements MethodCall {
         this.objectIsImplicit = objectIsImplicit;
         this.parameterExpressions = Objects.requireNonNull(parameterExpressions);
         this.concreteReturnType = Objects.requireNonNull(concreteReturnType);
+        this.typeArguments = Objects.requireNonNull(typeArguments);
         this.methodInfo = Objects.requireNonNull(methodInfo);
         this.modificationTimes = Objects.requireNonNull(modificationTimes);
         assert !(object instanceof TypeExpression) || methodInfo.isStatic();
@@ -70,7 +69,7 @@ public class MethodCallImpl extends ExpressionImpl implements MethodCall {
     @Override
     public Expression withSource(Source source) {
         return new MethodCallImpl(comments(), source, object, objectIsImplicit, methodInfo, parameterExpressions,
-                concreteReturnType, modificationTimes, propertyValueMap);
+                concreteReturnType, typeArguments, modificationTimes, propertyValueMap);
     }
 
     public static class Builder extends ElementImpl.Builder<MethodCall.Builder> implements MethodCall.Builder {
@@ -79,6 +78,7 @@ public class MethodCallImpl extends ExpressionImpl implements MethodCall {
         private List<Expression> parameterExpressions;
         private boolean objectIsImplicit;
         private ParameterizedType concreteReturnType;
+        private List<ParameterizedType> typeArguments;
         private String modificationTimes = "";
 
         public Builder() {
@@ -92,6 +92,7 @@ public class MethodCallImpl extends ExpressionImpl implements MethodCall {
             objectIsImplicit = mc.objectIsImplicit();
             concreteReturnType = mc.concreteReturnType();
             modificationTimes = mc.modificationTimes();
+            typeArguments = mc.typeArguments();
         }
 
         @Override
@@ -101,41 +102,48 @@ public class MethodCallImpl extends ExpressionImpl implements MethodCall {
                                     + methodInfo;
             assert concreteReturnType != null : "Must set the concrete return type of call to " + methodInfo;
             return new MethodCallImpl(comments, source, object, objectIsImplicit, methodInfo,
-                    List.copyOf(parameterExpressions), concreteReturnType, modificationTimes);
+                    List.copyOf(parameterExpressions), concreteReturnType,
+                    typeArguments == null ? List.of() : List.copyOf(typeArguments), modificationTimes);
         }
 
         @Override
-        public MethodCall.Builder setObject(Expression object) {
+        public Builder setObject(Expression object) {
             this.object = object;
             return this;
         }
 
         @Override
-        public MethodCall.Builder setMethodInfo(MethodInfo methodInfo) {
+        public Builder setMethodInfo(MethodInfo methodInfo) {
             this.methodInfo = methodInfo;
             return this;
         }
 
         @Override
-        public MethodCall.Builder setModificationTimes(String modificationTimes) {
+        public Builder setModificationTimes(String modificationTimes) {
             this.modificationTimes = modificationTimes;
             return this;
         }
 
         @Override
-        public MethodCall.Builder setParameterExpressions(List<Expression> expressions) {
+        public Builder setParameterExpressions(List<Expression> expressions) {
             this.parameterExpressions = expressions;
             return this;
         }
 
         @Override
-        public MethodCall.Builder setObjectIsImplicit(boolean objectIsImplicit) {
+        public Builder setTypeArguments(List<ParameterizedType> typeArguments) {
+            this.typeArguments = typeArguments;
+            return this;
+        }
+
+        @Override
+        public Builder setObjectIsImplicit(boolean objectIsImplicit) {
             this.objectIsImplicit = objectIsImplicit;
             return this;
         }
 
         @Override
-        public MethodCall.Builder setConcreteReturnType(ParameterizedType returnType) {
+        public Builder setConcreteReturnType(ParameterizedType returnType) {
             this.concreteReturnType = returnType;
             return this;
         }
@@ -191,13 +199,18 @@ public class MethodCallImpl extends ExpressionImpl implements MethodCall {
     @Override
     public MethodCall withParameterExpressions(List<Expression> parameterExpressions) {
         return new MethodCallImpl(comments(), source(), object, objectIsImplicit, methodInfo, parameterExpressions,
-                concreteReturnType, modificationTimes, propertyValueMap);
+                concreteReturnType, typeArguments, modificationTimes, propertyValueMap);
     }
 
     @Override
     public MethodCall withObject(Expression object) {
         return new MethodCallImpl(comments(), source(), object, objectIsImplicit, methodInfo, parameterExpressions,
-                concreteReturnType, modificationTimes, propertyValueMap);
+                concreteReturnType, typeArguments, modificationTimes, propertyValueMap);
+    }
+
+    @Override
+    public List<ParameterizedType> typeArguments() {
+        return typeArguments;
     }
 
     @Override
@@ -248,8 +261,22 @@ public class MethodCallImpl extends ExpressionImpl implements MethodCall {
         boolean last = false;
         boolean start = false;
         GuideImpl.GuideGenerator gg = null;
+
+        String methodName;
+        if (!typeArguments.isEmpty()) {
+            // TODO this is a hack; type arguments interfere with the QualifiedNameImpl implementation
+            //   implement properly!
+            String ta = new OutputBuilderImpl().add(typeArguments.stream()
+                    .map(pt -> pt.print(qualification, false, DiamondEnum.SHOW_ALL))
+                    .collect(OutputBuilderImpl.joining(SymbolEnum.COMMA, SymbolEnum.LEFT_ANGLE_BRACKET,
+                            SymbolEnum.RIGHT_ANGLE_BRACKET, GuideImpl.defaultGuideGenerator()))).toString();
+            methodName = ta + " " + methodInfo.name();
+        } else {
+            methodName = methodInfo.name();
+        }
+
         if (objectIsImplicit && qualification.doNotQualifyImplicit()) {
-            outputBuilder.add(new TextImpl(methodInfo.name()));
+            outputBuilder.add(new TextImpl(methodName));
         } else {
             VariableExpression ve;
             MethodCall methodCall;
@@ -265,7 +292,7 @@ public class MethodCallImpl extends ExpressionImpl implements MethodCall {
                 outputBuilder.add(((MethodCallImpl) methodCall).print(qualification, gg)); // recursive call
                 outputBuilder.add(gg.mid());
                 outputBuilder.add(SymbolEnum.DOT);
-                outputBuilder.add(new TextImpl(methodInfo.name()));
+                outputBuilder.add(new TextImpl(methodName));
             } else if ((typeExpression = object.asInstanceOf(TypeExpression.class)) != null) {
                 /*
                 we may or may not need to write the type here.
@@ -274,7 +301,7 @@ public class MethodCallImpl extends ExpressionImpl implements MethodCall {
                 assert methodInfo.isStatic();
                 TypeInfo typeInfo = typeExpression.parameterizedType().typeInfo();
                 TypeName typeName = TypeNameImpl.typeName(typeInfo, qualification.qualifierRequired(typeInfo), false);
-                outputBuilder.add(new QualifiedNameImpl(methodInfo.name(), typeName,
+                outputBuilder.add(new QualifiedNameImpl(methodName, typeName,
                         qualification.qualifierRequired(methodInfo) ? QualifiedNameImpl.Required.YES : QualifiedNameImpl.Required.NO_METHOD));
                 if (guideGenerator != null) start = true;
             } else if ((ve = object.asInstanceOf(VariableExpression.class)) != null &&
@@ -288,7 +315,7 @@ public class MethodCallImpl extends ExpressionImpl implements MethodCall {
                 ThisName thisName = new ThisNameImpl(thisVar.writeSuper(), typeName,
                         qualification.qualifierRequired(thisVar));
                 boolean qualifierRequired = qualification.qualifierRequired(methodInfo);
-                outputBuilder.add(new QualifiedNameImpl(methodInfo.name(), thisName,
+                outputBuilder.add(new QualifiedNameImpl(methodName, thisName,
                         qualifierRequired ? QualifiedNameImpl.Required.YES : QualifiedNameImpl.Required.NO_METHOD));
                 if (guideGenerator != null) start = true;
             } else {
@@ -296,7 +323,7 @@ public class MethodCallImpl extends ExpressionImpl implements MethodCall {
                 outputBuilder.add(outputInParenthesis(qualification, precedence(), object));
                 if (guideGenerator != null) outputBuilder.add(guideGenerator.start());
                 outputBuilder.add(SymbolEnum.DOT);
-                outputBuilder.add(new TextImpl(methodInfo.name()));
+                outputBuilder.add(new TextImpl(methodName));
             }
         }
 
@@ -327,8 +354,9 @@ public class MethodCallImpl extends ExpressionImpl implements MethodCall {
 
     @Override
     public Stream<Element.TypeReference> typesReferenced() {
-        return Stream.concat(object.typesReferenced(),
-                parameterExpressions.stream().flatMap(Expression::typesReferenced));
+        return Stream.concat(typeArguments.stream().flatMap(ParameterizedType::typesReferencedMadeExplicit),
+                Stream.concat(object.typesReferenced(),
+                        parameterExpressions.stream().flatMap(Expression::typesReferenced)));
     }
 
     @Override
@@ -343,18 +371,22 @@ public class MethodCallImpl extends ExpressionImpl implements MethodCall {
                 parameterExpressions.stream().map(e -> e.translate(translationMap))
                         .filter(e -> !e.isEmpty()) // allows for removal of certain arguments
                         .collect(translationMap.toList(parameterExpressions));
+        List<ParameterizedType> trTypeArgs = typeArguments.stream()
+                .map(translationMap::translateType)
+                .collect(translationMap.toList(typeArguments));
         String newModificationTimes = Objects.requireNonNullElse(
                 translationMap.modificationTimes(this, translatedObject, translatedParameters),
                 modificationTimes);
-        if (translatedMethod.size() == 1 && translatedMethod.get(0) == methodInfo && translatedObject == object
+        if (translatedMethod.size() == 1 && translatedMethod.getFirst() == methodInfo && translatedObject == object
             && translatedReturnType == concreteReturnType
             && translatedParameters == parameterExpressions
             && newModificationTimes.equals(modificationTimes)
+            && trTypeArgs == typeArguments
             && (propertyValueMap.isEmpty() || !translationMap.isClearAnalysis())) {
             return this;
         }
         MethodCall translatedMc = new MethodCallImpl(comments(), source(), translatedObject, objectIsImplicit,
-                translatedMethod.get(0), translatedParameters, translatedReturnType, newModificationTimes,
+                translatedMethod.getFirst(), translatedParameters, translatedReturnType, trTypeArgs, newModificationTimes,
                 translationMap.isClearAnalysis() ? new PropertyValueMapImpl() : propertyValueMap);
         if (translationMap.translateAgain() && !this.equals(translatedMc)) {
             return translatedMc.translate(translationMap);
@@ -371,7 +403,9 @@ public class MethodCallImpl extends ExpressionImpl implements MethodCall {
     public Expression rewire(InfoMap infoMap) {
         List<Expression> rewiredParams = parameterExpressions.stream().map(e -> e.rewire(infoMap)).toList();
         return new MethodCallImpl(comments(), source(), object.rewire(infoMap), objectIsImplicit,
-                infoMap.methodInfo(methodInfo), rewiredParams, concreteReturnType.rewire(infoMap), modificationTimes,
+                infoMap.methodInfo(methodInfo), rewiredParams, concreteReturnType.rewire(infoMap),
+                typeArguments.stream().map(pt -> pt.rewire(infoMap)).toList(),
+                modificationTimes,
                 propertyValueMap.rewire(infoMap));
     }
 }

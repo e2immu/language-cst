@@ -15,6 +15,8 @@ public interface ConstructorCall extends Expression {
 
     List<Expression> parameterExpressions();
 
+    List<ParameterizedType> typeArguments();
+
     TypeInfo anonymousClass();
 
     ArrayInitializer arrayInitializer();
@@ -49,6 +51,9 @@ public interface ConstructorCall extends Expression {
 
         @Fluent
         Builder setConcreteReturnType(ParameterizedType returnType);
+
+        @Fluent
+        Builder setTypeArguments(List<ParameterizedType> typeArguments);
     }
 
     String NAME = "constructorCall";

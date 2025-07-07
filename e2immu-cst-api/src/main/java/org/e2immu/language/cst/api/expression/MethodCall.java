@@ -21,6 +21,8 @@ public interface MethodCall extends Expression, OneVariable {
 
     ParameterizedType concreteReturnType();
 
+    List<ParameterizedType> typeArguments();
+
     MethodCall withObject(Expression object);
 
     // make a copy, with different parameters
@@ -40,6 +42,9 @@ public interface MethodCall extends Expression, OneVariable {
 
         @Fluent
         Builder setParameterExpressions(List<Expression> expressions);
+
+        @Fluent
+        Builder setTypeArguments(List<ParameterizedType> typeArguments);
 
         @Fluent
         Builder setObjectIsImplicit(boolean objectIsImplicit);
