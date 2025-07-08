@@ -526,9 +526,8 @@ public class ParameterizedTypeImpl implements ParameterizedType {
     @Override
     public ParameterizedType mostSpecific(Predefined runtime, TypeInfo primaryType, ParameterizedType other) {
         if (equals(other)) return this;
-        if (isType() && typeInfo.isVoid() || other.isType() && other.typeInfo().isVoid()) {
-            return runtime.voidParameterizedType();
-        }
+        if (isType() && typeInfo.isVoid()) return other;
+        if (other.isType() && other.typeInfo().isVoid()) return this;
         if (isTypeParameter()) {
             if (other.isTypeParameter()) {
                 // a type parameter in the primary type has priority over another one

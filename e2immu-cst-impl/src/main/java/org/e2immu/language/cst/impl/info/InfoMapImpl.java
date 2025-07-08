@@ -4,16 +4,16 @@ import org.e2immu.language.cst.api.expression.AnnotationExpression;
 import org.e2immu.language.cst.api.info.*;
 import org.e2immu.language.cst.impl.statement.BlockImpl;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class InfoMapImpl implements InfoMap {
-    private final Map<String, TypeInfo> typeInfoMap = new HashMap<>();
-    private final Map<String, MethodInfo> methodInfoMap = new HashMap<>();
-    private final Map<String, FieldInfo> fieldInfoMap = new HashMap<>();
-    private final Map<String, ParameterInfo> parameterInfoMap = new HashMap<>();
+    private final Map<String, TypeInfo> typeInfoMap = new ConcurrentHashMap<>();
+    private final Map<String, MethodInfo> methodInfoMap = new ConcurrentHashMap<>();
+    private final Map<String, FieldInfo> fieldInfoMap = new ConcurrentHashMap<>();
+    private final Map<String, ParameterInfo> parameterInfoMap = new ConcurrentHashMap<>();
     private final Set<TypeInfo> setOfTypesToRewire;
 
     public InfoMapImpl(Set<TypeInfo> setOfTypesToRewire) {
