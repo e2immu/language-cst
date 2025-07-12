@@ -118,6 +118,11 @@ public class SourceImpl implements Source {
     }
 
     @Override
+    public Source withEndPos(int endPos) {
+        return new SourceImpl(index, beginLine, beginPos, endLine, endPos);
+    }
+
+    @Override
     public String index() {
         return index;
     }

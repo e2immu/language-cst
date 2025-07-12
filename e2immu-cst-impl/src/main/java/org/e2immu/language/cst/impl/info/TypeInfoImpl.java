@@ -57,7 +57,7 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     public TypeInfoImpl(MethodInfo enclosingMethod, String simpleName, int index) {
         this.simpleName = simpleName;
         fullyQualifiedName = enclosingMethod.typeInfo().fullyQualifiedName() + "."
-                             + index + "$" + enclosingMethod.name() + "$" + simpleName;
+                + index + "$" + enclosingMethod.name() + "$" + simpleName;
         this.compilationUnitOrEnclosingType = Either.right(enclosingMethod.typeInfo());
         inspection.setVariable(new TypeInspectionImpl.Builder(this));
     }
@@ -117,8 +117,8 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
                 .toList();
         if (list.size() != 1) {
             throw new NoSuchElementException("Cannot find a unique method named '" + methodName
-                                             + "', with " + numberOfParameters + " parameters, in type "
-                                             + fullyQualifiedName);
+                    + "', with " + numberOfParameters + " parameters, in type "
+                    + fullyQualifiedName);
         }
         return list.getFirst();
     }
@@ -130,7 +130,7 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
                 .toList();
         if (list.size() != 1) {
             throw new NoSuchElementException("Found " + list.size() + " constructors with "
-                                             + numberOfParameters + " parameters");
+                    + numberOfParameters + " parameters");
         }
         return list.getFirst();
     }
@@ -139,11 +139,11 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     public MethodInfo findConstructor(TypeInfo typeOfFirstParameter) {
         List<MethodInfo> list = constructors().stream()
                 .filter(constructor -> !constructor.parameters().isEmpty()
-                                       && typeOfFirstParameter.equals(constructor.parameters().getFirst().parameterizedType().typeInfo()))
+                        && typeOfFirstParameter.equals(constructor.parameters().getFirst().parameterizedType().typeInfo()))
                 .toList();
         if (list.size() != 1) {
             throw new NoSuchElementException("Found " + list.size() + " constructors with "
-                                             + typeOfFirstParameter + " as type of the first parameter");
+                    + typeOfFirstParameter + " as type of the first parameter");
         }
         return list.getFirst();
     }
@@ -172,8 +172,8 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     public MethodInfo findUniqueMethod(String name, TypeInfo typeInfoOfFirstParameter) {
         List<MethodInfo> list = methods().stream()
                 .filter(mi -> name.equals(mi.name())
-                              && !mi.parameters().isEmpty()
-                              && typeInfoOfFirstParameter.equals(mi.parameters().getFirst().parameterizedType().typeInfo()))
+                        && !mi.parameters().isEmpty()
+                        && typeInfoOfFirstParameter.equals(mi.parameters().getFirst().parameterizedType().typeInfo()))
                 .toList();
         if (list.size() != 1) throw new NoSuchElementException();
         return list.getFirst();
@@ -255,8 +255,8 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     @Override
     public boolean isStatic() {
         return typeNature().isStatic()  // interface, enum, etc.. otherwise: CLASS
-               || isPrimaryType() // otherwise: subtype
-               || inspection.get().modifiers().stream().anyMatch(TypeModifier::isStatic);
+                || isPrimaryType() // otherwise: subtype
+                || inspection.get().modifiers().stream().anyMatch(TypeModifier::isStatic);
     }
 
     @Override
@@ -281,18 +281,18 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     @Override
     public boolean isNumeric() {
         return isInt() || isInteger() ||
-               isLong() || isBoxedLong() ||
-               isShort() || isBoxedShort() ||
-               isByte() || isBoxedByte() ||
-               isFloat() || isBoxedFloat() ||
-               isDouble() || isBoxedDouble() ||
-               isChar() || isCharacter();
+                isLong() || isBoxedLong() ||
+                isShort() || isBoxedShort() ||
+                isByte() || isBoxedByte() ||
+                isFloat() || isBoxedFloat() ||
+                isDouble() || isBoxedDouble() ||
+                isChar() || isCharacter();
     }
 
     @Override
     public boolean isBoxedExcludingVoid() {
         return isBoxedByte() || isBoxedShort() || isInteger() || isBoxedLong()
-               || isCharacter() || isBoxedFloat() || isBoxedDouble() || isBoxedBoolean();
+                || isCharacter() || isBoxedFloat() || isBoxedDouble() || isBoxedBoolean();
     }
 
     @Override
@@ -433,7 +433,7 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     @Override
     public boolean isPrimitiveExcludingVoid() {
         return this.isByte() || this.isShort() || this.isInt() || this.isLong() ||
-               this.isChar() || this.isFloat() || this.isDouble() || this.isBoolean();
+                this.isChar() || this.isFloat() || this.isDouble() || this.isBoolean();
     }
 
     @Override
@@ -897,23 +897,33 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     public QualificationData qualificationData(Source source) {
         int len = source.endPos() - source.beginPos() + 1;
         int diff = len - simpleName.length();
-        if (diff == 0) return new QualificationData(QualificationState.SIMPLE, null, simpleName);
-        return remainderQualification(diff - 1, "." + simpleName, this); // -1 to remove the dot
+        if (diff == 0) return new QualificationData(QualificationState.SIMPLE, null, simpleName, null);
+        Map<TypeInfo, Source> sourceMap = new HashMap<>();
+        // -1 to remove the dot
+        return remainderQualification(diff - 1, "." + simpleName, this, source, sourceMap);
     }
 
-    private QualificationData remainderQualification(int diff, String qualifiedName, TypeInfo start) {
+    private QualificationData remainderQualification(int diff,
+                                                     String qualifiedName,
+                                                     TypeInfo start,
+                                                     Source source,
+                                                     Map<TypeInfo, Source> sourceMap) {
         assert diff > 0;
         if (compilationUnitOrEnclosingType.isLeft()) {
             // the rest must be package
-            return new QualificationData(QualificationState.FULLY_QUALIFIED, null, start.fullyQualifiedName());
+            return new QualificationData(QualificationState.FULLY_QUALIFIED, null, start.fullyQualifiedName(),
+                    Map.copyOf(sourceMap));
         }
         TypeInfo enclosing = compilationUnitOrEnclosingType().getRight();
-        int diff2 = diff - enclosing.simpleName().length();
+        String simpleName = enclosing.simpleName();
+        Source newSource = source.withEndPos(source.beginPos() + diff - 1);
+        sourceMap.put(enclosing, newSource);
+        int diff2 = diff - simpleName.length();
         if (diff2 == 0) {
             return new QualificationData(QualificationState.QUALIFIED, enclosing,
-                    enclosing.simpleName() + qualifiedName);
+                    simpleName + qualifiedName, Map.copyOf(sourceMap));
         }
         return ((TypeInfoImpl) enclosing).remainderQualification(diff2 - 1,
-                "." + enclosing.simpleName() + qualifiedName, start);
+                "." + simpleName + qualifiedName, start, source, sourceMap);
     }
 }

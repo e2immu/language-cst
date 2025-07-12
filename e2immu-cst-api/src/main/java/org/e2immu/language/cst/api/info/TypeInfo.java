@@ -14,6 +14,7 @@ import org.e2immu.language.cst.api.type.TypeParameter;
 import org.e2immu.support.Either;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -344,7 +345,10 @@ public interface TypeInfo extends NamedType, Info {
         SIMPLE, QUALIFIED, FULLY_QUALIFIED;
     }
 
-    record QualificationData(QualificationState state, TypeInfo qualifier, String qualifiedName) {
+    record QualificationData(QualificationState state,
+                             TypeInfo qualifier,
+                             String qualifiedName,
+                             Map<TypeInfo, Source> sourceMap) {
     }
 
     QualificationData qualificationData(Source source);

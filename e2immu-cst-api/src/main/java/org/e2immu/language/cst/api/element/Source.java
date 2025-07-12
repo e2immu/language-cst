@@ -21,6 +21,8 @@ public interface Source extends Comparable<Source> {
 
     Source withBeginPos(int beginPos);
 
+    Source withEndPos(int endPos);
+
     Source withDetailedSources(DetailedSources detailedSources);
 
     Source mergeDetailedSources(DetailedSources detailedSources);
@@ -44,5 +46,4 @@ public interface Source extends Comparable<Source> {
         if (line == beginLine()) return beginPos() <= pos;
         return pos <= endPos();
     }
-
 }
