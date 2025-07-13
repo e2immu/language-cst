@@ -525,7 +525,7 @@ public class ParameterizedTypeImpl implements ParameterizedType {
 
     @Override
     public ParameterizedType mostSpecific(Predefined runtime, TypeInfo primaryType, ParameterizedType other) {
-        if (equals(other)) return this;
+        if (equals(other) || other == null) return this;
         if (isType() && typeInfo.isVoid()) return other;
         if (other.isType() && other.typeInfo().isVoid()) return this;
         if (isTypeParameter()) {
