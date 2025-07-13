@@ -34,7 +34,6 @@ public class CodecImpl implements Codec {
 
     private static final Pattern FIELD_NAME_PATTERN = Pattern.compile("(.+)\\.([^.]+)");
     private static final Pattern NAME_INDEX_PATTERN = Pattern.compile("(.+)\\((\\d+)\\)");
-    private static final Pattern METHOD_PATTERN = Pattern.compile("(.+)\\.(\\w+)\\((\\d+)\\)");
     private static final Pattern NUM_PATTERN = Pattern.compile("-?\\.?[0-9]+");
     private final DecoderProvider decoderProvider;
     private final TypeProvider typeProvider;
@@ -100,7 +99,7 @@ public class CodecImpl implements Codec {
 
     @Override
     public boolean decodeBoolean(Context context, EncodedValue encodedValue) {
-        if (encodedValue instanceof D d && d.s instanceof Literal l) {
+        if (encodedValue instanceof D(Node s) && s instanceof Literal l) {
             return "true".equals(l.getSource());
         } else throw new UnsupportedOperationException();
     }
@@ -134,7 +133,7 @@ public class CodecImpl implements Codec {
             int index = Integer.parseInt(m.group(2));
             if (index >= typeInfo.fields().size()) {
                 throw new UnsupportedOperationException("Index " + index
-                                                        + " greater than the number of fields in " + typeInfo);
+                        + " greater than the number of fields in " + typeInfo);
             }
             FieldInfo fieldInfo = typeInfo.fields().get(index);
             assert fieldInfo.name().equals(m.group(1));
@@ -164,7 +163,7 @@ public class CodecImpl implements Codec {
 
     @Override
     public Info decodeInfoInContext(Context context, EncodedValue ev) {
-        if (ev instanceof D d && d.s instanceof StringLiteral sl) {
+        if (ev instanceof D(Node s) && s instanceof StringLiteral sl) {
             String source = unquote(sl.getSource());
             char type = source.charAt(0);
             String name = source.substring(1);
@@ -191,9 +190,9 @@ public class CodecImpl implements Codec {
         List<EncodedValue> list = decodeList(context, encodedValue);
         Info current = null;
         for (EncodedValue ev : list) {
-            if (ev instanceof D d && d.s instanceof StringLiteral sl) {
-                String s = unquote(sl.getSource());
-                current = decodeInfo(current, s.charAt(0), s.substring(1));
+            if (ev instanceof D(Node s) && s instanceof StringLiteral sl) {
+                String src = unquote(sl.getSource());
+                current = decodeInfo(current, src.charAt(0), src.substring(1));
             } else throw new UnsupportedOperationException();
         }
         return current;
@@ -201,7 +200,7 @@ public class CodecImpl implements Codec {
 
     @Override
     public int decodeInt(Context context, EncodedValue encodedValue) {
-        if (encodedValue instanceof D d && d.s instanceof Literal l) {
+        if (encodedValue instanceof D(Node s) && s instanceof Literal l) {
             return Integer.parseInt(potentiallyUnquote(l.getSource()));
         } else throw new UnsupportedOperationException();
     }
@@ -209,7 +208,7 @@ public class CodecImpl implements Codec {
     @Override
     public List<EncodedValue> decodeList(Context context, EncodedValue encodedValue) {
         List<EncodedValue> list = new LinkedList<>();
-        if (encodedValue instanceof D d && d.s instanceof Array jo && jo.size() > 2) {
+        if (encodedValue instanceof D(Node s) && s instanceof Array jo && jo.size() > 2) {
             for (int i = 1; i < jo.size(); i += 2) {
                 list.add(new D(jo.get(i)));
             }
@@ -220,7 +219,7 @@ public class CodecImpl implements Codec {
     @Override
     public Map<EncodedValue, EncodedValue> decodeMap(Context context, EncodedValue encodedValue) {
         Map<EncodedValue, EncodedValue> map = new LinkedHashMap<>();
-        if (encodedValue instanceof D d && d.s instanceof JSONObject jo && jo.size() > 2) {
+        if (encodedValue instanceof D(Node s) && s instanceof JSONObject jo && jo.size() > 2) {
             // kv pairs, starting with 1 unless empty
             for (int i = 1; i < jo.size(); i += 2) {
                 if (jo.get(i) instanceof KeyValuePair kvp) {
@@ -251,7 +250,7 @@ public class CodecImpl implements Codec {
             int index = Integer.parseInt(m.group(2));
             MethodInfo methodInfo = typeInfo.methods().get(index);
             assert !methodInfo.isConstructor();
-            assert methodInfo.name().equals(m.group(1)):"Method names do not agree: "+methodInfo+" vs "+m.group(1);
+            assert methodInfo.name().equals(m.group(1)) : "Method names do not agree: " + methodInfo + " vs " + m.group(1);
             return methodInfo;
         } else throw new UnsupportedOperationException();
     }
@@ -272,7 +271,7 @@ public class CodecImpl implements Codec {
     @Override
     public Set<EncodedValue> decodeSet(Context context, EncodedValue encodedValue) {
         Set<EncodedValue> list = new LinkedHashSet<>();
-        if (encodedValue instanceof D d && d.s instanceof Array jo && jo.size() > 2) {
+        if (encodedValue instanceof D(Node s) && s instanceof Array jo && jo.size() > 2) {
             for (int i = 1; i < jo.size(); i += 2) {
                 list.add(new D(jo.get(i)));
             }
@@ -304,7 +303,7 @@ public class CodecImpl implements Codec {
 
     @Override
     public String decodeString(Context context, EncodedValue encodedValue) {
-        if (encodedValue instanceof D d && d.s instanceof StringLiteral l) {
+        if (encodedValue instanceof D(Node s) && s instanceof StringLiteral l) {
             return unquote(l.getSource());
         } else {
             throw new UnsupportedOperationException();
@@ -326,7 +325,7 @@ public class CodecImpl implements Codec {
 
     @Override
     public ParameterizedType decodeType(Context context, EncodedValue encodedValue) {
-        if (encodedValue instanceof D d && d.s instanceof StringLiteral sl) {
+        if (encodedValue instanceof D(Node s) && s instanceof StringLiteral sl) {
             return decodeSimpleType(context, sl);
         }
         List<EncodedValue> list = decodeList(context, encodedValue);
@@ -334,14 +333,14 @@ public class CodecImpl implements Codec {
         // list index 0: named type
         int i = 1;
         NamedType nt;
-        if (list.getFirst() instanceof D d0 && d0.s instanceof StringLiteral sl) {
+        if (list.getFirst() instanceof D(Node s) && s instanceof StringLiteral sl) {
             String fqn = unquote(sl.getSource());
             char first = fqn.charAt(0);
             if ('T' == first) {
                 nt = context.findType(typeProvider, fqn.substring(1));
             } else {
                 int index = Integer.parseInt(fqn.substring(1));
-                boolean ownerNotInContext = !(list.get(i) instanceof D d1 && d1.s instanceof NumberLiteral);
+                boolean ownerNotInContext = !(list.get(i) instanceof D(Node s1) && s1 instanceof NumberLiteral);
                 if ('M' == first) {
                     MethodInfo owner = ownerNotInContext ? (MethodInfo) this.decodeInfoInContext(context, list.get(i)) : context.currentMethod();
                     nt = owner.typeParameters().get(index);
@@ -357,7 +356,7 @@ public class CodecImpl implements Codec {
 
         // list index 2: arrays
         int arrays;
-        if (list.get(i) instanceof D d2 && d2.s instanceof NumberLiteral nl) {
+        if (list.get(i) instanceof D(Node s1) && s1 instanceof NumberLiteral nl) {
             arrays = Integer.parseInt(nl.getSource());
         } else throw new UnsupportedOperationException();
 
@@ -370,9 +369,9 @@ public class CodecImpl implements Codec {
         ++i;
         if (list.size() <= i) {
             wildCard = null;
-        } else if (list.get(i) instanceof D d3 && d3.s instanceof StringLiteral sl2) {
-            String s = unquote(sl2.getSource());
-            wildCard = "E".equals(s) ? runtime.wildcardExtends() : runtime.wildcardSuper();
+        } else if (list.get(i) instanceof D(Node s2) && s2 instanceof StringLiteral sl2) {
+            String src = unquote(sl2.getSource());
+            wildCard = "E".equals(src) ? runtime.wildcardExtends() : runtime.wildcardSuper();
         } else throw new UnsupportedOperationException();
 
         // create
@@ -418,9 +417,7 @@ public class CodecImpl implements Codec {
                 }
                 yield runtime.newDependentVariable(a, i);
             }
-            default -> {
-                throw new UnsupportedOperationException();
-            }
+            default -> throw new UnsupportedOperationException();
         };
     }
 
@@ -604,7 +601,7 @@ public class CodecImpl implements Codec {
         EncodedValue e0 = encodeString(context, s0);
         EncodedValue e1 = type.isTypeParameter() ? encodeOwnerOfTypeParameter(context, type.typeParameter()) : null;
         if (type.arrays() == 0 && type.parameters().isEmpty()
-            && e1 == null && (type.wildcard() == null || type.wildcard().isUnbound())) {
+                && e1 == null && (type.wildcard() == null || type.wildcard().isUnbound())) {
             return e0;
         }
         EncodedValue e2 = encodeInt(context, type.arrays());
@@ -616,30 +613,26 @@ public class CodecImpl implements Codec {
 
     @Override
     public EncodedValue encodeVariable(Context context, Variable variable) {
-        if (variable instanceof ParameterInfo pi) {
-            return encodeList(context, List.of(encodeString(context, "P"), encodeInfoOutOfContext(context, pi)));
-        }
-        if (variable instanceof FieldReference fr) {
-            EncodedValue f = encodeString(context, "F");
-            EncodedValue encodedFieldInfo = encodeInfoOutOfContext(context, fr.fieldInfo());
-            if (fr.isDefaultScope()) {
-                return encodeList(context, List.of(f, encodedFieldInfo));
+        return switch (variable) {
+            case ParameterInfo pi ->
+                    encodeList(context, List.of(encodeString(context, "P"), encodeInfoOutOfContext(context, pi)));
+            case FieldReference fr -> {
+                EncodedValue f = encodeString(context, "F");
+                EncodedValue encodedFieldInfo = encodeInfoOutOfContext(context, fr.fieldInfo());
+                if (fr.isDefaultScope()) {
+                    yield encodeList(context, List.of(f, encodedFieldInfo));
+                }
+                yield encodeList(context, List.of(f, encodedFieldInfo, encodeExpression(context, fr.scope())));
             }
-            return encodeList(context, List.of(f, encodedFieldInfo, encodeExpression(context, fr.scope())));
-        }
-        if (variable instanceof This thisVar) {
-            return encodeList(context, List.of(encodeString(context, "T"),
+            case This thisVar -> encodeList(context, List.of(encodeString(context, "T"),
                     encodeInfoOutOfContext(context, thisVar.typeInfo())));
-        }
-        if (variable instanceof LocalVariable lv) {
-            return encodeList(context, List.of(encodeString(context, "L"), encodeString(context, lv.simpleName()),
-                    encodeType(context, lv.parameterizedType())));
-        }
-        if (variable instanceof DependentVariable dv) {
-            return encodeList(context, List.of(encodeString(context, "D"),
+            case LocalVariable lv ->
+                    encodeList(context, List.of(encodeString(context, "L"), encodeString(context, lv.simpleName()),
+                            encodeType(context, lv.parameterizedType())));
+            case DependentVariable dv -> encodeList(context, List.of(encodeString(context, "D"),
                     encodeExpression(context, dv.arrayExpression()), encodeExpression(context, dv.indexExpression())));
-        }
-        throw new UnsupportedOperationException();
+            default -> throw new UnsupportedOperationException();
+        };
     }
 
     private EncodedValue encodeWildcard(Context context, Wildcard wildcard) {
@@ -663,8 +656,8 @@ public class CodecImpl implements Codec {
 
     @Override
     public boolean isList(EncodedValue encodedValue) {
-        if (encodedValue instanceof D d) {
-            return d.s instanceof Array;
+        if (encodedValue instanceof D(Node s)) {
+            return s instanceof Array;
         }
         throw new UnsupportedOperationException("Expect D object, not E object");
     }
@@ -726,7 +719,7 @@ public class CodecImpl implements Codec {
             writer.write(s);
             if (subs != null && !subs.isEmpty()) {
                 if (subs.size() == 1) {
-                    EncodedValue sub0 = subs.get(0);
+                    EncodedValue sub0 = subs.getFirst();
                     if (sub0 != null) {
                         writer.write(", \"sub\":");
                         ((E) sub0).write(writer, tab + 1, true);
