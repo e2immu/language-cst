@@ -971,6 +971,11 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
+    public LocalVariable newUnnamedLocalVariable(ParameterizedType parameterizedType, Expression assignmentExpression) {
+        return new LocalVariableImpl(parameterizedType, assignmentExpression);
+    }
+
+    @Override
     public VariableExpression newVariableExpression(Variable variable) {
         assert variable != null;
         return new VariableExpressionImpl(variable);

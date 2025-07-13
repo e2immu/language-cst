@@ -14,17 +14,32 @@ import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.language.cst.impl.output.OutputBuilderImpl;
 import org.e2immu.language.cst.impl.output.QualifiedNameImpl;
 
+import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 public class LocalVariableImpl extends VariableImpl implements LocalVariable {
+    private static final String UNNAMED = ":";
+
     private final Expression assignmentExpression;
     private final String name;
 
+    public LocalVariableImpl(ParameterizedType parameterizedType, Expression assignmentExpression) {
+        super(parameterizedType);
+        this.name = UNNAMED;
+        this.assignmentExpression = assignmentExpression;
+    }
+
     public LocalVariableImpl(String name, ParameterizedType parameterizedType, Expression assignmentExpression) {
         super(parameterizedType);
-        this.name = name;
+        this.name = Objects.requireNonNull(name);
+        assert !name.equals(UNNAMED);
         this.assignmentExpression = assignmentExpression;
+    }
+
+    @Override
+    public boolean isUnnamed() {
+        return UNNAMED.equals(name);
     }
 
     @Override

@@ -10,6 +10,8 @@ can be null (not known, not relevant)
  */
 public interface LocalVariable extends Variable {
 
+    boolean isUnnamed();
+
     Expression assignmentExpression();
 
     @Override

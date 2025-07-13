@@ -395,6 +395,8 @@ public interface Factory {
     UnaryOperator newUnaryOperator(List<Comment> comments, Source source, MethodInfo operator, Expression e,
                                    Precedence precedence);
 
+    LocalVariable newUnnamedLocalVariable(ParameterizedType parameterizedType, Expression assignmentExpression);
+
     VariableExpression newVariableExpression(Variable variable);
 
     VariableExpression.Builder newVariableExpressionBuilder();
