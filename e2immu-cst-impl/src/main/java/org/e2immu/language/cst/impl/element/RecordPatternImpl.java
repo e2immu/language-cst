@@ -71,7 +71,7 @@ public class RecordPatternImpl extends ElementImpl implements RecordPattern {
         @Override
         public Builder setPatterns(List<RecordPattern> patterns) {
             this.patterns = patterns;
-            return null;
+            return this;
         }
 
         @Override
