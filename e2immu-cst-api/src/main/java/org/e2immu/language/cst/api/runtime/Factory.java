@@ -319,6 +319,8 @@ public interface Factory {
     Source newParserSource(String index, int beginLine, int beginPos, int endLine, int endPos,
                            DetailedSources detailedSources);
 
+    RecordPattern.Builder newRecordPatternBuilder();
+
     ReturnStatement.Builder newReturnBuilder();
 
     ReturnStatement newReturnStatement(Expression expression);

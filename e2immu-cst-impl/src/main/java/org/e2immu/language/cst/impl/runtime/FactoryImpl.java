@@ -816,6 +816,11 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
+    public RecordPattern.Builder newRecordPatternBuilder() {
+        return new RecordPatternImpl.Builder();
+    }
+
+    @Override
     public ReturnStatement.Builder newReturnBuilder() {
         return new ReturnStatementImpl.Builder();
     }

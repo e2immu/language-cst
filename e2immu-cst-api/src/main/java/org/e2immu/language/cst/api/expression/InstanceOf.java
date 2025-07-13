@@ -2,13 +2,14 @@ package org.e2immu.language.cst.api.expression;
 
 import org.e2immu.annotation.Fluent;
 import org.e2immu.language.cst.api.element.Element;
+import org.e2immu.language.cst.api.element.RecordPattern;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.variable.LocalVariable;
 
 public interface InstanceOf extends Expression {
     Expression expression();
 
-    LocalVariable patternVariable();
+    RecordPattern patternVariable();
 
     ParameterizedType testType();
 
@@ -17,7 +18,7 @@ public interface InstanceOf extends Expression {
         Builder setExpression(Expression expression);
 
         @Fluent
-        Builder setPatternVariable(LocalVariable patternVariable);
+        Builder setPatternVariable(RecordPattern patternVariable);
 
         @Fluent
         Builder setTestType(ParameterizedType testType);

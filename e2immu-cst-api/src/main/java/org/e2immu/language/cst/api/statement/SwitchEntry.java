@@ -2,6 +2,7 @@ package org.e2immu.language.cst.api.statement;
 
 import org.e2immu.annotation.Fluent;
 import org.e2immu.language.cst.api.element.Element;
+import org.e2immu.language.cst.api.element.RecordPattern;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.variable.LocalVariable;
@@ -15,7 +16,7 @@ public interface SwitchEntry extends Comparable<SwitchEntry>, Element {
     List<Expression> conditions();
     // or null, when absent (Java 21)
 
-    LocalVariable patternVariable();
+    RecordPattern patternVariable();
 
     // EmptyExpression when absent (Java 21)
     Expression whenExpression();
@@ -34,7 +35,7 @@ public interface SwitchEntry extends Comparable<SwitchEntry>, Element {
         Builder setStatement(Statement statement);
 
         @Fluent
-        Builder setPatternVariable(LocalVariable patternVariable);
+        Builder setPatternVariable(RecordPattern patternVariable);
 
         @Fluent
         Builder setWhenExpression(Expression whenExpression);

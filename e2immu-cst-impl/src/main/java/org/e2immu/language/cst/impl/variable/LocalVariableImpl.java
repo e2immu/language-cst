@@ -105,7 +105,7 @@ public class LocalVariableImpl extends VariableImpl implements LocalVariable {
     public LocalVariable translate(TranslationMap translationMap) {
         Variable direct = translationMap.translateVariable(this);
         if (direct != this && direct instanceof LocalVariable lv) return lv;
-        Expression tex = assignmentExpression.translate(translationMap);
+        Expression tex = assignmentExpression == null ? null : assignmentExpression.translate(translationMap);
         ParameterizedType type = translationMap.translateType(parameterizedType());
         if (tex != assignmentExpression || type != parameterizedType()) {
             return new LocalVariableImpl(name, type, tex);

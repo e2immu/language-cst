@@ -1,9 +1,6 @@
 package org.e2immu.language.cst.impl.statement;
 
-import org.e2immu.language.cst.api.element.Comment;
-import org.e2immu.language.cst.api.element.Element;
-import org.e2immu.language.cst.api.element.Source;
-import org.e2immu.language.cst.api.element.Visitor;
+import org.e2immu.language.cst.api.element.*;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.output.OutputBuilder;
@@ -26,7 +23,7 @@ import java.util.stream.Stream;
 
 public class SwitchEntryImpl implements SwitchEntry {
     private final List<Expression> conditions;
-    private final LocalVariable patternVariable;
+    private final RecordPattern patternVariable;
     private final Expression whenExpression;
     private final Statement statement;
     private final Source source;
@@ -35,7 +32,7 @@ public class SwitchEntryImpl implements SwitchEntry {
     public SwitchEntryImpl(List<Comment> comments,
                            Source source,
                            List<Expression> conditions,
-                           LocalVariable patternVariable,
+                           RecordPattern patternVariable,
                            Expression whenExpression,
                            Statement statement) {
         this.conditions = conditions;
@@ -59,8 +56,8 @@ public class SwitchEntryImpl implements SwitchEntry {
     @Override
     public int complexity() {
         return (patternVariable != null ? 1 : 0)
-               + conditions.stream().mapToInt(Expression::complexity).sum()
-               + whenExpression.complexity() + statement().complexity();
+                + conditions.stream().mapToInt(Expression::complexity).sum()
+                + whenExpression.complexity() + statement().complexity();
     }
 
     @Override
@@ -74,7 +71,7 @@ public class SwitchEntryImpl implements SwitchEntry {
     }
 
     @Override
-    public LocalVariable patternVariable() {
+    public RecordPattern patternVariable() {
         return patternVariable;
     }
 
@@ -122,13 +119,13 @@ public class SwitchEntryImpl implements SwitchEntry {
     public SwitchEntry translate(TranslationMap translationMap) {
         List<Expression> tConditions = conditions.stream().map(c -> c.translate(translationMap))
                 .collect(translationMap.toList(conditions));
-        LocalVariable tPattern = patternVariable == null ? null
-                : (LocalVariable) translationMap.translateVariable(patternVariable);
+        RecordPattern tPattern = patternVariable == null ? null
+                : patternVariable.translate(translationMap);
         Expression tWhen = whenExpression == null ? null : whenExpression.translate(translationMap);
         List<Statement> tStatements = statement.translate(translationMap);
         Statement tStatement = tStatements.isEmpty() ? null : tStatements.getFirst();
         if (tConditions == conditions && tPattern == patternVariable && tWhen == whenExpression
-            && tStatement == statement) {
+                && tStatement == statement) {
             return this;
         }
         if (tStatement == null) return null; // a way for the entry to disappear
@@ -139,7 +136,7 @@ public class SwitchEntryImpl implements SwitchEntry {
     public SwitchEntry rewire(InfoMap infoMap) {
         return new SwitchEntryImpl(comments, source,
                 conditions.stream().map(e -> e.rewire(infoMap)).toList(),
-                patternVariable == null ? null : (LocalVariable) patternVariable.rewire(infoMap),
+                patternVariable == null ? null : (RecordPattern) patternVariable.rewire(infoMap),
                 whenExpression.rewire(infoMap), statement.rewire(infoMap));
     }
 
@@ -168,12 +165,15 @@ public class SwitchEntryImpl implements SwitchEntry {
 
     @Override
     public Stream<Variable> variableStreamDoNotDescend() {
-        return Stream.ofNullable(patternVariable);
+        return patternVariable == null || patternVariable.localVariable() != null
+                ? Stream.of()
+                : patternVariable.variableStreamDoNotDescend();
     }
 
     @Override
     public Stream<Variable> variableStreamDescend() {
-        return Stream.concat(Stream.concat(Stream.ofNullable(patternVariable), whenExpression.variableStreamDescend()),
+        return Stream.concat(Stream.concat(patternVariable == null ? Stream.of() : patternVariable.variableStreamDescend(),
+                        whenExpression.variableStreamDescend()),
                 statement.variableStreamDescend());
     }
 
@@ -184,7 +184,7 @@ public class SwitchEntryImpl implements SwitchEntry {
 
     public static class EntryBuilderImpl extends ElementImpl.Builder<Builder> implements Builder {
         private final List<Expression> conditions = new ArrayList<>();
-        private LocalVariable patternVariable;
+        private RecordPattern patternVariable;
         private Expression whenExpression;
         private Statement statement;
 
@@ -201,7 +201,7 @@ public class SwitchEntryImpl implements SwitchEntry {
         }
 
         @Override
-        public Builder setPatternVariable(LocalVariable patternVariable) {
+        public Builder setPatternVariable(RecordPattern patternVariable) {
             this.patternVariable = patternVariable;
             return this;
         }

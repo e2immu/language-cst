@@ -15,6 +15,7 @@
 package org.e2immu.language.cst.impl.output;
 
 import org.e2immu.language.cst.api.output.FormattingOptions;
+import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.element.Space;
 import org.e2immu.language.cst.api.output.element.Symbol;
 import org.e2immu.util.internal.util.StringUtil;
@@ -22,6 +23,7 @@ import org.e2immu.util.internal.util.StringUtil;
 import static org.e2immu.language.cst.impl.output.SpaceEnum.*;
 
 public record SymbolEnum(String symbol, Space left, Space right, String constant) implements Symbol {
+
 
     public SymbolEnum {
         assert symbol != null;
@@ -77,6 +79,7 @@ public record SymbolEnum(String symbol, Space left, Space right, String constant
     public static final SymbolEnum SINGLE_LINE_COMMENT = new SymbolEnum("//", NONE, NONE, "SINGLE_LINE_COMMENT");
 
     public static final SymbolEnum DIAMOND = new SymbolEnum("<>", NONE, NONE, "DIAMOND");
+    public static final Symbol UNDERSCORE = new SymbolEnum("_", ONE, ONE_IS_NICE_EASY_R, "UNDERSCORE");
 
     public static Symbol plusPlusPrefix(String s) {
         return new SymbolEnum(s, ONE_IS_NICE_EASY_SPLIT, NONE, null);

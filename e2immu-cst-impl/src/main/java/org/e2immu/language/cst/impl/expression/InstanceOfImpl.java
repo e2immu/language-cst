@@ -1,9 +1,6 @@
 package org.e2immu.language.cst.impl.expression;
 
-import org.e2immu.language.cst.api.element.Comment;
-import org.e2immu.language.cst.api.element.Element;
-import org.e2immu.language.cst.api.element.Source;
-import org.e2immu.language.cst.api.element.Visitor;
+import org.e2immu.language.cst.api.element.*;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.expression.InstanceOf;
 import org.e2immu.language.cst.api.expression.Precedence;
@@ -33,14 +30,14 @@ import java.util.stream.Stream;
 public class InstanceOfImpl extends ExpressionImpl implements InstanceOf {
     private final Expression expression;
     private final ParameterizedType testType;
-    private final LocalVariable patternVariable;
+    private final RecordPattern patternVariable;
     private final ParameterizedType booleanParameterizedType;
 
     public InstanceOfImpl(List<Comment> comments,
                           Source source,
                           Expression expression,
                           ParameterizedType testType,
-                          LocalVariable patternVariable,
+                          RecordPattern patternVariable,
                           ParameterizedType booleanParameterizedType) {
         super(comments, source, 2 + expression.complexity());
         this.expression = expression;
@@ -59,7 +56,7 @@ public class InstanceOfImpl extends ExpressionImpl implements InstanceOf {
 
         private Expression expression;
         private ParameterizedType testType;
-        private LocalVariable patternVariable;
+        private RecordPattern patternVariable;
 
         public BuilderImpl(ParameterizedType booleanPt) {
             this.booleanPt = booleanPt;
@@ -72,7 +69,7 @@ public class InstanceOfImpl extends ExpressionImpl implements InstanceOf {
         }
 
         @Override
-        public InstanceOf.Builder setPatternVariable(LocalVariable patternVariable) {
+        public InstanceOf.Builder setPatternVariable(RecordPattern patternVariable) {
             this.patternVariable = patternVariable;
             return this;
         }
@@ -94,8 +91,8 @@ public class InstanceOfImpl extends ExpressionImpl implements InstanceOf {
         if (this == o) return true;
         if (!(o instanceof InstanceOfImpl that)) return false;
         return Objects.equals(expression, that.expression)
-               && Objects.equals(testType, that.testType)
-               && Objects.equals(patternVariable, that.patternVariable);
+                && Objects.equals(testType, that.testType)
+                && Objects.equals(patternVariable, that.patternVariable);
     }
 
     @Override
@@ -132,7 +129,7 @@ public class InstanceOfImpl extends ExpressionImpl implements InstanceOf {
     public int internalCompareTo(Expression expression) {
         if (expression instanceof InstanceOf other) {
             if (expression instanceof VariableExpression ve
-                && other.expression() instanceof VariableExpression ve2) {
+                    && other.expression() instanceof VariableExpression ve2) {
                 int c = ve.variable().fullyQualifiedName().compareTo(ve2.variable().fullyQualifiedName());
                 if (c == 0)
                     c = testType.detailedString().compareTo(other.testType().detailedString());
@@ -152,10 +149,10 @@ public class InstanceOfImpl extends ExpressionImpl implements InstanceOf {
 
         ParameterizedType translatedType = translationMap.translateType(this.testType);
         Expression translatedExpression = expression.translate(translationMap);
-        LocalVariable translatedLv = patternVariable == null ? null
-                : (LocalVariable) translationMap.translateVariable(patternVariable);
+        RecordPattern translatedLv = patternVariable == null ? null
+                : patternVariable.translate(translationMap);
         if (translatedType == testType && translatedExpression == expression
-            && translatedLv == patternVariable) {
+                && translatedLv == patternVariable) {
             return this;
         }
         return new InstanceOfImpl(comments(), source(), translatedExpression, translatedType, translatedLv,
@@ -163,7 +160,7 @@ public class InstanceOfImpl extends ExpressionImpl implements InstanceOf {
     }
 
     @Override
-    public LocalVariable patternVariable() {
+    public RecordPattern patternVariable() {
         return patternVariable;
     }
 
@@ -187,10 +184,11 @@ public class InstanceOfImpl extends ExpressionImpl implements InstanceOf {
     public OutputBuilder print(Qualification qualification) {
         OutputBuilder ob = new OutputBuilderImpl()
                 .add(expression.print(qualification))
-                .add(SymbolEnum.INSTANCE_OF)
-                .add(testType.print(qualification, false, DiamondEnum.SHOW_ALL));
+                .add(SymbolEnum.INSTANCE_OF);
         if (patternVariable != null) {
-            ob.add(SpaceEnum.ONE).add(patternVariable.print(qualification));
+            ob.add(patternVariable.print(qualification));
+        } else {
+            ob.add(testType.print(qualification, false, DiamondEnum.SHOW_ALL));
         }
         return ob;
     }
@@ -209,7 +207,7 @@ public class InstanceOfImpl extends ExpressionImpl implements InstanceOf {
     @Override
     public Expression rewire(InfoMap infoMap) {
         return new InstanceOfImpl(comments(), source(), expression.rewire(infoMap), testType.rewire(infoMap),
-                patternVariable == null ? null : (LocalVariable) patternVariable.rewire(infoMap),
+                patternVariable == null ? null : (RecordPattern) patternVariable.rewire(infoMap),
                 booleanParameterizedType);
     }
 }
