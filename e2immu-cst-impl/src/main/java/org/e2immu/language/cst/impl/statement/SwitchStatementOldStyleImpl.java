@@ -1,9 +1,6 @@
 package org.e2immu.language.cst.impl.statement;
 
-import org.e2immu.language.cst.api.element.Comment;
-import org.e2immu.language.cst.api.element.Element;
-import org.e2immu.language.cst.api.element.Source;
-import org.e2immu.language.cst.api.element.Visitor;
+import org.e2immu.language.cst.api.element.*;
 import org.e2immu.language.cst.api.expression.AnnotationExpression;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.info.InfoMap;
@@ -50,10 +47,10 @@ public class SwitchStatementOldStyleImpl extends StatementImpl implements Switch
     public static class SwitchLabelImpl implements SwitchLabel {
         private final Expression literal;
         private final int startFromPosition;
-        private final LocalVariable patternVariable;
+        private final RecordPattern patternVariable;
         private final Expression whenExpression;
 
-        public SwitchLabelImpl(Expression literal, int startFromPosition, LocalVariable patternVariable, Expression whenExpression) {
+        public SwitchLabelImpl(Expression literal, int startFromPosition, RecordPattern patternVariable, Expression whenExpression) {
             this.literal = literal;
             this.startFromPosition = startFromPosition;
             this.patternVariable = patternVariable;
@@ -96,15 +93,14 @@ public class SwitchStatementOldStyleImpl extends StatementImpl implements Switch
         }
 
         @Override
-        public LocalVariable patternVariable() {
+        public RecordPattern patternVariable() {
             return patternVariable;
         }
 
         @Override
         public SwitchLabel translate(TranslationMap translationMap) {
             Expression tLiteral = literal.translate(translationMap);
-            LocalVariable tPatternVariable = patternVariable == null ? null
-                    : (LocalVariable) translationMap.translateVariable(patternVariable);
+            RecordPattern tPatternVariable = patternVariable == null ? null : patternVariable.translate(translationMap);
             Expression tWhen = whenExpression.translate(translationMap);
             if (tLiteral == literal && tPatternVariable == patternVariable && tWhen == whenExpression) return this;
             return new SwitchLabelImpl(tLiteral, startFromPosition, tPatternVariable, tWhen);
@@ -118,7 +114,7 @@ public class SwitchStatementOldStyleImpl extends StatementImpl implements Switch
         @Override
         public SwitchLabel rewire(InfoMap infoMap) {
             return new SwitchLabelImpl(literal.rewire(infoMap), startFromPosition,
-                    patternVariable == null ? null : (LocalVariable) patternVariable.rewire(infoMap),
+                    patternVariable == null ? null : (RecordPattern) patternVariable.rewire(infoMap),
                     whenExpression.rewire(infoMap));
         }
     }
@@ -273,8 +269,8 @@ public class SwitchStatementOldStyleImpl extends StatementImpl implements Switch
         Statement tBlock = block.translate(translationMap).getFirst();
         List<AnnotationExpression> tAnnotations = translateAnnotations(translationMap);
         if (tBlock != block || tSelector != selector || translatedLabels != switchLabels
-            || !analysis().isEmpty() && translationMap.isClearAnalysis()
-            || tAnnotations != annotations()) {
+                || !analysis().isEmpty() && translationMap.isClearAnalysis()
+                || tAnnotations != annotations()) {
             SwitchStatementOldStyleImpl ssos = new SwitchStatementOldStyleImpl(comments(), source(),
                     tAnnotations, label(), tSelector, (Block) tBlock, translatedLabels);
             if (!translationMap.isClearAnalysis()) ssos.analysis().setAll(analysis());

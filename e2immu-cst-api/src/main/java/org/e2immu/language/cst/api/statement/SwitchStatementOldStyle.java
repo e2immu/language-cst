@@ -2,6 +2,7 @@ package org.e2immu.language.cst.api.statement;
 
 import org.e2immu.annotation.Fluent;
 import org.e2immu.language.cst.api.element.Element;
+import org.e2immu.language.cst.api.element.RecordPattern;
 import org.e2immu.language.cst.api.element.Visitor;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.info.InfoMap;
@@ -31,7 +32,7 @@ public interface SwitchStatementOldStyle extends Statement {
         Expression literal();
 
         // null when absent
-        LocalVariable patternVariable();
+        RecordPattern patternVariable();
 
         // EmptyExpression when absent (Java 21)
         Expression whenExpression();

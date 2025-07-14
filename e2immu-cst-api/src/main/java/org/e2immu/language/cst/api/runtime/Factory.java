@@ -345,7 +345,7 @@ public interface Factory {
     SwitchExpression.Builder newSwitchExpressionBuilder();
 
     SwitchStatementOldStyle.SwitchLabel newSwitchLabelOldStyle(Expression literal, int pos,
-                                                               LocalVariable patternVariable,
+                                                               RecordPattern patternVariable,
                                                                Expression whenExpression);
 
     SwitchStatementNewStyle.Builder newSwitchStatementNewStyleBuilder();
