@@ -9,10 +9,7 @@ import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.variable.DescendMode;
 import org.e2immu.language.cst.api.variable.LocalVariable;
 import org.e2immu.language.cst.api.variable.Variable;
-import org.e2immu.language.cst.impl.output.OutputBuilderImpl;
-import org.e2immu.language.cst.impl.output.SpaceEnum;
-import org.e2immu.language.cst.impl.output.SymbolEnum;
-import org.e2immu.language.cst.impl.output.TextImpl;
+import org.e2immu.language.cst.impl.output.*;
 import org.e2immu.language.cst.impl.type.DiamondEnum;
 
 import java.util.List;
@@ -157,7 +154,9 @@ public class RecordPatternImpl extends ElementImpl implements RecordPattern {
     @Override
     public void visit(Predicate<Element> predicate) {
         if (predicate.test(this)) {
-            if (recordType != null) {
+            if (localVariable != null) {
+                localVariable.visit(predicate);
+            } else if (recordType != null) {
                 patterns.forEach(p -> p.visit(predicate));
             }
         }
@@ -165,18 +164,29 @@ public class RecordPatternImpl extends ElementImpl implements RecordPattern {
 
     @Override
     public void visit(Visitor visitor) {
-
+        if (visitor.beforeElement(this)) {
+            if (localVariable != null) {
+                localVariable.visit(visitor);
+            } else if (recordType != null) {
+                patterns.forEach(p -> p.visit(visitor));
+            }
+        }
+        visitor.afterElement(this);
     }
 
     @Override
     public OutputBuilder print(Qualification qualification) {
         OutputBuilder ob = new OutputBuilderImpl();
-        if(unnamedPattern) ob.add(SymbolEnum.UNDERSCORE);
-        else if(localVariable != null) {
+        if (unnamedPattern) ob.add(SymbolEnum.UNDERSCORE);
+        else if (localVariable != null) {
             ob.add(localVariable.parameterizedType().print(qualification, false, DiamondEnum.SHOW_ALL))
                     .add(SpaceEnum.ONE).add(new TextImpl(localVariable.simpleName()));
         } else {
-            throw new UnsupportedOperationException();
+            ob.add(recordType.print(qualification, false, DiamondEnum.SHOW_ALL))
+                    .add(patterns.stream()
+                            .map(p -> p.print(qualification))
+                            .collect(OutputBuilderImpl.joining(SymbolEnum.COMMA, SymbolEnum.LEFT_PARENTHESIS,
+                                    SymbolEnum.RIGHT_PARENTHESIS, GuideImpl.generatorForParameterDeclaration())));
         }
         return ob;
     }

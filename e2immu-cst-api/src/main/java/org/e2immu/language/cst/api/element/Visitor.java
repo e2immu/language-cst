@@ -53,4 +53,11 @@ public interface Visitor {
     default void afterJavaDoc(JavaDoc javaDoc) {
         // do nothing
     }
+
+    default boolean beforeElement(Element element) {
+        return true;
+    }
+
+    default void afterElement(Element element) {
+    }
 }
