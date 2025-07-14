@@ -54,7 +54,4 @@ public interface AnnotationExpression extends Expression {
     List<Float> extractFloatArray(String key);
 
     AnnotationExpression withKeyValuePair(String key, Expression value);
-
-    TypeInfo.QualificationData qualificationData();
-
 }

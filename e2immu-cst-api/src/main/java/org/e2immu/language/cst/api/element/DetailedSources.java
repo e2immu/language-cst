@@ -1,6 +1,7 @@
 package org.e2immu.language.cst.api.element;
 
 import org.e2immu.annotation.NotNull;
+import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 
 import java.util.List;
@@ -39,5 +40,8 @@ public interface DetailedSources {
         DetailedSources build();
 
         Builder putAssociatedObject(ParameterizedType from, ParameterizedType to);
+
+        record TypeInfoSource(TypeInfo typeInfo, Source source) {}
+        Builder putTypeQualification(TypeInfo typeInfo, List<TypeInfoSource> associatedList);
     }
 }

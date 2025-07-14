@@ -892,38 +892,4 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
         }
         return true;
     }
-
-    @Override
-    public QualificationData qualificationData(Source source) {
-        int len = source.endPos() - source.beginPos() + 1;
-        int diff = len - simpleName.length();
-        if (diff == 0) return new QualificationData(QualificationState.SIMPLE, null, simpleName, null);
-        Map<TypeInfo, Source> sourceMap = new HashMap<>();
-        // -1 to remove the dot
-        return remainderQualification(diff - 1, "." + simpleName, this, source, sourceMap);
-    }
-
-    private QualificationData remainderQualification(int diff,
-                                                     String qualifiedName,
-                                                     TypeInfo start,
-                                                     Source source,
-                                                     Map<TypeInfo, Source> sourceMap) {
-        assert diff > 0;
-        if (compilationUnitOrEnclosingType.isLeft()) {
-            // the rest must be package
-            return new QualificationData(QualificationState.FULLY_QUALIFIED, null, start.fullyQualifiedName(),
-                    Map.copyOf(sourceMap));
-        }
-        TypeInfo enclosing = compilationUnitOrEnclosingType().getRight();
-        String simpleName = enclosing.simpleName();
-        Source newSource = source.withEndPos(source.beginPos() + diff - 1);
-        sourceMap.put(enclosing, newSource);
-        int diff2 = diff - simpleName.length();
-        if (diff2 == 0) {
-            return new QualificationData(QualificationState.QUALIFIED, enclosing,
-                    simpleName + qualifiedName, Map.copyOf(sourceMap));
-        }
-        return ((TypeInfoImpl) enclosing).remainderQualification(diff2 - 1,
-                "." + simpleName + qualifiedName, start, source, sourceMap);
-    }
 }

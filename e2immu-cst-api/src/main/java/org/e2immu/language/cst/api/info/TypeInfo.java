@@ -340,17 +340,4 @@ public interface TypeInfo extends NamedType, Info {
     True for classes when the type's declaration does not contain "extends".
      */
     boolean hasImplicitParent();
-
-    enum QualificationState {
-        SIMPLE, QUALIFIED, FULLY_QUALIFIED;
-    }
-
-    record QualificationData(QualificationState state,
-                             TypeInfo qualifier,
-                             String qualifiedName,
-                             Map<TypeInfo, Source> sourceMap) {
-    }
-
-    QualificationData qualificationData(Source source);
-
 }

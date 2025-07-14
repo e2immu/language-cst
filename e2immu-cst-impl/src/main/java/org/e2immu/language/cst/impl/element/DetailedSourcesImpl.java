@@ -2,6 +2,7 @@ package org.e2immu.language.cst.impl.element;
 
 import org.e2immu.language.cst.api.element.DetailedSources;
 import org.e2immu.language.cst.api.element.Source;
+import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 
 import java.util.ArrayList;
@@ -60,10 +61,18 @@ public class DetailedSourcesImpl implements DetailedSources {
             return new DetailedSourcesImpl(identityHashMap, association);
         }
 
+        // used for the type without array [] [] parts
         @Override
         public Builder putAssociatedObject(ParameterizedType from, ParameterizedType to) {
             if (association == null) association = new IdentityHashMap<>();
             association.put(from, to);
+            return this;
+        }
+
+        @Override
+        public Builder putTypeQualification(TypeInfo typeInfo, List<TypeInfoSource> associatedList) {
+            if(association == null) association = new IdentityHashMap<>();
+            association.put(typeInfo, associatedList);
             return this;
         }
     }

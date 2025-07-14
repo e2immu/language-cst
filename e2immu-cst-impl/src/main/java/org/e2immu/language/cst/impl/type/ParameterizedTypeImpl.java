@@ -774,23 +774,4 @@ public class ParameterizedTypeImpl implements ParameterizedType {
             }
         }
     }
-
-    @Override
-    public TypeInfo.QualificationData qualificationData(Source source) {
-        if (typeInfo == null) {
-            if (typeParameter == null) {
-                return new TypeInfo.QualificationData(TypeInfo.QualificationState.SIMPLE,
-                        null, "?", null);
-            }
-            return new TypeInfo.QualificationData(TypeInfo.QualificationState.SIMPLE, null,
-                    typeParameter.simpleName(), null); // type parameter
-        }
-        Source s;
-        if (parameters.isEmpty()) {
-            s = source.detailedSources().detail(this);
-        } else {
-            s = source.detailedSources().detail(typeInfo);
-        }
-        return typeInfo.qualificationData(s);
-    }
 }

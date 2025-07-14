@@ -186,6 +186,4 @@ public interface ParameterizedType {
     ParameterizedType replaceTypeParameter(TypeParameter oldTp, TypeParameter newPt);
 
     Map<NamedType, ParameterizedType> formalToConcrete(ParameterizedType forwardedReturnType);
-
-    TypeInfo.QualificationData qualificationData(Source source);
 }
