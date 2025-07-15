@@ -54,6 +54,7 @@ public class IsAssignableFrom {
     public static final int IN_HIERARCHY = 10;
     private static final int UNBOUND_WILDCARD = 100;
     private static final int ARRAY_PENALTY = 1000;
+    private static final int PENALTY_VOID = 10;
 
     public static final int MAX = 10_000;
 
@@ -325,7 +326,12 @@ public class IsAssignableFrom {
         // target void -> fromIsVoid is unimportant, we can assign a function to a consumer
         if (!targetIsVoid && fromIsVoid) return NOT_ASSIGNABLE;
 
-        if (mode == Mode.COVARIANT_ERASURE) return FUNCTIONAL_TYPE_EQUIVALENCE;
+        if (mode == Mode.COVARIANT_ERASURE) {
+            if (targetIsVoid != fromIsVoid) {
+                return FUNCTIONAL_TYPE_EQUIVALENCE + PENALTY_VOID; // penalty for void vs return type
+            }
+            return FUNCTIONAL_TYPE_EQUIVALENCE;
+        }
         // now, ensure that all type parameters have equal values
         int i = 0;
         for (ParameterInfo t : targetMi.parameters()) {
