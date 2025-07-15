@@ -71,7 +71,7 @@ public class DetailedSourcesImpl implements DetailedSources {
 
         @Override
         public Builder putTypeQualification(TypeInfo typeInfo, List<TypeInfoSource> associatedList) {
-            if(association == null) association = new IdentityHashMap<>();
+            if (association == null) association = new IdentityHashMap<>();
             association.put(typeInfo, associatedList);
             return this;
         }
@@ -79,7 +79,7 @@ public class DetailedSourcesImpl implements DetailedSources {
 
     @Override
     public Object associatedObject(Object object) {
-        assert association != null;
+        if (association == null) return null;
         return association.get(object);
     }
 
