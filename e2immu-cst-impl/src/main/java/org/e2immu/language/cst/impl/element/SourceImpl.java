@@ -12,10 +12,10 @@ we must be a bit memory-conscious: no unnecessary fields because there may be mi
 public class SourceImpl implements Source {
     public static final Source NO_SOURCE = new SourceImpl(null, 0, 0, 0, 0);
     private final String index;
-    private final short beginLine;
-    private final short beginPos;
-    private final short endLine;
-    private final short endPos;
+    private final int beginLine;
+    private final int beginPos;
+    private final int endLine;
+    private final int endPos;
     private final DetailedSources detailedSources;
 
     public SourceImpl(String index, int beginLine, int beginPos, int endLine, int endPos) {
@@ -26,10 +26,10 @@ public class SourceImpl implements Source {
                       DetailedSources detailedSources) {
         // we internalize, because there are many repeats here ("0", "1", ...)
         this.index = index == null ? null : index.intern();
-        this.beginLine = (short) beginLine;
-        this.beginPos = (short) beginPos;
-        this.endLine = (short) endLine;
-        this.endPos = (short) endPos;
+        this.beginLine = beginLine;
+        this.beginPos = beginPos;
+        this.endLine = endLine;
+        this.endPos = endPos;
         this.detailedSources = detailedSources;
     }
 
