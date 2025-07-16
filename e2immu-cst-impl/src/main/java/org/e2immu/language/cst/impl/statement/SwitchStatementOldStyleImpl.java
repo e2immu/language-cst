@@ -169,7 +169,13 @@ public class SwitchStatementOldStyleImpl extends StatementImpl implements Switch
         if (predicate.test(this)) {
             selector.visit(predicate);
             block.visit(predicate);
-            switchLabels.forEach(sl -> sl.literal().visit(predicate));
+            switchLabels.forEach(sl -> {
+                if (sl.literal() != null) {
+                    sl.literal().visit(predicate);
+                } else {
+                    sl.patternVariable().visit(predicate);
+                }
+            });
         }
     }
 
@@ -178,7 +184,10 @@ public class SwitchStatementOldStyleImpl extends StatementImpl implements Switch
         if (visitor.beforeStatement(this)) {
             selector.visit(visitor);
             visitor.startSubBlock(0);
-            switchLabels.forEach(sl -> sl.literal().visit(visitor));
+            switchLabels.forEach(sl -> {
+                if (sl.literal() != null) sl.literal().visit(visitor);
+                else sl.patternVariable().visit(visitor);
+            });
             block.visit(visitor);
             visitor.endSubBlock(0);
         }
