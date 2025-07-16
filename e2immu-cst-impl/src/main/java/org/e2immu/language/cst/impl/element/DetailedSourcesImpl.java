@@ -25,9 +25,11 @@ public class DetailedSourcesImpl implements DetailedSources {
 
         @Override
         public Builder addAll(DetailedSources detailedSources) {
-            identityHashMap.putAll(((DetailedSourcesImpl) detailedSources).identityHashMap);
-            if (association != null) {
-                association.putAll(((DetailedSourcesImpl) detailedSources).association);
+            DetailedSourcesImpl dsi = (DetailedSourcesImpl) detailedSources;
+            identityHashMap.putAll(dsi.identityHashMap);
+            if (dsi.association != null) {
+                if (association == null) association = new IdentityHashMap<>();
+                association.putAll(dsi.association);
             }
             return this;
         }
@@ -36,6 +38,9 @@ public class DetailedSourcesImpl implements DetailedSources {
         public Builder copy() {
             BuilderImpl copy = new BuilderImpl();
             copy.identityHashMap.putAll(identityHashMap);
+            if (association != null) {
+                copy.association = new IdentityHashMap<>(association);
+            }
             return copy;
         }
 
