@@ -5,6 +5,7 @@ import java.nio.charset.Charset;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Stream;
 
 /**
  * Possible situations.
@@ -110,4 +111,6 @@ public interface SourceSet {
     void setModuleInfo(ModuleInfo moduleInfo);
 
     ModuleInfo moduleInfo();
+
+    Set<SourceSet> recursiveDependenciesSameExternal();
 }

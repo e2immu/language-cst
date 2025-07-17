@@ -67,16 +67,21 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
         return "type";
     }
 
+    /*
+    It is possible to have multiple types with the same fully qualified name.
+    They must reside in different source sets, however.
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof TypeInfoImpl typeInfo)) return false;
-        return Objects.equals(fullyQualifiedName, typeInfo.fullyQualifiedName);
+        return Objects.equals(fullyQualifiedName, typeInfo.fullyQualifiedName) &&
+                compilationUnit().sourceSet().equals(typeInfo.compilationUnit().sourceSet());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(fullyQualifiedName);
+        return fullyQualifiedName.hashCode();
     }
 
     @Override
