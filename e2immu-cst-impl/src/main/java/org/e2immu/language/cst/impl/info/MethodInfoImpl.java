@@ -102,7 +102,8 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof MethodInfoImpl that)) return false;
-        return fullyQualifiedName().equals(that.fullyQualifiedName());
+        return fullyQualifiedName().equals(that.fullyQualifiedName())
+                && typeInfo.compilationUnit().source().equals(that.typeInfo.compilationUnit().sourceSet());
     }
 
     @Override
@@ -482,7 +483,7 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
     @Override
     public boolean isFactoryMethod() {
         return isStatic() && returnType().typeInfo() != null
-               && returnType().typeInfo().isEnclosedIn(typeInfo);
+                && returnType().typeInfo().isEnclosedIn(typeInfo);
     }
 
     @Override

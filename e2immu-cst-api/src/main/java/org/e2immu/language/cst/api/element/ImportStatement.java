@@ -8,6 +8,10 @@ public interface ImportStatement extends Element {
 
     boolean isStatic();
 
+    default boolean isStar() {
+        return importString().endsWith(".*");
+    }
+
     interface Builder extends Element.Builder<Builder> {
 
         @Fluent
