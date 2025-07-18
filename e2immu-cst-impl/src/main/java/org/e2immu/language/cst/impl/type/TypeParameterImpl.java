@@ -81,7 +81,7 @@ public class TypeParameterImpl extends ElementImpl implements TypeParameter {
                 .map(ae -> (AnnotationExpression) ae.rewire(infoMap)).toList();
         TypeParameter rewired = new TypeParameterImpl(comments, rewiredAnnotations, index, name, rewiredOwner);
         typeBounds.get().forEach(pt -> rewired.builder().addTypeBound(pt.rewire(infoMap)));
-        rewired.builder().setSource(source.get()).commit();
+        rewired.builder().setSource(source()).commit();
         return rewired;
     }
 
@@ -119,7 +119,7 @@ public class TypeParameterImpl extends ElementImpl implements TypeParameter {
         TypeParameterImpl tpi = new TypeParameterImpl(comments, annotations, getIndex(), simpleName(), owner);
         List<ParameterizedType> newBounds = typeBounds().stream()
                 .map(pt -> pt.replaceTypeParameter(this, tpi)).toList();
-        tpi.builder().setTypeBounds(newBounds).setSource(source.get());
+        tpi.builder().setTypeBounds(newBounds).setSource(source());
         return tpi;
     }
 
