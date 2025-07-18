@@ -218,6 +218,8 @@ public interface MethodInfo extends Info {
 
         ParameterInfo addParameter(String name, ParameterizedType type);
 
+        ParameterInfo addUnnamedParameter(ParameterizedType type);
+
         @Fluent
         Builder addTypeParameter(TypeParameter typeParameter);
 

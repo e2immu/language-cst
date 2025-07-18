@@ -19,7 +19,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 public class LocalVariableImpl extends VariableImpl implements LocalVariable {
-    private static final String UNNAMED = ":";
+    public static final String UNNAMED = ":";
 
     private final Expression assignmentExpression;
     private final String name;

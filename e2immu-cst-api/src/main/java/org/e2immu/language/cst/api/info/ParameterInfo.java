@@ -20,6 +20,8 @@ public interface ParameterInfo extends Variable, Info {
 
     List<ParameterInfo> translate(TranslationMap translationMap);
 
+    boolean isUnnamed();
+
     interface Builder extends Info.Builder<Builder> {
 
         @Fluent

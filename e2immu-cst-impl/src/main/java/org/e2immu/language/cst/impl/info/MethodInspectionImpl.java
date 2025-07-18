@@ -11,7 +11,9 @@ import org.e2immu.language.cst.api.info.ParameterInfo;
 import org.e2immu.language.cst.api.statement.Block;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.type.TypeParameter;
+import org.e2immu.language.cst.api.variable.LocalVariable;
 import org.e2immu.language.cst.impl.type.DiamondEnum;
+import org.e2immu.language.cst.impl.variable.LocalVariableImpl;
 import org.e2immu.support.SetOnce;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -200,6 +202,14 @@ public class MethodInspectionImpl extends InspectionImpl implements MethodInspec
             assert name != null;
             assert type != null;
             ParameterInfo pi = new ParameterInfoImpl(methodInfo, parameters.size(), name, type);
+            parameters.add(pi);
+            return pi;
+        }
+
+        @Override
+        public ParameterInfo addUnnamedParameter(ParameterizedType type) {
+            assert type != null;
+            ParameterInfo pi = new ParameterInfoImpl(methodInfo, parameters.size(), LocalVariableImpl.UNNAMED, type);
             parameters.add(pi);
             return pi;
         }

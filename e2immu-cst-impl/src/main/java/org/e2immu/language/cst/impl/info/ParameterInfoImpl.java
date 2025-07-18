@@ -17,6 +17,7 @@ import org.e2immu.language.cst.impl.analysis.ValueImpl;
 import org.e2immu.language.cst.impl.output.OutputBuilderImpl;
 import org.e2immu.language.cst.impl.output.TextImpl;
 import org.e2immu.language.cst.impl.variable.DescendModeEnum;
+import org.e2immu.language.cst.impl.variable.LocalVariableImpl;
 import org.e2immu.support.EventuallyFinal;
 
 import java.util.List;
@@ -39,6 +40,11 @@ public class ParameterInfoImpl implements ParameterInfo {
         this.parameterizedType = parameterizedType;
         inspection = new EventuallyFinal<>();
         inspection.setVariable(new ParameterInspectionImpl.Builder(this));
+    }
+
+    @Override
+    public boolean isUnnamed() {
+        return LocalVariableImpl.UNNAMED.equals(name);
     }
 
     @Override
