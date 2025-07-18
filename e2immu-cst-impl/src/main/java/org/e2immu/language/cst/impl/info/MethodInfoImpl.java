@@ -103,7 +103,7 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
         if (this == o) return true;
         if (!(o instanceof MethodInfoImpl that)) return false;
         return fullyQualifiedName().equals(that.fullyQualifiedName())
-                && typeInfo.compilationUnit().source().equals(that.typeInfo.compilationUnit().sourceSet());
+                && typeInfo.compilationUnit().sourceSet().equals(that.typeInfo.compilationUnit().sourceSet());
     }
 
     @Override
