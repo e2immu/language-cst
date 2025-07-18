@@ -104,6 +104,11 @@ public class JavaDocImpl extends MultiLineCommentImpl implements JavaDoc {
         public Tag withResolvedReference(Element resolvedReference) {
             return new TagImpl(tagIdentifier, content, resolvedReference, source, sourceOfReference, blockTag);
         }
+
+        @Override
+        public Tag withSource(Source source) {
+            return new TagImpl(tagIdentifier, content, resolvedReference, source, sourceOfReference, blockTag);
+        }
     }
 
     private final List<Tag> tags;
