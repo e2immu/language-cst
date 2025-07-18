@@ -148,6 +148,8 @@ public class TypeInspectionImpl extends InspectionImpl implements TypeInspection
         private boolean fieldsAccessedInRestOfPrimaryType;
         private MethodInfo enclosingMethod;
 
+        private volatile boolean hierarchyDone;
+
         @Override
         public Set<TypeInfo> superTypesExcludingJavaLangObject() {
             Set<TypeInfo> set = new HashSet<>();
@@ -395,6 +397,16 @@ public class TypeInspectionImpl extends InspectionImpl implements TypeInspection
         @Override
         public String toString() {
             return "TypeInspectionImpl.Builder of " + typeInfo;
+        }
+
+        @Override
+        public boolean hierarchyNotYetDone() {
+            return !hierarchyDone;
+        }
+
+        @Override
+        public void hierarchyIsDone() {
+            this.hierarchyDone = true;
         }
     }
 

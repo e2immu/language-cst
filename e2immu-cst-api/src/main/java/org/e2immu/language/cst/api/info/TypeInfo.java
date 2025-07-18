@@ -14,7 +14,6 @@ import org.e2immu.language.cst.api.type.TypeParameter;
 import org.e2immu.support.Either;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -181,6 +180,10 @@ public interface TypeInfo extends NamedType, Info {
 
     int anonymousTypes();
 
+    default boolean hierarchyNotYetDone() {
+        return !hasBeenInspected() && builder().hierarchyNotYetDone();
+    }
+
     interface Builder extends Info.Builder<Builder> {
         Builder addPermittedType(TypeInfo typeInfo);
 
@@ -233,6 +236,10 @@ public interface TypeInfo extends NamedType, Info {
         Source source();
 
         TypeNature typeNature();
+
+        boolean hierarchyNotYetDone();
+
+        void hierarchyIsDone();
     }
 
     boolean isAtLeastImmutableHC();
