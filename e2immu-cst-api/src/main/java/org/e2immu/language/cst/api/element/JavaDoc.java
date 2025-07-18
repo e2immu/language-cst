@@ -81,6 +81,8 @@ public interface JavaDoc extends MultiLineComment {
         Tag translate(TranslationMap translationMap);
 
         Tag withResolvedReference(Element resolvedReference);
+
+        Tag withSource(Source source);
     }
 
     List<Tag> tags();
