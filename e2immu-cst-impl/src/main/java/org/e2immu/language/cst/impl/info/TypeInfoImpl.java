@@ -645,11 +645,13 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
         typeParameters().forEach(tp -> {
             List<AnnotationExpression> rewiredAnnotations = tp.annotations().stream()
                     .map(ae -> (AnnotationExpression) ae.rewire(infoMap)).toList();
-            TypeParameter newTp = new TypeParameterImpl(tp.comments(), tp.source(), rewiredAnnotations,
+            TypeParameter newTp = new TypeParameterImpl(tp.comments(), rewiredAnnotations,
                     tp.getIndex(), tp.simpleName(), Either.left(typeInfo));
             typeInfo.builder().addOrSetTypeParameter(newTp);
             tp.typeBounds().forEach(tb -> newTp.builder().addTypeBound(tb.rewire(infoMap)));
-            newTp.builder().commit();
+            newTp.builder()
+                    .setSource(tp.source())
+                    .commit();
         });
         builder.setTypeNature(typeNature())
                 .setSource(source())
@@ -713,11 +715,11 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
         methodInfo.typeParameters().forEach(tp -> {
             List<AnnotationExpression> rewiredAnnotations = tp.annotations().stream()
                     .map(ae -> (AnnotationExpression) ae.rewire(infoMap)).toList();
-            TypeParameter newTp = new TypeParameterImpl(tp.comments(), tp.source(), rewiredAnnotations,
+            TypeParameter newTp = new TypeParameterImpl(tp.comments(), rewiredAnnotations,
                     tp.getIndex(), tp.simpleName(), Either.right(rewiredMethod));
             builder.addTypeParameter(newTp);
             tp.typeBounds().forEach(tb -> newTp.builder().addTypeBound(tb.rewire(infoMap)));
-            newTp.builder().commit();
+            newTp.builder().setSource(tp.source()).commit();
         });
         rewireParameters(methodInfo, rewiredMethod, infoMap);
         methodInfo.methodModifiers().forEach(builder::addMethodModifier);

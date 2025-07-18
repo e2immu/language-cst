@@ -47,7 +47,7 @@ public interface TypeParameter extends NamedType, Element {
     @NotNull
     Stream<Element.TypeReference> typesReferenced(boolean explicit, Set<TypeParameter> visited);
 
-    interface Builder {
+    interface Builder extends Element.Builder<Builder> {
         List<ParameterizedType> getTypeBounds();
 
         @Fluent

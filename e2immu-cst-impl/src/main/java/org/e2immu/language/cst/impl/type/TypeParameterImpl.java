@@ -20,6 +20,7 @@ import org.e2immu.language.cst.impl.element.ElementImpl;
 import org.e2immu.language.cst.impl.output.*;
 import org.e2immu.support.Either;
 import org.e2immu.support.FirstThen;
+import org.e2immu.support.SetOnce;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -32,17 +33,16 @@ public class TypeParameterImpl extends ElementImpl implements TypeParameter {
     private final FirstThen<Builder, List<ParameterizedType>> typeBounds;
     private final List<AnnotationExpression> annotations;
     private final List<Comment> comments;
-    private final Source source;
+    private final SetOnce<Source> source = new SetOnce<>();
     private final PropertyValueMap analysis = new PropertyValueMapImpl();
 
-    public TypeParameterImpl(List<Comment> comments, Source source, List<AnnotationExpression> annotations,
+    public TypeParameterImpl(List<Comment> comments, List<AnnotationExpression> annotations,
                              int index, String name, Either<TypeInfo, MethodInfo> owner) {
         this.index = index;
         this.name = name;
         this.owner = owner;
         this.typeBounds = new FirstThen<>(new Builder(this));
         this.comments = comments;
-        this.source = source;
         this.annotations = annotations;
     }
 
@@ -79,15 +79,15 @@ public class TypeParameterImpl extends ElementImpl implements TypeParameter {
                 : Either.right(infoMap.methodInfo(owner.getRight()));
         List<AnnotationExpression> rewiredAnnotations = annotations.stream()
                 .map(ae -> (AnnotationExpression) ae.rewire(infoMap)).toList();
-        TypeParameter rewired = new TypeParameterImpl(comments, source, rewiredAnnotations, index, name, rewiredOwner);
+        TypeParameter rewired = new TypeParameterImpl(comments, rewiredAnnotations, index, name, rewiredOwner);
         typeBounds.get().forEach(pt -> rewired.builder().addTypeBound(pt.rewire(infoMap)));
-        rewired.builder().commit();
+        rewired.builder().setSource(source.get()).commit();
         return rewired;
     }
 
     @Override
     public Source source() {
-        return source;
+        return source.getOrDefaultNull();
     }
 
     @Override
@@ -116,10 +116,10 @@ public class TypeParameterImpl extends ElementImpl implements TypeParameter {
     }
 
     private TypeParameter withOwner(Either<TypeInfo, MethodInfo> owner) {
-        TypeParameterImpl tpi = new TypeParameterImpl(comments, source, annotations, getIndex(), simpleName(), owner);
+        TypeParameterImpl tpi = new TypeParameterImpl(comments, annotations, getIndex(), simpleName(), owner);
         List<ParameterizedType> newBounds = typeBounds().stream()
                 .map(pt -> pt.replaceTypeParameter(this, tpi)).toList();
-        tpi.builder().setTypeBounds(newBounds);
+        tpi.builder().setTypeBounds(newBounds).setSource(source.get());
         return tpi;
     }
 
@@ -128,7 +128,7 @@ public class TypeParameterImpl extends ElementImpl implements TypeParameter {
         return typeBounds.getFirst();
     }
 
-    public static class Builder implements TypeParameter.Builder {
+    public static class Builder extends ElementImpl.Builder<TypeParameter.Builder> implements TypeParameter.Builder {
         private final TypeParameterImpl typeParameter;
         private List<ParameterizedType> typeBounds = new ArrayList<>();
 
@@ -151,6 +151,9 @@ public class TypeParameterImpl extends ElementImpl implements TypeParameter {
         @Override
         public TypeParameter commit() {
             typeParameter.commit(List.copyOf(typeBounds));
+            if (source != null) {
+                typeParameter.source.set(source);
+            }
             return typeParameter;
         }
 
