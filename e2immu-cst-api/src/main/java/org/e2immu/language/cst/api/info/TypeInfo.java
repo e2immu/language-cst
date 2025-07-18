@@ -245,7 +245,7 @@ public interface TypeInfo extends NamedType, Info {
 
         boolean hierarchyNotYetDone();
 
-        void hierarchyIsDone();
+        @Fluent Builder hierarchyIsDone();
     }
 
     boolean isAtLeastImmutableHC();

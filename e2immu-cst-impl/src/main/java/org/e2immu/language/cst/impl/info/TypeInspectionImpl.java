@@ -410,8 +410,9 @@ public class TypeInspectionImpl extends InspectionImpl implements TypeInspection
         }
 
         @Override
-        public void hierarchyIsDone() {
+        public Builder hierarchyIsDone() {
             this.hierarchyDone = true;
+            return this;
         }
 
         @Override
