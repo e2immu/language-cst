@@ -75,8 +75,9 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof TypeInfoImpl typeInfo)) return false;
-        return Objects.equals(fullyQualifiedName, typeInfo.fullyQualifiedName) &&
-                compilationUnit().sourceSet().equals(typeInfo.compilationUnit().sourceSet());
+        return fullyQualifiedName.equals( typeInfo.fullyQualifiedName) &&
+                // note: the primitives have no source set
+               Objects.equals( compilationUnit().sourceSet(), typeInfo.compilationUnit().sourceSet());
     }
 
     @Override

@@ -49,8 +49,9 @@ public class FieldInfoImpl extends InfoImpl implements FieldInfo {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof FieldInfoImpl fieldInfo)) return false;
-        return Objects.equals(fullyQualifiedName, fieldInfo.fullyQualifiedName)
-                && owner.compilationUnit().sourceSet().equals(fieldInfo.owner.compilationUnit().sourceSet());
+        return fullyQualifiedName.equals(fieldInfo.fullyQualifiedName)
+                // note: the primitive types have no source set
+                && Objects.equals(owner.compilationUnit().sourceSet(), fieldInfo.owner.compilationUnit().sourceSet());
     }
 
     @Override
