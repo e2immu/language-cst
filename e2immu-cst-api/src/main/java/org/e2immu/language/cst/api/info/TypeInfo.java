@@ -184,6 +184,12 @@ public interface TypeInfo extends NamedType, Info {
         return !hasBeenInspected() && builder().hierarchyNotYetDone();
     }
 
+    List<TypeInfo> permittedWhenSealed();
+
+    boolean isFinal();
+
+    boolean isNonSealed();
+
     interface Builder extends Info.Builder<Builder> {
         Builder addPermittedType(TypeInfo typeInfo);
 

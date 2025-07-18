@@ -50,4 +50,6 @@ public interface TypeInspection extends Inspection {
     List<TypeInfo> permittedWhenSealed();
 
     int anonymousTypes();
+
+    boolean isFinal();
 }

@@ -15,6 +15,7 @@ import org.e2immu.language.cst.api.variable.DescendMode;
 import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.language.cst.impl.analysis.PropertyImpl;
 import org.e2immu.language.cst.impl.analysis.ValueImpl;
+import org.e2immu.language.cst.impl.element.ElementImpl;
 import org.e2immu.language.cst.impl.translate.TranslationMapImpl;
 import org.e2immu.language.cst.impl.type.ParameterizedTypeImpl;
 import org.e2immu.language.cst.impl.type.TypeParameterImpl;
@@ -75,9 +76,9 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!(o instanceof TypeInfoImpl typeInfo)) return false;
-        return fullyQualifiedName.equals( typeInfo.fullyQualifiedName) &&
+        return fullyQualifiedName.equals(typeInfo.fullyQualifiedName) &&
                 // note: the primitives have no source set
-               Objects.equals( compilationUnit().sourceSet(), typeInfo.compilationUnit().sourceSet());
+                Objects.equals(compilationUnit().sourceSet(), typeInfo.compilationUnit().sourceSet());
     }
 
     @Override
@@ -193,6 +194,21 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     @Override
     public List<ParameterizedType> interfacesImplemented() {
         return inspection.get().interfacesImplemented();
+    }
+
+    @Override
+    public List<TypeInfo> permittedWhenSealed() {
+        return inspection.get().permittedWhenSealed();
+    }
+
+    @Override
+    public boolean isFinal() {
+        return inspection.get().isFinal();
+    }
+
+    @Override
+    public boolean isNonSealed() {
+        return typeModifiers().contains(TypeModifierEnum.NON_SEALED);
     }
 
     @Override
@@ -515,10 +531,12 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
 
     @Override
     public Stream<TypeReference> typesReferenced() {
-        Stream<TypeReference> fromParent = isJavaLangObject() ? Stream.empty()
+        Stream<TypeReference> fromParent = parentClass().isJavaLangObject() ? Stream.empty()
                 : parentClass().typesReferencedMadeExplicit();
         Stream<TypeReference> fromInterfaces = interfacesImplemented().stream()
                 .flatMap(ParameterizedType::typesReferencedMadeExplicit);
+        Stream<TypeReference> fromPermits = permittedWhenSealed().stream()
+                .map(ti -> new ElementImpl.TypeReference(ti, true));
         Stream<TypeReference> fromAnnotations = annotations().stream().flatMap(AnnotationExpression::typesReferenced);
         Stream<TypeReference> fromMethods = methods().stream().flatMap(MethodInfo::typesReferenced);
         Stream<TypeReference> fromConstructors = constructors().stream().flatMap(MethodInfo::typesReferenced);
@@ -527,9 +545,11 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
         Stream<TypeReference> fromTypeParameters = typeParameters().stream()
                 .flatMap(tp -> tp.typesReferenced(true, new HashSet<>()));
         return Stream.concat(fromParent,
-                Stream.concat(fromInterfaces, Stream.concat(fromAnnotations, Stream.concat(fromMethods,
-                        Stream.concat(fromConstructors, Stream.concat(fromFields,
-                                Stream.concat(fromSubTypes, fromTypeParameters)))))));
+                Stream.concat(fromInterfaces,
+                        Stream.concat(fromPermits,
+                                Stream.concat(fromAnnotations, Stream.concat(fromMethods,
+                                        Stream.concat(fromConstructors, Stream.concat(fromFields,
+                                                Stream.concat(fromSubTypes, fromTypeParameters))))))));
     }
 
     @Override

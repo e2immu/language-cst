@@ -76,6 +76,11 @@ public class TypeInspectionImpl extends InspectionImpl implements TypeInspection
     }
 
     @Override
+    public boolean isFinal() {
+        return typeModifiers.contains(TypeModifierEnum.FINAL);
+    }
+
+    @Override
     public List<TypeParameter> typeParameters() {
         return typeParameters;
     }
@@ -281,8 +286,8 @@ public class TypeInspectionImpl extends InspectionImpl implements TypeInspection
                     fieldsAccessedInRestOfPrimaryType, enclosingMethod, List.copyOf(permittedWhenSealed),
                     superTypesExcludingJavaLangObject(), anonymousTypes);
             if (ti.parentClass() == null
-                && !typeInfo.isJavaLangObject()
-                && typeNature != TypeNatureEnum.PRIMITIVE) {
+                    && !typeInfo.isJavaLangObject()
+                    && typeNature != TypeNatureEnum.PRIMITIVE) {
                 throw new UnsupportedOperationException("Cannot commit. Type " + typeInfo + " has a null parent class, and it is not JLO. Its type nature is " + ti.typeNature());
             }
             typeInfo.commit(ti);
@@ -343,9 +348,9 @@ public class TypeInspectionImpl extends InspectionImpl implements TypeInspection
                 Access fromEnclosing = enclosingType.access();
                 if (fromEnclosing == null) {
                     throw new UnsupportedOperationException("Trying to compute access of " + typeInfo
-                                                            + " (from modifiers: " + fromModifiers
-                                                            + "), but access of enclosing type "
-                                                            + enclosingType + " not yet set.");
+                            + " (from modifiers: " + fromModifiers
+                            + "), but access of enclosing type "
+                            + enclosingType + " not yet set.");
                 }
                 Access combined = fromEnclosing.combine(fromModifiers);
                 setAccess(combined);
@@ -407,6 +412,11 @@ public class TypeInspectionImpl extends InspectionImpl implements TypeInspection
         @Override
         public void hierarchyIsDone() {
             this.hierarchyDone = true;
+        }
+
+        @Override
+        public boolean isFinal() {
+            return modifiers().contains(TypeModifierEnum.FINAL);
         }
     }
 
