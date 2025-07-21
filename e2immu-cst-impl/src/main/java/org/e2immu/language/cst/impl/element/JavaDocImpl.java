@@ -15,6 +15,7 @@ import org.e2immu.language.cst.impl.output.TextImpl;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -200,7 +201,10 @@ public class JavaDocImpl extends MultiLineCommentImpl implements JavaDoc {
 
     @Override
     public Stream<TypeReference> typesReferenced() {
-        return Stream.empty();
+        return tags.stream().map(tag -> tag.resolvedReference() == null ? null
+                        : (Element.TypeReference) new ElementImpl.TypeReference
+                        (((Info) tag.resolvedReference()).typeInfo(), !tag.content().startsWith("#")))
+                .filter(Objects::nonNull);
     }
 
     @Override

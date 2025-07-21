@@ -230,8 +230,9 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
         Stream<TypeReference> fromExceptionTypes = exceptionTypes()
                 .stream().flatMap(ParameterizedType::typesReferencedMadeExplicit);
         Stream<TypeReference> fromBody = includeBody ? methodBody().typesReferenced() : Stream.of();
+        Stream<TypeReference> fromJavaDoc = javaDoc() == null ? Stream.of() : javaDoc().typesReferenced();
         return Stream.concat(fromReturnType, Stream.concat(fromParameters, Stream.concat(fromAnnotations,
-                Stream.concat(fromExceptionTypes, Stream.concat(fromTypeParameters, fromBody)))));
+                Stream.concat(fromExceptionTypes, Stream.concat(fromTypeParameters, Stream.concat(fromJavaDoc, fromBody))))));
     }
 
     @Override

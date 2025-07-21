@@ -544,12 +544,14 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
         Stream<TypeReference> fromSubTypes = subTypes().stream().flatMap(TypeInfo::typesReferenced);
         Stream<TypeReference> fromTypeParameters = typeParameters().stream()
                 .flatMap(tp -> tp.typesReferenced(true, new HashSet<>()));
+        Stream<TypeReference> fromJavaDoc = javaDoc() == null ? Stream.of() : javaDoc().typesReferenced();
         return Stream.concat(fromParent,
                 Stream.concat(fromInterfaces,
                         Stream.concat(fromPermits,
                                 Stream.concat(fromAnnotations, Stream.concat(fromMethods,
                                         Stream.concat(fromConstructors, Stream.concat(fromFields,
-                                                Stream.concat(fromSubTypes, fromTypeParameters))))))));
+                                                Stream.concat(fromSubTypes,
+                                                        Stream.concat(fromTypeParameters, fromJavaDoc)))))))));
     }
 
     @Override

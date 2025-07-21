@@ -185,8 +185,10 @@ public class FieldInfoImpl extends InfoImpl implements FieldInfo {
         Expression initializer = inspection.get().initializer();
         Stream<TypeReference> fromAnnotations = annotations().stream().flatMap(Element::typesReferenced);
         Stream<TypeReference> fromInitializer = initializer == null ? Stream.of() : initializer.typesReferenced();
+        Stream<TypeReference> fromJavaDoc = javaDoc() == null ? Stream.of() : javaDoc().typesReferenced();
         return Stream.concat(fromAnnotations,
-                Stream.concat(type.typesReferencedMadeExplicit(), fromInitializer));
+                Stream.concat(type.typesReferencedMadeExplicit(),
+                        Stream.concat(fromJavaDoc, fromInitializer)));
     }
 
     @Override
