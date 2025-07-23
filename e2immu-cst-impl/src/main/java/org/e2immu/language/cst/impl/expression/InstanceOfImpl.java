@@ -167,6 +167,9 @@ public class InstanceOfImpl extends ExpressionImpl implements InstanceOf {
     @Override
     public void visit(Predicate<Element> predicate) {
         if (predicate.test(this)) {
+            if (patternVariable != null) {
+                patternVariable.visit(predicate);
+            }
             expression.visit(predicate);
         }
     }
@@ -174,6 +177,9 @@ public class InstanceOfImpl extends ExpressionImpl implements InstanceOf {
     @Override
     public void visit(Visitor visitor) {
         if (visitor.beforeExpression(this)) {
+            if (patternVariable != null) {
+                patternVariable.visit(visitor);
+            }
             expression.visit(visitor);
         }
         visitor.afterExpression(this);

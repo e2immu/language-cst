@@ -154,9 +154,7 @@ public class RecordPatternImpl extends ElementImpl implements RecordPattern {
     @Override
     public void visit(Predicate<Element> predicate) {
         if (predicate.test(this)) {
-            if (localVariable != null) {
-                localVariable.visit(predicate);
-            } else if (recordType != null) {
+            if (recordType != null) {
                 patterns.forEach(p -> p.visit(predicate));
             }
         }
@@ -165,9 +163,7 @@ public class RecordPatternImpl extends ElementImpl implements RecordPattern {
     @Override
     public void visit(Visitor visitor) {
         if (visitor.beforeElement(this)) {
-            if (localVariable != null) {
-                localVariable.visit(visitor);
-            } else if (recordType != null) {
+            if (recordType != null) {
                 patterns.forEach(p -> p.visit(visitor));
             }
         }
