@@ -3,6 +3,7 @@ package org.e2immu.language.cst.impl.element;
 import org.e2immu.language.cst.api.element.*;
 import org.e2immu.language.cst.api.info.Info;
 import org.e2immu.language.cst.api.info.InfoMap;
+import org.e2immu.language.cst.api.info.TypeInfo;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.translate.TranslationMap;
@@ -201,10 +202,14 @@ public class JavaDocImpl extends MultiLineCommentImpl implements JavaDoc {
 
     @Override
     public Stream<TypeReference> typesReferenced() {
-        return tags.stream().map(tag -> tag.resolvedReference() == null ? null
-                        : (Element.TypeReference) new ElementImpl.TypeReference
-                        (((Info) tag.resolvedReference()).typeInfo(), !tag.content().startsWith("#")))
-                .filter(Objects::nonNull);
+        return tags.stream().map(this::typeReference).filter(Objects::nonNull);
+    }
+
+    private Element.TypeReference typeReference(Tag tag) {
+        if (tag.resolvedReference() instanceof TypeInfo typeInfo) {
+            return new ElementImpl.TypeReference(typeInfo, !tag.content().startsWith("#"));
+        }
+        return null;
     }
 
     @Override
