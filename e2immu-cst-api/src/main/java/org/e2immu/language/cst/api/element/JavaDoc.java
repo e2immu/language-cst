@@ -50,7 +50,7 @@ public interface JavaDoc extends MultiLineComment {
         }
 
         public int argumentsAsBlockTag() {
-            if (this == PARAM || this == THROWS) return 1;
+            if (this == PARAM || this == THROWS || isReference()) return 1;
             return 0;
         }
     }
