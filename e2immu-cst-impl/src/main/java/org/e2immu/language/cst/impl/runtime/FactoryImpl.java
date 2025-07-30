@@ -700,6 +700,11 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
+    public LocalVariable newLocalVariable(ParameterizedType parameterizedType) {
+        return new LocalVariableImpl(parameterizedType, null);
+    }
+
+    @Override
     public LocalVariable newLocalVariable(String name, ParameterizedType parameterizedType) {
         return new LocalVariableImpl(name, parameterizedType, null);
     }

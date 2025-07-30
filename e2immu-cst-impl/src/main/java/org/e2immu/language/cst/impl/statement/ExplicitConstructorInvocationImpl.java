@@ -23,12 +23,15 @@ import org.e2immu.language.cst.impl.output.TextImpl;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Predicate;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 public class ExplicitConstructorInvocationImpl extends StatementImpl implements ExplicitConstructorInvocation {
     private final boolean isSuper;
     private final MethodInfo methodInfo;
     private final List<Expression> parameterExpressions;
+
+    private static final Pattern ZEROS = Pattern.compile("0+");
 
     public ExplicitConstructorInvocationImpl(List<Comment> comments,
                                              Source source, List<AnnotationExpression> annotations,
@@ -38,7 +41,7 @@ public class ExplicitConstructorInvocationImpl extends StatementImpl implements 
         this.isSuper = isSuper;
         this.methodInfo = methodInfo;
         this.parameterExpressions = parameterExpressions;
-        assert source == null || "0".equals(source.index());
+        assert source == null || ZEROS.matcher(source.index()).matches();
     }
 
     @Override

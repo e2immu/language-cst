@@ -269,6 +269,8 @@ public interface Factory {
 
     LocalTypeDeclaration.Builder newLocalTypeDeclarationBuilder();
 
+    LocalVariable newLocalVariable(ParameterizedType parameterizedType);
+
     LocalVariable newLocalVariable(String name, ParameterizedType parameterizedType);
 
     LocalVariable newLocalVariable(String name, ParameterizedType parameterizedType, Expression assignmentExpression);

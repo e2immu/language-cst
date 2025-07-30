@@ -63,14 +63,7 @@ public class SwitchStatementNewStyleImpl extends StatementImpl implements Switch
 
     @Override
     public Stream<Block> otherBlocksStream() {
-        return entries.stream()
-                .map(SwitchEntry::statement)
-                .map(statement -> {
-                    if (statement instanceof Block b) return b;
-                    // NOTE: using the statement's source is not correct index-wise, but it may be better than nothing
-                    return new BlockImpl(List.of(), statement.source(), List.of(), null, List.of(statement),
-                            List.of());
-                });
+        return entries.stream().map(SwitchEntry::statementAsBlock);
     }
 
     @Override

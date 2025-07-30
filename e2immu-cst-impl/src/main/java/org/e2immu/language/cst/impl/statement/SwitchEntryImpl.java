@@ -5,11 +5,11 @@ import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.output.OutputBuilder;
 import org.e2immu.language.cst.api.output.Qualification;
+import org.e2immu.language.cst.api.statement.Block;
 import org.e2immu.language.cst.api.statement.Statement;
 import org.e2immu.language.cst.api.statement.SwitchEntry;
 import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.variable.DescendMode;
-import org.e2immu.language.cst.api.variable.LocalVariable;
 import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.language.cst.impl.element.ElementImpl;
 import org.e2immu.language.cst.impl.output.*;
@@ -56,8 +56,8 @@ public class SwitchEntryImpl implements SwitchEntry {
     @Override
     public int complexity() {
         return (patternVariable != null ? 1 : 0)
-                + conditions.stream().mapToInt(Expression::complexity).sum()
-                + whenExpression.complexity() + statement().complexity();
+               + conditions.stream().mapToInt(Expression::complexity).sum()
+               + whenExpression.complexity() + statement().complexity();
     }
 
     @Override
@@ -73,6 +73,13 @@ public class SwitchEntryImpl implements SwitchEntry {
     @Override
     public RecordPattern patternVariable() {
         return patternVariable;
+    }
+
+    @Override
+    public Block statementAsBlock() {
+        if (statement instanceof Block b) return b;
+        // NOTE: using the statement's source is not correct index-wise, but it may be better than nothing
+        return new BlockImpl(List.of(), statement.source(), List.of(), null, List.of(statement), List.of());
     }
 
     @Override
@@ -125,7 +132,7 @@ public class SwitchEntryImpl implements SwitchEntry {
         List<Statement> tStatements = statement.translate(translationMap);
         Statement tStatement = tStatements.isEmpty() ? null : tStatements.getFirst();
         if (tConditions == conditions && tPattern == patternVariable && tWhen == whenExpression
-                && tStatement == statement) {
+            && tStatement == statement) {
             return this;
         }
         if (tStatement == null) return null; // a way for the entry to disappear

@@ -5,7 +5,6 @@ import org.e2immu.language.cst.api.element.Element;
 import org.e2immu.language.cst.api.element.RecordPattern;
 import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.translate.TranslationMap;
-import org.e2immu.language.cst.api.variable.LocalVariable;
 
 import java.util.Collection;
 import java.util.List;
@@ -17,6 +16,8 @@ public interface SwitchEntry extends Comparable<SwitchEntry>, Element {
     // or null, when absent (Java 21)
 
     RecordPattern patternVariable();
+
+    Block statementAsBlock();
 
     // EmptyExpression when absent (Java 21)
     Expression whenExpression();

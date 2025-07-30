@@ -37,8 +37,8 @@ public class RecordPatternImpl extends ElementImpl implements RecordPattern {
         this.recordType = recordType;
         this.patterns = patterns;
         assert unnamedPattern && localVariable == null && recordType == null && patterns == null
-                || !unnamedPattern && localVariable != null && recordType == null && patterns == null
-                || !unnamedPattern && localVariable == null && recordType != null && patterns != null;
+               || !unnamedPattern && localVariable != null && recordType == null && patterns == null
+               || !unnamedPattern && localVariable == null && recordType != null && patterns != null;
     }
 
     public static class Builder extends ElementImpl.Builder<RecordPattern.Builder> implements RecordPattern.Builder {
@@ -190,7 +190,8 @@ public class RecordPatternImpl extends ElementImpl implements RecordPattern {
     @Override
     public Stream<Variable> variables(DescendMode descendMode) {
         return Stream.concat(Stream.ofNullable(localVariable),
-                patterns.stream().flatMap(p -> p.variables(descendMode)));
+                patterns == null ? Stream.of() :
+                        patterns.stream().flatMap(p -> p.variables(descendMode)));
     }
 
     @Override
