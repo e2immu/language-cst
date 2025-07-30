@@ -51,11 +51,13 @@ public class PropertyValueMapImpl implements PropertyValueMap {
 
     @SuppressWarnings("unchecked")
     @Override
-    public <V extends Value> V getOrCreate(Property property, Supplier<V> createDefaultValue) {
+    public synchronized <V extends Value> V getOrCreate(Property property, Supplier<V> computeValue) {
         V v = (V) map.get(property);
         if (v != null) return v;
-        V vv = createDefaultValue.get();
-        map.put(property, vv);
+        V vv = computeValue.get();
+        if (vv != null) {
+            map.put(property, vv);
+        }
         return vv;
     }
 
