@@ -128,6 +128,12 @@ public class TypeParameterImpl extends ElementImpl implements TypeParameter {
         return typeBounds.getFirst();
     }
 
+    @Override
+    public boolean typeBoundsAreSet() {
+        if (typeBounds.isFirst()) return false;
+        return typeBounds.get().stream().allMatch(pt -> pt.typeBoundsAreSet(this));
+    }
+
     public static class Builder extends ElementImpl.Builder<TypeParameter.Builder> implements TypeParameter.Builder {
         private final TypeParameterImpl typeParameter;
         private List<ParameterizedType> typeBounds = new ArrayList<>();

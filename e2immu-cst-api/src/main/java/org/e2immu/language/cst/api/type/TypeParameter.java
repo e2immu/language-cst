@@ -19,6 +19,8 @@ import java.util.stream.Stream;
 
 public interface TypeParameter extends NamedType, Element {
 
+    boolean typeBoundsAreSet();
+
     int getIndex();
 
     Either<TypeInfo, MethodInfo> getOwner();

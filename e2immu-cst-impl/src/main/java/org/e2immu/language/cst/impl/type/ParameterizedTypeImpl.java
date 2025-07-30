@@ -1,7 +1,6 @@
 package org.e2immu.language.cst.impl.type;
 
 import org.e2immu.language.cst.api.element.Element;
-import org.e2immu.language.cst.api.element.Source;
 import org.e2immu.language.cst.api.info.InfoMap;
 import org.e2immu.language.cst.api.info.MethodInfo;
 import org.e2immu.language.cst.api.info.TypeInfo;
@@ -773,5 +772,16 @@ public class ParameterizedTypeImpl implements ParameterizedType {
                 ++i;
             }
         }
+    }
+
+    @Override
+    public boolean typeBoundsAreSet(TypeParameter self) {
+        if (typeParameter != null && !typeParameter.equals(self)) {
+            return typeParameter.typeBoundsAreSet();
+        }
+        for (ParameterizedType param : parameters) {
+            if (!param.typeBoundsAreSet(self)) return false;
+        }
+        return true;
     }
 }
