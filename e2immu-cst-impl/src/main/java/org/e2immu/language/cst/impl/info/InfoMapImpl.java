@@ -4,69 +4,82 @@ import org.e2immu.language.cst.api.expression.AnnotationExpression;
 import org.e2immu.language.cst.api.info.*;
 import org.e2immu.language.cst.impl.statement.BlockImpl;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
+/*
+BASIC RULE OF REWIRING: the fqn stays the same, as does the (name of the) source set.
+Conceptually the object stays the same.
+
+As a consequence, it doesn't really matter which object is used as the key.
+ */
 public class InfoMapImpl implements InfoMap {
-    private final Map<String, TypeInfo> typeInfoMap = new ConcurrentHashMap<>();
-    private final Map<String, MethodInfo> methodInfoMap = new ConcurrentHashMap<>();
-    private final Map<String, FieldInfo> fieldInfoMap = new ConcurrentHashMap<>();
-    private final Map<String, ParameterInfo> parameterInfoMap = new ConcurrentHashMap<>();
-    private final Set<TypeInfo> setOfTypesToRewire;
+    private final Map<TypeInfo, Map<Info, Info>> setOfTypesToRewire;
 
     public InfoMapImpl(Set<TypeInfo> setOfTypesToRewire) {
-        this.setOfTypesToRewire = setOfTypesToRewire;
+        this.setOfTypesToRewire = setOfTypesToRewire.stream()
+                .collect(Collectors.toUnmodifiableMap(primary -> primary, _ -> new HashMap<>()));
     }
 
     @Override
     public void put(TypeInfo typeInfo) {
-        TypeInfo previous = typeInfoMap.put(typeInfo.fullyQualifiedName(), typeInfo);
-        assert previous == null : "Already put in a type for FQN " + typeInfo.fullyQualifiedName();
+        Map<Info, Info> map = setOfTypesToRewire.get(typeInfo.primaryType());
+        if (map != null) {
+            map.put(typeInfo, typeInfo); // here, we use the "newly wired" object as a key; eq is based on fqn+source set
+        }
     }
 
     @Override
-    public void put(String fqn, MethodInfo methodInfo) {
-        MethodInfo previous = methodInfoMap.put(fqn, methodInfo);
-        assert previous == null : "Already put in a method for FQN " + fqn;
+    public void put(MethodInfo original, MethodInfo rewired) {
+        Map<Info, Info> map = setOfTypesToRewire.get(original.typeInfo().primaryType());
+        if (map != null) {
+            map.put(original, rewired); // here, we add the original, because the rewired's FQN has not been built yet
+        }
     }
 
     @Override
     public void put(FieldInfo fieldInfo) {
-        FieldInfo previous = fieldInfoMap.put(fieldInfo.fullyQualifiedName(), fieldInfo);
-        assert previous == null : "Already put in a field for FQN " + fieldInfo.fullyQualifiedName();
+        Map<Info, Info> map = setOfTypesToRewire.get(fieldInfo.owner().primaryType());
+        if (map != null) {
+            map.put(fieldInfo, fieldInfo); // here, we use the "newly wired" object as a key; eq is based on fqn+source set
+        }
     }
 
     @Override
-    public void put(String fqn, ParameterInfo parameterInfo) {
-        ParameterInfo previous = parameterInfoMap.put(fqn, parameterInfo);
-        assert previous == null : "Already put in a parameter for FQN " + fqn;
+    public void put(ParameterInfo original, ParameterInfo rewired) {
+        Map<Info, Info> map = setOfTypesToRewire.get(original.typeInfo().primaryType());
+        if (map != null) {
+            map.put(original, rewired); // here, we add the original, because the rewired's FQN has not been built yet
+        }
     }
 
     @Override
     public TypeInfo typeInfo(TypeInfo typeInfo) {
-        if (!setOfTypesToRewire.contains(typeInfo.primaryType())) return typeInfo;
-        String fqn = typeInfo.fullyQualifiedName();
-        return Objects.requireNonNull(typeInfoMap.get(fqn), "Should have been present: " + fqn);
+        Map<Info, Info> map = setOfTypesToRewire.get(typeInfo.primaryType());
+        if (map == null) return typeInfo;
+        return (TypeInfo) Objects.requireNonNull(map.get(typeInfo), "Should have been present: " + typeInfo);
     }
 
     @Override
     public TypeInfo typeInfoNullIfAbsent(TypeInfo typeInfo) {
-        if (!setOfTypesToRewire.contains(typeInfo.primaryType())) return typeInfo;
-        return typeInfoMap.get(typeInfo.fullyQualifiedName());
+        Map<Info, Info> map = setOfTypesToRewire.get(typeInfo.primaryType());
+        if (map == null) return typeInfo;
+        return (TypeInfo) map.get(typeInfo);
     }
 
     @Override
     public TypeInfo typeInfoRecurse(TypeInfo typeInfo) {
-        if (!setOfTypesToRewire.contains(typeInfo.primaryType())) return typeInfo;
+        Map<Info, Info> map = setOfTypesToRewire.get(typeInfo.primaryType());
+        if (map == null) return typeInfo;
 
-        String fqn = typeInfo.fullyQualifiedName();
-        TypeInfo inMap = typeInfoMap.get(fqn);
+        TypeInfo inMap = (TypeInfo) map.get(typeInfo);
         if (inMap == null) {
             TypeInfo rewired = typeInfo.rewirePhase1(this);
-            assert rewired != null : "Rewiring of " + fqn + " returns null";
-            assert typeInfoMap.containsKey(fqn);
+            assert rewired != null : "Rewiring of " + typeInfo + " returns null";
+            assert map.containsKey(typeInfo);
             return rewired;
         }
         return inMap;
@@ -74,12 +87,13 @@ public class InfoMapImpl implements InfoMap {
 
     @Override
     public TypeInfo typeInfoRecurseAllPhases(TypeInfo typeInfo) {
-        String fqn = typeInfo.fullyQualifiedName();
-        TypeInfo inMap = typeInfoMap.get(fqn);
+        Map<Info, Info> map = setOfTypesToRewire.get(typeInfo.primaryType());
+        assert map != null;
+        TypeInfo inMap = (TypeInfo) map.get(typeInfo);
         if (inMap != null) return inMap;
         TypeInfo rewired = typeInfo.rewirePhase1(this);
-        assert rewired != null : "Rewiring of " + fqn + " returns null";
-        assert typeInfoMap.containsKey(fqn);
+        assert rewired != null : "Rewiring of " + typeInfo + " returns null";
+        assert map.containsKey(typeInfo);
         typeInfo.rewirePhase2(this);
         typeInfo.rewirePhase3(this);
         return rewired;
@@ -115,21 +129,22 @@ public class InfoMapImpl implements InfoMap {
             // and we don't store it either
             return mi;
         }
-        if (!setOfTypesToRewire.contains(methodInfo.typeInfo().primaryType())) return methodInfo;
-        MethodInfo rewired = methodInfoMap.get(methodInfo.fullyQualifiedName());
-        assert rewired != null;
-        return rewired;
+        Map<Info, Info> map = setOfTypesToRewire.get(methodInfo.typeInfo().primaryType());
+        if (map == null) return methodInfo;
+        return (MethodInfo) Objects.requireNonNull(map.get(methodInfo));
     }
 
     @Override
     public FieldInfo fieldInfo(FieldInfo fieldInfo) {
-        if (!setOfTypesToRewire.contains(fieldInfo.owner().primaryType())) return fieldInfo;
-        return Objects.requireNonNull(fieldInfoMap.get(fieldInfo.fullyQualifiedName()));
+        Map<Info, Info> map = setOfTypesToRewire.get(fieldInfo.owner().primaryType());
+        if (map == null) return fieldInfo;
+        return (FieldInfo) Objects.requireNonNull(map.get(fieldInfo));
     }
 
     @Override
     public ParameterInfo parameterInfo(ParameterInfo parameterInfo) {
-        if (!setOfTypesToRewire.contains(parameterInfo.typeInfo().primaryType())) return parameterInfo;
-        return Objects.requireNonNull(parameterInfoMap.get(parameterInfo.fullyQualifiedName()));
+        Map<Info, Info> map = setOfTypesToRewire.get(parameterInfo.typeInfo().primaryType());
+        if (map == null) return parameterInfo;
+        return (ParameterInfo) Objects.requireNonNull(map.get(parameterInfo));
     }
 }

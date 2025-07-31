@@ -731,7 +731,7 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     }
 
     private void handleMethodOrConstructor(MethodInfo methodInfo, MethodInfo rewiredMethod, InfoMap infoMap) {
-        infoMap.put(methodInfo.fullyQualifiedName(), rewiredMethod);
+        infoMap.put(methodInfo, rewiredMethod);
         MethodInfo.Builder builder = rewiredMethod.builder();
 
         methodInfo.typeParameters().forEach(tp -> {
@@ -770,7 +770,7 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
                     .setVarArgs(pi.isVarArgs())
                     .setSynthetic(pi.isSynthetic())
                     .commit();
-            infoMap.put(pi.fullyQualifiedName(), rewiredPi);
+            infoMap.put(pi, rewiredPi);
         }
         rewiredMethod.builder().commitParameters();
     }
@@ -852,9 +852,9 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
         for (MethodInfo methodInfo : methods()) {
             List<MethodInfo> tMethod = methodInfo.translate(translationMap);
             newMethods.addAll(tMethod);
-            change |= tMethod.size() != 1 || tMethod.get(0) != methodInfo;
+            change |= tMethod.size() != 1 || tMethod.getFirst() != methodInfo;
             if (methodInfo == singleAbstractMethod()) {
-                translatedSam = tMethod.size() == 1 ? tMethod.get(0) : singleAbstractMethod();
+                translatedSam = tMethod.size() == 1 ? tMethod.getFirst() : singleAbstractMethod();
             }
         }
         List<TypeInfo> subTypeList = subTypes();
