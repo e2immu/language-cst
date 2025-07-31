@@ -14,6 +14,7 @@ import java.util.*;
 import java.util.stream.Stream;
 
 public interface MethodInfo extends Info {
+    String CONSTRUCTOR_NAME = "<init>";
 
     List<ParameterizedType> exceptionTypes();
 

@@ -369,7 +369,7 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
 
     @Override
     public MethodInfo newArrayCreationConstructor(ParameterizedType type) {
-        MethodInfo mi = newMethod(type.typeInfo(), "<init>", methodTypeSyntheticArrayConstructor());
+        MethodInfo mi = newMethod(type.typeInfo(), MethodInfoImpl.CONSTRUCTOR_NAME, methodTypeSyntheticArrayConstructor());
         mi.builder()
                 .setReturnType(type)
                 .addMethodModifier(methodModifierPublic())

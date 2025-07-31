@@ -288,9 +288,8 @@ public class RuntimeImpl extends FactoryImpl implements Runtime {
 
     @Override
     public ComputeMethodOverrides computeMethodOverrides() {
-        return new ComputeMethodOverridesImpl(this);
+        return new ComputeMethodOverridesImpl();
     }
-
 
     /* given a getter call, create the corresponding (indexed) variable */
     @Override

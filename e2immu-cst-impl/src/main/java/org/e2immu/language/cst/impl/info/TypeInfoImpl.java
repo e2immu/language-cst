@@ -58,7 +58,7 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     public TypeInfoImpl(MethodInfo enclosingMethod, String simpleName, int index) {
         this.simpleName = simpleName;
         fullyQualifiedName = enclosingMethod.typeInfo().fullyQualifiedName() + "."
-                + index + "$" + enclosingMethod.name() + "$" + simpleName;
+                             + index + "$" + enclosingMethod.name() + "$" + simpleName;
         this.compilationUnitOrEnclosingType = Either.right(enclosingMethod.typeInfo());
         inspection.setVariable(new TypeInspectionImpl.Builder(this));
     }
@@ -77,8 +77,8 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
         if (this == o) return true;
         if (!(o instanceof TypeInfoImpl typeInfo)) return false;
         return fullyQualifiedName.equals(typeInfo.fullyQualifiedName) &&
-                // note: the primitives have no source set
-                Objects.equals(compilationUnit().sourceSet(), typeInfo.compilationUnit().sourceSet());
+               // note: the primitives have no source set
+               Objects.equals(compilationUnit().sourceSet(), typeInfo.compilationUnit().sourceSet());
     }
 
     @Override
@@ -124,8 +124,8 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
                 .toList();
         if (list.size() != 1) {
             throw new NoSuchElementException("Cannot find a unique method named '" + methodName
-                    + "', with " + numberOfParameters + " parameters, in type "
-                    + fullyQualifiedName);
+                                             + "', with " + numberOfParameters + " parameters, in type "
+                                             + fullyQualifiedName);
         }
         return list.getFirst();
     }
@@ -137,7 +137,7 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
                 .toList();
         if (list.size() != 1) {
             throw new NoSuchElementException("Found " + list.size() + " constructors with "
-                    + numberOfParameters + " parameters");
+                                             + numberOfParameters + " parameters");
         }
         return list.getFirst();
     }
@@ -146,11 +146,11 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     public MethodInfo findConstructor(TypeInfo typeOfFirstParameter) {
         List<MethodInfo> list = constructors().stream()
                 .filter(constructor -> !constructor.parameters().isEmpty()
-                        && typeOfFirstParameter.equals(constructor.parameters().getFirst().parameterizedType().typeInfo()))
+                                       && typeOfFirstParameter.equals(constructor.parameters().getFirst().parameterizedType().typeInfo()))
                 .toList();
         if (list.size() != 1) {
             throw new NoSuchElementException("Found " + list.size() + " constructors with "
-                    + typeOfFirstParameter + " as type of the first parameter");
+                                             + typeOfFirstParameter + " as type of the first parameter");
         }
         return list.getFirst();
     }
@@ -179,8 +179,8 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     public MethodInfo findUniqueMethod(String name, TypeInfo typeInfoOfFirstParameter) {
         List<MethodInfo> list = methods().stream()
                 .filter(mi -> name.equals(mi.name())
-                        && !mi.parameters().isEmpty()
-                        && typeInfoOfFirstParameter.equals(mi.parameters().getFirst().parameterizedType().typeInfo()))
+                              && !mi.parameters().isEmpty()
+                              && typeInfoOfFirstParameter.equals(mi.parameters().getFirst().parameterizedType().typeInfo()))
                 .toList();
         if (list.size() != 1) throw new NoSuchElementException();
         return list.getFirst();
@@ -277,8 +277,8 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     @Override
     public boolean isStatic() {
         return typeNature().isStatic()  // interface, enum, etc.. otherwise: CLASS
-                || isPrimaryType() // otherwise: subtype
-                || inspection.get().modifiers().stream().anyMatch(TypeModifier::isStatic);
+               || isPrimaryType() // otherwise: subtype
+               || inspection.get().modifiers().stream().anyMatch(TypeModifier::isStatic);
     }
 
     @Override
@@ -303,18 +303,18 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     @Override
     public boolean isNumeric() {
         return isInt() || isInteger() ||
-                isLong() || isBoxedLong() ||
-                isShort() || isBoxedShort() ||
-                isByte() || isBoxedByte() ||
-                isFloat() || isBoxedFloat() ||
-                isDouble() || isBoxedDouble() ||
-                isChar() || isCharacter();
+               isLong() || isBoxedLong() ||
+               isShort() || isBoxedShort() ||
+               isByte() || isBoxedByte() ||
+               isFloat() || isBoxedFloat() ||
+               isDouble() || isBoxedDouble() ||
+               isChar() || isCharacter();
     }
 
     @Override
     public boolean isBoxedExcludingVoid() {
         return isBoxedByte() || isBoxedShort() || isInteger() || isBoxedLong()
-                || isCharacter() || isBoxedFloat() || isBoxedDouble() || isBoxedBoolean();
+               || isCharacter() || isBoxedFloat() || isBoxedDouble() || isBoxedBoolean();
     }
 
     @Override
@@ -455,7 +455,7 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     @Override
     public boolean isPrimitiveExcludingVoid() {
         return this.isByte() || this.isShort() || this.isInt() || this.isLong() ||
-                this.isChar() || this.isFloat() || this.isDouble() || this.isBoolean();
+               this.isChar() || this.isFloat() || this.isDouble() || this.isBoolean();
     }
 
     @Override
@@ -650,20 +650,26 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     }
 
     @Override
-    public TypeInfo rewirePhase1(InfoMap infoMap) {
+    public TypeInfo rewirePhase0(InfoMap infoMap, TypeInfo newEnclosingType) {
         assert infoMap.typeInfoNullIfAbsent(this) == null;
         TypeInfo typeInfo;
         if (compilationUnitOrEnclosingType.isLeft()) {
             typeInfo = new TypeInfoImpl(compilationUnit(), simpleName);
         } else {
-            typeInfo = new TypeInfoImpl(infoMap.typeInfoRecurse(compilationUnitOrEnclosingType.getRight()), simpleName);
+            typeInfo = new TypeInfoImpl(infoMap.typeInfo(newEnclosingType), simpleName);
         }
         infoMap.put(typeInfo);
-
         TypeInfo.Builder builder = typeInfo.builder();
         for (TypeInfo subType : subTypes()) {
-            builder.addSubType(subType.rewirePhase1(infoMap));
+            builder.addSubType(subType.rewirePhase0(infoMap, typeInfo));
         }
+        return typeInfo;
+    }
+
+    @Override
+    public TypeInfo rewirePhase1(InfoMap infoMap) {
+        TypeInfo typeInfo = infoMap.typeInfo(this);
+
         typeParameters().forEach(tp -> {
             List<AnnotationExpression> rewiredAnnotations = tp.annotations().stream()
                     .map(ae -> (AnnotationExpression) ae.rewire(infoMap)).toList();
@@ -675,13 +681,32 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
                     .setSource(tp.source())
                     .commit();
         });
+
+        for (TypeInfo subType : subTypes()) {
+            subType.rewirePhase1(infoMap);
+        }
+        for (MethodInfo constructor : constructors()) {
+            MethodInfo rewiredConstructor = new MethodInfoImpl(typeInfo, constructor.methodType());
+            infoMap.put(constructor, rewiredConstructor);
+        }
+        for (MethodInfo methodInfo : methods()) {
+            MethodInfo rewiredMethod = new MethodInfoImpl(methodInfo.methodType(), methodInfo.name(), typeInfo);
+            infoMap.put(methodInfo, rewiredMethod);
+        }
+        for (FieldInfo fieldInfo : fields()) {
+            FieldInfo rewiredField = new FieldInfoImpl(fieldInfo.name(), fieldInfo.isStatic(),
+                    fieldInfo.type().rewire(infoMap), typeInfo);
+            infoMap.put(rewiredField);
+        }
+
+        TypeInfo.Builder builder = typeInfo.builder();
         builder.setTypeNature(typeNature())
                 .setSource(source())
                 .addComments(comments())
                 .addAnnotations(annotations())
                 .setSynthetic(isSynthetic())
                 .setParentClass(parentClass() == null ? null : parentClass().rewire(infoMap))
-                .setAccess(typeInfo.access());
+                .setAccess(access());
         typeModifiers().forEach(builder::addTypeModifier);
         interfacesImplemented().forEach(pt -> builder.addInterfaceImplemented(pt.rewire(infoMap)));
 
@@ -693,31 +718,39 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
     @Override
     public void rewirePhase2(InfoMap infoMap) {
         TypeInfo rewiredType = infoMap.typeInfo(this);
+        assert rewiredType != this;
         TypeInfo.Builder builder = rewiredType.builder();
-
 
         for (TypeInfo subType : subTypes()) {
             subType.rewirePhase2(infoMap);
         }
         for (MethodInfo constructor : constructors()) {
-            MethodInfo rewiredConstructor = new MethodInfoImpl(constructor.methodType(), constructor.name(), rewiredType);
+            MethodInfo rewiredConstructor = infoMap.methodInfo(constructor);
+            assert rewiredConstructor != constructor;
             builder.addConstructor(rewiredConstructor);
             handleMethodOrConstructor(constructor, rewiredConstructor, infoMap);
         }
         for (MethodInfo methodInfo : methods()) {
-            MethodInfo rewiredMethod = new MethodInfoImpl(methodInfo.methodType(), methodInfo.name(), rewiredType);
+            MethodInfo rewiredMethod = infoMap.methodInfo(methodInfo);
+            assert rewiredMethod != methodInfo;
             builder.addMethod(rewiredMethod);
             handleMethodOrConstructor(methodInfo, rewiredMethod, infoMap);
         }
-        if (enclosingMethod() != null) {
-            builder.setEnclosingMethod(infoMap.methodInfo(enclosingMethod()));
+        MethodInfo enclosingMethod = enclosingMethod();
+        if (enclosingMethod != null) {
+            MethodInfo rewiredEnclosing = infoMap.methodInfo(enclosingMethod);
+            assert rewiredEnclosing != enclosingMethod;
+            builder.setEnclosingMethod(rewiredEnclosing);
         }
-        if (singleAbstractMethod() != null) {
-            builder.setSingleAbstractMethod(infoMap.methodInfo(singleAbstractMethod()));
+        MethodInfo sam = singleAbstractMethod();
+        if (sam != null) {
+            MethodInfo rewiredSam = infoMap.methodInfo(sam);
+            assert rewiredSam != sam;
+            builder.setSingleAbstractMethod(rewiredSam);
         }
         for (FieldInfo fieldInfo : fields()) {
-            FieldInfo rewiredField = new FieldInfoImpl(fieldInfo.name(), fieldInfo.isStatic(),
-                    fieldInfo.type().rewire(infoMap), rewiredType);
+            FieldInfo rewiredField = infoMap.fieldInfo(fieldInfo);
+            assert rewiredField != fieldInfo;
             rewiredField.builder().setSynthetic(fieldInfo.isSynthetic())
                     .setSource(fieldInfo.source())
                     .addComments(fieldInfo.comments())

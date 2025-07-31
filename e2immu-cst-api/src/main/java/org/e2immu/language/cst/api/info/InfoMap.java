@@ -21,8 +21,7 @@ public interface InfoMap {
     // do not recurse, error if absent
     TypeInfo typeInfo(TypeInfo typeInfo);
 
-    TypeInfo typeInfoRecurse(TypeInfo typeInfo);
-
+    // only to be used in phase 3, inside expressions
     TypeInfo typeInfoRecurseAllPhases(TypeInfo typeInfo);
 
     TypeInfo typeInfoNullIfAbsent(TypeInfo typeInfo);

@@ -16,17 +16,11 @@ import java.util.stream.Stream;
 
 public class ComputeMethodOverridesImpl implements ComputeMethodOverrides {
     private static final Logger LOGGER = LoggerFactory.getLogger(ComputeMethodOverridesImpl.class);
-    private final Runtime runtime;
-
-    public ComputeMethodOverridesImpl(Runtime runtime) {
-        this.runtime = runtime;
-    }
-
 
     @Override
     public MethodInfo computeFunctionalInterface(TypeInfo typeInfo) {
         List<MethodInfo> abstractMethods = computeIsFunctionalInterface(typeInfo, new HashSet<>(), new HashMap<>());
-        return abstractMethods.size() == 1 ? abstractMethods.get(0) : null;
+        return abstractMethods.size() == 1 ? abstractMethods.getFirst() : null;
     }
 
     /*

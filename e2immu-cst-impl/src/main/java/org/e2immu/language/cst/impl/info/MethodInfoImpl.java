@@ -73,16 +73,17 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
     private final EventuallyFinal<MethodInspection> inspection = new EventuallyFinal<>();
 
     public MethodInfoImpl(TypeInfo typeInfo) {
-        this(MethodTypeEnum.CONSTRUCTOR, "<init>", typeInfo);
+        this(MethodTypeEnum.CONSTRUCTOR, CONSTRUCTOR_NAME, typeInfo);
     }
 
     public MethodInfoImpl(TypeInfo typeInfo, MethodType methodType) {
-        this(methodType, "<init>", typeInfo);
+        this(methodType, CONSTRUCTOR_NAME, typeInfo);
     }
 
     public MethodInfoImpl(MethodInfo.MethodType methodType,
                           String name,
                           TypeInfo typeInfo) {
+        assert CONSTRUCTOR_NAME.equals(name) == methodType.isConstructor();
         this.name = name;
         this.methodType = methodType;
         this.typeInfo = typeInfo;
@@ -103,8 +104,8 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
         if (this == o) return true;
         if (!(o instanceof MethodInfoImpl that)) return false;
         return fullyQualifiedName().equals(that.fullyQualifiedName())
-                // note: the primitive types have no source set
-                && Objects.equals(typeInfo.compilationUnit().sourceSet(), that.typeInfo.compilationUnit().sourceSet());
+               // note: the primitive types have no source set
+               && Objects.equals(typeInfo.compilationUnit().sourceSet(), that.typeInfo.compilationUnit().sourceSet());
     }
 
     @Override
@@ -485,7 +486,7 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
     @Override
     public boolean isFactoryMethod() {
         return isStatic() && returnType().typeInfo() != null
-                && returnType().typeInfo().isEnclosedIn(typeInfo);
+               && returnType().typeInfo().isEnclosedIn(typeInfo);
     }
 
     @Override

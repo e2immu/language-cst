@@ -624,7 +624,7 @@ public class ParameterizedTypeImpl implements ParameterizedType {
     @Override
     public ParameterizedType rewire(InfoMap infoMap, Map<TypeParameter, TypeParameter> rewiredTypeParameters) {
         if (typeInfo != null) {
-            TypeInfo rewired = infoMap.typeInfoRecurse(typeInfo);
+            TypeInfo rewired = infoMap.typeInfo(typeInfo);
             List<ParameterizedType> rewiredParameters = parameters.stream()
                     .map(pt -> pt.rewire(infoMap, rewiredTypeParameters)).toList();
             return new ParameterizedTypeImpl(rewired, null, rewiredParameters, arrays, wildcard);

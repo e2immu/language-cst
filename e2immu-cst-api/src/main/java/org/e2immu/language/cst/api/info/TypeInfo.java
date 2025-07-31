@@ -245,7 +245,8 @@ public interface TypeInfo extends NamedType, Info {
 
         boolean hierarchyNotYetDone();
 
-        @Fluent Builder hierarchyIsDone();
+        @Fluent
+        Builder hierarchyIsDone();
     }
 
     boolean isAtLeastImmutableHC();
@@ -322,6 +323,8 @@ public interface TypeInfo extends NamedType, Info {
         if (enclosingMethod() != null) return enclosingMethod().typeInfo().owningTypeStartFromAnonymous();
         return this;
     }
+
+    TypeInfo rewirePhase0(InfoMap infoMap, TypeInfo newEnclosingType);
 
     TypeInfo rewirePhase1(InfoMap infoMap);
 

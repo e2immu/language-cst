@@ -70,23 +70,10 @@ public class InfoMapImpl implements InfoMap {
         return (TypeInfo) map.get(typeInfo);
     }
 
-    @Override
-    public TypeInfo typeInfoRecurse(TypeInfo typeInfo) {
-        Map<Info, Info> map = setOfPrimaryTypesToRewire.get(typeInfo.primaryType());
-        if (map == null) return typeInfo;
-
-        TypeInfo inMap = (TypeInfo) map.get(typeInfo);
-        if (inMap == null) {
-            TypeInfo rewired = typeInfo.rewirePhase1(this);
-            assert rewired != null : "Rewiring of " + typeInfo + " returns null";
-            assert map.containsKey(typeInfo);
-            return rewired;
-        }
-        return inMap;
-    }
-
-    @Override
     public Set<TypeInfo> rewireAll() {
+        for (TypeInfo primaryType : setOfPrimaryTypesToRewire.keySet()) {
+            primaryType.rewirePhase0(this, null);
+        }
         for (TypeInfo primaryType : setOfPrimaryTypesToRewire.keySet()) {
             primaryType.rewirePhase1(this);
         }
@@ -107,7 +94,10 @@ public class InfoMapImpl implements InfoMap {
         assert map != null;
         TypeInfo inMap = (TypeInfo) map.get(typeInfo);
         if (inMap != null) return inMap;
-        TypeInfo rewired = typeInfo.rewirePhase1(this);
+        // the enclosing type should already have been done
+        TypeInfo enclosingType = typeInfo(typeInfo.compilationUnitOrEnclosingType().getRight());
+        TypeInfo rewired = typeInfo.rewirePhase0(this, enclosingType);
+        typeInfo.rewirePhase1(this);
         assert rewired != null : "Rewiring of " + typeInfo + " returns null";
         assert map.containsKey(typeInfo);
         typeInfo.rewirePhase2(this);
@@ -123,13 +113,14 @@ public class InfoMapImpl implements InfoMap {
         }
         Map<Info, Info> map = setOfPrimaryTypesToRewire.get(methodInfo.typeInfo().primaryType());
         if (map == null) return methodInfo;
-        return (MethodInfo) Objects.requireNonNull(map.get(methodInfo));
+        return (MethodInfo) Objects.requireNonNull(map.get(methodInfo),
+                "Cannot find " + methodInfo.fullyQualifiedName());
     }
 
     private MethodInfo createSyntheticArrayConstructor(MethodInfo methodInfo) {
         // the synthetic array constructor won't be in the map
         MethodInfo mi = new MethodInfoImpl(MethodInfoImpl.MethodTypeEnum.SYNTHETIC_ARRAY_CONSTRUCTOR,
-                "<init>", typeInfo(methodInfo.typeInfo()));
+                MethodInfoImpl.CONSTRUCTOR_NAME, typeInfo(methodInfo.typeInfo()));
         mi.builder()
                 .addAnnotations(methodInfo.annotations().stream()
                         .map(a -> (AnnotationExpression) a.rewire(this)).toList())
