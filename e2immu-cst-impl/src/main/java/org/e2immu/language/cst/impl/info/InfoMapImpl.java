@@ -86,6 +86,22 @@ public class InfoMapImpl implements InfoMap {
     }
 
     @Override
+    public Set<TypeInfo> rewireAll() {
+        for (TypeInfo primaryType : setOfPrimaryTypesToRewire.keySet()) {
+            primaryType.rewirePhase1(this);
+        }
+        for (TypeInfo primaryType : setOfPrimaryTypesToRewire.keySet()) {
+            primaryType.rewirePhase2(this);
+        }
+        for (TypeInfo primaryType : setOfPrimaryTypesToRewire.keySet()) {
+            primaryType.rewirePhase3(this);
+        }
+        return setOfPrimaryTypesToRewire.entrySet().stream()
+                .map(e -> (TypeInfo) e.getValue().get(e.getKey()))
+                .collect(Collectors.toUnmodifiableSet());
+    }
+
+    @Override
     public TypeInfo typeInfoRecurseAllPhases(TypeInfo typeInfo) {
         Map<Info, Info> map = setOfPrimaryTypesToRewire.get(typeInfo.primaryType());
         assert map != null;

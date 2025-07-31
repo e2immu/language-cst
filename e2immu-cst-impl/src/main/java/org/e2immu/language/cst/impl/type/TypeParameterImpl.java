@@ -74,13 +74,18 @@ public class TypeParameterImpl extends ElementImpl implements TypeParameter {
 
     @Override
     public TypeParameter rewire(InfoMap infoMap) {
+        return rewire(infoMap, new HashMap<>());
+    }
+
+    public TypeParameter rewire(InfoMap infoMap, Map<TypeParameter, TypeParameter> done) {
         Either<TypeInfo, MethodInfo> rewiredOwner = owner.isLeft()
                 ? Either.left(infoMap.typeInfo(owner.getLeft()))
                 : Either.right(infoMap.methodInfo(owner.getRight()));
         List<AnnotationExpression> rewiredAnnotations = annotations.stream()
                 .map(ae -> (AnnotationExpression) ae.rewire(infoMap)).toList();
         TypeParameter rewired = new TypeParameterImpl(comments, rewiredAnnotations, index, name, rewiredOwner);
-        typeBounds.get().forEach(pt -> rewired.builder().addTypeBound(pt.rewire(infoMap)));
+        done.put(this, rewired);
+        typeBounds.get().forEach(pt -> rewired.builder().addTypeBound(pt.rewire(infoMap, done)));
         rewired.builder().setSource(source()).commit();
         return rewired;
     }
