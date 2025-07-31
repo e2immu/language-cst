@@ -250,6 +250,8 @@ public interface Factory {
 
     ImportStatement.Builder newImportStatementBuilder();
 
+    InfoMap newInfoMap(Set<TypeInfo> primaryTypes);
+
     InlineConditional newInlineConditional(Expression condition, Expression ifTrue, Expression ifFalse);
 
     InlineConditional.Builder newInlineConditionalBuilder();

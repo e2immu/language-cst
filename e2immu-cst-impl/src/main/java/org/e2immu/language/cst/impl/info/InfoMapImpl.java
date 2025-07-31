@@ -17,16 +17,16 @@ Conceptually the object stays the same.
 As a consequence, it doesn't really matter which object is used as the key.
  */
 public class InfoMapImpl implements InfoMap {
-    private final Map<TypeInfo, Map<Info, Info>> setOfTypesToRewire;
+    private final Map<TypeInfo, Map<Info, Info>> setOfPrimaryTypesToRewire;
 
-    public InfoMapImpl(Set<TypeInfo> setOfTypesToRewire) {
-        this.setOfTypesToRewire = setOfTypesToRewire.stream()
+    public InfoMapImpl(Set<TypeInfo> setOfPrimaryTypesToRewire) {
+        this.setOfPrimaryTypesToRewire = setOfPrimaryTypesToRewire.stream()
                 .collect(Collectors.toUnmodifiableMap(primary -> primary, _ -> new HashMap<>()));
     }
 
     @Override
     public void put(TypeInfo typeInfo) {
-        Map<Info, Info> map = setOfTypesToRewire.get(typeInfo.primaryType());
+        Map<Info, Info> map = setOfPrimaryTypesToRewire.get(typeInfo.primaryType());
         if (map != null) {
             map.put(typeInfo, typeInfo); // here, we use the "newly wired" object as a key; eq is based on fqn+source set
         }
@@ -34,7 +34,7 @@ public class InfoMapImpl implements InfoMap {
 
     @Override
     public void put(MethodInfo original, MethodInfo rewired) {
-        Map<Info, Info> map = setOfTypesToRewire.get(original.typeInfo().primaryType());
+        Map<Info, Info> map = setOfPrimaryTypesToRewire.get(original.typeInfo().primaryType());
         if (map != null) {
             map.put(original, rewired); // here, we add the original, because the rewired's FQN has not been built yet
         }
@@ -42,7 +42,7 @@ public class InfoMapImpl implements InfoMap {
 
     @Override
     public void put(FieldInfo fieldInfo) {
-        Map<Info, Info> map = setOfTypesToRewire.get(fieldInfo.owner().primaryType());
+        Map<Info, Info> map = setOfPrimaryTypesToRewire.get(fieldInfo.owner().primaryType());
         if (map != null) {
             map.put(fieldInfo, fieldInfo); // here, we use the "newly wired" object as a key; eq is based on fqn+source set
         }
@@ -50,7 +50,7 @@ public class InfoMapImpl implements InfoMap {
 
     @Override
     public void put(ParameterInfo original, ParameterInfo rewired) {
-        Map<Info, Info> map = setOfTypesToRewire.get(original.typeInfo().primaryType());
+        Map<Info, Info> map = setOfPrimaryTypesToRewire.get(original.typeInfo().primaryType());
         if (map != null) {
             map.put(original, rewired); // here, we add the original, because the rewired's FQN has not been built yet
         }
@@ -58,21 +58,21 @@ public class InfoMapImpl implements InfoMap {
 
     @Override
     public TypeInfo typeInfo(TypeInfo typeInfo) {
-        Map<Info, Info> map = setOfTypesToRewire.get(typeInfo.primaryType());
+        Map<Info, Info> map = setOfPrimaryTypesToRewire.get(typeInfo.primaryType());
         if (map == null) return typeInfo;
         return (TypeInfo) Objects.requireNonNull(map.get(typeInfo), "Should have been present: " + typeInfo);
     }
 
     @Override
     public TypeInfo typeInfoNullIfAbsent(TypeInfo typeInfo) {
-        Map<Info, Info> map = setOfTypesToRewire.get(typeInfo.primaryType());
+        Map<Info, Info> map = setOfPrimaryTypesToRewire.get(typeInfo.primaryType());
         if (map == null) return typeInfo;
         return (TypeInfo) map.get(typeInfo);
     }
 
     @Override
     public TypeInfo typeInfoRecurse(TypeInfo typeInfo) {
-        Map<Info, Info> map = setOfTypesToRewire.get(typeInfo.primaryType());
+        Map<Info, Info> map = setOfPrimaryTypesToRewire.get(typeInfo.primaryType());
         if (map == null) return typeInfo;
 
         TypeInfo inMap = (TypeInfo) map.get(typeInfo);
@@ -87,7 +87,7 @@ public class InfoMapImpl implements InfoMap {
 
     @Override
     public TypeInfo typeInfoRecurseAllPhases(TypeInfo typeInfo) {
-        Map<Info, Info> map = setOfTypesToRewire.get(typeInfo.primaryType());
+        Map<Info, Info> map = setOfPrimaryTypesToRewire.get(typeInfo.primaryType());
         assert map != null;
         TypeInfo inMap = (TypeInfo) map.get(typeInfo);
         if (inMap != null) return inMap;
@@ -103,47 +103,51 @@ public class InfoMapImpl implements InfoMap {
     public MethodInfo methodInfo(MethodInfo methodInfo) {
         assert methodInfo != null;
         if (methodInfo.isSyntheticArrayConstructor()) {
-            // the synthetic array constructor won't be in the map
-            MethodInfo mi = new MethodInfoImpl(MethodInfoImpl.MethodTypeEnum.SYNTHETIC_ARRAY_CONSTRUCTOR,
-                    "<init>", typeInfo(methodInfo.typeInfo()));
-            mi.builder()
-                    .addAnnotations(methodInfo.annotations().stream()
-                            .map(a -> (AnnotationExpression) a.rewire(this)).toList())
-                    .addComments(methodInfo.comments().stream().map(c -> c.rewire(this)).toList())
-                    .setSource(methodInfo.source())
-                    .setReturnType(methodInfo.returnType().rewire(this))
-                    .addMethodModifier(MethodModifierEnum.PUBLIC)
-                    .setMethodBody(new BlockImpl.Builder().build())
-                    .setMissingData(methodInfo.missingData())
-                    .computeAccess();
-            for (int i = 0; i < methodInfo.returnType().arrays(); i++) {
-                ParameterInfo pii = methodInfo.parameters().get(i);
-                ParameterInfo pi = mi.builder().addParameter(pii.name(), pii.parameterizedType());
-                pi.builder()
-                        .addAnnotations(methodInfo.annotations().stream()
-                                .map(a -> (AnnotationExpression) a.rewire(this)).toList())
-                        .addComments(pii.comments().stream().map(c -> c.rewire(this)).toList())
-                        .setSource(pii.source());
-            }
-            mi.builder().commitParameters().commit();
-            // and we don't store it either
-            return mi;
+            return createSyntheticArrayConstructor(methodInfo);
         }
-        Map<Info, Info> map = setOfTypesToRewire.get(methodInfo.typeInfo().primaryType());
+        Map<Info, Info> map = setOfPrimaryTypesToRewire.get(methodInfo.typeInfo().primaryType());
         if (map == null) return methodInfo;
         return (MethodInfo) Objects.requireNonNull(map.get(methodInfo));
     }
 
+    private MethodInfo createSyntheticArrayConstructor(MethodInfo methodInfo) {
+        // the synthetic array constructor won't be in the map
+        MethodInfo mi = new MethodInfoImpl(MethodInfoImpl.MethodTypeEnum.SYNTHETIC_ARRAY_CONSTRUCTOR,
+                "<init>", typeInfo(methodInfo.typeInfo()));
+        mi.builder()
+                .addAnnotations(methodInfo.annotations().stream()
+                        .map(a -> (AnnotationExpression) a.rewire(this)).toList())
+                .addComments(methodInfo.comments().stream().map(c -> c.rewire(this)).toList())
+                .setSource(methodInfo.source())
+                .setReturnType(methodInfo.returnType().rewire(this))
+                .addMethodModifier(MethodModifierEnum.PUBLIC)
+                .setMethodBody(new BlockImpl.Builder().build())
+                .setMissingData(methodInfo.missingData())
+                .computeAccess();
+        for (int i = 0; i < methodInfo.returnType().arrays(); i++) {
+            ParameterInfo pii = methodInfo.parameters().get(i);
+            ParameterInfo pi = mi.builder().addParameter(pii.name(), pii.parameterizedType());
+            pi.builder()
+                    .addAnnotations(methodInfo.annotations().stream()
+                            .map(a -> (AnnotationExpression) a.rewire(this)).toList())
+                    .addComments(pii.comments().stream().map(c -> c.rewire(this)).toList())
+                    .setSource(pii.source());
+        }
+        mi.builder().commitParameters().commit();
+        // and we don't store it either
+        return mi;
+    }
+
     @Override
     public FieldInfo fieldInfo(FieldInfo fieldInfo) {
-        Map<Info, Info> map = setOfTypesToRewire.get(fieldInfo.owner().primaryType());
+        Map<Info, Info> map = setOfPrimaryTypesToRewire.get(fieldInfo.owner().primaryType());
         if (map == null) return fieldInfo;
         return (FieldInfo) Objects.requireNonNull(map.get(fieldInfo));
     }
 
     @Override
     public ParameterInfo parameterInfo(ParameterInfo parameterInfo) {
-        Map<Info, Info> map = setOfTypesToRewire.get(parameterInfo.typeInfo().primaryType());
+        Map<Info, Info> map = setOfPrimaryTypesToRewire.get(parameterInfo.typeInfo().primaryType());
         if (map == null) return parameterInfo;
         return (ParameterInfo) Objects.requireNonNull(map.get(parameterInfo));
     }
