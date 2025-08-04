@@ -10,7 +10,6 @@ import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.type.NamedType;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.type.TypeNature;
-import org.e2immu.language.cst.api.type.TypeParameter;
 import org.e2immu.language.cst.api.variable.DescendMode;
 import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.language.cst.impl.analysis.PropertyImpl;
@@ -673,12 +672,13 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
         typeParameters().forEach(tp -> {
             List<AnnotationExpression> rewiredAnnotations = tp.annotations().stream()
                     .map(ae -> (AnnotationExpression) ae.rewire(infoMap)).toList();
-            TypeParameter newTp = new TypeParameterImpl(tp.comments(), rewiredAnnotations,
-                    tp.getIndex(), tp.simpleName(), Either.left(typeInfo));
+            TypeParameter newTp = new TypeParameterImpl(tp.getIndex(), tp.simpleName(), Either.left(typeInfo));
             typeInfo.builder().addOrSetTypeParameter(newTp);
-            tp.typeBounds().forEach(tb -> newTp.builder().addTypeBound(tb.rewire(infoMap)));
             newTp.builder()
+                    .addComments(tp.comments())
+                    .addAnnotations(rewiredAnnotations)
                     .setSource(tp.source())
+                    .setTypeBounds(tp.typeBounds().stream().map(tb -> tb.rewire(infoMap)).toList())
                     .commit();
         });
 
@@ -770,11 +770,14 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
         methodInfo.typeParameters().forEach(tp -> {
             List<AnnotationExpression> rewiredAnnotations = tp.annotations().stream()
                     .map(ae -> (AnnotationExpression) ae.rewire(infoMap)).toList();
-            TypeParameter newTp = new TypeParameterImpl(tp.comments(), rewiredAnnotations,
-                    tp.getIndex(), tp.simpleName(), Either.right(rewiredMethod));
+            TypeParameter newTp = new TypeParameterImpl(tp.getIndex(), tp.simpleName(), Either.right(rewiredMethod));
             builder.addTypeParameter(newTp);
-            tp.typeBounds().forEach(tb -> newTp.builder().addTypeBound(tb.rewire(infoMap)));
-            newTp.builder().setSource(tp.source()).commit();
+            newTp.builder()
+                    .addComments(tp.comments())
+                    .addAnnotations(rewiredAnnotations)
+                    .setSource(tp.source())
+                    .setTypeBounds(tp.typeBounds().stream().map(tb -> tb.rewire(infoMap)).toList())
+                    .commit();
         });
         rewireParameters(methodInfo, rewiredMethod, infoMap);
         methodInfo.methodModifiers().forEach(builder::addMethodModifier);
@@ -859,7 +862,7 @@ public class TypeInfoImpl extends InfoImpl implements TypeInfo {
         TranslationMap translationMap = tmb.build();
 
         for (TypeParameter tp : newTypeParameters) {
-            List<ParameterizedType> newTypeBounds = tp.builder().getTypeBounds()
+            List<ParameterizedType> newTypeBounds = tp.typeBounds()
                     .stream().map(translationMap::translateType)
                     .toList();
             tp.builder().setTypeBounds(newTypeBounds).commit();

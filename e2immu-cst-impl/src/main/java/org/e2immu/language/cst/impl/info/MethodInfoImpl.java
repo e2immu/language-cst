@@ -10,7 +10,7 @@ import org.e2immu.language.cst.api.statement.Block;
 import org.e2immu.language.cst.api.statement.Statement;
 import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.type.ParameterizedType;
-import org.e2immu.language.cst.api.type.TypeParameter;
+import org.e2immu.language.cst.api.info.TypeParameter;
 import org.e2immu.language.cst.api.variable.DescendMode;
 import org.e2immu.language.cst.api.variable.Variable;
 import org.e2immu.language.cst.impl.analysis.PropertyImpl;
@@ -596,7 +596,7 @@ public class MethodInfoImpl extends InfoImpl implements MethodInfo {
                 .map(tp0 -> {
                     TypeParameter tp = tp0.withOwnerVariableTypeBounds(methodInfo);
                     if (translationMap != null) {
-                        List<ParameterizedType> newTypeBounds = tp.builder().getTypeBounds().stream()
+                        List<ParameterizedType> newTypeBounds = tp.typeBounds().stream()
                                 .map(translationMap::translateType)
                                 .toList();
                         tp.builder().setTypeBounds(newTypeBounds);

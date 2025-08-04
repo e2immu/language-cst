@@ -12,7 +12,10 @@ import org.e2immu.language.cst.api.output.element.TextBlockFormatting;
 import org.e2immu.language.cst.api.runtime.Factory;
 import org.e2immu.language.cst.api.statement.*;
 import org.e2immu.language.cst.api.translate.TranslationMap;
-import org.e2immu.language.cst.api.type.*;
+import org.e2immu.language.cst.api.type.Diamond;
+import org.e2immu.language.cst.api.type.ParameterizedType;
+import org.e2immu.language.cst.api.type.TypeNature;
+import org.e2immu.language.cst.api.type.Wildcard;
 import org.e2immu.language.cst.api.variable.*;
 import org.e2immu.language.cst.impl.analysis.PropertyImpl;
 import org.e2immu.language.cst.impl.analysis.ValueImpl;
@@ -965,13 +968,11 @@ public class FactoryImpl extends PredefinedImpl implements Factory {
     }
 
     @Override
-    public TypeParameter newTypeParameter(List<Comment> comments,
-                                          List<AnnotationExpression> annotations,
-                                          int index, String simpleName, Info owner) {
+    public TypeParameter newTypeParameter(int index, String simpleName, Info owner) {
         if (owner instanceof TypeInfo typeInfo) {
-            return new TypeParameterImpl(comments, annotations, index, simpleName, Either.left(typeInfo));
+            return new TypeParameterImpl(index, simpleName, Either.left(typeInfo));
         } else if (owner instanceof MethodInfo methodInfo) {
-            return new TypeParameterImpl(comments, annotations, index, simpleName, Either.right(methodInfo));
+            return new TypeParameterImpl(index, simpleName, Either.right(methodInfo));
         } else throw new UnsupportedOperationException();
     }
 

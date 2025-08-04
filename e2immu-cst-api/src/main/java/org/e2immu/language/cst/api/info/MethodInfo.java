@@ -7,7 +7,6 @@ import org.e2immu.language.cst.api.expression.Expression;
 import org.e2immu.language.cst.api.statement.Block;
 import org.e2immu.language.cst.api.translate.TranslationMap;
 import org.e2immu.language.cst.api.type.ParameterizedType;
-import org.e2immu.language.cst.api.type.TypeParameter;
 import org.e2immu.language.cst.api.util.ParSeq;
 
 import java.util.*;

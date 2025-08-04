@@ -1,17 +1,13 @@
 package org.e2immu.language.cst.impl.info;
 
 import org.e2immu.annotation.Fluent;
-import org.e2immu.language.cst.api.element.Comment;
-import org.e2immu.language.cst.api.element.Source;
-import org.e2immu.language.cst.api.expression.AnnotationExpression;
 import org.e2immu.language.cst.api.info.Access;
 import org.e2immu.language.cst.api.info.MethodInfo;
 import org.e2immu.language.cst.api.info.MethodModifier;
 import org.e2immu.language.cst.api.info.ParameterInfo;
 import org.e2immu.language.cst.api.statement.Block;
 import org.e2immu.language.cst.api.type.ParameterizedType;
-import org.e2immu.language.cst.api.type.TypeParameter;
-import org.e2immu.language.cst.api.variable.LocalVariable;
+import org.e2immu.language.cst.api.info.TypeParameter;
 import org.e2immu.language.cst.impl.type.DiamondEnum;
 import org.e2immu.language.cst.impl.variable.LocalVariableImpl;
 import org.e2immu.support.SetOnce;

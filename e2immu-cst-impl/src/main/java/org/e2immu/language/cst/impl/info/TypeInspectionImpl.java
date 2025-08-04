@@ -3,7 +3,7 @@ package org.e2immu.language.cst.impl.info;
 import org.e2immu.language.cst.api.info.*;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.type.TypeNature;
-import org.e2immu.language.cst.api.type.TypeParameter;
+import org.e2immu.language.cst.api.info.TypeParameter;
 
 import java.util.*;
 import java.util.stream.Stream;

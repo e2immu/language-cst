@@ -388,13 +388,7 @@ public interface Factory {
 
     TypeInfo newTypeInfo(CompilationUnit cu, String simpleName);
 
-    default TypeParameter newTypeParameter(int index, String simpleName, Info owner) {
-        return newTypeParameter(List.of(), List.of(), index, simpleName, owner);
-    }
-
-    TypeParameter newTypeParameter(List<Comment> comments,
-                                   List<AnnotationExpression> annotations,
-                                   int index, String simpleName, Info owner);
+    TypeParameter newTypeParameter(int index, String simpleName, Info owner);
 
     TypePrinter newTypePrinter(TypeInfo typeInfo, boolean formatter2);
 
