@@ -38,6 +38,8 @@ public interface TypeParameter extends NamedType, Info {
 
     Builder builder();
 
+    boolean hasBeenInspected();
+
     TypeParameter withOwnerVariableTypeBounds(MethodInfo methodInfo);
 
     TypeParameter withOwnerVariableTypeBounds(TypeInfo typeInfo);

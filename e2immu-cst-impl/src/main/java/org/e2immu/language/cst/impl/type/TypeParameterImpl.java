@@ -52,6 +52,7 @@ public class TypeParameterImpl extends InfoImpl implements TypeParameter {
         this.inspection.setFinal(typeParameterInspection);
     }
 
+    @Override
     public boolean hasBeenInspected() {
         return this.inspection.isFinal();
     }
