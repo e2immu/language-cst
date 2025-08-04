@@ -3,7 +3,6 @@ package org.e2immu.language.cst.impl.info;
 import org.e2immu.language.cst.api.info.*;
 import org.e2immu.language.cst.api.type.ParameterizedType;
 import org.e2immu.language.cst.api.type.TypeNature;
-import org.e2immu.language.cst.api.info.TypeParameter;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -286,10 +285,14 @@ public class TypeInspectionImpl extends InspectionImpl implements TypeInspection
                     fieldsAccessedInRestOfPrimaryType, enclosingMethod, List.copyOf(permittedWhenSealed),
                     superTypesExcludingJavaLangObject(), anonymousTypes);
             if (ti.parentClass() == null
-                    && !typeInfo.isJavaLangObject()
-                    && typeNature != TypeNatureEnum.PRIMITIVE) {
+                && !typeInfo.isJavaLangObject()
+                && typeNature != TypeNatureEnum.PRIMITIVE) {
                 throw new UnsupportedOperationException("Cannot commit. Type " + typeInfo + " has a null parent class, and it is not JLO. Its type nature is " + ti.typeNature());
             }
+            assert !ti.typeNature().isEnum()
+                   || "java.lang.Enum".equals(ti.parentClass().typeInfo().fullyQualifiedName());
+            assert !ti.typeNature().isAnnotation()
+                   || "java.lang.annotation.Annotation".equals(ti.interfacesImplemented().getFirst().typeInfo().fullyQualifiedName());
             typeInfo.commit(ti);
         }
 
@@ -348,9 +351,9 @@ public class TypeInspectionImpl extends InspectionImpl implements TypeInspection
                 Access fromEnclosing = enclosingType.access();
                 if (fromEnclosing == null) {
                     throw new UnsupportedOperationException("Trying to compute access of " + typeInfo
-                            + " (from modifiers: " + fromModifiers
-                            + "), but access of enclosing type "
-                            + enclosingType + " not yet set.");
+                                                            + " (from modifiers: " + fromModifiers
+                                                            + "), but access of enclosing type "
+                                                            + enclosingType + " not yet set.");
                 }
                 Access combined = fromEnclosing.combine(fromModifiers);
                 setAccess(combined);
