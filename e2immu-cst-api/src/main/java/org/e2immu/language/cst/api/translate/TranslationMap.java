@@ -7,10 +7,10 @@ import org.e2immu.language.cst.api.expression.MethodCall;
 import org.e2immu.language.cst.api.info.FieldInfo;
 import org.e2immu.language.cst.api.info.MethodInfo;
 import org.e2immu.language.cst.api.info.TypeInfo;
+import org.e2immu.language.cst.api.info.TypeParameter;
 import org.e2immu.language.cst.api.statement.Statement;
 import org.e2immu.language.cst.api.type.ParameterizedType;
-import org.e2immu.language.cst.api.info.TypeParameter;
-import org.e2immu.language.cst.api.variable.*;
+import org.e2immu.language.cst.api.variable.Variable;
 
 import java.util.*;
 import java.util.function.BiConsumer;
@@ -180,8 +180,12 @@ public interface TranslationMap {
             @Override
             public BiConsumer<List<T>, T> accumulator() {
                 return (list, t) -> {
-                    T inOriginal = original.get(list.size());
-                    changes |= inOriginal != t;
+                    if (list.size() < original.size()) {
+                        T inOriginal = original.get(list.size());
+                        changes |= inOriginal != t;
+                    } else {
+                        changes = true;
+                    }
                     list.add(t);
                 };
             }
