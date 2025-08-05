@@ -10,7 +10,10 @@ import org.e2immu.language.cst.api.output.Qualification;
 import org.e2immu.language.cst.api.runtime.Predefined;
 import org.e2immu.language.cst.api.runtime.PredefinedWithoutParameterizedType;
 import org.e2immu.language.cst.api.translate.TranslationMap;
-import org.e2immu.language.cst.api.type.*;
+import org.e2immu.language.cst.api.type.Diamond;
+import org.e2immu.language.cst.api.type.NamedType;
+import org.e2immu.language.cst.api.type.ParameterizedType;
+import org.e2immu.language.cst.api.type.Wildcard;
 import org.e2immu.language.cst.impl.element.ElementImpl;
 import org.e2immu.language.cst.impl.output.QualificationImpl;
 
@@ -582,15 +585,16 @@ public class ParameterizedTypeImpl implements ParameterizedType {
     @Override
     public ParameterizedType applyTranslation(PredefinedWithoutParameterizedType predefined,
                                               Map<NamedType, ParameterizedType> translate) {
-        return applyTranslation(predefined, translate, 0);
+        return applyTranslation(predefined, translate, new HashSet<>());
     }
 
+    /*
+    Mono<R> is to be translated
+    the translation map maps R -> Function<Object, ? extends Mono<? extends R>>
+     */
     private ParameterizedType applyTranslation(PredefinedWithoutParameterizedType primitives,
                                                Map<NamedType, ParameterizedType> translate,
-                                               int recursionDepth) {
-        if (recursionDepth > 20) {
-            throw new IllegalArgumentException("Reached recursion depth");
-        }
+                                               Set<ParameterizedType> alreadyTranslated) {
         if (translate.isEmpty()) return this;
         ParameterizedType pt = this;
         if (pt.isTypeParameter()) {
@@ -611,9 +615,13 @@ public class ParameterizedTypeImpl implements ParameterizedType {
         final ParameterizedType stablePt = pt;
         if (stablePt.parameters().isEmpty()) return stablePt;
         List<ParameterizedType> recursivelyMappedParameters = stablePt.parameters().stream()
-                .map(x -> x == stablePt || x == this
-                        ? stablePt
-                        : ((ParameterizedTypeImpl) x).applyTranslation(primitives, translate, recursionDepth + 1))
+                .map(x -> {
+                    if (x == stablePt || x == this) return stablePt;
+                    if (alreadyTranslated.contains(x)) return WILDCARD_PARAMETERIZED_TYPE;
+                    Set<ParameterizedType> addToAlreadyTranslated = Stream.concat(Stream.of(x),
+                            alreadyTranslated.stream()).collect(Collectors.toUnmodifiableSet());
+                    return ((ParameterizedTypeImpl) x).applyTranslation(primitives, translate, addToAlreadyTranslated);
+                })
                 .map(x -> x.ensureBoxed(primitives))
                 .collect(Collectors.toList());
         if (stablePt.typeInfo() == null) {
