@@ -531,6 +531,8 @@ public class ParameterizedTypeImpl implements ParameterizedType {
         if (equals(other) || other == null) return this;
         if (isType() && typeInfo.isVoid()) return other;
         if (other.isType() && other.typeInfo().isVoid()) return this;
+        if (isUnboundWildcard()) return other;
+        if (other.isUnboundWildcard()) return this;
         if (isTypeParameter()) {
             if (other.isTypeParameter()) {
                 // a type parameter in the primary type has priority over another one
