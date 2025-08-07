@@ -230,7 +230,7 @@ public class TypeParameterImpl extends InfoImpl implements TypeParameter {
 
     @Override
     public JavaDoc javaDoc() {
-        throw new UnsupportedOperationException();
+       return null;
     }
 
     @Override
