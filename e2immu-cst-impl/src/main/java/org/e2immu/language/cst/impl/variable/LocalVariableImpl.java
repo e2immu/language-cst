@@ -33,7 +33,6 @@ public class LocalVariableImpl extends VariableImpl implements LocalVariable {
     public LocalVariableImpl(String name, ParameterizedType parameterizedType, Expression assignmentExpression) {
         super(parameterizedType);
         this.name = Objects.requireNonNull(name);
-        assert !name.equals(UNNAMED);
         this.assignmentExpression = assignmentExpression;
     }
 
