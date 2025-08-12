@@ -24,6 +24,12 @@ public class DetailedSourcesImpl implements DetailedSources {
         private IdentityHashMap<Object, Object> association;
 
         @Override
+        public Object getAssociated(Object pt) {
+            if (association == null) throw new UnsupportedOperationException();
+            return association.get(pt);
+        }
+
+        @Override
         public Builder addAll(DetailedSources detailedSources) {
             DetailedSourcesImpl dsi = (DetailedSourcesImpl) detailedSources;
             identityHashMap.putAll(dsi.identityHashMap);
@@ -68,9 +74,11 @@ public class DetailedSourcesImpl implements DetailedSources {
 
         // used for the type without array [] [] parts
         @Override
-        public Builder putAssociatedObject(ParameterizedType from, ParameterizedType to) {
+        public Builder putWithArrayToWithoutArray(ParameterizedType withArray, ParameterizedType withoutArray) {
             if (association == null) association = new IdentityHashMap<>();
-            association.put(from, to);
+            assert withArray.arrays() > 0;
+            assert withoutArray.arrays() == 0;
+            association.put(withArray, withoutArray);
             return this;
         }
 

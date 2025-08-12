@@ -35,12 +35,16 @@ public interface DetailedSources {
 
         Builder copy();
 
+        Object getAssociated(Object pt);
+
         Builder put(Object object, Source source);
 
         DetailedSources build();
 
-        Builder putAssociatedObject(ParameterizedType from, ParameterizedType to);
+        // associated object
+        Builder putWithArrayToWithoutArray(ParameterizedType withArray, ParameterizedType withoutArray);
 
+        // associated object
         record TypeInfoSource(TypeInfo typeInfo, Source source) {}
         Builder putTypeQualification(TypeInfo typeInfo, List<TypeInfoSource> associatedList);
     }
